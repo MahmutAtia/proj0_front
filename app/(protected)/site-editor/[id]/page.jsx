@@ -29,6 +29,10 @@ const PersonalSiteEditorPage = ({ params }) => {
     const toast = useRef(null);
     const [hoveredBlock, setHoveredBlock] = useState(null);
 
+    // history
+    const [blockHistory, setBlockHistory] = useState({}); // Stores history of each block's content
+    const [historyIndex, setHistoryIndex] = useState({}); // Stores the current position in each block's history
+
     useEffect(() => {
         if (!resumeId) return;
         const fetchYaml = async () => {
@@ -92,8 +96,10 @@ const PersonalSiteEditorPage = ({ params }) => {
             const newBlockData = response.data;
 
             setYamlData(prevData => {
+                let previousBlockState;
                 const updatedBlocks = prevData.code_bloks.map(block => {
                     if (block.name === currentBlock.name) {
+                        previousBlockState = { html: block.html, css: block.css, js: block.js };
                         return {
                             ...block,
                             html: newBlockData.html || block.html,
@@ -113,6 +119,24 @@ const PersonalSiteEditorPage = ({ params }) => {
                         feedback: newBlockData.newFeedback || prevData.global.feedback
                     } : prevData.global;
 
+                // Update history if a change occurred
+                if (previousBlockState) {
+                    const newHistory = [previousBlockState, ...(blockHistory[currentBlock.name] || [])];
+                    setBlockHistory(prevHistory => ({
+                        ...prevHistory,
+                        [currentBlock.name]: newHistory,
+                    }));
+                    setHistoryIndex(prevIndex => ({
+                        ...prevIndex,
+                        [currentBlock.name]: 0,
+                    }));
+
+
+                    console.log(`[${currentBlock.name}] History after edit:`, newHistory);
+                    console.log(`[${currentBlock.name}] History Index after edit:`, 0);
+
+                }
+
                 return {
                     ...prevData,
                     global: updatedGlobal,
@@ -126,11 +150,71 @@ const PersonalSiteEditorPage = ({ params }) => {
         } catch (err) {
             console.error("Error calling AI endpoint:", err);
             toast.current?.show({ severity: 'error', summary: 'Error', detail: `Failed to update ${currentBlock?.name}.`, life: 5000 });
-            // DO NOT set the component-level error state here
             toast.current?.show({ severity: 'error', summary: 'Error', detail: `Failed to update ${currentBlock?.name}.`, life: 5000 });
         } finally {
             setIsAiProcessing(false);
         }
+    };
+
+    const rollbackBlock = (blockName) => {
+        console.log(`[${blockName}] Rollback - Current Index:`, currentIndex);
+        console.log(`[${blockName}] Rollback - History:`, history);
+        setYamlData(prevData => {
+            const currentIndex = historyIndex[blockName] || -1;
+            const history = blockHistory[blockName] || [];
+
+            if (currentIndex < history.length - 1) {
+                const nextIndex = currentIndex + 1;
+                const newState = history[nextIndex];
+                setHistoryIndex(prevIndex => ({
+                    ...prevIndex,
+                    [blockName]: nextIndex,
+                }));
+
+                const updatedBlocks = prevData.code_bloks.map(block => {
+                    if (block.name === blockName) {
+                        return { ...block, html: newState.html, css: newState.css, js: newState.js };
+                    }
+                    return block;
+                });
+                const updatedGlobal = prevData.global.name === blockName ?
+                    { ...prevData.global, html: newState.html, css: newState.css, js: newState.js } : prevData.global;
+
+                return { ...prevData, global: updatedGlobal, code_bloks: updatedBlocks };
+            }
+            return prevData; // No further rollback available
+        });
+    };
+    const forwardBlock = (blockName) => {
+        setYamlData(prevData => {
+            const currentIndex = historyIndex[blockName];
+            const history = blockHistory[blockName] || [];
+
+            console.log(`[${blockName}] Forward - Current Index:`, currentIndex);
+            console.log(`[${blockName}] Forward - History:`, history);
+
+
+            if (currentIndex > 0) {
+                const previousIndex = currentIndex - 1;
+                const newState = history[previousIndex];
+                setHistoryIndex(prevIndex => ({
+                    ...prevIndex,
+                    [blockName]: previousIndex,
+                }));
+
+                const updatedBlocks = prevData.code_bloks.map(block => {
+                    if (block.name === blockName) {
+                        return { ...block, html: newState.html, css: newState.css, js: newState.js };
+                    }
+                    return block;
+                });
+                const updatedGlobal = prevData.global.name === blockName ?
+                    { ...prevData.global, html: newState.html, css: newState.css, js: newState.js } : prevData.global;
+
+                return { ...prevData, global: updatedGlobal, code_bloks: updatedBlocks };
+            }
+            return prevData; // No further forward available
+        });
     };
 
     const handleArtifactKeyChange = (index, value) => {
@@ -185,11 +269,11 @@ const PersonalSiteEditorPage = ({ params }) => {
                     onMouseLeave={handleMouseLeave}
                     style={{ minHeight: '50px', outline: hoveredBlock === block.name ? '2px dashed var(--primary-color)' : 'none', transition: 'outline-color 0.2s' }}
                 >
-             <iframe
-    title={`Preview ${block.name}`}
-    style={{ width: '100%', border: 'none', minHeight: 'inherit' }}
-    sandbox="allow-scripts allow-same-origin"
-    srcDoc={`
+                    <iframe
+                        title={`Preview ${block.name}`}
+                        style={{ width: '100%', border: 'none', minHeight: 'inherit' }}
+                        sandbox="allow-scripts allow-same-origin"
+                        srcDoc={`
         <!DOCTYPE html>
         <html>
         <head>
@@ -211,27 +295,27 @@ const PersonalSiteEditorPage = ({ params }) => {
         </body>
         </html>
     `}
-    onLoad={(e) => {
-        try {
-            const iframe = e.target;
-            const body = iframe.contentDocument.body;
-            const htmlElement = iframe.contentDocument.documentElement;
+                        onLoad={(e) => {
+                            try {
+                                const iframe = e.target;
+                                const body = iframe.contentDocument.body;
+                                const htmlElement = iframe.contentDocument.documentElement;
 
-            // Calculate the maximum of scrollHeight and clientHeight to account for content and viewport
-            const contentHeight = Math.max(body.scrollHeight, body.offsetHeight, htmlElement.clientHeight, htmlElement.scrollHeight, htmlElement.offsetHeight);
+                                // Calculate the maximum of scrollHeight and clientHeight to account for content and viewport
+                                const contentHeight = Math.max(body.scrollHeight, body.offsetHeight, htmlElement.clientHeight, htmlElement.scrollHeight, htmlElement.offsetHeight);
 
-            // Get the computed styles of the body to account for margins
-            const bodyStyle = window.getComputedStyle(body);
-            const marginTop = parseInt(bodyStyle.marginTop, 10) || 0;
-            const marginBottom = parseInt(bodyStyle.marginBottom, 10) || 0;
+                                // Get the computed styles of the body to account for margins
+                                const bodyStyle = window.getComputedStyle(body);
+                                const marginTop = parseInt(bodyStyle.marginTop, 10) || 0;
+                                const marginBottom = parseInt(bodyStyle.marginBottom, 10) || 0;
 
-            iframe.style.height = `${contentHeight + marginTop + marginBottom}px`;
-        } catch (error) {
-            console.error("Error adjusting iframe height with margins:", error);
-        }
-    }}
-    scrolling="no"
-/>
+                                iframe.style.height = `${contentHeight + marginTop + marginBottom}px`;
+                            } catch (error) {
+                                console.error("Error adjusting iframe height with margins:", error);
+                            }
+                        }}
+                        scrolling="no"
+                    />
                     {hoveredBlock === block.name && (
                         <div
                             className="edit-overlay absolute top-0 right-0 p-2 flex flex-column align-items-end gap-2 z-1000"
@@ -250,14 +334,35 @@ const PersonalSiteEditorPage = ({ params }) => {
                                     <Tooltip target=".feedback-tooltip-target" />
                                 </React.Fragment>
                             )}
-                            <Button
-                                icon="pi pi-pencil"
-                                className="p-button-rounded p-button-secondary"
-                                onClick={() => openEditDialog(block)}
-                                tooltip={`Edit ${block.name}`}
-                                tooltipOptions={{ position: 'left' }}
-                                style={{ zIndex: 1001 }}
-                            />
+                            <div className="flex align-items-center gap-2">
+                                <Button
+                                    icon="pi pi-undo"
+                                    className="p-button-rounded p-button-secondary"
+                                    onClick={() => rollbackBlock(block.name)}
+                                    tooltip={`Rollback ${block.name}`}
+                                    tooltipOptions={{ position: 'left' }}
+                                    style={{ zIndex: 1001 }}
+                                    disabled={!(blockHistory[block.name]?.length > 1 && (historyIndex[block.name] || 0) < blockHistory[block.name].length - 1)}
+                                />
+                                <Button
+                                    icon="pi pi-redo"
+                                    className="p-button-rounded p-button-secondary"
+                                    onClick={() => forwardBlock(block.name)}
+                                    tooltip={`Forward ${block.name}`}
+                                    tooltipOptions={{ position: 'left' }}
+                                    style={{ zIndex: 1001 }}
+                                    disabled={!(historyIndex[block.name] > 0)}
+                                />
+
+                                <Button
+                                    icon="pi pi-pencil"
+                                    className="p-button-rounded p-button-secondary"
+                                    onClick={() => openEditDialog(block)}
+                                    tooltip={`Edit ${block.name}`}
+                                    tooltipOptions={{ position: 'left' }}
+                                    style={{ zIndex: 1001 }}
+                                />
+                            </div>
                         </div>
                     )}
                 </div>
