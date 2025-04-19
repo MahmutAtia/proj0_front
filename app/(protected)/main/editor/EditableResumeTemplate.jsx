@@ -218,6 +218,13 @@ const EditableResumeTemplate = ({ resumeId }) => {
                 <h1 className="text-2xl font-semibold m-0">Resume Editor</h1>
                 <div className="flex gap-2">
                     <Button
+                        icon="pi pi-globe"
+                        label='Generate Website'
+                        className="p-button-outlined"
+                        onClick={() => router.push(`/generate_site/${resumeId}`)}
+                    />
+
+                    <Button
                         icon="pi pi-download"
                         label="Export"
                         className="p-button-outlined"
