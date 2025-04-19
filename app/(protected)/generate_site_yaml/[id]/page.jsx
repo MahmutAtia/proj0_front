@@ -181,10 +181,10 @@ const GenerateWebsiteForm = ({ params }) => {
                 }
             );
 
-            if (response.data && response.data.website_url) {
+            if (response.data && response.data.website_uuid) {
                 showSuccess("Website generated successfully! Redirecting...");
                 setTimeout(() => {
-                    window.location.href = response.data.website_url;
+                    router.push(`/site-editor/${response.data.website_uuid}/`);
                 }, 1500);
             } else if (response.data && response.data.error) {
                 console.error("Error generating website:", response.data.error);

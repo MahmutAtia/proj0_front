@@ -1,10 +1,11 @@
 "use client";
 
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import axios from 'axios';
 import { Dialog } from 'primereact/dialog';
 import { Button } from 'primereact/button';
 import { ProgressSpinner } from 'primereact/progressspinner';
+import { ConfirmDialog, confirmDialog } from 'primereact/confirmdialog'; // Import ConfirmDialog
 import { InputText } from 'primereact/inputtext';
 import { Tooltip } from 'primereact/tooltip';
 import { Toast } from 'primereact/toast';
@@ -16,6 +17,18 @@ const initialYamlState = {
     code_bloks: []
 };
 
+// Debounce helper function
+function debounce(func, wait) {
+    let timeout;
+    return function executedFunction(...args) {
+        const later = () => {
+            clearTimeout(timeout);
+            func(...args);
+        };
+        clearTimeout(timeout);
+        timeout = setTimeout(later, wait);
+    };
+}
 const PersonalSiteEditorPage = ({ params }) => {
     const resumeId = params.id;
     const [yamlData, setYamlData] = useState(initialYamlState);
@@ -34,47 +47,166 @@ const PersonalSiteEditorPage = ({ params }) => {
     const [historyIndex, setHistoryIndex] = useState({}); // Stores the index of the current state in the history array
 
 
+    // New State for Save & Local Storage & Unsaved Changes
+    const [isSaving, setIsSaving] = useState(false);
+    const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
+    const initialDataRef = useRef(null); // To compare for unsaved changes
+    const [isRestoring, setIsRestoring] = useState(false); // Flag during restore confirmation
+
+    // --- Local Storage Key ---
+    const getLocalStorageKey = useCallback(() => `personalSiteEditorBackup_${resumeId}`, [resumeId]);
+    // --- Helper to Initialize History --- (Run after setting yamlData)
+    const initializeHistory = useCallback((data) => {
+        if (!data || !data.code_bloks) return;
+        const initialHistory = {};
+        const initialIndices = {};
+        data.code_bloks.forEach(block => {
+            const initialState = { html: block.html, css: block.css, js: block.js };
+            initialHistory[block.name] = [initialState];
+            initialIndices[block.name] = 0;
+        });
+        if (data.global) {
+            const globalInitialState = { html: data.global.html, css: data.global.css, js: data.global.js };
+            initialHistory[data.global.name] = [globalInitialState];
+            initialIndices[data.global.name] = 0;
+        }
+        setBlockHistory(initialHistory);
+        setHistoryIndex(initialIndices);
+        console.log("History Initialized:", initialHistory);
+    }, []); // No dependencies needed if it only uses the 'data' argument
+
+
+
+    // --- Initial Load & Restore Logic ---
     useEffect(() => {
-        if (!resumeId) return;
-        const fetchYaml = async () => {
+        if (!resumeId || isRestoring) return; // Don't run if no ID or during restore prompt
+
+        const localStorageKey = getLocalStorageKey();
+        const backup = localStorage.getItem(localStorageKey);
+
+        const processFetchedData = (fetchedData) => {
+            setYamlData(fetchedData);
+            initialDataRef.current = JSON.stringify(fetchedData); // Store initial state for comparison
+            initializeHistory(fetchedData); // Initialize history based on fetched data
+            setHasUnsavedChanges(false); // Fresh data has no unsaved changes
+            setLoading(false);
+        };
+
+        const fetchAndProcess = async () => {
             setLoading(true);
             setError(null);
             try {
                 const response = await axios.get(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/website-yaml/${resumeId}`);
-                const fetchedData = response.data;
-                setYamlData(fetchedData);
-
-                // Initialize history for each block
-                const initialHistory = {};
-                const initialIndices = {};
-                fetchedData.code_bloks.forEach(block => {
-                    const initialState = { html: block.html, css: block.css, js: block.js };
-                    initialHistory[block.name] = [initialState]; // Start history with the initial fetched state
-                    initialIndices[block.name] = 0; // Current state is the first (and only) one at index 0
-                });
-                // Optionally handle global block history if needed
-                if (fetchedData.global) {
-                    const globalInitialState = { html: fetchedData.global.html, css: fetchedData.global.css, js: fetchedData.global.js };
-                    initialHistory[fetchedData.global.name] = [globalInitialState];
-                    initialIndices[fetchedData.global.name] = 0;
-                }
-
-                setBlockHistory(initialHistory);
-                setHistoryIndex(initialIndices);
-
-                console.log("Initial History Set:", initialHistory);
-                console.log("Initial Indices Set:", initialIndices);
-
+                processFetchedData(response.data);
             } catch (err) {
                 console.error("Error fetching YAML:", err);
-                setError("Failed to load website data. Please try again.");
+                setError("Failed to load website data.");
                 toast.current?.show({ severity: 'error', summary: 'Error', detail: 'Failed to load website data.', life: 5000 });
-            } finally {
-                setLoading(false);
+                setLoading(false); // Stop loading on error
             }
         };
-        fetchYaml();
-    }, [resumeId]);
+
+        if (backup) {
+            setIsRestoring(true); // Set flag to prevent re-triggering
+            confirmDialog({
+                message: 'You have unsaved changes from a previous session. Do you want to restore them?',
+                header: 'Restore Session?',
+                icon: 'pi pi-exclamation-triangle',
+                acceptLabel: 'Restore',
+                rejectLabel: 'Discard & Load Saved',
+                accept: () => {
+                    try {
+                        const parsedBackup = JSON.parse(backup);
+                        setYamlData(parsedBackup);
+                        initialDataRef.current = null; // Restored data IS unsaved compared to server
+                        initializeHistory(parsedBackup); // Init history from backup
+                        setHasUnsavedChanges(true); // Mark as having unsaved changes
+                        setLoading(false); // Stop loading
+                        toast.current?.show({ severity: 'info', summary: 'Restored', detail: 'Restored previous unsaved work.', life: 3000 });
+                    } catch (e) {
+                        console.error("Error parsing backup:", e);
+                        toast.current?.show({ severity: 'warn', summary: 'Restore Failed', detail: 'Could not parse local backup. Loading saved version.', life: 4000 });
+                        localStorage.removeItem(localStorageKey); // Remove corrupted backup
+                        fetchAndProcess(); // Fetch fresh data
+                    } finally {
+                        setIsRestoring(false);
+                    }
+                },
+                reject: () => {
+                    localStorage.removeItem(localStorageKey); // Remove backup if discarded
+                    toast.current?.show({ severity: 'info', summary: 'Discarded', detail: 'Discarded local changes. Loading saved version.', life: 3000 });
+                    fetchAndProcess(); // Fetch fresh data
+                    setIsRestoring(false);
+                }
+            });
+        } else {
+            fetchAndProcess(); // Fetch if no backup
+        }
+
+    }, [resumeId, getLocalStorageKey, initializeHistory, isRestoring]); // Dependencies
+
+    // --- Auto Save to Local Storage ---
+    const debouncedSaveToLocalStorage = useCallback(
+        debounce((data) => {
+            if (!loading && hasUnsavedChanges) { // Only save if loaded and changes exist
+                console.log("Auto-saving to local storage...");
+                const localStorageKey = getLocalStorageKey();
+                localStorage.setItem(localStorageKey, JSON.stringify(data));
+            }
+        }, 1500), // Debounce for 1.5 seconds
+        [loading, hasUnsavedChanges, getLocalStorageKey] // Dependencies for useCallback
+    );
+
+    useEffect(() => {
+        // Trigger debounce function when yamlData changes
+        debouncedSaveToLocalStorage(yamlData);
+    }, [yamlData, debouncedSaveToLocalStorage]);
+
+
+
+    // --- Manual Save to Backend ---
+    const handleSaveChanges = async () => {
+        setIsSaving(true);
+        try {
+            // Prepare data payload (send only necessary parts)
+            const payload = {
+                global: yamlData.global,
+                code_bloks: yamlData.code_bloks
+            };
+            await axios.put(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/website-yaml/update/${resumeId}/`, payload); // Use PUT for overwrite
+
+            const localStorageKey = getLocalStorageKey();
+            localStorage.removeItem(localStorageKey); // Clear backup on successful save
+            initialDataRef.current = JSON.stringify(yamlData); // Update the reference for "saved" state
+            setHasUnsavedChanges(false); // Mark changes as saved
+            toast.current?.show({ severity: 'success', summary: 'Saved', detail: 'Website changes saved successfully!', life: 3000 });
+
+        } catch (err) {
+            console.error("Error saving changes:", err);
+            let detail = 'Failed to save changes to the server.';
+            if (err.response?.data?.detail) {
+                detail += ` Error: ${err.response.data.detail}`;
+            }
+            toast.current?.show({ severity: 'error', summary: 'Save Error', detail: detail, life: 5000 });
+            // Keep hasUnsavedChanges as true if save failed
+        } finally {
+            setIsSaving(false);
+        }
+    };
+
+
+    // --- Modify functions that change yamlData to set hasUnsavedChanges ---
+    const updateYamlDataAndHistory = (blockName, newState, newFeedback) => {
+        // Logic to update yamlData, blockHistory, historyIndex
+        // ... (as implemented in previous steps for AI edit, rollback, forward) ...
+
+        // ** Add this line in handleAIEditSubmit, rollbackBlock, forwardBlock
+        // ** AFTER the state updates are scheduled
+        setHasUnsavedChanges(true);
+    };
+
+
+
 
     const handleMouseEnter = (blockName) => {
         setHoveredBlock(blockName);
@@ -84,16 +216,16 @@ const PersonalSiteEditorPage = ({ params }) => {
         setHoveredBlock(null);
     };
 
-    const openEditDialog = (block) => {
+    // --- AI Dialog Handlers ---
+    const openEditDialog = (block) => { // Now accepts any block object
         setCurrentBlock(block);
-        setAiPrompt('');
-        setArtifacts([{ key: '', value: '' }]);
+        setAiPrompt(''); // Reset prompt for new dialog opening
+        setArtifacts([{ key: '', value: '' }]); // Reset artifacts
         setIsAiDialogOpen(true);
     };
-
     const closeEditDialog = () => {
         setIsAiDialogOpen(false);
-        setCurrentBlock(null);
+        setCurrentBlock(null); // Clear current block on close
         setAiPrompt('');
         setArtifacts([{ key: '', value: '' }]);
     };
@@ -202,6 +334,9 @@ const PersonalSiteEditorPage = ({ params }) => {
                 };
             });
 
+            // --- Mark changes as unsaved ---
+            setHasUnsavedChanges(true);
+
             toast.current?.show({ severity: 'success', summary: 'Success', detail: `${blockName} updated!`, life: 3000 });
             closeEditDialog();
 
@@ -211,9 +346,9 @@ const PersonalSiteEditorPage = ({ params }) => {
             // Improved error message
             let detailMessage = `Failed to update ${blockNameToToast}.`;
             if (err.response?.data?.detail) {
-                 detailMessage += ` Server Error: ${err.response.data.detail}`;
+                detailMessage += ` Server Error: ${err.response.data.detail}`;
             } else if (err.message) {
-                 detailMessage += ` Error: ${err.message}`;
+                detailMessage += ` Error: ${err.message}`;
             }
             toast.current?.show({ severity: 'error', summary: 'Error', detail: detailMessage, life: 6000 });
         } finally {
@@ -221,7 +356,7 @@ const PersonalSiteEditorPage = ({ params }) => {
         }
     };
 
-const rollbackBlock = (blockName) => {
+    const rollbackBlock = (blockName) => {
         const history = blockHistory[blockName] || [];
         const currentIndex = historyIndex[blockName];
 
@@ -255,6 +390,9 @@ const rollbackBlock = (blockName) => {
                 [blockName]: previousIndex,
             }));
 
+            // --- Mark changes as unsaved ---
+            setHasUnsavedChanges(true);
+
             toast.current?.show({ severity: 'info', summary: 'Rolled Back', detail: `Rolled back ${blockName}`, life: 1500 });
 
         } else {
@@ -280,11 +418,11 @@ const rollbackBlock = (blockName) => {
                 const updatedBlocks = prevData.code_bloks.map(block => {
                     if (block.name === blockName) {
                         // Restore html, css, js from the next state
-                         return { ...block, ...nextState };
+                        return { ...block, ...nextState };
                     }
                     return block;
                 });
-                 const updatedGlobal = prevData.global.name === blockName ?
+                const updatedGlobal = prevData.global.name === blockName ?
                     { ...prevData.global, ...nextState } : prevData.global;
 
                 return { ...prevData, global: updatedGlobal, code_bloks: updatedBlocks };
@@ -296,10 +434,13 @@ const rollbackBlock = (blockName) => {
                 [blockName]: nextIndex,
             }));
 
+            // --- Mark changes as unsaved ---
+            setHasUnsavedChanges(true);
+
             toast.current?.show({ severity: 'info', summary: 'Forwarded', detail: `Forwarded ${blockName}`, life: 1500 });
         } else {
             console.log(`[${blockName}] Forward impossible: Already at the latest state.`);
-             toast.current?.show({ severity: 'warn', summary: 'Latest State', detail: `Already at the latest version of ${blockName}`, life: 2000 });
+            toast.current?.show({ severity: 'warn', summary: 'Latest State', detail: `Already at the latest version of ${blockName}`, life: 2000 });
         }
     };
 
@@ -325,7 +466,8 @@ const rollbackBlock = (blockName) => {
     };
 
 
-    if (loading) {
+    // --- Render Logic ---
+    if (loading && !isRestoring) { // Show loading only if not handling restore prompt
         return (
             <div className="flex justify-content-center align-items-center min-h-screen">
                 <ProgressSpinner />
@@ -333,6 +475,7 @@ const rollbackBlock = (blockName) => {
             </div>
         );
     }
+
 
     if (error) {
         return (
@@ -346,6 +489,19 @@ const rollbackBlock = (blockName) => {
     return (
         <div className="personal-site-editor relative">
             <Toast ref={toast} />
+            <ConfirmDialog /> {/* Add this for the restore prompt */}
+
+            {/* --- Render the Toolbar --- */}
+            {!loading && yamlData.global && ( // Render toolbar only when data is loaded
+                <EditorToolbar
+                    resumeId={resumeId}
+                    onSave={handleSaveChanges}
+                    isSaving={isSaving}
+                    hasUnsavedChanges={hasUnsavedChanges}
+                    onEditGlobal={() => openEditDialog(yamlData.global)} // Pass global block
+                />
+            )}
+
 
             {yamlData.code_bloks.map((block, index) => (
                 <div
@@ -420,27 +576,27 @@ const rollbackBlock = (blockName) => {
                                     <Tooltip target=".feedback-tooltip-target" />
                                 </React.Fragment>
                             )}
-                          <div className="flex align-items-center gap-2">
-                        <Button
-                            icon="pi pi-undo"
-                            className="p-button-rounded p-button-secondary"
-                            onClick={() => rollbackBlock(block.name)}
-                            tooltip={`Rollback ${block.name}`}
-                            tooltipOptions={{ position: 'left' }}
-                            style={{ zIndex: 1001 }}
-                            // Disable if history doesn't exist or index is 0 (or less)
-                            disabled={!blockHistory[block.name] || (historyIndex[block.name] ?? 0) <= 0}
-                        />
-                        <Button
-                            icon="pi pi-redo"
-                            className="p-button-rounded p-button-secondary"
-                            onClick={() => forwardBlock(block.name)}
-                            tooltip={`Forward ${block.name}`}
-                            tooltipOptions={{ position: 'left' }}
-                            style={{ zIndex: 1001 }}
-                            // Disable if history doesn't exist or index is already the last one
-                            disabled={!blockHistory[block.name] || (historyIndex[block.name] ?? 0) >= blockHistory[block.name].length - 1}
-                        />
+                            <div className="flex align-items-center gap-2">
+                                <Button
+                                    icon="pi pi-undo"
+                                    className="p-button-rounded p-button-secondary"
+                                    onClick={() => rollbackBlock(block.name)}
+                                    tooltip={`Rollback ${block.name}`}
+                                    tooltipOptions={{ position: 'left' }}
+                                    style={{ zIndex: 1001 }}
+                                    // Disable if history doesn't exist or index is 0 (or less)
+                                    disabled={!blockHistory[block.name] || (historyIndex[block.name] ?? 0) <= 0}
+                                />
+                                <Button
+                                    icon="pi pi-redo"
+                                    className="p-button-rounded p-button-secondary"
+                                    onClick={() => forwardBlock(block.name)}
+                                    tooltip={`Forward ${block.name}`}
+                                    tooltipOptions={{ position: 'left' }}
+                                    style={{ zIndex: 1001 }}
+                                    // Disable if history doesn't exist or index is already the last one
+                                    disabled={!blockHistory[block.name] || (historyIndex[block.name] ?? 0) >= blockHistory[block.name].length - 1}
+                                />
                                 <Button
                                     icon="pi pi-pencil"
                                     className="p-button-rounded p-button-secondary"
@@ -534,3 +690,73 @@ const rollbackBlock = (blockName) => {
 };
 
 export default PersonalSiteEditorPage;
+
+
+
+
+const EditorToolbar = ({
+    resumeId,
+    onSave,
+    isSaving,
+    hasUnsavedChanges, // New prop to indicate pending changes
+    onEditGlobal
+}) => {
+    // Construct the URL for the live site preview
+    // Ensure the base URL ends with a slash if needed, or adjust accordingly
+    const siteUrl = `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/${resumeId}/`;
+
+    return (
+        <div className="p-3 surface-ground border-bottom-1 surface-border flex flex-wrap justify-content-between align-items-center sticky top-0 z-5 gap-2" style={{ zIndex: 1010 }}> {/* Higher z-index */}
+            {/* Left Side: Global Edit */}
+            <div>
+                <Button
+                    label="Edit Global Settings"
+                    icon="pi pi-cog"
+                    className="p-button-secondary p-button-sm"
+                    onClick={onEditGlobal}
+                    tooltip="Edit sitewide CSS, JS, or Head HTML"
+                    tooltipOptions={{ position: 'bottom' }}
+                />
+            </div>
+
+            {/* Right Side: View Site & Save */}
+            <div className="flex align-items-center gap-2">
+                {/* Link to Live Site */}
+                <a href={siteUrl} target="_blank" rel="noopener noreferrer" style={{ textDecoration: 'none' }}>
+                    <Button
+                        label="View My Site"
+                        icon="pi pi-external-link"
+                        className="p-button-outlined p-button-sm"
+                        tooltip="Open your generated website in a new tab"
+                        tooltipOptions={{ position: 'bottom' }}
+                    />
+                </a>
+
+                {/* Save Button */}
+                <Button
+                    label={isSaving ? 'Saving...' : 'Save Changes'}
+                    icon={isSaving ? <ProgressSpinner style={{ width: '18px', height: '18px' }} strokeWidth="8" /> : "pi pi-save"}
+                    className="p-button-sm p-button-success" // Make save button prominent
+                    onClick={onSave}
+                    disabled={isSaving || !hasUnsavedChanges} // Disable if saving or no changes
+                    tooltip={hasUnsavedChanges ? "Save your latest changes to the server" : "No changes to save"}
+                    tooltipOptions={{ position: 'bottom' }}
+                />
+                {/* Optional: Visual indicator for unsaved changes */}
+                {hasUnsavedChanges && !isSaving && (
+                    <i className="pi pi-circle-fill text-orange-500 p-ml-1 animation-pulse" style={{ fontSize: '0.7rem' }} title="Unsaved changes"></i>
+                )}
+            </div>
+            <style jsx>{`
+                .animation-pulse {
+                    animation: pulse 1.5s infinite cubic-bezier(0.4, 0, 0.6, 1);
+                }
+                @keyframes pulse {
+                    0%, 100% { opacity: 1; }
+                    50% { opacity: .5; }
+                }
+            `}</style>
+        </div>
+    );
+};
+

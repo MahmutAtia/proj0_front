@@ -221,7 +221,7 @@ const EditableResumeTemplate = ({ resumeId }) => {
                         icon="pi pi-globe"
                         label='Generate Website'
                         className="p-button-outlined"
-                        onClick={() => router.push(`/generate_site/${resumeId}`)}
+                        onClick={() => router.push(`/generate_site_yaml/${resumeId}`)}
                     />
 
                     <Button
