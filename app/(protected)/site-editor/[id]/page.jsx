@@ -71,24 +71,89 @@ const PersonalSiteEditorPage = ({ params }) => {
     };
 
     const handleAIEditSubmit = async () => {
-        // ... AI Edit Logic ...
+        if (!currentBlock || !aiPrompt.trim()) {
+            toast.current?.show({ severity: 'warn', summary: 'Warning', detail: 'Please select a block and enter a prompt.', life: 3000 });
+            return;
+        }
+
+        setIsAiProcessing(true);
+        try {
+            const validArtifacts = artifacts.filter(art => art.key.trim() !== '');
+            const response = await axios.post(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/website-yaml/edit-block/`, {
+                resumeId: resumeId,
+                blockName: currentBlock.name,
+                currentHtml: currentBlock.html,
+                currentCss: currentBlock.css,
+                currentJs: currentBlock.js,
+                prompt: aiPrompt,
+                artifacts: validArtifacts,
+            });
+
+            const newBlockData = response.data;
+
+            setYamlData(prevData => {
+                const updatedBlocks = prevData.code_bloks.map(block => {
+                    if (block.name === currentBlock.name) {
+                        return {
+                            ...block,
+                            html: newBlockData.html || block.html,
+                            css: newBlockData.css || block.css,
+                            js: newBlockData.js || block.js,
+                            feedback: newBlockData.feedback || block.feedback
+                        };
+                    }
+                    return block;
+                });
+                const updatedGlobal = prevData.global.name === currentBlock.name ?
+                    {
+                        ...prevData.global,
+                        html: newBlockData.newHtml || prevData.global.html,
+                        css: newBlockData.newCss || prevData.global.css,
+                        js: newBlockData.newJs || prevData.global.js,
+                        feedback: newBlockData.newFeedback || prevData.global.feedback
+                    } : prevData.global;
+
+                return {
+                    ...prevData,
+                    global: updatedGlobal,
+                    code_bloks: updatedBlocks
+                };
+            });
+
+            toast.current?.show({ severity: 'success', summary: 'Success', detail: `${currentBlock.name} updated!`, life: 3000 });
+            closeEditDialog();
+
+        } catch (err) {
+            console.error("Error calling AI endpoint:", err);
+            toast.current?.show({ severity: 'error', summary: 'Error', detail: `Failed to update ${currentBlock?.name}.`, life: 5000 });
+            // DO NOT set the component-level error state here
+            toast.current?.show({ severity: 'error', summary: 'Error', detail: `Failed to update ${currentBlock?.name}.`, life: 5000 });
+        } finally {
+            setIsAiProcessing(false);
+        }
     };
 
     const handleArtifactKeyChange = (index, value) => {
-        // ... Artifact Logic ...
+        const newArtifacts = [...artifacts];
+        newArtifacts[index].key = value;
+        setArtifacts(newArtifacts);
     };
 
     const handleArtifactValueChange = (index, value) => {
-        // ... Artifact Logic ...
+        const newArtifacts = [...artifacts];
+        newArtifacts[index].value = value;
+        setArtifacts(newArtifacts);
     };
 
     const addArtifactPair = () => {
-        // ... Artifact Logic ...
+        setArtifacts([...artifacts, { key: '', value: '' }]);
     };
 
     const removeArtifactPair = (index) => {
-        // ... Artifact Logic ...
+        const newArtifacts = artifacts.filter((_, i) => i !== index);
+        setArtifacts(newArtifacts);
     };
+
 
     if (loading) {
         return (
