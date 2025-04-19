@@ -30,8 +30,9 @@ const PersonalSiteEditorPage = ({ params }) => {
     const [hoveredBlock, setHoveredBlock] = useState(null);
 
     // history
-    const [blockHistory, setBlockHistory] = useState({}); // Stores history of each block's content
-    const [historyIndex, setHistoryIndex] = useState({}); // Stores the current position in each block's history
+    const [blockHistory, setBlockHistory] = useState({}); // Stores array of states {html, css, js} for each block
+    const [historyIndex, setHistoryIndex] = useState({}); // Stores the index of the current state in the history array
+
 
     useEffect(() => {
         if (!resumeId) return;
@@ -40,7 +41,30 @@ const PersonalSiteEditorPage = ({ params }) => {
             setError(null);
             try {
                 const response = await axios.get(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/website-yaml/${resumeId}`);
-                setYamlData(response.data);
+                const fetchedData = response.data;
+                setYamlData(fetchedData);
+
+                // Initialize history for each block
+                const initialHistory = {};
+                const initialIndices = {};
+                fetchedData.code_bloks.forEach(block => {
+                    const initialState = { html: block.html, css: block.css, js: block.js };
+                    initialHistory[block.name] = [initialState]; // Start history with the initial fetched state
+                    initialIndices[block.name] = 0; // Current state is the first (and only) one at index 0
+                });
+                // Optionally handle global block history if needed
+                if (fetchedData.global) {
+                    const globalInitialState = { html: fetchedData.global.html, css: fetchedData.global.css, js: fetchedData.global.js };
+                    initialHistory[fetchedData.global.name] = [globalInitialState];
+                    initialIndices[fetchedData.global.name] = 0;
+                }
+
+                setBlockHistory(initialHistory);
+                setHistoryIndex(initialIndices);
+
+                console.log("Initial History Set:", initialHistory);
+                console.log("Initial Indices Set:", initialIndices);
+
             } catch (err) {
                 console.error("Error fetching YAML:", err);
                 setError("Failed to load website data. Please try again.");
@@ -81,6 +105,8 @@ const PersonalSiteEditorPage = ({ params }) => {
         }
 
         setIsAiProcessing(true);
+        let responseData = null; // Initialize variable to hold response data
+
         try {
             const validArtifacts = artifacts.filter(art => art.key.trim() !== '');
             const response = await axios.post(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/website-yaml/edit-block/`, {
@@ -93,49 +119,81 @@ const PersonalSiteEditorPage = ({ params }) => {
                 artifacts: validArtifacts,
             });
 
-            const newBlockData = response.data;
+            // --- Correctly assign response data ---
+            responseData = response.data;
 
+            // --- Validate response data (basic check) ---
+            if (!responseData || typeof responseData !== 'object') {
+                console.error("Invalid response data structure:", responseData);
+                throw new Error("Received invalid data from AI edit endpoint.");
+            }
+
+            const blockName = currentBlock.name;
+
+            // --- Create the new state object using response data safely ---
+            const newState = {
+                html: responseData?.html ?? currentBlock.html, // Fallback to current if null/undefined
+                css: responseData?.css ?? currentBlock.css,   // Fallback to current
+                js: responseData?.js ?? currentBlock.js,     // Fallback to current
+            };
+            // --- Get the new feedback separately ---
+            const newFeedback = responseData?.feedback ?? currentBlock.feedback; // Fallback to current
+
+            let finalNewIndex = 0; // To store the calculated index
+
+            // --- Update History State ---
+            setBlockHistory(prevHistory => {
+                const currentHistory = prevHistory[blockName] || [];
+                // Use the current historyIndex state value for slicing
+                const currentIndex = historyIndex[blockName] ?? -1;
+
+                // Slice history up to the current index + 1
+                const relevantHistory = currentHistory.slice(0, currentIndex + 1);
+
+                // Add the new state object to the history
+                const updatedHistory = [...relevantHistory, newState]; // Add the CONTENT state
+
+                // --- Calculate the index of the newly added state ---
+                finalNewIndex = updatedHistory.length - 1;
+
+                console.log(`[${blockName}] History updated. New calculated index: ${finalNewIndex}`, updatedHistory);
+
+                return {
+                    ...prevHistory,
+                    [blockName]: updatedHistory,
+                };
+            });
+
+            // --- Update History Index State ---
+            // This setter receives the *calculated* finalNewIndex from the scope above
+            setHistoryIndex(prevIndex => {
+                console.log(`[${blockName}] Setting history index state to: ${finalNewIndex}`);
+                return {
+                    ...prevIndex,
+                    [blockName]: finalNewIndex
+                };
+            });
+
+            // --- Update Main Data State (yamlData) ---
+            // This needs to run to reflect the changes visually
             setYamlData(prevData => {
-                let previousBlockState;
+                console.log(`[${blockName}] Updating yamlData with newState and newFeedback.`);
                 const updatedBlocks = prevData.code_bloks.map(block => {
-                    if (block.name === currentBlock.name) {
-                        previousBlockState = { html: block.html, css: block.css, js: block.js };
+                    if (block.name === blockName) {
                         return {
                             ...block,
-                            html: newBlockData.html || block.html,
-                            css: newBlockData.css || block.css,
-                            js: newBlockData.js || block.js,
-                            feedback: newBlockData.feedback || block.feedback
+                            ...newState,      // Apply the new HTML, CSS, JS
+                            feedback: newFeedback // Apply the new feedback
                         };
                     }
                     return block;
                 });
-                const updatedGlobal = prevData.global.name === currentBlock.name ?
+                const updatedGlobal = prevData.global.name === blockName ?
                     {
                         ...prevData.global,
-                        html: newBlockData.newHtml || prevData.global.html,
-                        css: newBlockData.newCss || prevData.global.css,
-                        js: newBlockData.newJs || prevData.global.js,
-                        feedback: newBlockData.newFeedback || prevData.global.feedback
+                        ...newState,      // Apply the new HTML, CSS, JS
+                        feedback: newFeedback // Apply the new feedback
                     } : prevData.global;
-
-                // Update history if a change occurred
-                if (previousBlockState) {
-                    const newHistory = [previousBlockState, ...(blockHistory[currentBlock.name] || [])];
-                    setBlockHistory(prevHistory => ({
-                        ...prevHistory,
-                        [currentBlock.name]: newHistory,
-                    }));
-                    setHistoryIndex(prevIndex => ({
-                        ...prevIndex,
-                        [currentBlock.name]: 0,
-                    }));
-
-
-                    console.log(`[${currentBlock.name}] History after edit:`, newHistory);
-                    console.log(`[${currentBlock.name}] History Index after edit:`, 0);
-
-                }
 
                 return {
                     ...prevData,
@@ -144,77 +202,105 @@ const PersonalSiteEditorPage = ({ params }) => {
                 };
             });
 
-            toast.current?.show({ severity: 'success', summary: 'Success', detail: `${currentBlock.name} updated!`, life: 3000 });
+            toast.current?.show({ severity: 'success', summary: 'Success', detail: `${blockName} updated!`, life: 3000 });
             closeEditDialog();
 
         } catch (err) {
-            console.error("Error calling AI endpoint:", err);
-            toast.current?.show({ severity: 'error', summary: 'Error', detail: `Failed to update ${currentBlock?.name}.`, life: 5000 });
-            toast.current?.show({ severity: 'error', summary: 'Error', detail: `Failed to update ${currentBlock?.name}.`, life: 5000 });
+            console.error("Error during AI edit submission:", err);
+            const blockNameToToast = currentBlock?.name || 'Block';
+            // Improved error message
+            let detailMessage = `Failed to update ${blockNameToToast}.`;
+            if (err.response?.data?.detail) {
+                 detailMessage += ` Server Error: ${err.response.data.detail}`;
+            } else if (err.message) {
+                 detailMessage += ` Error: ${err.message}`;
+            }
+            toast.current?.show({ severity: 'error', summary: 'Error', detail: detailMessage, life: 6000 });
         } finally {
             setIsAiProcessing(false);
         }
     };
 
-    const rollbackBlock = (blockName) => {
-        console.log(`[${blockName}] Rollback - Current Index:`, currentIndex);
-        console.log(`[${blockName}] Rollback - History:`, history);
-        setYamlData(prevData => {
-            const currentIndex = historyIndex[blockName] || -1;
-            const history = blockHistory[blockName] || [];
+const rollbackBlock = (blockName) => {
+        const history = blockHistory[blockName] || [];
+        const currentIndex = historyIndex[blockName];
 
-            if (currentIndex < history.length - 1) {
-                const nextIndex = currentIndex + 1;
-                const newState = history[nextIndex];
-                setHistoryIndex(prevIndex => ({
-                    ...prevIndex,
-                    [blockName]: nextIndex,
-                }));
+        console.log(`[${blockName}] Rollback Attempt - Current Index: ${currentIndex}, History Length: ${history.length}`);
 
+        // Can rollback if the current index is greater than 0
+        if (currentIndex > 0) {
+            const previousIndex = currentIndex - 1;
+            const previousState = history[previousIndex];
+
+            console.log(`[${blockName}] Rolling back to Index: ${previousIndex}`);
+
+            // Update yamlData to the previous state
+            setYamlData(prevData => {
                 const updatedBlocks = prevData.code_bloks.map(block => {
                     if (block.name === blockName) {
-                        return { ...block, html: newState.html, css: newState.css, js: newState.js };
+                        // Restore html, css, js. Keep current feedback or restore it too if it's in history state
+                        return { ...block, ...previousState };
                     }
                     return block;
                 });
                 const updatedGlobal = prevData.global.name === blockName ?
-                    { ...prevData.global, html: newState.html, css: newState.css, js: newState.js } : prevData.global;
+                    { ...prevData.global, ...previousState } : prevData.global;
 
                 return { ...prevData, global: updatedGlobal, code_bloks: updatedBlocks };
-            }
-            return prevData; // No further rollback available
-        });
+            });
+
+            // Update the history index
+            setHistoryIndex(prevIndex => ({
+                ...prevIndex,
+                [blockName]: previousIndex,
+            }));
+
+            toast.current?.show({ severity: 'info', summary: 'Rolled Back', detail: `Rolled back ${blockName}`, life: 1500 });
+
+        } else {
+            console.log(`[${blockName}] Rollback impossible: Already at the beginning of history.`);
+            toast.current?.show({ severity: 'warn', summary: 'No More History', detail: `Cannot roll back ${blockName} further`, life: 2000 });
+        }
     };
     const forwardBlock = (blockName) => {
-        setYamlData(prevData => {
-            const currentIndex = historyIndex[blockName];
-            const history = blockHistory[blockName] || [];
+        const history = blockHistory[blockName] || [];
+        const currentIndex = historyIndex[blockName];
 
-            console.log(`[${blockName}] Forward - Current Index:`, currentIndex);
-            console.log(`[${blockName}] Forward - History:`, history);
+        console.log(`[${blockName}] Forward Attempt - Current Index: ${currentIndex}, History Length: ${history.length}`);
 
+        // Can forward if the current index is less than the last index in the history array
+        if (currentIndex < history.length - 1) {
+            const nextIndex = currentIndex + 1;
+            const nextState = history[nextIndex];
 
-            if (currentIndex > 0) {
-                const previousIndex = currentIndex - 1;
-                const newState = history[previousIndex];
-                setHistoryIndex(prevIndex => ({
-                    ...prevIndex,
-                    [blockName]: previousIndex,
-                }));
+            console.log(`[${blockName}] Forwarding to Index: ${nextIndex}`);
 
+            // Update yamlData to the next state
+            setYamlData(prevData => {
                 const updatedBlocks = prevData.code_bloks.map(block => {
                     if (block.name === blockName) {
-                        return { ...block, html: newState.html, css: newState.css, js: newState.js };
+                        // Restore html, css, js from the next state
+                         return { ...block, ...nextState };
                     }
                     return block;
                 });
-                const updatedGlobal = prevData.global.name === blockName ?
-                    { ...prevData.global, html: newState.html, css: newState.css, js: newState.js } : prevData.global;
+                 const updatedGlobal = prevData.global.name === blockName ?
+                    { ...prevData.global, ...nextState } : prevData.global;
 
                 return { ...prevData, global: updatedGlobal, code_bloks: updatedBlocks };
-            }
-            return prevData; // No further forward available
-        });
+            });
+
+            // Update the history index
+            setHistoryIndex(prevIndex => ({
+                ...prevIndex,
+                [blockName]: nextIndex,
+            }));
+
+            toast.current?.show({ severity: 'info', summary: 'Forwarded', detail: `Forwarded ${blockName}`, life: 1500 });
+        } else {
+            console.log(`[${blockName}] Forward impossible: Already at the latest state.`);
+             toast.current?.show({ severity: 'warn', summary: 'Latest State', detail: `Already at the latest version of ${blockName}`, life: 2000 });
+        }
     };
 
     const handleArtifactKeyChange = (index, value) => {
@@ -334,26 +420,27 @@ const PersonalSiteEditorPage = ({ params }) => {
                                     <Tooltip target=".feedback-tooltip-target" />
                                 </React.Fragment>
                             )}
-                            <div className="flex align-items-center gap-2">
-                                <Button
-                                    icon="pi pi-undo"
-                                    className="p-button-rounded p-button-secondary"
-                                    onClick={() => rollbackBlock(block.name)}
-                                    tooltip={`Rollback ${block.name}`}
-                                    tooltipOptions={{ position: 'left' }}
-                                    style={{ zIndex: 1001 }}
-                                    disabled={!(blockHistory[block.name]?.length > 1 && (historyIndex[block.name] || 0) < blockHistory[block.name].length - 1)}
-                                />
-                                <Button
-                                    icon="pi pi-redo"
-                                    className="p-button-rounded p-button-secondary"
-                                    onClick={() => forwardBlock(block.name)}
-                                    tooltip={`Forward ${block.name}`}
-                                    tooltipOptions={{ position: 'left' }}
-                                    style={{ zIndex: 1001 }}
-                                    disabled={!(historyIndex[block.name] > 0)}
-                                />
-
+                          <div className="flex align-items-center gap-2">
+                        <Button
+                            icon="pi pi-undo"
+                            className="p-button-rounded p-button-secondary"
+                            onClick={() => rollbackBlock(block.name)}
+                            tooltip={`Rollback ${block.name}`}
+                            tooltipOptions={{ position: 'left' }}
+                            style={{ zIndex: 1001 }}
+                            // Disable if history doesn't exist or index is 0 (or less)
+                            disabled={!blockHistory[block.name] || (historyIndex[block.name] ?? 0) <= 0}
+                        />
+                        <Button
+                            icon="pi pi-redo"
+                            className="p-button-rounded p-button-secondary"
+                            onClick={() => forwardBlock(block.name)}
+                            tooltip={`Forward ${block.name}`}
+                            tooltipOptions={{ position: 'left' }}
+                            style={{ zIndex: 1001 }}
+                            // Disable if history doesn't exist or index is already the last one
+                            disabled={!blockHistory[block.name] || (historyIndex[block.name] ?? 0) >= blockHistory[block.name].length - 1}
+                        />
                                 <Button
                                     icon="pi pi-pencil"
                                     className="p-button-rounded p-button-secondary"
