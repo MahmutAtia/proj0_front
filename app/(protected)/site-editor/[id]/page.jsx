@@ -106,42 +106,42 @@ const PersonalSiteEditorPage = ({ params }) => {
             }
         };
 
-        if (backup) {
-            setIsRestoring(true); // Set flag to prevent re-triggering
-            confirmDialog({
-                message: 'You have unsaved changes from a previous session. Do you want to restore them?',
-                header: 'Restore Session?',
-                icon: 'pi pi-exclamation-triangle',
-                acceptLabel: 'Restore',
-                rejectLabel: 'Discard & Load Saved',
-                accept: () => {
-                    try {
-                        const parsedBackup = JSON.parse(backup);
-                        setYamlData(parsedBackup);
-                        initialDataRef.current = null; // Restored data IS unsaved compared to server
-                        initializeHistory(parsedBackup); // Init history from backup
-                        setHasUnsavedChanges(true); // Mark as having unsaved changes
-                        setLoading(false); // Stop loading
-                        toast.current?.show({ severity: 'info', summary: 'Restored', detail: 'Restored previous unsaved work.', life: 3000 });
-                    } catch (e) {
-                        console.error("Error parsing backup:", e);
-                        toast.current?.show({ severity: 'warn', summary: 'Restore Failed', detail: 'Could not parse local backup. Loading saved version.', life: 4000 });
-                        localStorage.removeItem(localStorageKey); // Remove corrupted backup
-                        fetchAndProcess(); // Fetch fresh data
-                    } finally {
-                        setIsRestoring(false);
-                    }
-                },
-                reject: () => {
-                    localStorage.removeItem(localStorageKey); // Remove backup if discarded
-                    toast.current?.show({ severity: 'info', summary: 'Discarded', detail: 'Discarded local changes. Loading saved version.', life: 3000 });
-                    fetchAndProcess(); // Fetch fresh data
-                    setIsRestoring(false);
-                }
-            });
-        } else {
+        // if (backup) {
+        //     setIsRestoring(true); // Set flag to prevent re-triggering
+        //     confirmDialog({
+        //         message: 'You have unsaved changes from a previous session. Do you want to restore them?',
+        //         header: 'Restore Session?',
+        //         icon: 'pi pi-exclamation-triangle',
+        //         acceptLabel: 'Restore',
+        //         rejectLabel: 'Discard & Load Saved',
+        //         accept: () => {
+        //             try {
+        //                 const parsedBackup = JSON.parse(backup);
+        //                 setYamlData(parsedBackup);
+        //                 initialDataRef.current = null; // Restored data IS unsaved compared to server
+        //                 initializeHistory(parsedBackup); // Init history from backup
+        //                 setHasUnsavedChanges(true); // Mark as having unsaved changes
+        //                 setLoading(false); // Stop loading
+        //                 toast.current?.show({ severity: 'info', summary: 'Restored', detail: 'Restored previous unsaved work.', life: 3000 });
+        //             } catch (e) {
+        //                 console.error("Error parsing backup:", e);
+        //                 toast.current?.show({ severity: 'warn', summary: 'Restore Failed', detail: 'Could not parse local backup. Loading saved version.', life: 4000 });
+        //                 localStorage.removeItem(localStorageKey); // Remove corrupted backup
+        //                 fetchAndProcess(); // Fetch fresh data
+        //             } finally {
+        //                 setIsRestoring(false);
+        //             }
+        //         },
+        //         reject: () => {
+        //             localStorage.removeItem(localStorageKey); // Remove backup if discarded
+        //             toast.current?.show({ severity: 'info', summary: 'Discarded', detail: 'Discarded local changes. Loading saved version.', life: 3000 });
+        //             fetchAndProcess(); // Fetch fresh data
+        //             setIsRestoring(false);
+        //         }
+        //     });
+        // } else {
             fetchAndProcess(); // Fetch if no backup
-        }
+        // }
 
     }, [resumeId, getLocalStorageKey, initializeHistory, isRestoring]); // Dependencies
 
