@@ -519,6 +519,9 @@ const PersonalSiteEditorPage = ({ params }) => {
         <!DOCTYPE html>
         <html>
         <head>
+            <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      ${yamlData.global?.html || ''}
             <style>
                 /* Include a CSS reset or normalize here */
                 body, h1, h2, h3, p, ul, li { margin: 0; padding: 0; } /* Example reset */
@@ -526,15 +529,14 @@ const PersonalSiteEditorPage = ({ params }) => {
                 ${yamlData.global?.css || ''}
                 ${block.css || ''}
             </style>
-            ${yamlData.global?.html ? `<div style="display:none !important;" dangerouslySetInnerHTML={{ __html: '${yamlData.global.html}' }}></div>` : ''}
+
+
         </head>
-        <body style="margin: 0;">
             ${block.html || ''}
             <script>
                 ${yamlData.global?.js || ''}
                 ${block.js || ''}
             </script>
-        </body>
         </html>
     `}
                         onLoad={(e) => {
