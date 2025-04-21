@@ -82,6 +82,19 @@ const DashboardLayout = ({ children }) => {
     const { data: session, status } = useSession();
     const router = useRouter();
 
+
+    const [positionChanging, setPositionChanging] = useState(false);
+
+
+
+    // Add a new state to track accordion open/closed status
+    const [templatesAccordionOpen, setTemplatesAccordionOpen] = useState(true);
+
+    // Add a toggle function for the accordion
+    const toggleTemplatesAccordion = () => {
+        setTemplatesAccordionOpen(!templatesAccordionOpen);
+    };
+
     useEffect(() => {
         const fetchPositions = async () => {
             try {
@@ -131,8 +144,17 @@ const DashboardLayout = ({ children }) => {
         }
     }, [status, session, error, positions.length]);
 
+
+    // Modify your handlePositionSelect function
     const handlePositionSelect = (position) => {
-        setSelectedPosition(position);
+        // Set loading state
+        setPositionChanging(true);
+
+        // Simulate a brief delay for better UX
+        setTimeout(() => {
+            setSelectedPosition(position);
+            setPositionChanging(false);
+        }, 400); // 400ms delay is usually enough to notice but not annoy users
     };
 
     const handleTemplateSelect = (position, selectedItem, type = 'resume') => {
@@ -140,9 +162,9 @@ const DashboardLayout = ({ children }) => {
         const itemId = selectedItem.id;
         const positionId = position.id;
 
-// the correct path to navigate to the editor
-//`/main/editor/${selectedPosition.id}` #
-//`/main/editor/${selectedPosition.id}/${selectedItem.id} for documents`
+        // the correct path to navigate to the editor
+        //`/main/editor/${selectedPosition.id}` #
+        //`/main/editor/${selectedPosition.id}/${selectedItem.id} for documents`
 
         // Navigate to the editor page with the selected position and document type
         if (type === 'resume') {
@@ -171,42 +193,58 @@ const DashboardLayout = ({ children }) => {
                         <Ripple />
                     </a>
 
-                    {/* Templates Accordion - Always Open */}
+                    {/* Templates Accordion - With Toggle */}
                     <div className="mb-2">
-                        <div className="flex align-items-center cursor-pointer p-3 border-round text-700 bg-primary-100">
+                        <div
+                            className="flex align-items-center cursor-pointer p-3 border-round text-700 bg-primary-100"
+                            onClick={toggleTemplatesAccordion}
+                        >
                             <i className="pi pi-list mr-3"></i>
                             <span className="font-medium">Templates</span>
-                            <i className="pi pi-chevron-down ml-auto"></i>
+                            <i className={`pi ${templatesAccordionOpen ? 'pi-chevron-down' : 'pi-chevron-right'} ml-auto`}></i>
                         </div>
 
-                        {/* Positions List - Always Visible */}
-                        <div className="pl-3 pr-1 py-2 max-h-15rem overflow-y-auto">
-                            {loading ? (
-                                <div className="p-2 text-center">
-                                    <ProgressSpinner style={{width: '30px', height: '30px'}} />
-                                </div>
-                            ) : error ? (
-                                <div className="p-2 text-center text-red-600">
-                                    <i className="pi pi-exclamation-circle mr-2"></i>
-                                    Error loading positions
-                                </div>
-                            ) : positions.length === 0 ? (
-                                <div className="p-2 text-center text-700">
-                                    No positions available
-                                </div>
-                            ) : (
-                                positions.map(position => (
-                                    <div
-                                        key={position.id}
-                                        className={`p-2 border-round cursor-pointer flex align-items-center ${selectedPosition?.id === position.id ? 'bg-primary-50 text-primary-700' : 'text-700 hover:surface-hover'}`}
-                                        onClick={() => handlePositionSelect(position)}
-                                    >
-                                        <i className={`${position.icon || 'pi pi-briefcase'} mr-2 text-sm`}></i>
-                                        <span className="text-sm">{position.title}</span>
+                        {/* Positions List - Conditionally Visible */}
+                        {templatesAccordionOpen && (
+                            <div className="pl-3 pr-1 py-2 max-h-15rem overflow-y-auto">
+                                {loading ? (
+                                    <div className="p-2 text-center">
+                                        <ProgressSpinner style={{ width: '30px', height: '30px' }} />
                                     </div>
-                                ))
-                            )}
-                        </div>
+                                ) : error ? (
+                                    <div className="p-2 text-center text-red-600">
+                                        <i className="pi pi-exclamation-circle mr-2"></i>
+                                        Error loading positions
+                                    </div>
+                                ) : positions.length === 0 ? (
+                                    <div className="p-2 text-center text-700">
+                                        No positions available
+                                    </div>
+                                ) : (
+                                    positions.map(position => (
+                                        <div
+                                            key={position.id}
+                                            className={`p-2 border-round cursor-pointer flex align-items-center
+                            ${selectedPosition?.id === position.id ? 'bg-primary-50 text-primary-700' : 'text-700 hover:surface-hover'}
+                            ${positionChanging && 'position-selection' === position.id ? 'position-loading' : ''}`}
+                                            onClick={() => {
+                                                if (!positionChanging) {  // Prevent multiple rapid clicks
+                                                    // Add a temporary ID to track which position is being selected
+                                                    setPositionChanging('position-selection');
+                                                    handlePositionSelect(position);
+                                                }
+                                            }}
+                                        >
+                                            <i className={`${position.icon || 'pi pi-briefcase'} mr-2 text-sm`}></i>
+                                            <span className="text-sm">{position.title}</span>
+                                            {positionChanging && 'position-selection' === position.id && (
+                                                <i className="pi pi-spin pi-spinner ml-auto text-primary"></i>
+                                            )}
+                                        </div>
+                                    ))
+                                )}
+                            </div>
+                        )}
                     </div>
 
                     <a className="p-ripple flex align-items-center cursor-pointer p-3 border-round text-700 hover:surface-hover transition-duration-150 transition-colors mb-2">
@@ -250,7 +288,12 @@ const DashboardLayout = ({ children }) => {
 
                 {/* Main Content */}
                 <div className="flex-grow-1 overflow-y-auto p-4">
-                    {!selectedPosition ? (
+                    {positionChanging ? (
+                        <div className="flex flex-column align-items-center justify-content-center h-full">
+                            <ProgressSpinner style={{ width: '50px', height: '50px' }} strokeWidth="4" />
+                            <p className="text-primary mt-3 font-medium">Loading templates...</p>
+                        </div>
+                    ) : !selectedPosition ? (
                         <div className="flex justify-content-center align-items-center h-full">
                             <div className="text-center">
                                 <i className="pi pi-arrow-left text-4xl text-primary mb-3"></i>
