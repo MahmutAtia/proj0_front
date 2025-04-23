@@ -5,7 +5,7 @@
     top: 0;
     left: 0;
     width: 100%;
-    z-index: 1000;
+    z-index: 1000; /* Header base z-index */
     height: var(--header-height); /* Use variable */
     display: flex; /* Use flex to center content vertically */
     align-items: center;
@@ -80,6 +80,7 @@
 }
 .desktopNav li {
     padding: 0; margin: 0;
+    position: relative; /* Needed for absolute positioning of tooltip */
 }
 
 /* Shared Nav Link Styles */
@@ -111,8 +112,10 @@
     color: var(--primary);
     font-weight: 600;
 }
+/* Add hover effect specifically for the special link */
 .navLink.special:hover {
-    color: var(--secondary);
+    color: var(--secondary); /* Keep existing color change */
+    /* The scale/textShadow is handled by Framer Motion `specialLinkHover` variant */
 }
 
 /* Desktop Actions */
@@ -122,7 +125,7 @@
 .mobileMenuToggle {
     background: none; border: none; cursor: pointer;
     color: var(--text-dark);
-    z-index: 1100;
+    z-index: 1100; /* Above mobile nav */
     display: block; /* Default */
     padding: 0.5rem; margin: -0.5rem; /* Hit area */
     line-height: 0; /* Prevent extra space */
@@ -137,8 +140,9 @@
     box-shadow: var(--shadow-lg);
     border-bottom-left-radius: var(--border-radius-md);
     border-bottom-right-radius: var(--border-radius-md);
-    overflow: hidden;
+    overflow: hidden; /* Important for animation */
     border-top: 1px solid #e2e8f0; /* Slate 200 */
+    z-index: 1050; /* Below toggle, above content */
 }
 .mobileNav ul { list-style: none; padding: 0.5rem 0; margin: 0; }
 .mobileNav ul li {
@@ -161,3 +165,91 @@
     .mobileMenuToggle { display: none; }
     .mobileNav { display: none; }
 }
+
+/* ... Keep all existing Header styles UP TO the tooltip section ... */
+
+
+/* --- ATS Tooltip Styles (Revamped) --- */
+.atsTooltip {
+    position: absolute;
+    top: 100%;
+    left: 50%;
+    transform: translateX(-50%) translateY(14px); /* Slightly more gap */
+    /* Use a slightly lighter dark shade */
+    background-color: #2d3748; /* Slate 800 */
+    color: var(--text-light);
+    padding: 1rem 1.5rem; /* More padding */
+    border-radius: var(--border-radius-lg); /* Larger radius */
+    font-size: 0.95rem; /* Base size */
+    line-height: 1.6; /* Better line height */
+    width: max-content;
+    max-width: 320px; /* Slightly wider */
+    box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.2), 0 8px 10px -6px rgba(0, 0, 0, 0.15); /* Softer shadow */
+    z-index: 1100;
+    text-align: left;
+    pointer-events: none;
+    white-space: normal;
+    overflow: visible;
+    height: auto;
+    /* Optional: Add a subtle border */
+    border: 1px solid rgba(126, 34, 206, 0.3); /* primary-light with alpha */
+  }
+
+  /* Tooltip Pointer */
+  .tooltipPointer {
+    position: absolute;
+    top: -10px; /* Adjust overlap */
+    left: 50%;
+    transform: translateX(-50%);
+    color: #2d3748; /* Match new background */
+    font-size: 1.2rem; /* Slightly larger pointer */
+    line-height: 1;
+  }
+
+  /* Optional Icon inside tooltip */
+  /* .tooltipIcon {
+    float: left;
+    margin-right: 0.75rem;
+    font-size: 1.5rem;
+    color: var(--warning);
+    position: relative;
+    top: 2px;
+  } */
+
+  /* Wrapper for text content */
+  .tooltipContent {
+    overflow: hidden; /* Clear float if using icon */
+  }
+
+  /* Headline style within tooltip */
+  .tooltipHeadline {
+    display: block; /* Make it block */
+    font-weight: 600;
+    font-size: 1rem;
+    color: white; /* Brighter headline */
+    margin-bottom: 0.5rem; /* Space below headline */
+  }
+
+  /* Blinking cursor effect */
+  .blinkingCursor {
+    display: inline-block;
+    background-color: var(--text-light);
+    width: 1px;
+    height: 1em; /* Match line height better */
+    margin-left: 3px;
+    position: relative;
+    top: 3px; /* Adjust vertical alignment */
+    animation: blink 1s step-end infinite;
+  }
+
+  @keyframes blink {
+    from, to { opacity: 1; }
+    50% { opacity: 0; }
+  }
+
+  /* --- Responsive Adjustments for Tooltip --- */
+  @media (max-width: 1023px) {
+    .atsTooltip {
+      display: none;
+    }
+  }

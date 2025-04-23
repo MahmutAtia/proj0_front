@@ -2,11 +2,11 @@ import React, { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
 import { motion, AnimatePresence } from 'framer-motion';
 import { IoSparkles } from "react-icons/io5";
-import { FiMenu, FiX, FiArrowRight } from 'react-icons/fi';
+import { FiMenu, FiX, FiArrowRight, FiAlertTriangle } from 'react-icons/fi'; // Added FiAlertTriangle
 import { smoothScrollTo } from '../utils'; // Adjust path as necessary
 import styles from '../styles/Header.module.css'; // Import CSS Module
 
-// Simplified Animation Variants
+// Animation Variants
 const buttonHoverTap = {
     hover: { scale: 1.03, transition: { duration: 0.2 } },
     tap: { scale: 0.97 },
@@ -15,11 +15,33 @@ const mobileMenuVariant = {
     hidden: { opacity: 0, height: 0, transition: { duration: 0.3, ease: [0.4, 0, 0.2, 1] } },
     visible: { opacity: 1, height: 'auto', transition: { duration: 0.4, ease: [0.4, 0, 0.2, 1] } }
 };
+// Tooltip animation
+const tooltipVariant = {
+    hidden: { opacity: 0, y: -10, scale: 0.95 },
+    visible: { opacity: 1, y: 0, scale: 1, transition: { duration: 0.2, ease: 'easeOut' } },
+    exit: { opacity: 0, y: -10, scale: 0.95, transition: { duration: 0.15, ease: 'easeIn' } }
+};
+// Subtle pulse/glow for the special link on hover
+const specialLinkHover = {
+    hover: { scale: 1.05, textShadow: "0 0 8px rgba(88, 28, 135, 0.5)", transition: { duration: 0.3 } }
+};
+// --- Updated: Auto-pulse animation for the special link ---
+const autoPulse = {
+    scale: [1, 1.04, 1], // Slightly larger scale
+    transition: {
+        duration: 1.3, // Slightly faster cycle
+        ease: "easeInOut",
+        repeat: Infinity,
+        repeatDelay: 1.8, // Slightly shorter delay
+    }
+};
 
 const Header = () => {
     const [isOpen, setIsOpen] = useState(false);
     const [isSticky, setIsSticky] = useState(false);
-    // const headerRef = useRef<HTMLDivElement>(null); // Keep if needed for height calc
+    const [isTooltipVisible, setIsTooltipVisible] = useState(false);
+    const [tooltipText, setTooltipText] = useState('');
+    const timeoutRef = useRef<NodeJS.Timeout[]>([]);
 
     // Sticky Logic
     useEffect(() => {
@@ -39,6 +61,42 @@ const Header = () => {
         return () => window.removeEventListener('resize', handleResize);
     }, []);
 
+    // --- Updated ATS Tooltip Explanation ---
+    const fullExplanation = "ATS = Robot Recruiter 🤖 Scans resumes. Miss keywords? 💨 Ignored! 👉 Click me to check yours! ✅";
+    const wordDelay = 100;
+
+    useEffect(() => {
+        // Function to clear timeouts
+        const clearTimeouts = () => {
+            timeoutRef.current.forEach(clearTimeout);
+            timeoutRef.current = [];
+        };
+
+        if (isTooltipVisible) {
+            clearTimeouts(); // Clear any existing timeouts
+            const words = fullExplanation.split(' ');
+            let currentText = '';
+            setTooltipText(''); // Reset text immediately
+
+            words.forEach((word, index) => {
+                const timeoutId = setTimeout(() => {
+                    // Check if still visible before updating state
+                    if (timeoutRef.current.includes(timeoutId)) {
+                         currentText += (index > 0 ? ' ' : '') + word;
+                         setTooltipText(currentText);
+                    }
+                }, index * wordDelay);
+                timeoutRef.current.push(timeoutId);
+            });
+        } else {
+            // Clear timeouts immediately on mouse leave
+            clearTimeouts();
+        }
+
+        // Cleanup function on component unmount or if isTooltipVisible changes again
+        return clearTimeouts;
+    }, [isTooltipVisible]); // Re-run effect when visibility changes
+
     const navItems = [
         { label: 'The Struggle', targetId: 'struggle' },
         { label: 'Your Edge', targetId: 'features' },
@@ -52,24 +110,25 @@ const Header = () => {
         smoothScrollTo(targetId);
     };
 
+    const handleATSHoverEnter = () => setIsTooltipVisible(true);
+    const handleATSHoverLeave = () => setIsTooltipVisible(false);
+
     return (
         <>
-            {/* Use CSS Module classes */}
             <motion.header
-                // ref={headerRef}
                 className={`${styles.siteHeader} ${isSticky ? styles.isSticky : ''}`}
-                initial={{ y: -80 }} // Start based on approx height
+                initial={{ y: -80 }}
                 animate={{ y: 0 }}
                 transition={{ duration: 0.4, ease: 'easeOut' }}
             >
                 <div className={`container ${styles.headerContainer}`}>
-                    {/* Logo - Simplified */}
+                    {/* Logo */}
                     <Link href="/" passHref legacyBehavior>
                        <a className={styles.logo}>
                             <div className={styles.logoIconContainer}>
                                 <IoSparkles className={styles.logoIcon} />
                             </div>
-                            <span className={styles.logoText}>CareerFlow</span> {/* Shortened Name? */}
+                            <span className={styles.logoText}>CareerFlow</span>
                        </a>
                     </Link>
 
@@ -77,13 +136,41 @@ const Header = () => {
                     <nav className={styles.desktopNav}>
                         <ul>
                             {navItems.map((item) => (
-                                <li key={item.label}>
-                                    <button
+                                <li key={item.label} style={{ position: 'relative' }}>
+                                    <motion.button
                                         onClick={() => handleNavClick(item.targetId)}
                                         className={`${styles.navLink} ${item.special ? styles.special : ''}`}
+                                        onMouseEnter={item.targetId === 'ats-checker' ? handleATSHoverEnter : undefined}
+                                        onMouseLeave={item.targetId === 'ats-checker' ? handleATSHoverLeave : undefined}
+                                        // Combine hover and auto-pulse animations
+                                        variants={item.special ? specialLinkHover : {}}
+                                        whileHover="hover"
+                                        // Apply auto-pulse only to the special link
+                                        animate={item.special ? autoPulse : {}}
                                     >
                                         {item.label}
-                                    </button>
+                                    </motion.button>
+                                    {/* --- ATS Tooltip --- */}
+                                    <AnimatePresence>
+                                        {item.targetId === 'ats-checker' && isTooltipVisible && (
+                                            <motion.div
+                                                className={styles.atsTooltip}
+                                                variants={tooltipVariant}
+                                                initial="hidden"
+                                                animate="visible"
+                                                exit="exit"
+                                                aria-live="polite"
+                                            >
+                                                <span className={styles.tooltipPointer}></span>
+                                                <div className={styles.tooltipContent}> {/* Wrap text */}
+                                                    <strong className={styles.tooltipHeadline}>What's an ATS? 🤔</strong>
+                                                    {tooltipText}
+                                                    {tooltipText !== fullExplanation && <span className={styles.blinkingCursor}>|</span>}
+                                                </div>
+                                            </motion.div>
+                                        )}
+                                    </AnimatePresence>
+                                    {/* --- End ATS Tooltip --- */}
                                 </li>
                             ))}
                         </ul>
@@ -93,7 +180,7 @@ const Header = () => {
                     <div className={styles.desktopActions}>
                         <Link href="/login" passHref legacyBehavior>
                             <motion.a
-                                className="button button-secondary button-sm" // Use global button styles
+                                className="button button-secondary button-sm"
                                 variants={buttonHoverTap} whileHover="hover" whileTap="tap"
                             >
                                 Login
@@ -101,7 +188,7 @@ const Header = () => {
                         </Link>
                         <Link href="/signup" passHref legacyBehavior>
                             <motion.a
-                                className="button button-primary button-sm" // Use global button styles
+                                className="button button-primary button-sm"
                                 variants={buttonHoverTap} whileHover="hover" whileTap="tap"
                             >
                                 Get Started <FiArrowRight size="1em" style={{ marginLeft: '4px' }}/>
