@@ -1,0 +1,162 @@
+/* components/StruggleSection.module.css */
+
+.struggleSection {
+    padding: 6rem 0; /* INCREASED vertical padding for the whole section */
+    /* background-color: #fdfcff; */ /* Optional: Kept light tint */
+    overflow: hidden;
+}
+
+/* Section Header */
+.header {
+    text-align: center;
+    margin-bottom: 5rem; /* INCREASED space below header */
+    max-width: 700px; /* Slightly reduced max-width for tighter focus */
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.headerIcon {
+    font-size: 2.5rem; /* Slightly REDUCED icon size */
+    color: var(--danger);
+    margin-bottom: 1.25rem; /* INCREASED space below icon */
+    display: inline-block;
+}
+
+.title {
+    font-size: clamp(1.7rem, 4vw + 0.8rem, 2.6rem); /* Slightly REDUCED max title size */
+    font-weight: 700;
+    margin-bottom: 1rem; /* INCREASED space below title */
+    line-height: 1.3;
+}
+
+.title .strikethrough {
+    text-decoration: line-through wavy var(--danger) 3px;
+    text-underline-offset: 5px;
+    display: inline-block;
+    padding: 0 0.2em;
+    background-color: rgba(239, 68, 68, 0.05);
+    border-radius: var(--border-radius-sm);
+}
+
+.subtitle {
+    font-size: clamp(1rem, 2vw + 0.4rem, 1.15rem); /* Slightly REDUCED max subtitle size */
+    color: var(--text-muted);
+    line-height: 1.7;
+}
+
+/* Grid for Pain Points */
+.struggleGrid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(270px, 1fr)); /* Slightly increased min card width */
+    gap: 2.5rem; /* INCREASED gap between cards */
+    margin-bottom: 6rem; /* INCREASED space below grid */
+}
+
+/* Individual Pain Card */
+.painCard {
+    background-color: var(--bg-card);
+    /* INCREASED padding, especially horizontal */
+    padding: 2.5rem 2rem;
+    border-radius: var(--border-radius-md);
+    box-shadow: var(--shadow-md);
+    text-align: center;
+    border: 1px solid #e2e8f0;
+    border-top: 4px solid var(--card-accent-color, var(--text-muted));
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    color: var(--text-dark);
+}
+
+.painCard:hover {
+    transform: translateY(-6px);
+    box-shadow: var(--shadow-lg);
+}
+
+.painIcon {
+    font-size: 2rem; /* Slightly REDUCED icon size */
+    margin-bottom: 1.5rem; /* INCREASED space below icon */
+    display: inline-block;
+    color: var(--card-accent-color, var(--text-muted));
+}
+
+.painTitle {
+    font-size: 1.15rem; /* Slightly REDUCED card title size */
+    font-weight: 600;
+    margin-bottom: 0.75rem; /* INCREASED space below title */
+    color: inherit;
+}
+
+.painText {
+    font-size: 0.88rem; /* Slightly REDUCED card text size */
+    color: var(--text-muted);
+    line-height: 1.65; /* Slightly INCREASED line height */
+}
+
+/* "Missing Out" Box */
+.missingOutBox {
+    background-color: rgba(88, 28, 135, 0.03);
+    border: 1px solid rgba(88, 28, 135, 0.1);
+    border-left: 5px solid var(--primary);
+    border-radius: var(--border-radius-md);
+    /* REDUCED internal padding */
+    padding: 1.75rem 2rem;
+    display: flex;
+    align-items: center;
+    /* REDUCED gap */
+    gap: 1.75rem;
+    box-shadow: var(--shadow-sm);
+    margin-top: 3rem; /* INCREASED space above */
+}
+
+.missingOutIcon {
+    font-size: 2.5rem; /* REDUCED icon size */
+    color: var(--primary);
+    flex-shrink: 0;
+}
+
+.missingOutContent h3 {
+    font-size: 1.25rem; /* Slightly REDUCED size */
+    font-weight: 700;
+    margin-bottom: 0.5rem;
+    color: var(--text-dark);
+}
+
+.missingOutContent p {
+    margin-bottom: 0;
+    color: var(--text-muted);
+    font-size: 0.95rem; /* Slightly REDUCED size */
+    line-height: 1.6; /* Adjusted line height */
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) { /* Adjust gap for tablets */
+    .struggleGrid {
+        gap: 2rem;
+    }
+}
+
+@media (max-width: 640px) {
+    .struggleSection {
+        padding: 4rem 0; /* Adjust padding for smaller screens */
+    }
+    .header {
+        margin-bottom: 3rem; /* Adjust spacing */
+    }
+    .struggleGrid {
+        gap: 1.5rem; /* Reduce gap further */
+        margin-bottom: 4rem; /* Adjust spacing */
+    }
+     .painCard {
+        padding: 2rem 1.5rem; /* Adjust card padding */
+    }
+    .missingOutBox {
+        flex-direction: column;
+        text-align: center;
+        padding: 1.5rem;
+        gap: 1.25rem; /* Reduce gap */
+        margin-top: 2rem; /* Adjust spacing */
+    }
+    .missingOutIcon {
+        font-size: 2.2rem; /* Adjust icon size */
+        margin-bottom: 0.5rem;
+    }
+}

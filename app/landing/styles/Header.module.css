@@ -1,0 +1,255 @@
+/* components/Header.module.css */
+
+.siteHeader {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    z-index: 1000; /* Header base z-index */
+    height: var(--header-height); /* Use variable */
+    display: flex; /* Use flex to center content vertically */
+    align-items: center;
+    background-color: transparent;
+    border-bottom: 1px solid transparent;
+    transition: background-color 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;
+    padding: 0; /* Remove padding, rely on container */
+}
+
+.siteHeader.isSticky {
+    background-color: rgba(255, 255, 255, 0.9); /* Slightly less transparent */
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    border-bottom: 1px solid #e2e8f0; /* Slate 200 */
+    box-shadow: var(--shadow-md);
+}
+
+/* Container specific styles for header */
+.headerContainer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%; /* Take full width of the parent container */
+    padding: 0; /* Remove padding here, comes from global .container */
+}
+
+/* Logo */
+.logo {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    text-decoration: none !important;
+    flex-shrink: 0; /* Prevent shrinking */
+}
+
+.logoIconContainer {
+   display: inline-flex;
+   align-items: center;
+   justify-content: center;
+   background-color: var(--primary); /* Simpler solid background */
+   padding: 0.5rem;
+   border-radius: var(--border-radius-md);
+   color: white;
+   transition: background-color var(--transition-speed) var(--transition-ease);
+}
+.logo:hover .logoIconContainer {
+    background-color: var(--primary-light);
+}
+
+.logoIcon {
+   font-size: 1.5rem; /* Adjusted */
+   display: block;
+}
+
+.logoText {
+    font-size: 1.25rem; /* Adjusted */
+    font-weight: 600; /* Slightly lighter */
+    color: var(--text-dark);
+    transition: color var(--transition-speed) var(--transition-ease);
+}
+.logo:hover .logoText {
+    color: var(--primary);
+}
+
+/* Desktop Navigation */
+.desktopNav { display: none; } /* Hidden mobile first */
+.desktopNav ul {
+    list-style: none;
+    display: flex;
+    gap: 0.25rem; /* Reduce gap */
+    margin: 0; padding: 0;
+}
+.desktopNav li {
+    padding: 0; margin: 0;
+    position: relative; /* Needed for absolute positioning of tooltip */
+}
+
+/* Shared Nav Link Styles */
+.navLink {
+    padding: 0.5rem 0.9rem; /* Adjusted padding */
+    font-weight: 500;
+    font-size: 0.9rem; /* Adjusted size */
+    color: var(--text-muted);
+    transition: color 0.2s ease, background-color 0.2s ease;
+    background: none;
+    border: none;
+    border-radius: var(--border-radius-sm);
+    cursor: pointer;
+    font-family: inherit; /* Inherit body font */
+    display: block; /* Ensure block for mobile layout */
+    width: 100%; /* Ensure full width for mobile */
+    text-align: center; /* Center text mobile */
+}
+.desktopNav .navLink { /* Desktop specific overrides */
+    display: inline-block;
+    width: auto;
+    text-align: left;
+}
+.navLink:hover {
+    color: var(--primary);
+    background-color: rgba(88, 28, 135, 0.05); /* Subtle hover background */
+}
+.navLink.special {
+    color: var(--primary);
+    font-weight: 600;
+}
+/* Add hover effect specifically for the special link */
+.navLink.special:hover {
+    color: var(--secondary); /* Keep existing color change */
+    /* The scale/textShadow is handled by Framer Motion `specialLinkHover` variant */
+}
+
+/* Desktop Actions */
+.desktopActions { display: none; gap: 0.75rem; align-items: center; }
+
+/* Mobile Toggle */
+.mobileMenuToggle {
+    background: none; border: none; cursor: pointer;
+    color: var(--text-dark);
+    z-index: 1100; /* Above mobile nav */
+    display: block; /* Default */
+    padding: 0.5rem; margin: -0.5rem; /* Hit area */
+    line-height: 0; /* Prevent extra space */
+}
+
+/* Mobile Navigation */
+.mobileNav {
+    position: absolute;
+    top: var(--header-height); /* Position below header */
+    left: 0; right: 0;
+    background-color: var(--bg-card);
+    box-shadow: var(--shadow-lg);
+    border-bottom-left-radius: var(--border-radius-md);
+    border-bottom-right-radius: var(--border-radius-md);
+    overflow: hidden; /* Important for animation */
+    border-top: 1px solid #e2e8f0; /* Slate 200 */
+    z-index: 1050; /* Below toggle, above content */
+}
+.mobileNav ul { list-style: none; padding: 0.5rem 0; margin: 0; }
+.mobileNav ul li {
+    border-bottom: 1px solid #e2e8f0; /* Separator */
+}
+.mobileNav ul li:last-child { border-bottom: none; }
+
+.mobileActions {
+    padding: 1rem 1.5rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    border-top: 1px solid #e2e8f0;
+}
+
+/* Desktop Breakpoint */
+@media (min-width: 1024px) {
+    .desktopNav { display: block; }
+    .desktopActions { display: flex; }
+    .mobileMenuToggle { display: none; }
+    .mobileNav { display: none; }
+}
+
+/* ... Keep all existing Header styles UP TO the tooltip section ... */
+
+
+/* --- ATS Tooltip Styles (Revamped) --- */
+.atsTooltip {
+    position: absolute;
+    top: 100%;
+    left: 50%;
+    transform: translateX(-50%) translateY(14px); /* Slightly more gap */
+    /* Use a slightly lighter dark shade */
+    background-color: #2d3748; /* Slate 800 */
+    color: var(--text-light);
+    padding: 1rem 1.5rem; /* More padding */
+    border-radius: var(--border-radius-lg); /* Larger radius */
+    font-size: 0.95rem; /* Base size */
+    line-height: 1.6; /* Better line height */
+    width: max-content;
+    max-width: 320px; /* Slightly wider */
+    box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.2), 0 8px 10px -6px rgba(0, 0, 0, 0.15); /* Softer shadow */
+    z-index: 1100;
+    text-align: left;
+    pointer-events: none;
+    white-space: normal;
+    overflow: visible;
+    height: auto;
+    /* Optional: Add a subtle border */
+    border: 1px solid rgba(126, 34, 206, 0.3); /* primary-light with alpha */
+  }
+
+  /* Tooltip Pointer */
+  .tooltipPointer {
+    position: absolute;
+    top: -10px; /* Adjust overlap */
+    left: 50%;
+    transform: translateX(-50%);
+    color: #2d3748; /* Match new background */
+    font-size: 1.2rem; /* Slightly larger pointer */
+    line-height: 1;
+  }
+
+  /* Optional Icon inside tooltip */
+  /* .tooltipIcon {
+    float: left;
+    margin-right: 0.75rem;
+    font-size: 1.5rem;
+    color: var(--warning);
+    position: relative;
+    top: 2px;
+  } */
+
+  /* Wrapper for text content */
+  .tooltipContent {
+    overflow: hidden; /* Clear float if using icon */
+  }
+
+  /* Headline style within tooltip */
+  .tooltipHeadline {
+    display: block; /* Make it block */
+    font-weight: 600;
+    font-size: 1rem;
+    color: white; /* Brighter headline */
+    margin-bottom: 0.5rem; /* Space below headline */
+  }
+
+  /* Blinking cursor effect */
+  .blinkingCursor {
+    display: inline-block;
+    background-color: var(--text-light);
+    width: 1px;
+    height: 1em; /* Match line height better */
+    margin-left: 3px;
+    position: relative;
+    top: 3px; /* Adjust vertical alignment */
+    animation: blink 1s step-end infinite;
+  }
+
+  @keyframes blink {
+    from, to { opacity: 1; }
+    50% { opacity: 0; }
+  }
+
+  /* --- Responsive Adjustments for Tooltip --- */
+  @media (max-width: 1023px) {
+    .atsTooltip {
+      display: none;
+    }
+  }

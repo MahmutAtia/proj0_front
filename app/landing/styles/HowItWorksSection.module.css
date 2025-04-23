@@ -1,0 +1,134 @@
+/* How It Works Section Styles */
+
+.container {
+    /* Assuming a global container class is styled elsewhere or define here */
+    max-width: var(--container-width, 1200px);
+    margin: 0 auto;
+    padding: 5rem var(--container-padding-x, 1rem); /* Add vertical padding */
+    position: relative; /* Needed if animating background directly on section */
+    overflow: hidden; /* Contain potential pseudo-elements */
+}
+
+.textCenter {
+    text-align: center;
+}
+
+.marginBottom6 {
+    margin-bottom: 4rem; /* Increased spacing */
+}
+
+.iconSparkles {
+    font-size: 3rem;
+    color: var(--primary, #581C87);
+    margin-bottom: 1rem;
+    display: inline-block; /* Center properly */
+}
+
+.heading {
+    font-weight: 700;
+    margin-bottom: 0.5rem; /* Adjust spacing */
+    font-size: clamp(1.8rem, 4vw + 1rem, 2.5rem); /* Responsive heading */
+    color: var(--text-dark);
+}
+
+.subheading {
+    font-size: clamp(1rem, 2vw + 0.5rem, 1.15rem); /* Responsive subheading */
+    color: var(--text-muted, #64748B);
+    max-width: 70ch; /* Slightly wider max-width */
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.howItWorksGrid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 4rem 2.5rem; /* Increased row gap for number overlap */
+    position: relative; /* For pseudo-element line */
+    padding-top: 2rem; /* Space for step numbers */
+    margin-top: 2rem; /* Add margin from heading */
+}
+
+/* Dashed line connector (desktop only) */
+.howItWorksGrid::before {
+    content: '';
+    position: absolute;
+    top: calc(2rem + 20px); /* Align with step number centers (40px height / 2) */
+    left: 15%;
+    right: 15%;
+    height: 2px;
+    /* Dashed line effect */
+    background-image: linear-gradient(to right, var(--primary-light, #7E22CE) 50%, transparent 50%);
+    background-size: 16px 2px; /* Adjust dash length/gap */
+    background-repeat: repeat-x;
+    z-index: 0;
+    display: none; /* Hide on mobile */
+}
+
+@media (min-width: 992px) { /* Adjust breakpoint if needed */
+    .howItWorksGrid::before {
+        display: block;
+    }
+    /* Ensure enough gap on desktop for line */
+    .howItWorksGrid {
+         gap: 4rem 3.5rem;
+    }
+}
+
+.stepCard {
+    background-color: var(--bg-card, #FFFFFF);
+    padding: 3rem 2rem 2rem 2rem; /* More top padding */
+    border-radius: var(--border-radius-lg, 16px); /* Use defined variable */
+    box-shadow: var(--shadow-md, 0 4px 6px -1px rgba(0,0,0,0.1), 0 2px 4px -2px rgba(0,0,0,0.1));
+    text-align: center;
+    border: 1px solid var(--border-light, #e2e8f0);
+    position: relative;
+    z-index: 1; /* Above line */
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    transition: transform 0.3s var(--transition-ease, ease), box-shadow 0.3s var(--transition-ease, ease);
+}
+
+.stepCard:hover {
+    transform: translateY(-5px);
+    box-shadow: var(--shadow-lg, 0 10px 15px -3px rgba(0,0,0,0.1), 0 4px 6px -4px rgba(0,0,0,0.1));
+}
+
+.stepNumber {
+    position: absolute;
+    top: -20px; /* Position half outside */
+    left: 50%;
+    transform: translateX(-50%);
+    width: 45px; /* Slightly larger */
+    height: 45px;
+    border-radius: 50%;
+    background: var(--primary, #581C87);
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    font-size: 1.2rem;
+    box-shadow: 0 3px 6px rgba(88, 28, 135, 0.2); /* Shadow for number */
+    border: 2px solid var(--bg-card, #FFFFFF); /* Border matching card bg */
+}
+
+.stepIcon {
+    font-size: 2.8rem; /* Slightly larger icon */
+    color: var(--primary, #581C87);
+    margin-top: 1rem; /* Space below number */
+    margin-bottom: 1.25rem;
+}
+
+.stepTitle {
+    font-weight: 600; /* Semibold */
+    font-size: 1.15rem;
+    color: var(--text-dark, #1E293B);
+    margin-bottom: 0.75rem;
+}
+
+.stepText {
+    font-size: 0.95rem;
+    color: var(--text-muted, #64748B);
+    line-height: 1.6; /* Improve readability */
+}

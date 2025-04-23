@@ -1,0 +1,126 @@
+/* Footer Styles */
+
+.footer {
+    background-color: var(--bg-light, #F8FAFC); /* Or a slightly darker bg like #f1f5f9 */
+    border-top: 1px solid var(--border-light, #e2e8f0);
+    padding-top: 4rem; /* Top padding for the whole section */
+}
+
+.container {
+    /* Assuming a global container class is styled elsewhere or define here */
+    max-width: var(--container-width, 1200px);
+    margin: 0 auto;
+    padding: 0 var(--container-padding-x, 1rem);
+}
+
+.footerContainer {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 3rem;
+    padding-bottom: 3rem; /* Bottom padding before the bottom bar */
+}
+
+.footerAbout {
+    /* Styles specific to the about section if needed */
+}
+
+.logo {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--text-dark, #1E293B);
+    font-family: var(--font-headings, 'General Sans', sans-serif);
+    margin-bottom: 1rem; /* mb-3 */
+    text-decoration: none; /* Ensure link has no underline */
+}
+
+.logoIcon {
+    color: var(--primary, #581C87);
+    font-size: 1.8rem;
+}
+
+.aboutText {
+    font-size: 0.9rem; /* text-sm */
+    color: var(--text-muted, #64748B);
+    max-width: 320px; /* Limit width */
+    line-height: 1.6;
+}
+
+.socialLinks {
+    display: flex;
+    gap: 1.25rem; /* Increased gap */
+    margin-top: 1.5rem; /* mt-4 */
+}
+
+.socialLink {
+    font-size: 1.5rem;
+    color: var(--text-muted, #64748B);
+    transition: color 0.2s var(--transition-ease, ease), transform 0.2s var(--transition-ease, ease);
+    display: inline-block; /* Needed for transform */
+}
+
+.socialLink:hover {
+    color: var(--primary, #581C87);
+    transform: scale(1.1); /* Slight scale on hover */
+}
+
+.footerLinks {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr); /* 2 columns on mobile */
+    gap: 2.5rem 2rem; /* Row and column gap */
+}
+
+.linkColumn h5 {
+    color: var(--text-dark, #1E293B);
+    font-size: 1rem;
+    font-weight: 600; /* Semibold */
+    margin-bottom: 1rem; /* mb-3 */
+}
+
+.linkColumn ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.linkColumn li {
+    margin-bottom: 0.7rem; /* Increased spacing */
+}
+
+.linkColumn a {
+    color: var(--text-muted, #64748B);
+    font-size: 0.95rem;
+    text-decoration: none;
+    transition: color 0.2s var(--transition-ease, ease);
+}
+
+.linkColumn a:hover {
+    color: var(--primary, #581C87);
+    text-decoration: underline;
+}
+
+.footerBottom {
+    border-top: 1px solid var(--border-light, #e2e8f0);
+    padding: 1.5rem 0;
+    margin-top: 3rem; /* Space above bottom bar */
+    text-align: center;
+}
+
+.copyrightText {
+    font-size: 0.85rem; /* text-sm */
+    color: var(--text-muted, #64748B);
+    margin: 0; /* m-0 */
+}
+
+/* Desktop layout adjustments */
+@media (min-width: 768px) {
+    .footerContainer {
+        grid-template-columns: 1fr 2fr; /* About takes less space */
+        gap: 4rem;
+    }
+    .footerLinks {
+        grid-template-columns: repeat(4, 1fr); /* 4 columns on desktop */
+    }
+}

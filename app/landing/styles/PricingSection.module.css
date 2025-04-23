@@ -1,0 +1,150 @@
+/* Pricing Section Styles */
+
+.container {
+    /* Assuming a global container class is styled elsewhere or define here */
+    max-width: var(--container-width, 1200px);
+    margin: 0 auto;
+    padding: 5rem var(--container-padding-x, 1rem); /* Add vertical padding */
+}
+
+.textCenter {
+    text-align: center;
+}
+
+.marginBottom6 {
+    margin-bottom: 3rem; /* Adjust spacing */
+}
+
+.heading {
+    font-weight: 700;
+    margin-bottom: 0.5rem; /* Adjust spacing */
+    font-size: clamp(1.8rem, 4vw + 1rem, 2.5rem); /* Responsive heading */
+    color: var(--text-dark);
+}
+
+.subheading {
+    font-size: clamp(1rem, 2vw + 0.5rem, 1.15rem); /* Responsive subheading */
+    color: var(--text-muted, #64748B);
+    max-width: 65ch; /* Limit line length for readability */
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.pricingGrid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 2rem;
+    align-items: stretch; /* Make cards same height */
+}
+
+.pricingCard {
+    background: var(--bg-card, #FFFFFF);
+    padding: 2.5rem 2rem;
+    border-radius: var(--border-radius-lg, 16px); /* Use defined variable */
+    box-shadow: var(--shadow-lg, 0 10px 15px -3px rgba(0,0,0,0.1), 0 4px 6px -4px rgba(0,0,0,0.1));
+    border: 1px solid transparent; /* Start transparent */
+    display: flex;
+    flex-direction: column;
+    position: relative;
+    overflow: hidden;
+    transition: transform 0.3s var(--transition-ease, ease),
+                box-shadow 0.3s var(--transition-ease, ease),
+                border-color 0.3s var(--transition-ease, ease);
+}
+
+.pricingCard.popular {
+    border-color: var(--primary, #581C87);
+    /* Keep scale effect for Framer Motion if preferred, or add here */
+    /* transform: scale(1.03); */
+    box-shadow: 0 15px 30px -5px rgba(88, 28, 135, 0.2), 0 8px 10px -6px rgba(88, 28, 135, 0.1); /* Enhanced shadow */
+}
+
+/* Add a hover effect distinct from popular */
+.pricingCard:not(.popular):hover {
+    transform: translateY(-5px);
+    border-color: var(--primary-light, #7E22CE);
+}
+
+
+.popularBadge {
+    position: absolute;
+    top: 0;
+    right: 0;
+    background: var(--primary, #581C87);
+    color: white;
+    padding: 0.4rem 1.2rem; /* Slightly larger padding */
+    font-size: 0.75rem; /* Smaller font */
+    font-weight: 700;
+    letter-spacing: 0.5px;
+    border-bottom-left-radius: var(--border-radius-lg, 16px); /* Match card radius */
+    z-index: 1; /* Ensure it's above content */
+}
+
+.planIcon {
+    font-size: 2.8rem; /* Slightly smaller */
+    margin-bottom: 0.75rem; /* Increased space */
+    display: inline-block; /* Needed for centering */
+}
+
+.planName {
+    font-weight: 700; /* Bold */
+    font-size: 1.4rem; /* Larger name */
+    color: var(--text-dark, #1E293B);
+    margin-bottom: 0.25rem;
+}
+
+.planTagline {
+    font-size: 0.9rem;
+    color: var(--text-muted, #64748B);
+    margin-bottom: 1.5rem; /* Space before price */
+    min-height: 2.7rem; /* Reserve space for 2 lines */
+}
+
+.priceWrapper {
+    margin-bottom: 1.5rem; /* Space below price */
+}
+
+.priceAmount {
+    font-size: 2.8rem; /* Larger price */
+    font-weight: 700;
+    color: var(--text-dark, #1E293B);
+    line-height: 1;
+}
+
+.priceSuffix {
+    font-size: 1rem;
+    color: var(--text-muted, #64748B);
+    margin-left: 0.3rem;
+    font-weight: 500;
+}
+
+.featuresList {
+    list-style: none;
+    padding: 0; /* Remove default padding */
+    margin: 1.5rem 0; /* Consistent margin */
+    flex-grow: 1; /* Pushes button down */
+    text-align: left; /* Align text left */
+}
+
+.featureItem {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    margin-bottom: 0.9rem; /* Increased spacing */
+    font-size: 0.95rem;
+    color: var(--text-muted, #64748B);
+}
+
+.checkIcon {
+    color: var(--success, #10B981);
+    font-size: 1.2rem;
+    flex-shrink: 0;
+}
+
+.buttonFullWidth {
+    width: 100%;
+}
+
+.marginTopAuto {
+    margin-top: auto; /* Ensures button is at the bottom */
+}
