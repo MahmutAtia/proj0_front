@@ -1,0 +1,163 @@
+/* components/Header.module.css */
+
+.siteHeader {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    z-index: 1000;
+    height: var(--header-height); /* Use variable */
+    display: flex; /* Use flex to center content vertically */
+    align-items: center;
+    background-color: transparent;
+    border-bottom: 1px solid transparent;
+    transition: background-color 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;
+    padding: 0; /* Remove padding, rely on container */
+}
+
+.siteHeader.isSticky {
+    background-color: rgba(255, 255, 255, 0.9); /* Slightly less transparent */
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    border-bottom: 1px solid #e2e8f0; /* Slate 200 */
+    box-shadow: var(--shadow-md);
+}
+
+/* Container specific styles for header */
+.headerContainer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%; /* Take full width of the parent container */
+    padding: 0; /* Remove padding here, comes from global .container */
+}
+
+/* Logo */
+.logo {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    text-decoration: none !important;
+    flex-shrink: 0; /* Prevent shrinking */
+}
+
+.logoIconContainer {
+   display: inline-flex;
+   align-items: center;
+   justify-content: center;
+   background-color: var(--primary); /* Simpler solid background */
+   padding: 0.5rem;
+   border-radius: var(--border-radius-md);
+   color: white;
+   transition: background-color var(--transition-speed) var(--transition-ease);
+}
+.logo:hover .logoIconContainer {
+    background-color: var(--primary-light);
+}
+
+.logoIcon {
+   font-size: 1.5rem; /* Adjusted */
+   display: block;
+}
+
+.logoText {
+    font-size: 1.25rem; /* Adjusted */
+    font-weight: 600; /* Slightly lighter */
+    color: var(--text-dark);
+    transition: color var(--transition-speed) var(--transition-ease);
+}
+.logo:hover .logoText {
+    color: var(--primary);
+}
+
+/* Desktop Navigation */
+.desktopNav { display: none; } /* Hidden mobile first */
+.desktopNav ul {
+    list-style: none;
+    display: flex;
+    gap: 0.25rem; /* Reduce gap */
+    margin: 0; padding: 0;
+}
+.desktopNav li {
+    padding: 0; margin: 0;
+}
+
+/* Shared Nav Link Styles */
+.navLink {
+    padding: 0.5rem 0.9rem; /* Adjusted padding */
+    font-weight: 500;
+    font-size: 0.9rem; /* Adjusted size */
+    color: var(--text-muted);
+    transition: color 0.2s ease, background-color 0.2s ease;
+    background: none;
+    border: none;
+    border-radius: var(--border-radius-sm);
+    cursor: pointer;
+    font-family: inherit; /* Inherit body font */
+    display: block; /* Ensure block for mobile layout */
+    width: 100%; /* Ensure full width for mobile */
+    text-align: center; /* Center text mobile */
+}
+.desktopNav .navLink { /* Desktop specific overrides */
+    display: inline-block;
+    width: auto;
+    text-align: left;
+}
+.navLink:hover {
+    color: var(--primary);
+    background-color: rgba(88, 28, 135, 0.05); /* Subtle hover background */
+}
+.navLink.special {
+    color: var(--primary);
+    font-weight: 600;
+}
+.navLink.special:hover {
+    color: var(--secondary);
+}
+
+/* Desktop Actions */
+.desktopActions { display: none; gap: 0.75rem; align-items: center; }
+
+/* Mobile Toggle */
+.mobileMenuToggle {
+    background: none; border: none; cursor: pointer;
+    color: var(--text-dark);
+    z-index: 1100;
+    display: block; /* Default */
+    padding: 0.5rem; margin: -0.5rem; /* Hit area */
+    line-height: 0; /* Prevent extra space */
+}
+
+/* Mobile Navigation */
+.mobileNav {
+    position: absolute;
+    top: var(--header-height); /* Position below header */
+    left: 0; right: 0;
+    background-color: var(--bg-card);
+    box-shadow: var(--shadow-lg);
+    border-bottom-left-radius: var(--border-radius-md);
+    border-bottom-right-radius: var(--border-radius-md);
+    overflow: hidden;
+    border-top: 1px solid #e2e8f0; /* Slate 200 */
+}
+.mobileNav ul { list-style: none; padding: 0.5rem 0; margin: 0; }
+.mobileNav ul li {
+    border-bottom: 1px solid #e2e8f0; /* Separator */
+}
+.mobileNav ul li:last-child { border-bottom: none; }
+
+.mobileActions {
+    padding: 1rem 1.5rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    border-top: 1px solid #e2e8f0;
+}
+
+/* Desktop Breakpoint */
+@media (min-width: 1024px) {
+    .desktopNav { display: block; }
+    .desktopActions { display: flex; }
+    .mobileMenuToggle { display: none; }
+    .mobileNav { display: none; }
+}

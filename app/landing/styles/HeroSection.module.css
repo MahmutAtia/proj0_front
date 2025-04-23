@@ -1,0 +1,126 @@
+/* components/HeroSection.module.css */
+
+.heroSection {
+    background: linear-gradient(170deg, var(--bg-light) 55%, #f3e8ff 100%); /* Subtle purple tint */
+    padding-top: calc(var(--header-height) + 3rem); /* Space below header */
+    padding-bottom: 4rem;
+    min-height: 90vh; /* Ensure it takes substantial height */
+    display: flex;
+    align-items: center;
+    overflow: hidden;
+}
+
+.heroContainer {
+    display: grid;
+    grid-template-columns: 1fr; /* Mobile first */
+    gap: 2.5rem;
+    align-items: center;
+}
+
+.heroContent {
+    text-align: center; /* Mobile */
+    z-index: 2;
+    order: 2; /* Content below image on mobile */
+}
+
+.heroTitle {
+    font-size: clamp(2.1rem, 6vw + 0.5rem, 3.6rem); /* Adjusted size */
+    font-weight: 700;
+    line-height: 1.25;
+    margin-bottom: 1rem;
+    color: var(--text-dark);
+    max-width: 650px; /* Control width */
+    margin-left: auto; /* Center on mobile */
+    margin-right: auto;
+}
+
+.heroTitle .highlight {
+    color: var(--primary); /* Simple color highlight */
+    /* Optional: Add a subtle underline */
+    /* text-decoration: underline wavy var(--primary) 2px; */
+    /* text-underline-offset: 3px; */
+}
+
+.heroSubtitle {
+    font-size: clamp(1rem, 2vw + 0.5rem, 1.2rem); /* Adjusted size */
+    color: var(--text-muted);
+    margin-bottom: 2rem;
+    max-width: 550px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.heroActions {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1rem;
+    margin-top: 1.5rem; /* Reduced margin */
+}
+
+/* Optional: Slightly larger buttons in hero */
+.heroButton {
+    padding: 0.8rem 1.8rem;
+    font-size: 1rem;
+}
+
+/* Image */
+.heroImageContainer {
+    order: 1; /* Image above content on mobile */
+    width: 100%;
+    max-width: 550px; /* Control max size on mobile */
+    margin: 0 auto 1rem auto; /* Center & add bottom margin */
+    z-index: 1;
+}
+
+.heroImage {
+    width: 100%;
+    height: auto;
+    border-radius: var(--border-radius-lg); /* Softer radius */
+    box-shadow: var(--shadow-lg);
+    object-fit: cover;
+}
+
+
+/* Tablet and Up */
+@media (min-width: 768px) {
+    .heroActions {
+        flex-direction: row;
+        justify-content: center;
+    }
+    .heroImageContainer {
+        max-width: 650px; /* Allow larger image */
+    }
+    .heroSection {
+       padding-bottom: 5rem;
+    }
+}
+
+/* Desktop Layout */
+@media (min-width: 1024px) {
+    .heroSection {
+        padding-top: calc(var(--header-height) + 4rem);
+        min-height: calc(100vh - var(--header-height));
+    }
+    .heroContainer {
+        grid-template-columns: minmax(0, 550px) 1fr; /* Adjust column balance */
+        gap: 4rem;
+        align-items: center;
+    }
+    .heroContent {
+        text-align: left;
+        order: 1; /* Text left */
+    }
+    .heroTitle, .heroSubtitle {
+        margin-left: 0; /* Align left */
+        margin-right: 0;
+    }
+    .heroActions {
+        justify-content: flex-start;
+    }
+    .heroImageContainer {
+        order: 2; /* Image right */
+        max-width: none; /* Allow full column width */
+        margin: 0;
+    }
+}
