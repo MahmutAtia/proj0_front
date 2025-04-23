@@ -181,21 +181,23 @@ img, svg {
     padding-bottom: var(--space-section-y);
 }
 
-.gradient-text {
-   background: linear-gradient(90deg, var(--primary), var(--secondary), var(--accent));
-   background-size: 200% auto;
-   color: #000;
-   background-clip: text;
-   -webkit-background-clip: text;
-   -webkit-text-fill-color: transparent;
-   animation: gradient-flow 5s ease infinite;
-}
+/* Add this to globals.css or HeroSection.module.css */
 
-@keyframes gradient-flow {
-   0% { background-position: 0% 50%; }
-   50% { background-position: 100% 50%; }
-   100% { background-position: 0% 50%; }
-}
+.gradient-text {
+    background: linear-gradient(90deg, var(--primary-light), var(--secondary), var(--primary-light));
+    background-size: 200% auto; /* Double size for animation */
+    background-clip: text;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    animation: gradient-flow 4s linear infinite; /* Apply animation */
+    display: inline-block; /* Needed for animation */
+  }
+
+  @keyframes gradient-flow {
+    0% { background-position: 0% center; }
+    50% { background-position: 100% center; }
+    100% { background-position: 0% center; }
+  }
 
 .text-center { text-align: center; }
 .mx-auto { margin-left: auto; margin-right: auto; }
@@ -210,3 +212,4 @@ img, svg {
 .bg-light { background-color: var(--bg-light); }
 .bg-dark { background-color: var(--bg-dark); color: var(--text-light); } /* Ensure text is light on dark */
 .bg-alternate { background-color: #f1f5f9; } /* Example slightly off-white */
+

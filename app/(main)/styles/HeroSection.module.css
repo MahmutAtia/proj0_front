@@ -1,70 +1,84 @@
 .heroSection {
-    /* ... Keep existing background, min-height, display flex ... */
     min-height: calc(100vh - var(--header-height, 70px));
     display: flex;
     align-items: center;
-    background: linear-gradient(160deg, var(--bg-light) 60%, #f3e8ff 100%); /* Lighter purple gradient */
+    /* Enhanced background gradient with animation */
+    background: linear-gradient(150deg, var(--bg-light) 40%, #e9d5ff 70%, #d8b4fe 100%); /* Adjusted stops */
+    background-size: 150% 150%; /* Larger size for subtle movement */
+    animation: gradient-bg-flow 15s ease infinite; /* Slower background animation */
     overflow: hidden;
 }
 
+/* Keyframes for background animation */
+@keyframes gradient-bg-flow {
+    0% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
+}
+
+
 .heroContainer {
-    /* ... Keep existing grid layout ... */
     display: grid;
     grid-template-columns: 1fr;
     align-items: center;
-    gap: 2rem 3rem; /* Adjusted gap */
+    gap: 2rem 3rem;
 }
 
 .heroContent {
-    /* ... Keep existing styles ... */
     text-align: center;
     z-index: 2;
 }
 
 .heroTitle {
-    font-size: clamp(2.5rem, 6vw + 1rem, 4.2rem); /* Slightly adjusted size */
-    font-weight: 700; /* Keep bold */
-    margin-bottom: 1.25rem; /* Adjusted spacing */
-    line-height: 1.25; /* Slightly increased line-height */
-    color: var(--text-dark);
+    font-size: clamp(2.5rem, 6vw + 1rem, 4.2rem);
+    font-weight: 700;
+    margin-bottom: 1.25rem;
+    line-height: 1.25;
+    color: var(--text-dark); /* Base color */
+    /* Optional: Subtle text shadow for depth */
+    text-shadow: 0 1px 3px rgba(0,0,0,0.1);
 }
 
-/* New highlight style - using gradient */
-.highlightGradient {
-    /* Use the global gradient text class */
-    background: linear-gradient(90deg, var(--primary), var(--secondary));
-    background-clip: text;
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    /* Optional: Add slight animation if desired */
-    /* animation: gradient-flow 5s ease infinite; */
+/* Style for the 'rejected' highlight with animation */
+.highlightRejected {
+    color: var(--danger);
+    text-shadow: 1px 1px 2px rgba(239, 68, 68, 0.2);
+    display: inline-block;
+    /* Add a subtle pulse animation */
+    animation: pulse-danger 2.5s ease-in-out infinite;
 }
 
-/* Removed .highlightRejected */
+/* Keyframes for highlight pulse */
+@keyframes pulse-danger {
+    0%, 100% { transform: scale(1); opacity: 1; }
+    50% { transform: scale(1.03); opacity: 0.9; }
+}
 
 .heroSubtitle {
-    font-size: clamp(1.1rem, 2vw + 0.7rem, 1.4rem); /* Adjusted size */
-    font-weight: 500; /* Medium weight */
-    color: var(--text-muted);
+    font-size: clamp(1.1rem, 2vw + 0.7rem, 1.5rem); /* Slightly larger max */
+    font-weight: 500;
+    color: var(--text-muted-dark); /* Darker muted color for contrast */
     margin-bottom: 1.5rem;
-    max-width: 60ch; /* Slightly adjusted max-width */
+    max-width: 65ch; /* Slightly wider */
     margin-left: auto;
     margin-right: auto;
-    line-height: 1.6; /* Ensure good readability */
+    line-height: 1.65; /* Increased line height */
 }
 
+/* Ensure the gradient text within subtitle uses the class defined above */
+/* .heroSubtitle .gradient-text { ... } */ /* No extra style needed if global class is used */
+
 .heroParagraph {
-    font-size: 1rem;
+    font-size: 1.05rem; /* Slightly larger */
     color: var(--text-muted);
-    max-width: 55ch; /* Slightly adjusted max-width */
+    max-width: 60ch; /* Slightly wider */
     margin-left: auto;
     margin-right: auto;
     margin-bottom: 2.5rem;
-    line-height: 1.65; /* Ensure good readability */
+    line-height: 1.7; /* Increased line height */
 }
 
 .heroActions {
-    /* ... Keep existing flex styles ... */
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -72,24 +86,32 @@
     margin-top: 2.5rem;
 }
 
+/* Ensure buttons have smooth transitions */
 .heroButton {
-   /* Add padding if global button style isn't enough */
    padding: 0.8rem 1.8rem;
+   transition: transform var(--transition-speed) var(--transition-ease),
+               background-color var(--transition-speed) var(--transition-ease),
+               border-color var(--transition-speed) var(--transition-ease),
+               box-shadow 0.3s ease;
+   /* Add a subtle border to secondary button for definition */
+}
+.heroButton.button-secondary {
+    border: 1px solid var(--primary-light);
 }
 
+
 .heroImageContainer {
-    /* ... Keep existing styles ... */
     display: none;
     z-index: 1;
 }
 
 .heroImage {
-    /* ... Keep existing image styles ... */
     width: 100%;
-    max-width: 580px; /* Adjusted max-width */
+    max-width: 580px;
     height: auto;
     border-radius: var(--border-radius-lg);
-    box-shadow: var(--shadow-lg);
+    /* Enhanced shadow */
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1), 0 6px 6px rgba(0, 0, 0, 0.1);
     object-fit: cover;
     margin: 0 auto;
 }
@@ -105,7 +127,7 @@
 
 @media (min-width: 1024px) {
     .heroContainer {
-        grid-template-columns: 1fr 0.9fr; /* Give slightly more space to text */
+        grid-template-columns: 1fr 0.9fr;
         gap: 4rem;
     }
     .heroContent {
@@ -125,25 +147,3 @@
        align-items: center;
     }
 }
-
-
-
-/* Tooltip Pointer (CSS Border Triangle) */
-.tooltipPointer {
-    position: absolute;
-    /* Position ABOVE the tooltip box */
-    top: -6px; /* Adjust overlap based on border size */
-    left: 50%;
-    transform: translateX(-50%);
-    width: 0;
-    height: 0;
-    /* Create the triangle using borders */
-    border-left: 7px solid transparent; /* Adjust size as needed */
-    border-right: 7px solid transparent; /* Adjust size as needed */
-    border-bottom: 7px solid #2d3748; /* Match tooltip background, points down */
-    /* Remove text color and font-size */
-    /* color: #2d3748; */
-    /* font-size: 1.2rem; */
-    line-height: 1;
-  }
-

@@ -1,11 +1,10 @@
-"use client"; // This component is a client component
-
+"use client";
 import React from 'react';
 import { motion } from 'framer-motion';
 import { FiArrowRight, FiShield } from 'react-icons/fi';
 import styles from '../styles/HeroSection.module.css'; // Import CSS Module
 
-// Animation Variants (Keep existing variants)
+// Animation Variants
 const staggerContainer = (staggerChildren, delayChildren) => ({
     hidden: {},
     visible: {
@@ -18,10 +17,27 @@ const fadeInUp = {
     visible: { y: 0, opacity: 1, transition: { duration: 0.6, ease: 'easeOut' } },
 };
 
+// --- Enhanced Button Hover/Tap ---
 const buttonHoverTap = {
-    hover: { scale: 1.03, transition: { duration: 0.2 } },
-    tap: { scale: 0.97 },
+    hover: {
+        scale: 1.04, // Slightly larger scale
+        boxShadow: "0 5px 15px rgba(88, 28, 135, 0.3)", // Add subtle purple shadow on hover
+        transition: { duration: 0.2 }
+    },
+    tap: { scale: 0.96 }, // Slightly more pronounced tap
 };
+
+// --- New: Idle Pulse for Primary Button ---
+const primaryButtonPulse = {
+    scale: [1, 1.02, 1], // Subtle scale pulse
+    transition: {
+        duration: 1.8,
+        ease: "easeInOut",
+        repeat: Infinity,
+        repeatDelay: 2.5,
+    }
+};
+
 
 const HeroSection = () => {
     return (
@@ -33,47 +49,50 @@ const HeroSection = () => {
                     initial="hidden"
                     animate="visible"
                 >
-                    {/* --- Revised H1 --- */}
+                    {/* --- Content remains the same --- */}
                     <motion.h1 variants={fadeInUp} className={styles.heroTitle}>
-                        Land Your Dream Job, <span className={styles.highlightGradient}>Not the Spam Folder</span>.
+                        Resume <span className={styles.highlightRejected}>Rejected</span>? Again? <br /> Let's Fix That.
                     </motion.h1>
-                    {/* --- Revised Subtitle --- */}
                     <motion.p variants={fadeInUp} className={styles.heroSubtitle}>
-                        Craft ATS-beating resumes and stunning portfolios with AI assistance. Turn applications into interviews.
+                        Escape the soul-crushing job hunt. Did you know most jobs need a <span className="gradient-text">tailored resume</span> just to pass the bots? We build them *with* you, using AI.
                     </motion.p>
-                    {/* --- Revised Paragraph --- */}
                     <motion.p variants={fadeInUp} className={styles.heroParagraph}>
-                        Tired of the application black hole? Your skills deserve to be seen. CareerFlow AI helps you build compelling applications that stand out to recruiters and pass the bots.
+                        You're brilliant, skilled, and ready. But your application vanishes into the ATS abyss. It's not you, it's the system. CareerFlow AI crafts resumes & portfolios that get you noticed.
                     </motion.p>
                     <motion.div variants={fadeInUp} className={styles.heroActions}>
-                        {/* --- Buttons remain the same, text is clear --- */}
+                        {/* --- Apply new animations --- */}
                         <motion.button
                            className={`button button-primary ${styles.heroButton}`}
-                           variants={buttonHoverTap} whileHover="hover" whileTap="tap"
+                           variants={buttonHoverTap} // Use enhanced hover/tap
+                           whileHover="hover"
+                           whileTap="tap"
+                           animate={primaryButtonPulse} // Add idle pulse animation
                         >
                             Start My Free AI Resume <FiArrowRight size="1.1em" />
                         </motion.button>
                         <motion.button
                            className={`button button-secondary ${styles.heroButton}`}
-                           variants={buttonHoverTap} whileHover="hover" whileTap="tap"
+                           variants={buttonHoverTap} // Use enhanced hover/tap
+                           whileHover="hover"
+                           whileTap="tap"
+                           // No idle pulse for secondary button to keep focus on primary
                         >
                             Check My ATS Score <FiShield size="1.1em" />
                         </motion.button>
                     </motion.div>
                 </motion.div>
-                {/* --- Updated Image --- */}
+                {/* --- Image Container remains the same --- */}
                 <motion.div
                     className={styles.heroImageContainer}
-                    initial={{ opacity: 0, scale: 0.9, x: 50 }} // Slightly different entry
+                    initial={{ opacity: 0, scale: 0.9, x: 50 }}
                     animate={{ opacity: 1, scale: 1, x: 0 }}
-                    transition={{ duration: 0.7, delay: 0.4, ease: 'easeOut' }} // Adjusted delay
+                    transition={{ duration: 0.7, delay: 0.4, ease: 'easeOut' }}
                 >
                     <img
-                        // --- New Image Source ---
                         src="https://images.unsplash.com/photo-1551434678-e076c223a692?q=80&w=1740&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
                         alt="Professionals collaborating and achieving career success with technology"
                         loading="eager"
-                        width="1740" // Adjust width/height based on image aspect ratio if needed
+                        width="1740"
                         height="1160"
                         className={styles.heroImage}
                     />
@@ -84,3 +103,4 @@ const HeroSection = () => {
 };
 
 export default HeroSection;
+
