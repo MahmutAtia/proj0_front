@@ -1,4 +1,5 @@
-// filepath: /home/e-kalite/Downloads/sakai-react/app/landing/components/PricingSection.tsx
+"use client"; // This component is a client component
+
 import React from 'react';
 import { motion } from 'framer-motion';
 import { FiGift, FiZap, FiUsers, FiCheckCircle } from 'react-icons/fi';

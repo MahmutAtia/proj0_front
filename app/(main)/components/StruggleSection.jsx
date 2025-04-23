@@ -1,3 +1,5 @@
+"use client"; // This component is a client component
+
 import React, { useRef } from 'react';
 import { motion, useScroll, useTransform } from 'framer-motion';
 // Import different / more relevant icons

@@ -1,4 +1,4 @@
-// filepath: /home/e-kalite/Downloads/sakai-react/app/landing/components/ATSCheckerSection.tsx
+"use client"; // This component is a client component
 import React from 'react';
 import { motion } from 'framer-motion';
 import { FiShield, FiUploadCloud } from 'react-icons/fi';

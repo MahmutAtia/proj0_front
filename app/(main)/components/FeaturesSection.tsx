@@ -1,3 +1,5 @@
+"use client"; // This component is a client component
+
 import React from 'react';
 import { motion } from 'framer-motion';
 import { FiCpu, FiShield, FiGlobe, FiEdit, FiZap } from 'react-icons/fi';
