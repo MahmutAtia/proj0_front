@@ -33,6 +33,7 @@
 /* Custom transition for template selection if needed */
 .templateCard {
     transition: transform 0.2s ease, box-shadow 0.2s ease;
+    position: relative; /* Ensure position relative is set if not already */
 }
 .templateCard:hover {
     transform: translateY(-3px);
@@ -64,4 +65,16 @@
 .themeSwatchSelected {
     box-shadow: 0 0 0 2px var(--surface-card), 0 0 0 4px var(--primary-color); /* Ring effect */
     transform: scale(1.1);
+}
+
+/* Style the preview button */
+.previewButton {
+    background-color: rgba(255, 255, 255, 0.7); /* Semi-transparent background */
+    backdrop-filter: blur(2px); /* Optional blur effect */
+    width: 2rem; /* Adjust size */
+    height: 2rem; /* Adjust size */
+}
+
+.previewButton:hover {
+    background-color: rgba(255, 255, 255, 0.9);
 }

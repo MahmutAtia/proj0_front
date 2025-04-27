@@ -10,6 +10,7 @@ import { Message } from 'primereact/message';
 import { Button } from 'primereact/button';
 import { Card } from 'primereact/card';
 import { Tooltip } from 'primereact/tooltip';
+import { Dialog } from 'primereact/dialog'; // Import Dialog
 import styles from './export.module.css';
 import { MOCK_TEMPLATES_WITH_THEMES } from './templates.js';
 
@@ -33,6 +34,8 @@ const ResumePreviewPage = ({ params }) => {
     const [isLoadingPdf, setIsLoadingPdf] = useState(false);
     const [errorOptions, setErrorOptions] = useState(null);
     const [errorPdf, setErrorPdf] = useState(null);
+    const [isPreviewVisible, setIsPreviewVisible] = useState(false); // State for modal visibility
+    const [previewImageUrl, setPreviewImageUrl] = useState(''); // State for image URL in modal
 
     // --- Calculated Dimensions ---
     const iframeScaleFactor = scale / 100;
@@ -167,6 +170,12 @@ const ResumePreviewPage = ({ params }) => {
         }
     };
 
+    const handlePreviewOpen = (imageUrl, event) => {
+        event.stopPropagation(); // Prevent card selection when clicking preview
+        setPreviewImageUrl(imageUrl || '/images/previews/default.png');
+        setIsPreviewVisible(true);
+    };
+
     // --- Render Skeletons ---
     const renderTemplateSkeletons = () => (
         Array.from({ length: 4 }).map((_, i) => (
@@ -212,10 +221,24 @@ const ResumePreviewPage = ({ params }) => {
                                             {templatesData.map((template) => (
                                                 <div key={template.id} className="col-6 p-1">
                                                     <Card
-                                                        className={`cursor-pointer border-2 hover:shadow-md ${styles.templateCard} ${selectedTemplate?.id === template.id ? 'border-primary shadow-2' : 'border-transparent'}`}
+                                                        className={`cursor-pointer border-2 hover:shadow-md ${styles.templateCard} ${selectedTemplate?.id === template.id ? 'border-primary shadow-2' : 'border-transparent'} relative`} // Added relative positioning
                                                         onClick={() => handleTemplateSelect(template)}
                                                         pt={{ header: { className: 'p-0' }, body: { className: 'p-0' }, content: { className: 'p-2 text-center' } }}
                                                     >
+                                                        {/* --- Preview Button Overlay --- */}
+                                                        <Button
+                                                            icon="pi pi-eye"
+                                                            rounded
+                                                            text
+                                                            severity="secondary"
+                                                            aria-label={`Preview ${template.name}`}
+                                                            tooltip="Preview Template"
+                                                            tooltipOptions={{ position: 'top', showDelay: 300 }}
+                                                            className={`absolute top-0 right-0 mt-1 mr-1 z-1 ${styles.previewButton}`} // Position top-right
+                                                            onClick={(e) => handlePreviewOpen(template.previewUrl, e)}
+                                                        />
+                                                        {/* --- End Preview Button --- */}
+
                                                         <img src={template.previewUrl || '/images/previews/default.png'} alt={`${template.name} Preview`} className={`w-full block border-round-top ${styles.templatePreviewImage}`} />
                                                         <div className="text-sm font-medium text-color-secondary mt-1">{template.name}</div>
                                                     </Card>
@@ -313,6 +336,22 @@ const ResumePreviewPage = ({ params }) => {
                     </div>
                 </div>
             </div>
+
+            {/* --- Template Preview Modal --- */}
+            <Dialog
+                header="Template Preview"
+                visible={isPreviewVisible}
+                style={{ width: '90vw', maxWidth: '600px' }} // Responsive width
+                modal
+                onHide={() => setIsPreviewVisible(false)}
+                pt={{
+                    content: { className: 'p-0' } // Remove padding from content area
+                }}
+            >
+                <img src={previewImageUrl} alt="Template Preview" style={{ width: '100%', display: 'block' }} />
+            </Dialog>
+            {/* --- End Modal --- */}
+
         </div>
     );
 };
