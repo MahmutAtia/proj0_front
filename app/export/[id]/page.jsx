@@ -30,6 +30,15 @@ const ResumePreviewPage = ({ params }) => {
     const [errorOptions, setErrorOptions] = useState(null);
     const [errorPdf, setErrorPdf] = useState(null);
 
+    // --- Constants for calculation ---
+    const PDF_ASPECT_RATIO = 1.414; // Approx A4 height/width
+    const BASE_PREVIEW_WIDTH = 800; // e.g., 800px wide at 100% zoom
+
+    // Calculate iframe dimensions based on scale
+    const iframeScaleFactor = scale / 100;
+    const iframeWidth = BASE_PREVIEW_WIDTH * iframeScaleFactor;
+    const iframeHeight = iframeWidth * PDF_ASPECT_RATIO;
+
     // --- Refs --- (Keep refs the same)
     const pdfBlobCache = useRef({});
     const previewContentRef = useRef(null); // Ref for the scrollable preview area
@@ -278,12 +287,18 @@ const ResumePreviewPage = ({ params }) => {
                     </div>
                 </div>
 
-                {/* Preview Area */}
-                <div ref={previewContentRef} className="col-12 md:col-8 lg:col-9 h-full overflow-auto bg-surface-100 p-4 lg:p-6"> {/* Light gray bg, padding */}
-                    {/* PDF Container with scaling */}
+                {/* Preview Area - Handles scrolling and centers content */}
+                <div
+                    ref={previewContentRef}
+                    className="col-12 md:col-8 lg:col-9 h-full overflow-auto bg-surface-100 p-4 lg:p-6 flex justify-content-center" // Added flex justify-content-center
+                >
+                    {/* PDF Container - No CSS scaling, size set dynamically */}
                     <div
                         className={`${styles.pdfContainer} relative`} // Use relative for overlay positioning
-                        style={{ transform: `scale(${scale / 100})`, transformOrigin: 'center top' }}
+                        style={{
+                            width: `${iframeWidth}px`, // Apply calculated width
+                            height: `${iframeHeight}px` // Apply calculated height
+                        }}
                     >
                         {/* Loading Overlay */}
                         {isLoadingPdf && (
@@ -294,18 +309,22 @@ const ResumePreviewPage = ({ params }) => {
                         )}
                         {/* Error Overlay */}
                         {!isLoadingPdf && errorPdf && (
-                            <div className={`absolute top-0 left-0 w-full h-full flex flex-column align-items-center justify-content-center z-2 bg-red-100 text-red-700 p-4 border-round ${styles.overlayBase}`}>
+                             <div className={`absolute top-0 left-0 w-full h-full flex flex-column align-items-center justify-content-center z-2 bg-red-100 text-red-700 p-4 border-round ${styles.overlayBase}`}>
                                 <i className="pi pi-exclamation-circle text-3xl mb-2"></i>
                                 <p className="text-center">{errorPdf}</p>
                             </div>
                         )}
-                        {/* PDF Iframe */}
+                        {/* PDF Iframe - Fills its container */}
                         {!isLoadingPdf && pdfUrl && !errorPdf && (
                             <iframe
-                                key={pdfUrl} // Force re-render on src change
+                                key={pdfUrl}
                                 src={`${pdfUrl}#view=FitH&toolbar=0&navpanes=0&scrollbar=0`}
                                 title={`Resume Preview - ${selectedTemplate?.name || ''}`}
-                                className={styles.pdfIframe}
+                                className={styles.pdfIframe} // Ensure this has width/height 100%
+                                style={{
+                                    width: '100%', // Fill the container
+                                    height: '100%', // Fill the container
+                                }}
                             />
                         )}
                         {/* Placeholder */}

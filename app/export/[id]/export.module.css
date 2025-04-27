@@ -4,12 +4,12 @@
     width: 100%;
     max-width: 842px; /* Limit width */
     height: auto; /* Let aspect ratio control height */
-    overflow: hidden; /* Hide iframe overflow */
     position: relative; /* For overlays */
     margin: 0 auto; /* Center */
     background-color: var(--surface-card); /* White paper background */
-    box-shadow: var(--card-shadow); /* Use theme shadow */
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.15); /* Updated shadow */
     border-radius: var(--border-radius);
+    transition: width 0.2s ease-out, height 0.2s ease-out; /* Smooth size changes */
 }
 
 .pdfIframe {
@@ -21,7 +21,13 @@
 
 /* Subtle overlay base - PrimeFlex overlay classes might cover this */
 .overlayBase {
-     backdrop-filter: blur(2px);
+    backdrop-filter: blur(2px);
+    width: 100%;
+    height: 100%;
+    position: absolute; /* Ensure they overlay correctly */
+    top: 0;
+    left: 0;
+    border-radius: var(--border-radius); /* Match container if it has one */
 }
 
 /* Custom transition for template selection if needed */
@@ -29,7 +35,7 @@
     transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
 .templateCard:hover {
-     transform: translateY(-3px);
+    transform: translateY(-3px);
 }
 
 /* Ensure image covers the area within the template card */
