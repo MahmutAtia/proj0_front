@@ -1,0 +1,70 @@
+.atsCard {
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+    border: none;
+    border-radius: var(--border-radius-lg); /* Use global variable */
+    overflow: hidden; /* Ensure animations don't overflow card */
+}
+
+/* Style the FileUpload component */
+.fileUpload :global(.p-fileupload-buttonbar) {
+    /* background: transparent; */
+    /* border: none; */
+    /* padding: 0; */
+}
+.fileUpload :global(.p-fileupload-content) {
+    border: 2px dashed var(--surface-border);
+    border-radius: var(--border-radius);
+    padding: 2rem;
+    transition: border-color var(--transition-speed) var(--transition-ease);
+}
+.fileUpload :global(.p-fileupload-content:hover) {
+     border-color: var(--primary-color);
+}
+
+/* Results Container Styling */
+.resultsContainer {
+    background-color: var(--surface-ground); /* Slightly different background */
+    border: 1px solid var(--surface-border);
+    border-radius: var(--border-radius);
+    padding: 1.5rem 2rem;
+    margin-top: 2rem;
+}
+
+.resultsContainer h3 { /* Style for the main results heading */
+    color: var(--primary-color);
+    border-color: var(--surface-d);
+}
+
+/* Markdown specific styles within results */
+.resultsContainer p {
+    color: var(--text-color-secondary);
+}
+.resultsContainer ul {
+    color: var(--text-color-secondary);
+}
+.resultsContainer li::marker {
+    color: var(--primary-color);
+}
+
+.codeBlock {
+    background-color: #2d3748; /* Dark background for code */
+    color: #e2e8f0; /* Light text */
+    padding: 1rem;
+    border-radius: var(--border-radius-sm);
+    overflow-x: auto; /* Allow horizontal scrolling */
+    font-family: var(--font-mono); /* Use monospace font */
+    font-size: 0.875rem;
+    margin: 1rem 0;
+}
+.inlineCode {
+    background-color: var(--surface-hover);
+    color: var(--primary-color);
+    padding: 0.2em 0.4em;
+    border-radius: var(--border-radius-sm);
+    font-family: var(--font-mono);
+    font-size: 0.875em; /* Slightly smaller than surrounding text */
+}
+
+.errorMessage {
+    border-left: 4px solid var(--red-500);
+}
