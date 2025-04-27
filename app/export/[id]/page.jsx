@@ -12,180 +12,8 @@ import { Card } from 'primereact/card'; // Use Card for templates
 import { Tooltip } from 'primereact/tooltip';
 import styles from './export.module.css'; // Import the minimal CSS
 
-// Mock data (Keep the same structure)
-const MOCK_TEMPLATES_WITH_THEMES = [
-    {
-      id: 't0',
-      name: 'Default (Modern)',
-      value: 'default.html',
-      previewUrl: 'https://s3.resume.io/uploads/examples/resume/resume_pages/222/persistent-resource/student-resume-examples.jpg', // Generic placeholder
-      themes: [
-        { name: 'Default (Dark Blue/Grey)', value: 'theme-default', color: '#2c3e50' },
-        { name: 'Blue', value: 'theme-blue', color: '#1a5276' },
-        { name: 'Green', value: 'theme-green', color: '#1e8449' },
-        { name: 'Grey', value: 'theme-grey', color: '#566573' },
-      ],
-    },
-    {
-      id: 't1',
-      name: 'Europass Inspired',
-      value: 'template1.html',
-      previewUrl: 'https://s3.resume.io/uploads/examples/resume/resume_pages/222/persistent-resource/student-resume-examples.jpg', // Generic placeholder
-      themes: [
-        { name: 'Default (Europass Blue)', value: 'theme-default', color: '#003399' },
-        { name: 'Grey', value: 'theme-grey', color: '#6c757d' },
-        { name: 'Blue', value: 'theme-blue', color: '#0056b3' },
-        { name: 'Green', value: 'theme-green', color: '#28a745' },
-      ],
-    },
-    {
-      id: 't2',
-      name: 'Bootstrap Focused',
-      value: 'template2.html',
-      previewUrl: 'https://s3.resume.io/uploads/examples/resume/resume_pages/222/persistent-resource/student-resume-examples.jpg', // Generic placeholder
-      themes: [
-        { name: 'Default (Bootstrap Blue)', value: 'theme-default', color: '#0d6efd' },
-        { name: 'Grey', value: 'theme-grey', color: '#6c757d' },
-        { name: 'Blue', value: 'theme-blue', color: '#0056b3' },
-        { name: 'Green', value: 'theme-green', color: '#198754' },
-      ],
-    },
-    {
-      id: 't3',
-      name: 'Classic Serif',
-      value: 'template3.html',
-      previewUrl: 'https://s3.resume.io/uploads/examples/resume/resume_pages/222/persistent-resource/student-resume-examples.jpg', // Generic placeholder
-      themes: [
-        { name: 'Default (Dark Blue Accent)', value: 'theme-default', color: '#003366' },
-        { name: 'Grey', value: 'theme-grey', color: '#505050' },
-        { name: 'Maroon', value: 'theme-maroon', color: '#800000' },
-        { name: 'Dark Green', value: 'theme-darkgreen', color: '#006400' },
-      ],
-    },
-    {
-      id: 't4',
-      name: 'Vibrant Gradient (Sidebar)',
-      value: 'template4.html',
-      previewUrl: 'https://s3.resume.io/uploads/examples/resume/resume_pages/222/persistent-resource/student-resume-examples.jpg', // Generic placeholder
-      themes: [
-        { name: 'Default (Purple/Blue Gradient)', value: 'theme-default', color: '#6a11cb' },
-        { name: 'Sunset Gradient', value: 'theme-sunset', color: '#ff7e5f' },
-        { name: 'Forest Gradient', value: 'theme-forest', color: '#0f2027' },
-        { name: 'Mono Gradient', value: 'theme-mono', color: '#333333' },
-      ],
-    },
-    {
-      id: 't5',
-      name: 'Vibrant Gradient (Header)',
-      value: 'template5.html',
-      previewUrl: 'https://s3.resume.io/uploads/examples/resume/resume_pages/222/persistent-resource/student-resume-examples.jpg', // Generic placeholder
-      themes: [
-        { name: 'Default (Purple/Blue Gradient)', value: 'theme-default', color: '#6a11cb' },
-        { name: 'Sunset Gradient', value: 'theme-sunset', color: '#ff7e5f' },
-        { name: 'Forest Gradient', value: 'theme-forest', color: '#0f2027' },
-        { name: 'Mono Gradient', value: 'theme-mono', color: '#333333' },
-      ],
-    },
-    {
-      id: 't6',
-      name: 'Futuristic / Dark',
-      value: 'template6.html',
-      previewUrl: 'https://s3.resume.io/uploads/examples/resume/resume_pages/222/persistent-resource/student-resume-examples.jpg', // Generic placeholder
-      themes: [
-        { name: 'Default (Refined Dark)', value: 'theme-default', color: '#181a20' },
-        { name: 'Cyberpunk Neon', value: 'theme-cyberpunk', color: '#f02e8a' }, // Using accent color for representation
-        { name: 'Clean Light', value: 'theme-cleanlight', color: '#f4f7f9' },
-        { name: 'Deep Space Mono', value: 'theme-deepspace', color: '#0a0a0f' },
-      ],
-    },
-    {
-      id: 't7',
-      name: 'Historical / Textured',
-      value: 'template7.html',
-      previewUrl: 'https://s3.resume.io/uploads/examples/resume/resume_pages/222/persistent-resource/student-resume-examples.jpg', // Generic placeholder
-      themes: [
-        { name: 'Default (Renaissance Manuscript)', value: 'theme-default', color: '#fdf6e3' },
-        { name: 'Viking Runestone', value: 'theme-viking', color: '#e0e0e0' },
-        { name: 'Arabesque Scroll', value: 'theme-arabesque', color: '#fffaf0' },
-        { name: 'Spanish Armada Map', value: 'theme-armada', color: '#e1f5fe' },
-      ],
-    },
-    {
-      id: 't8',
-      name: 'Minimalist Inkwell',
-      value: 'template8.html',
-      previewUrl: 'https://s3.resume.io/uploads/examples/resume/resume_pages/222/persistent-resource/student-resume-examples.jpg', // Generic placeholder
-      themes: [
-        { name: 'Default (Inkwell & Quill)', value: 'theme-default', color: '#fdfbf5' },
-      ],
-    },
-    {
-      id: 't9',
-      name: 'Haze / Soft Gradient',
-      value: 'template9.html',
-      previewUrl: 'https://s3.resume.io/uploads/examples/resume/resume_pages/222/persistent-resource/student-resume-examples.jpg', // Generic placeholder
-      themes: [
-        { name: 'Default (Golden Hour Haze)', value: 'theme-default', color: '#fff8f0' },
-        { name: 'Dusk Haze', value: 'theme-dusk', color: '#f5f2f8' },
-        { name: 'Dawn Haze', value: 'theme-dawn', color: '#fffaf4' },
-      ],
-    },
-    {
-      id: 't10',
-      name: 'Cyberpunk Glitch',
-      value: 'template10.html',
-      previewUrl: 'https://s3.resume.io/uploads/examples/resume/resume_pages/222/persistent-resource/student-resume-examples.jpg', // Generic placeholder
-      themes: [
-        { name: 'Default (Chromatic Glitch)', value: 'theme-default', color: '#0f0f1a' },
-        { name: 'Green Matrix', value: 'theme-matrix', color: '#000000' }, // Using background color for representation
-      ],
-    },
-    {
-      id: 't11',
-      name: 'Quantum Foam (Dark)',
-      value: 'template11.html',
-      previewUrl: 'https://s3.resume.io/uploads/examples/resume/resume_pages/222/persistent-resource/student-resume-examples.jpg', // Generic placeholder
-      themes: [
-        { name: 'Default (Quantum Foam)', value: 'theme-default', color: '#0a0f1a' },
-      ],
-    },
-      {
-      id: 't12',
-      name: 'Modern Minimalist',
-      value: 'template12.html',
-      previewUrl: 'https://s3.resume.io/uploads/examples/resume/resume_pages/222/persistent-resource/student-resume-examples.jpg', // Generic placeholder
-      themes: [
-        { name: 'Default (Clean White)', value: 'theme-default', color: '#ffffff' },
-      ],
-    },
-    {
-      id: 't13',
-      name: 'Midnight Bloom (Dark)',
-      value: 'template13.html',
-      previewUrl: 'https://s3.resume.io/uploads/examples/resume/resume_pages/222/persistent-resource/student-resume-examples.jpg', // Generic placeholder
-      themes: [
-        { name: 'Default (Midnight Bloom)', value: 'theme-default', color: '#1a1a2e' },
-      ],
-    },
-     {
-      id: 't14',
-      name: 'Blueprint Schematic',
-      value: 'template14.html',
-      previewUrl: 'https://s3.resume.io/uploads/examples/resume/resume_pages/222/persistent-resource/student-resume-examples.jpg', // Generic placeholder
-      themes: [
-        { name: 'Default (Blueprint Blue)', value: 'theme-default', color: '#ffffff' }, // Using background color
-      ],
-    },
-    {
-      id: 't15',
-      name: 'Japonisme / Wabi-Sabi',
-      value: 'template15.html',
-      previewUrl: 'https://s3.resume.io/uploads/examples/resume/resume_pages/222/persistent-resource/student-resume-examples.jpg', // Generic placeholder
-      themes: [
-        { name: 'Default (Soft & Subtle)', value: 'theme-default', color: '#f8f8f4' },
-      ],
-    },
-  ];
+// import mock data from ./templates.js
+import { MOCK_TEMPLATES_WITH_THEMES } from './templates.js'; // Adjust the path as necessary
 
 const ResumePreviewPage = ({ params }) => {
     const { data: session, status } = useSession();
@@ -212,6 +40,9 @@ const ResumePreviewPage = ({ params }) => {
     }, [resumeId, status, session?.accessToken]);
     const generateCacheKey = useCallback((templateId, themeValue) => { if (!resumeId || !templateId || !themeValue) return null; return `${resumeId}-${templateId}-${themeValue}`; }, [resumeId]);
     // --- Fetch PDF --- (Using the provided logic)
+    // ...existing code...
+
+    // --- Fetch PDF --- (Using the provided logic)
     const fetchPdf = useCallback(async (templateObject, themeValue) => {
         // Check session status directly
         if (status !== 'authenticated') {
@@ -228,10 +59,17 @@ const ResumePreviewPage = ({ params }) => {
         const cacheKey = generateCacheKey(templateObject.id, themeValue);
         console.log("fetchPdf - Checking cache for:", cacheKey);
 
+        // --- CHANGE POINT 1: Revoke URL logic moved ---
+        // We will revoke the URL *before* setting the new one,
+        // but we don't need pdfUrl as a dependency for useCallback.
+        // We can access the current pdfUrl via state directly when needed.
+
         if (pdfBlobCache.current[cacheKey]) {
             console.log("fetchPdf - Cache HIT for:", cacheKey);
             // Revoke previous URL if it exists before setting a new one
-            if (pdfUrl) { URL.revokeObjectURL(pdfUrl); }
+            // Access pdfUrl directly from state closure (or use a ref if preferred, but state is fine here)
+            const currentPdfUrl = pdfUrl; // Get current value at time of execution
+            if (currentPdfUrl) { URL.revokeObjectURL(currentPdfUrl); }
             setPdfUrl(URL.createObjectURL(pdfBlobCache.current[cacheKey]));
             setIsLoadingPdf(false); // Ensure loading is false after cache hit
             setErrorPdf(null); // Clear any previous errors
@@ -242,7 +80,8 @@ const ResumePreviewPage = ({ params }) => {
         setIsLoadingPdf(true);
         setErrorPdf(null); // Clear previous errors on new fetch
         // Revoke previous URL and clear state before fetching new one
-        if (pdfUrl) { URL.revokeObjectURL(pdfUrl); }
+        const currentPdfUrl = pdfUrl; // Get current value at time of execution
+        if (currentPdfUrl) { URL.revokeObjectURL(currentPdfUrl); }
         setPdfUrl(null);
 
         try {
@@ -277,10 +116,34 @@ const ResumePreviewPage = ({ params }) => {
         } finally {
             setIsLoadingPdf(false); // Ensure loading is set to false in finally block
         }
-    }, [resumeId, status, session?.accessToken, generateCacheKey, pdfUrl]); // Added pdfUrl to dependencies for cleanup logic within fetchPdf
+        // --- CHANGE POINT 2: Remove pdfUrl from dependencies ---
+    }, [resumeId, status, session?.accessToken, generateCacheKey]); // REMOVED pdfUrl
 
-    useEffect(() => { if (selectedTemplate && selectedThemeValue) fetchPdf(selectedTemplate, selectedThemeValue); else if (!selectedTemplate || !selectedThemeValue) { if (pdfUrl) { URL.revokeObjectURL(pdfUrl); setPdfUrl(null); } setErrorPdf(null); } }, [selectedTemplate, selectedThemeValue, fetchPdf]);
-    useEffect(() => { return () => { if (pdfUrl) URL.revokeObjectURL(pdfUrl); }; }, [pdfUrl]);
+    // --- Trigger PDF Fetch on Selection Change ---
+    // This useEffect remains the same
+    useEffect(() => {
+        if (selectedTemplate && selectedThemeValue) {
+            // Pass the whole selectedTemplate object and the theme value string
+            fetchPdf(selectedTemplate, selectedThemeValue);
+        }
+        // No need for the else block here if fetchPdf handles null template/theme
+    }, [selectedTemplate, selectedThemeValue, fetchPdf]);
+
+    // --- Cleanup Object URLs on Unmount ---
+    // This useEffect remains the same
+    useEffect(() => {
+        // This effect runs only when the component unmounts
+        return () => {
+            if (pdfUrl) {
+                console.log("Unmounting: Revoking active PDF URL");
+                URL.revokeObjectURL(pdfUrl);
+            }
+        };
+    }, [pdfUrl]); // Only depends on pdfUrl
+
+
+
+
     const handleTemplateSelect = (template) => { if (isLoadingPdf || template.id === selectedTemplate?.id) return; setSelectedTemplate(template); const firstThemeValue = template.themes?.[0]?.value || null; setSelectedThemeValue(firstThemeValue); };
     const handleThemeSelect = (themeValue) => { if (isLoadingPdf || themeValue === selectedThemeValue) return; setSelectedThemeValue(themeValue); };
     const handleScaleChange = (e) => { setScale(e.value); };
@@ -296,7 +159,7 @@ const ResumePreviewPage = ({ params }) => {
         ))
     );
     const renderThemeSkeletons = () => (
-         <div className="flex align-items-center gap-2"> {/* Use gap-2 */}
+        <div className="flex align-items-center gap-2"> {/* Use gap-2 */}
             {Array.from({ length: 4 }).map((_, i) => (
                 <Skeleton key={`skel-thm-${i}`} shape="circle" size="24px" />
             ))}
@@ -367,7 +230,7 @@ const ResumePreviewPage = ({ params }) => {
                                                 </div>
                                             ))}
                                         </div>
-                                    ) : ( <p className="text-sm text-color-secondary">No templates available.</p> )}
+                                    ) : (<p className="text-sm text-color-secondary">No templates available.</p>)}
                                 </div>
 
                                 {/* Themes Section (Conditional) */}
@@ -387,7 +250,7 @@ const ResumePreviewPage = ({ params }) => {
                                                     </React.Fragment>
                                                 ))}
                                             </div>
-                                        ) : ( <p className="text-sm text-color-secondary">No themes for this template.</p> )}
+                                        ) : (<p className="text-sm text-color-secondary">No themes for this template.</p>)}
                                     </div>
                                 )}
 
@@ -405,14 +268,14 @@ const ResumePreviewPage = ({ params }) => {
 
                     {/* Download Button Area */}
                     <div className="p-4 border-top-1 surface-border mt-auto flex-shrink-0"> {/* mt-auto pushes to bottom */}
-                         <Button
-                             label="Download PDF"
-                             icon="pi pi-download"
-                             className="w-full" // Full width
-                             onClick={handleDownload}
-                             disabled={!pdfUrl || isLoadingPdf || errorPdf || isLoadingOptions}
-                         />
-                     </div>
+                        <Button
+                            label="Download PDF"
+                            icon="pi pi-download"
+                            className="w-full" // Full width
+                            onClick={handleDownload}
+                            disabled={!pdfUrl || isLoadingPdf || errorPdf || isLoadingOptions}
+                        />
+                    </div>
                 </div>
 
                 {/* Preview Area */}
@@ -432,8 +295,8 @@ const ResumePreviewPage = ({ params }) => {
                         {/* Error Overlay */}
                         {!isLoadingPdf && errorPdf && (
                             <div className={`absolute top-0 left-0 w-full h-full flex flex-column align-items-center justify-content-center z-2 bg-red-100 text-red-700 p-4 border-round ${styles.overlayBase}`}>
-                                 <i className="pi pi-exclamation-circle text-3xl mb-2"></i>
-                                 <p className="text-center">{errorPdf}</p>
+                                <i className="pi pi-exclamation-circle text-3xl mb-2"></i>
+                                <p className="text-center">{errorPdf}</p>
                             </div>
                         )}
                         {/* PDF Iframe */}
@@ -446,12 +309,12 @@ const ResumePreviewPage = ({ params }) => {
                             />
                         )}
                         {/* Placeholder */}
-                         {!isLoadingPdf && !pdfUrl && !errorPdf && (
-                             <div className={`absolute top-0 left-0 w-full h-full flex flex-column align-items-center justify-content-center z-1 bg-surface-50 text-color-secondary ${styles.overlayBase}`}>
-                                 <i className="pi pi-file-edit text-4xl mb-3 text-surface-400"></i>
-                                 <p>{isLoadingOptions ? 'Loading options...' : 'Select a template to begin.'}</p>
-                             </div>
-                         )}
+                        {!isLoadingPdf && !pdfUrl && !errorPdf && (
+                            <div className={`absolute top-0 left-0 w-full h-full flex flex-column align-items-center justify-content-center z-1 bg-surface-50 text-color-secondary ${styles.overlayBase}`}>
+                                <i className="pi pi-file-edit text-4xl mb-3 text-surface-400"></i>
+                                <p>{isLoadingOptions ? 'Loading options...' : 'Select a template to begin.'}</p>
+                            </div>
+                        )}
                     </div>
                 </div>
 
