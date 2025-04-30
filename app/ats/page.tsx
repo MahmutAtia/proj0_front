@@ -444,7 +444,7 @@ const ATSCheckerPage = () => {
                                 <motion.div initial="hidden" animate="visible" variants={fadeInUp} className="mt-5 pt-4 border-top-1 text-center">
                                     <p className="mb-3 font-semibold">Go to your dashboard to continue editing.</p>
                                     <motion.div variants={buttonHoverTap} whileHover="hover" whileTap="tap">
-                                        <Button label="Go to Dashboard" icon="pi pi-arrow-right" className="p-button-outlined" onClick={() => window.location.href = '/dashboard'} />
+                                        <Button label="Go to Dashboard" icon="pi pi-arrow-right" className="p-button-outlined" onClick={() => window.location.href = '/main/dashboard'} />
                                     </motion.div>
                                 </motion.div>
                             )}
