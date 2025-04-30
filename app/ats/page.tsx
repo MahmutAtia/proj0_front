@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { FileUpload, FileUploadSelectEvent, FileUploadHandlerEvent } from 'primereact/fileupload';
 import { InputText } from 'primereact/inputtext';
 import { Checkbox, CheckboxChangeEvent } from 'primereact/checkbox';
@@ -14,6 +14,7 @@ import { Dropdown, DropdownChangeEvent } from 'primereact/dropdown';
 import { motion, AnimatePresence } from 'framer-motion';
 import ReactMarkdown from 'react-markdown';
 import { signIn, useSession } from 'next-auth/react';
+import { useRouter } from 'next/navigation';
 import styles from './ats.module.css';
 
 // Animation Variants
@@ -31,6 +32,10 @@ const buttonHoverTap = {
     tap: { scale: 0.97 },
 };
 
+// Constants
+const POLLING_INTERVAL = 3000; // Check status every 3 seconds
+const MAX_POLLING_ATTEMPTS = 20; // Stop polling after 60 seconds (20 * 3s)
+
 // --- Define Page Component ---
 const ATSCheckerPage = () => {
     // --- State ---
@@ -46,10 +51,19 @@ const ATSCheckerPage = () => {
     const [error, setError] = useState<string | null>(null);
     const [showForm, setShowForm] = useState(true);
 
+    // State for background task polling
+    const [generationTaskId, setGenerationTaskId] = useState<string | null>(null);
+    const [isCheckingStatus, setIsCheckingStatus] = useState(false);
+    const [pollingAttempts, setPollingAttempts] = useState(0);
+    const [statusError, setStatusError] = useState<string | null>(null);
+    const [generatedResumeId, setGeneratedResumeId] = useState<string | null>(null);
+
     // --- Refs and Hooks ---
     const toast = useRef<Toast>(null);
     const fileUploadRef = useRef<FileUpload>(null);
     const { data: session, status } = useSession();
+    const router = useRouter();
+    const pollingIntervalRef = useRef<NodeJS.Timeout | null>(null);
 
     // --- Options for SelectButton ---
     const resumeInputOptions = [
@@ -64,12 +78,25 @@ const ATSCheckerPage = () => {
     ];
 
     // --- Event Handlers ---
+    const resetPollingState = () => {
+        setGenerationTaskId(null);
+        setIsCheckingStatus(false);
+        setPollingAttempts(0);
+        setStatusError(null);
+        setGeneratedResumeId(null);
+        if (pollingIntervalRef.current) {
+            clearInterval(pollingIntervalRef.current);
+            pollingIntervalRef.current = null;
+        }
+    };
+
     const handleFileSelect = (event: FileUploadSelectEvent) => {
         if (event.files && event.files.length > 0) {
             setResumeFile(event.files[0]);
             setResumeText('');
             setApiResponse(null);
             setError(null);
+            resetPollingState();
         }
     };
 
@@ -77,6 +104,7 @@ const ATSCheckerPage = () => {
         setResumeFile(null);
         setApiResponse(null);
         setError(null);
+        resetPollingState();
     };
 
     const handleResumeTextChange = (event: React.ChangeEvent<HTMLTextAreaElement>) => {
@@ -84,6 +112,7 @@ const ATSCheckerPage = () => {
         setResumeFile(null);
         setApiResponse(null);
         setError(null);
+        resetPollingState();
     };
 
     const handleInputMethodChange = (e: SelectButtonChangeEvent) => {
@@ -93,6 +122,7 @@ const ATSCheckerPage = () => {
             if (e.value === 'paste') setResumeFile(null);
             setApiResponse(null);
             setError(null);
+            resetPollingState();
         }
     };
 
@@ -103,6 +133,109 @@ const ATSCheckerPage = () => {
     const customUploader = async (event: FileUploadHandlerEvent) => {
         event.options.clear();
     };
+
+    useEffect(() => {
+        return () => {
+            if (pollingIntervalRef.current) {
+                clearInterval(pollingIntervalRef.current);
+            }
+        };
+    }, []);
+
+    useEffect(() => {
+        const checkStatus = async (taskId: string) => {
+            try {
+                const statusApiUrl = `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/resumes/pdf-generation-status/${taskId}/`;
+                const fetchOptions: RequestInit = {
+                    method: 'GET',
+                    headers: {
+                        ...(session?.accessToken && {
+                            'Authorization': `Bearer ${session.accessToken}`
+                        })
+                    },
+                };
+                const response = await fetch(statusApiUrl, fetchOptions);
+
+                if (!response.ok) {
+                    console.error(`Status check failed with status: ${response.status}`);
+                    if (pollingAttempts + 1 >= MAX_POLLING_ATTEMPTS) {
+                        throw new Error("Checking editor status timed out or failed repeatedly.");
+                    }
+                    setPollingAttempts(prev => prev + 1);
+                    return;
+                }
+
+                const statusResult = await response.json();
+
+                switch (statusResult.status) {
+                    case 'SUCCESS':
+                        if (pollingIntervalRef.current) clearInterval(pollingIntervalRef.current);
+                        pollingIntervalRef.current = null;
+                        const resumeIdFromResult = statusResult.result?.resume_id;
+
+                        if (resumeIdFromResult) {
+                            setGeneratedResumeId(String(resumeIdFromResult));
+                            setStatusError(null);
+                            toast.current?.show({ severity: 'info', summary: 'Ready', detail: 'Editor is ready.', life: 2000 });
+                        } else {
+                            console.warn("Status SUCCESS but 'resume_id' was missing:", statusResult.result);
+                            throw new Error("Editor prepared, but resume ID was not provided.");
+                        }
+                        setIsCheckingStatus(false);
+                        setPollingAttempts(0);
+                        break;
+
+                    case 'FAILURE':
+                        if (pollingIntervalRef.current) clearInterval(pollingIntervalRef.current);
+                        pollingIntervalRef.current = null;
+                        const errorDetail = statusResult.error || 'Preparing editor failed.';
+                        setStatusError(errorDetail);
+                        toast.current?.show({ severity: 'error', summary: 'Editor Status Failed', detail: errorDetail });
+                        setIsCheckingStatus(false);
+                        setPollingAttempts(0);
+                        break;
+
+                    case 'PENDING':
+                    default:
+                        if (pollingAttempts + 1 >= MAX_POLLING_ATTEMPTS) {
+                            if (pollingIntervalRef.current) clearInterval(pollingIntervalRef.current);
+                            pollingIntervalRef.current = null;
+                            throw new Error("Checking editor status is taking longer than expected.");
+                        }
+                        setPollingAttempts(prev => prev + 1);
+                        break;
+                }
+
+            } catch (err: any) {
+                console.error("Polling error:", err);
+                if (pollingIntervalRef.current) clearInterval(pollingIntervalRef.current);
+                pollingIntervalRef.current = null;
+                setStatusError(err.message || 'An error occurred while checking editor status.');
+                toast.current?.show({ severity: 'error', summary: 'Status Check Error', detail: err.message || 'Could not check editor status.' });
+                setIsCheckingStatus(false);
+                setPollingAttempts(0);
+            }
+        };
+
+        if (generationTaskId && !generatedResumeId && !statusError) {
+            setIsCheckingStatus(true);
+            setPollingAttempts(0);
+
+            if (pollingIntervalRef.current) {
+                clearInterval(pollingIntervalRef.current);
+            }
+            pollingIntervalRef.current = setInterval(() => {
+                checkStatus(generationTaskId);
+            }, POLLING_INTERVAL);
+        }
+
+        return () => {
+            if (pollingIntervalRef.current) {
+                clearInterval(pollingIntervalRef.current);
+                pollingIntervalRef.current = null;
+            }
+        };
+    }, [generationTaskId, session?.accessToken]);
 
     const handleSubmit = async () => {
         const isResumeProvided = (resumeInputMethod === 'upload' && resumeFile) || (resumeInputMethod === 'paste' && resumeText.trim());
@@ -123,6 +256,7 @@ const ATSCheckerPage = () => {
         setApiResponse(null);
         setError(null);
         setShowForm(false);
+        resetPollingState();
 
         const formData = new FormData();
 
@@ -139,7 +273,6 @@ const ATSCheckerPage = () => {
         };
         formData.append('formData', JSON.stringify(backendFormData));
 
-
         try {
             const apiUrl = `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/resumes/ats-checker/`;
 
@@ -152,7 +285,6 @@ const ATSCheckerPage = () => {
                     })
                 },
             };
-
 
             const response = await fetch(apiUrl, fetchOptions);
 
@@ -168,7 +300,8 @@ const ATSCheckerPage = () => {
             }
 
             const result = await response.json();
-            const markdownOutput = result;
+            const markdownOutput = result.ats_result;
+            const taskId = result.generation_task_id;
 
             if (typeof markdownOutput === 'string' && markdownOutput.trim() !== '') {
                 setApiResponse(markdownOutput);
@@ -177,14 +310,121 @@ const ATSCheckerPage = () => {
                 setApiResponse('Analysis complete, but no specific feedback was returned.');
             }
 
-            toast.current?.show({ severity: 'success', summary: 'Analysis Complete', detail: 'Your resume has been scanned.' });
+            toast.current?.show({ severity: 'success', summary: 'Analysis Complete', detail: 'Your resume has been scanned.', life: 3000 });
+
+            if (taskId) {
+                setGenerationTaskId(taskId);
+            } else {
+                console.warn("Backend did not return a 'generation_task_id'. Cannot check editor status.");
+                setStatusError("Could not initiate editor status check (missing task ID).");
+            }
 
         } catch (err: any) {
-            setError(err.message || 'An unexpected error occurred.');
+            setError(err.message || 'An unexpected error occurred during submission.');
             toast.current?.show({ severity: 'error', summary: 'Analysis Failed', detail: err.message || 'An unexpected error occurred.' });
             setShowForm(true);
+            resetPollingState();
         } finally {
             setIsLoading(false);
+        }
+    };
+
+    const handleGoToEditor = () => {
+        if (generatedResumeId) {
+            router.push(`/main/editor/${generatedResumeId}`);
+        } else {
+            toast.current?.show({ severity: 'warn', summary: 'Not Ready', detail: 'Editor is not ready yet or status check failed.' });
+        }
+    };
+
+    const handleRetryStatusCheck = () => {
+        if (generationTaskId) {
+            setStatusError(null);
+            setPollingAttempts(0);
+            setIsCheckingStatus(true);
+
+            const checkStatus = async (taskId: string) => {
+                try {
+                    const statusApiUrl = `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/resumes/pdf-generation-status/${taskId}/`;
+                    const fetchOptions: RequestInit = {
+                        method: 'GET',
+                        headers: {
+                            ...(session?.accessToken && {
+                                'Authorization': `Bearer ${session.accessToken}`
+                            })
+                        },
+                    };
+                    const response = await fetch(statusApiUrl, fetchOptions);
+
+                    if (!response.ok) {
+                        console.error(`Status check failed with status: ${response.status}`);
+                        if (pollingAttempts + 1 >= MAX_POLLING_ATTEMPTS) {
+                            throw new Error("Checking editor status timed out or failed repeatedly.");
+                        }
+                        setPollingAttempts(prev => prev + 1);
+                        return;
+                    }
+
+                    const statusResult = await response.json();
+
+                    switch (statusResult.status) {
+                        case 'SUCCESS':
+                            if (pollingIntervalRef.current) clearInterval(pollingIntervalRef.current);
+                            pollingIntervalRef.current = null;
+                            const resumeIdFromResult = statusResult.result?.resume_id;
+
+                            if (resumeIdFromResult) {
+                                setGeneratedResumeId(String(resumeIdFromResult));
+                                setStatusError(null);
+                                toast.current?.show({ severity: 'info', summary: 'Ready', detail: 'Editor is ready.', life: 2000 });
+                            } else {
+                                console.warn("Status SUCCESS but 'resume_id' was missing:", statusResult.result);
+                                throw new Error("Editor prepared, but resume ID was not provided.");
+                            }
+                            setIsCheckingStatus(false);
+                            setPollingAttempts(0);
+                            break;
+
+                        case 'FAILURE':
+                            if (pollingIntervalRef.current) clearInterval(pollingIntervalRef.current);
+                            pollingIntervalRef.current = null;
+                            const errorDetail = statusResult.error || 'Preparing editor failed.';
+                            setStatusError(errorDetail);
+                            toast.current?.show({ severity: 'error', summary: 'Editor Status Failed', detail: errorDetail });
+                            setIsCheckingStatus(false);
+                            setPollingAttempts(0);
+                            break;
+
+                        case 'PENDING':
+                        default:
+                            if (pollingAttempts + 1 >= MAX_POLLING_ATTEMPTS) {
+                                if (pollingIntervalRef.current) clearInterval(pollingIntervalRef.current);
+                                pollingIntervalRef.current = null;
+                                throw new Error("Checking editor status is taking longer than expected.");
+                            }
+                            setPollingAttempts(prev => prev + 1);
+                            break;
+                    }
+
+                } catch (err: any) {
+                    console.error("Polling error:", err);
+                    if (pollingIntervalRef.current) clearInterval(pollingIntervalRef.current);
+                    pollingIntervalRef.current = null;
+                    setStatusError(err.message || 'An error occurred while checking editor status.');
+                    toast.current?.show({ severity: 'error', summary: 'Status Check Error', detail: err.message || 'Could not check editor status.' });
+                    setIsCheckingStatus(false);
+                    setPollingAttempts(0);
+                }
+            };
+
+            checkStatus(generationTaskId);
+
+            if (pollingIntervalRef.current) clearInterval(pollingIntervalRef.current);
+            pollingIntervalRef.current = setInterval(() => {
+                checkStatus(generationTaskId);
+            }, POLLING_INTERVAL);
+        } else {
+            toast.current?.show({ severity: 'error', summary: 'Error', detail: 'Cannot retry, task ID is missing.' });
         }
     };
 
@@ -194,6 +434,8 @@ const ATSCheckerPage = () => {
         setResumeFile(null);
         setResumeText('');
         setShowForm(true);
+        resetPollingState();
+        fileUploadRef.current?.clear();
     };
 
     const handleGoogleSignIn = () => {
@@ -420,15 +662,53 @@ const ATSCheckerPage = () => {
                                 {apiResponse}
                             </ReactMarkdown>
 
-                            <div className="mt-5 pt-4 border-top-1 text-center">
+                            <div className="mt-5 pt-4 border-top-1 flex flex-column sm:flex-row justify-content-center align-items-center gap-3">
                                 <motion.div variants={buttonHoverTap} whileHover="hover" whileTap="tap">
                                     <Button
                                         label="Start New Scan"
                                         icon="pi pi-refresh"
-                                        className="p-button-secondary p-button-outlined"
+                                        className="p-button-secondary p-button-outlined w-full sm:w-auto"
                                         onClick={handleNewScan}
+                                        disabled={isCheckingStatus}
                                     />
                                 </motion.div>
+
+                                {status === 'authenticated' && generationTaskId && (
+                                    <motion.div variants={buttonHoverTap} whileHover="hover" whileTap="tap">
+                                        <Button
+                                            label={
+                                                isCheckingStatus ? "Checking Editor Status..." :
+                                                statusError ? "Retry Status Check" :
+                                                generatedResumeId ? "Go to Editor" :
+                                                "Preparing Editor..."
+                                            }
+                                            icon={
+                                                isCheckingStatus ? "pi pi-spin pi-spinner" :
+                                                statusError ? "pi pi-exclamation-triangle" :
+                                                generatedResumeId ? "pi pi-pencil" :
+                                                "pi pi-cog"
+                                            }
+                                            onClick={
+                                                isCheckingStatus ? () => {} :
+                                                statusError ? handleRetryStatusCheck :
+                                                generatedResumeId ? handleGoToEditor :
+                                                () => {}
+                                            }
+                                            disabled={isCheckingStatus || (!generatedResumeId && !statusError)}
+                                            className="p-button-outlined w-full sm:w-auto"
+                                            tooltip={
+                                                isCheckingStatus ? "Please wait..." :
+                                                statusError ? `Error: ${statusError}` :
+                                                generatedResumeId ? "Edit this resume" :
+                                                "Checking background task status"
+                                            }
+                                            tooltipOptions={{ position: 'bottom', showDelay: 300 }}
+                                        />
+                                    </motion.div>
+                                )}
+                                {statusError && !isCheckingStatus && (
+                                    <small className="p-error text-center sm:text-left w-full sm:w-auto">Failed to prepare editor. {statusError}</small>
+                                )}
                             </div>
 
                             {status !== 'authenticated' && (
@@ -438,14 +718,6 @@ const ATSCheckerPage = () => {
                                         <Button label="Continue with Google" icon="pi pi-google" className="p-button-outlined" onClick={handleGoogleSignIn} />
                                     </motion.div>
                                     <p className="text-xs text-color-secondary mt-2">Sign in to save results and access the full editor.</p>
-                                </motion.div>
-                            )}
-                            {status === 'authenticated' && (
-                                <motion.div initial="hidden" animate="visible" variants={fadeInUp} className="mt-5 pt-4 border-top-1 text-center">
-                                    <p className="mb-3 font-semibold">Go to your dashboard to continue editing.</p>
-                                    <motion.div variants={buttonHoverTap} whileHover="hover" whileTap="tap">
-                                        <Button label="Go to Dashboard" icon="pi pi-arrow-right" className="p-button-outlined" onClick={() => window.location.href = '/main/dashboard'} />
-                                    </motion.div>
                                 </motion.div>
                             )}
                         </motion.div>
