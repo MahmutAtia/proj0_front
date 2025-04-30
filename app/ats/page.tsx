@@ -9,13 +9,14 @@ import { Button } from 'primereact/button';
 import { Card } from 'primereact/card';
 import { Toast } from 'primereact/toast';
 import { ProgressSpinner } from 'primereact/progressspinner';
-import { SelectButton, SelectButtonChangeEvent } from 'primereact/selectbutton'; // Import SelectButton
+import { SelectButton, SelectButtonChangeEvent } from 'primereact/selectbutton';
+import { Dropdown, DropdownChangeEvent } from 'primereact/dropdown';
 import { motion, AnimatePresence } from 'framer-motion';
 import ReactMarkdown from 'react-markdown';
 import { signIn, useSession } from 'next-auth/react';
-import styles from './ats.module.css'; // Ensure this CSS module exists
+import styles from './ats.module.css';
 
-// Animation Variants (Keep existing)
+// Animation Variants
 const fadeInUp = {
     hidden: { opacity: 0, y: 20 },
     visible: { opacity: 1, y: 0, transition: { duration: 0.5, ease: 'easeOut' } },
@@ -33,15 +34,17 @@ const buttonHoverTap = {
 // --- Define Page Component ---
 const ATSCheckerPage = () => {
     // --- State ---
-    const [resumeInputMethod, setResumeInputMethod] = useState<'upload' | 'paste'>('upload'); // 'upload' or 'paste'
+    const [resumeInputMethod, setResumeInputMethod] = useState<'upload' | 'paste'>('upload');
     const [resumeFile, setResumeFile] = useState<File | null>(null);
-    const [resumeText, setResumeText] = useState<string>(''); // State for pasted text
+    const [resumeText, setResumeText] = useState<string>('');
     const [targetRole, setTargetRole] = useState('');
+    const [targetLanguage, setTargetLanguage] = useState<string>('en');
     const [includeJobDescription, setIncludeJobDescription] = useState(false);
     const [jobDescription, setJobDescription] = useState('');
     const [isLoading, setIsLoading] = useState(false);
     const [apiResponse, setApiResponse] = useState<string | null>(null);
     const [error, setError] = useState<string | null>(null);
+    const [showForm, setShowForm] = useState(true);
 
     // --- Refs and Hooks ---
     const toast = useRef<Toast>(null);
@@ -54,11 +57,17 @@ const ATSCheckerPage = () => {
         { label: 'Paste Text', value: 'paste', icon: 'pi pi-pencil' }
     ];
 
+    const languageOptions = [
+        { label: 'English', value: 'en' },
+        { label: 'French', value: 'fr' },
+        { label: 'Spanish', value: 'es' },
+    ];
+
     // --- Event Handlers ---
     const handleFileSelect = (event: FileUploadSelectEvent) => {
         if (event.files && event.files.length > 0) {
             setResumeFile(event.files[0]);
-            setResumeText(''); // Clear pasted text if file is selected
+            setResumeText('');
             setApiResponse(null);
             setError(null);
         }
@@ -72,7 +81,7 @@ const ATSCheckerPage = () => {
 
     const handleResumeTextChange = (event: React.ChangeEvent<HTMLTextAreaElement>) => {
         setResumeText(event.target.value);
-        setResumeFile(null); // Clear file if text is pasted
+        setResumeFile(null);
         setApiResponse(null);
         setError(null);
     };
@@ -80,7 +89,6 @@ const ATSCheckerPage = () => {
     const handleInputMethodChange = (e: SelectButtonChangeEvent) => {
         if (e.value !== null) {
             setResumeInputMethod(e.value);
-            // Optionally clear the other input type when switching
             if (e.value === 'upload') setResumeText('');
             if (e.value === 'paste') setResumeFile(null);
             setApiResponse(null);
@@ -88,13 +96,15 @@ const ATSCheckerPage = () => {
         }
     };
 
-    // Dummy uploader for FileUpload component when customUpload is true
+    const handleLanguageChange = (e: DropdownChangeEvent) => {
+        setTargetLanguage(e.value);
+    };
+
     const customUploader = async (event: FileUploadHandlerEvent) => {
         event.options.clear();
     };
 
     const handleSubmit = async () => {
-        // --- Validation ---
         const isResumeProvided = (resumeInputMethod === 'upload' && resumeFile) || (resumeInputMethod === 'paste' && resumeText.trim());
         if (!isResumeProvided) {
             toast.current?.show({ severity: 'warn', summary: 'Missing Resume', detail: `Please ${resumeInputMethod === 'upload' ? 'upload your resume file' : 'paste your resume text'}.` });
@@ -112,10 +122,10 @@ const ATSCheckerPage = () => {
         setIsLoading(true);
         setApiResponse(null);
         setError(null);
+        setShowForm(false);
 
         const formData = new FormData();
 
-        // Add resume data (either file or text)
         if (resumeInputMethod === 'upload' && resumeFile) {
             formData.append('resume', resumeFile);
         } else if (resumeInputMethod === 'paste' && resumeText.trim()) {
@@ -124,10 +134,11 @@ const ATSCheckerPage = () => {
 
         const backendFormData = {
             description: includeJobDescription ? jobDescription : '',
-            targetLanguage: 'en',
+            targetLanguage: targetLanguage,
+            targetRole: targetRole,
         };
         formData.append('formData', JSON.stringify(backendFormData));
-        formData.append('target_role', targetRole);
+
 
         try {
             const apiUrl = `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/resumes/ats-checker/`;
@@ -141,6 +152,7 @@ const ATSCheckerPage = () => {
                     })
                 },
             };
+
 
             const response = await fetch(apiUrl, fetchOptions);
 
@@ -156,206 +168,269 @@ const ATSCheckerPage = () => {
             }
 
             const result = await response.json();
-            setApiResponse(result.analysis || result.ats_result || 'Analysis complete, but no specific feedback was returned.');
+            const markdownOutput = result;
+
+            if (typeof markdownOutput === 'string' && markdownOutput.trim() !== '') {
+                setApiResponse(markdownOutput);
+            } else {
+                console.warn("Received response, but 'ats_result' key was missing, empty, or not a string:", result);
+                setApiResponse('Analysis complete, but no specific feedback was returned.');
+            }
+
             toast.current?.show({ severity: 'success', summary: 'Analysis Complete', detail: 'Your resume has been scanned.' });
 
         } catch (err: any) {
             setError(err.message || 'An unexpected error occurred.');
             toast.current?.show({ severity: 'error', summary: 'Analysis Failed', detail: err.message || 'An unexpected error occurred.' });
+            setShowForm(true);
         } finally {
             setIsLoading(false);
         }
+    };
+
+    const handleNewScan = () => {
+        setApiResponse(null);
+        setError(null);
+        setResumeFile(null);
+        setResumeText('');
+        setShowForm(true);
     };
 
     const handleGoogleSignIn = () => {
         signIn('google', { callbackUrl: '/dashboard' });
     };
 
-    // --- Render Logic ---
     const isSubmitDisabled = isLoading || !targetRole.trim() || !((resumeInputMethod === 'upload' && resumeFile) || (resumeInputMethod === 'paste' && resumeText.trim()));
 
     return (
-        // Add padding and center the card for a page layout
         <div className="p-4 md:p-6 lg:p-8 flex justify-content-center align-items-start min-h-screen bg-gray-100">
             <motion.div initial="hidden" animate="visible" variants={fadeInUp} className="w-full" style={{ maxWidth: '800px' }}>
                 <Toast ref={toast} position="top-right" />
                 <Card title="ATS Compatibility Checker" subTitle="See how your resume stacks up against automated screening systems." className={styles.atsCard}>
-                    <div className="p-fluid formgrid grid">
-
-                        {/* Resume Input Method Selection */}
-                        <div className="field col-12">
-                            <label className="font-semibold block mb-2">1. Provide Your Resume</label>
-                            <SelectButton
-                                value={resumeInputMethod}
-                                options={resumeInputOptions}
-                                onChange={handleInputMethodChange}
-                                optionLabel="label"
-                                itemTemplate={(option) => ( // Custom template for icon + label
-                                    <div className="flex align-items-center">
-                                        <i className={`${option.icon} mr-2`}></i>
-                                        <span>{option.label}</span>
+                    <AnimatePresence>
+                        {showForm && (
+                            <motion.div
+                                key="ats-form"
+                                initial={{ opacity: 0 }}
+                                animate={{ opacity: 1 }}
+                                exit={{ opacity: 0 }}
+                                transition={{ duration: 0.3 }}
+                            >
+                                <div className="p-fluid formgrid grid">
+                                    <div className="field col-12">
+                                        <label className="font-semibold block mb-2">1. Provide Your Resume</label>
+                                        <SelectButton
+                                            value={resumeInputMethod}
+                                            options={resumeInputOptions}
+                                            onChange={handleInputMethodChange}
+                                            optionLabel="label"
+                                            itemTemplate={(option) => (
+                                                <div className="flex align-items-center">
+                                                    <i className={`${option.icon} mr-2`}></i>
+                                                    <span>{option.label}</span>
+                                                </div>
+                                            )}
+                                            disabled={isLoading}
+                                        />
                                     </div>
-                                )}
-                                disabled={isLoading}
-                            />
-                        </div>
 
-                        {/* Conditional Resume Input: Upload */}
-                        <AnimatePresence mode="wait">
-                            {resumeInputMethod === 'upload' && (
-                                <motion.div
-                                    key="upload"
-                                    className="field col-12"
-                                    initial={{ opacity: 0 }}
-                                    animate={{ opacity: 1 }}
-                                    exit={{ opacity: 0 }}
-                                    transition={{ duration: 0.2 }}
-                                >
-                                    <FileUpload
-                                        ref={fileUploadRef}
-                                        name="resume"
-                                        customUpload
-                                        uploadHandler={customUploader}
-                                        onSelect={handleFileSelect}
-                                        onRemove={handleFileRemove}
-                                        onClear={() => setResumeFile(null)}
-                                        accept=".pdf,.doc,.docx,.txt"
-                                        maxFileSize={5000000} // 5MB
-                                        chooseLabel={resumeFile ? "Change File" : "Select File"}
-                                        chooseOptions={{ className: 'p-button-outlined w-full md:w-auto' }}
-                                        cancelOptions={{ className: 'p-button-danger p-button-outlined' }}
-                                        progressBarTemplate={() => null}
-                                        emptyTemplate={<p className="m-0 text-color-secondary">Drag and drop file here or click to select.</p>}
-                                        className={styles.fileUpload}
-                                        disabled={isLoading}
-                                    />
-                                    {resumeFile && <p className="mt-2 text-sm text-green-600">Selected: {resumeFile.name}</p>}
-                                </motion.div>
-                            )}
+                                    <AnimatePresence mode="wait">
+                                        {resumeInputMethod === 'upload' && (
+                                            <motion.div
+                                                key="upload"
+                                                className="field col-12"
+                                                initial={{ opacity: 0 }}
+                                                animate={{ opacity: 1 }}
+                                                exit={{ opacity: 0 }}
+                                                transition={{ duration: 0.2 }}
+                                            >
+                                                <FileUpload
+                                                    ref={fileUploadRef}
+                                                    name="resume"
+                                                    customUpload
+                                                    uploadHandler={customUploader}
+                                                    onSelect={handleFileSelect}
+                                                    onRemove={handleFileRemove}
+                                                    onClear={() => setResumeFile(null)}
+                                                    accept=".pdf,.doc,.docx,.txt"
+                                                    maxFileSize={5000000}
+                                                    chooseLabel={resumeFile ? "Change File" : "Select File"}
+                                                    chooseOptions={{ className: 'p-button-outlined w-full md:w-auto' }}
+                                                    cancelOptions={{ className: 'p-button-danger p-button-outlined' }}
+                                                    progressBarTemplate={() => null}
+                                                    emptyTemplate={<p className="m-0 text-color-secondary">Drag and drop file here or click to select.</p>}
+                                                    className={styles.fileUpload}
+                                                    disabled={isLoading}
+                                                    uploadOptions={{ style: { display: 'none' } }}
+                                                />
+                                                {resumeFile && <p className="mt-2 text-sm text-green-600">Selected: {resumeFile.name}</p>}
+                                            </motion.div>
+                                        )}
 
-                            {/* Conditional Resume Input: Paste */}
-                            {resumeInputMethod === 'paste' && (
-                                <motion.div
-                                    key="paste"
-                                    className="field col-12"
-                                    initial={{ opacity: 0 }}
-                                    animate={{ opacity: 1 }}
-                                    exit={{ opacity: 0 }}
-                                    transition={{ duration: 0.2 }}
-                                >
-                                    <InputTextarea
-                                        value={resumeText}
-                                        onChange={handleResumeTextChange}
-                                        rows={10}
-                                        placeholder="Paste your full resume text here..."
-                                        autoResize
-                                        className="w-full"
-                                        disabled={isLoading}
-                                    />
-                                </motion.div>
-                            )}
-                        </AnimatePresence>
+                                        {resumeInputMethod === 'paste' && (
+                                            <motion.div
+                                                key="paste"
+                                                className="field col-12"
+                                                initial={{ opacity: 0 }}
+                                                animate={{ opacity: 1 }}
+                                                exit={{ opacity: 0 }}
+                                                transition={{ duration: 0.2 }}
+                                            >
+                                                <InputTextarea
+                                                    value={resumeText}
+                                                    onChange={handleResumeTextChange}
+                                                    rows={10}
+                                                    placeholder="Paste your full resume text here..."
+                                                    autoResize
+                                                    className="w-full"
+                                                    disabled={isLoading}
+                                                />
+                                            </motion.div>
+                                        )}
+                                    </AnimatePresence>
 
-                        {/* Target Role */}
-                        <div className="field col-12 md:col-6">
-                            <label htmlFor="targetRole" className="font-semibold block mb-2">2. Target Role</label>
-                            <InputText
-                                id="targetRole"
-                                value={targetRole}
-                                onChange={(e) => setTargetRole(e.target.value)}
-                                placeholder="e.g., Software Engineer"
-                                disabled={isLoading}
-                            />
-                        </div>
+                                    <div className="field col-12 md:col-6">
+                                        <label htmlFor="targetRole" className="font-semibold block mb-2">2. Target Role</label>
+                                        <InputText
+                                            id="targetRole"
+                                            value={targetRole}
+                                            onChange={(e) => setTargetRole(e.target.value)}
+                                            placeholder="e.g., Software Engineer"
+                                            disabled={isLoading}
+                                        />
+                                    </div>
 
-                        {/* Job Description Checkbox */}
-                        <div className="field-checkbox col-12 md:col-6 flex align-items-end pb-2 md:pb-0 md:pt-3"> {/* Adjusted alignment */}
-                            <Checkbox
-                                inputId="includeJD"
-                                checked={includeJobDescription}
-                                onChange={(e: CheckboxChangeEvent) => setIncludeJobDescription(e.checked ?? false)}
-                                disabled={isLoading}
-                            />
-                            <label htmlFor="includeJD" className="ml-2 font-semibold">Add Job Description? (Recommended)</label>
-                        </div>
+                                    <div className="field col-12 md:col-6">
+                                        <label htmlFor="targetLanguage" className="font-semibold block mb-2">Target Language</label>
+                                        <Dropdown
+                                            id="targetLanguage"
+                                            value={targetLanguage}
+                                            options={languageOptions}
+                                            onChange={handleLanguageChange}
+                                            placeholder="Select Language"
+                                            disabled={isLoading}
+                                            className="w-full"
+                                        />
+                                    </div>
 
-                        {/* Job Description Textarea (Conditional) */}
-                        <AnimatePresence>
-                            {includeJobDescription && (
-                                <motion.div
-                                    className="field col-12"
-                                    variants={fadeInOut}
-                                    initial="hidden"
-                                    animate="visible"
-                                    exit="exit"
-                                >
-                                    <label htmlFor="jobDescription" className="font-semibold block mb-2">3. Paste Job Description</label>
-                                    <InputTextarea
-                                        id="jobDescription"
-                                        value={jobDescription}
-                                        onChange={(e) => setJobDescription(e.target.value)}
-                                        rows={8}
-                                        placeholder="Paste the full job description here..."
-                                        autoResize
-                                        className="w-full"
-                                        disabled={isLoading}
-                                    />
-                                </motion.div>
-                            )}
-                        </AnimatePresence>
+                                    <div className="field-checkbox col-12 md:col-6 flex align-items-end pb-2 md:pb-0 md:pt-3">
+                                        <Checkbox
+                                            inputId="includeJD"
+                                            checked={includeJobDescription}
+                                            onChange={(e: CheckboxChangeEvent) => setIncludeJobDescription(e.checked ?? false)}
+                                            disabled={isLoading}
+                                        />
+                                        <label htmlFor="includeJD" className="ml-2 font-semibold">Add Job Description? (Recommended)</label>
+                                    </div>
 
-                        {/* Submit Button */}
-                        <div className="col-12 flex justify-content-center mt-4">
-                            <motion.div variants={buttonHoverTap} whileHover="hover" whileTap="tap">
-                                <Button
-                                    label={isLoading ? "Analyzing..." : "Check ATS Score"}
-                                    icon={isLoading ? "pi pi-spin pi-spinner" : "pi pi-shield"}
-                                    onClick={handleSubmit}
-                                    disabled={isSubmitDisabled}
-                                    className="p-button-lg p-button-success w-full md:w-auto" // Full width on mobile
-                                />
+                                    <AnimatePresence>
+                                        {includeJobDescription && (
+                                            <motion.div
+                                                className="field col-12"
+                                                variants={fadeInOut}
+                                                initial="hidden"
+                                                animate="visible"
+                                                exit="exit"
+                                            >
+                                                <label htmlFor="jobDescription" className="font-semibold block mb-2">3. Paste Job Description</label>
+                                                <InputTextarea
+                                                    id="jobDescription"
+                                                    value={jobDescription}
+                                                    onChange={(e) => setJobDescription(e.target.value)}
+                                                    rows={8}
+                                                    placeholder="Paste the full job description here..."
+                                                    autoResize
+                                                    className="w-full"
+                                                    disabled={isLoading}
+                                                />
+                                            </motion.div>
+                                        )}
+                                    </AnimatePresence>
+
+                                    <div className="col-12 flex justify-content-center mt-4">
+                                        <motion.div variants={buttonHoverTap} whileHover="hover" whileTap="tap">
+                                            <Button
+                                                label="Check ATS Score"
+                                                icon="pi pi-shield"
+                                                onClick={handleSubmit}
+                                                disabled={isSubmitDisabled || isLoading}
+                                                className="p-button-lg p-button-success w-full md:w-auto"
+                                            />
+                                        </motion.div>
+                                    </div>
+                                </div>
                             </motion.div>
-                        </div>
-                    </div>
+                        )}
+                    </AnimatePresence>
 
-                    {/* Loading Spinner */}
                     {isLoading && (
-                        <div className="flex justify-content-center my-5">
-                            <ProgressSpinner style={{ width: '50px', height: '50px' }} strokeWidth="4" animationDuration=".5s" />
-                        </div>
+                        <motion.div
+                            key="loading"
+                            initial={{ opacity: 0 }}
+                            animate={{ opacity: 1 }}
+                            exit={{ opacity: 0 }}
+                            className="flex flex-column justify-content-center align-items-center my-5 text-center"
+                            style={{ minHeight: '200px' }}
+                        >
+                            <ProgressSpinner style={{ width: '50px', height: '50px' }} strokeWidth="4" animationDuration=".8s" />
+                            <motion.p
+                                className="mt-4 text-lg text-color-secondary font-semibold"
+                                initial={{ opacity: 0 }}
+                                animate={{ opacity: 1 }}
+                                transition={{ delay: 0.5, duration: 0.5 }}
+                            >
+                                Analyzing your resume...
+                            </motion.p>
+                            <motion.p
+                                className="mt-2 text-sm text-color-secondary"
+                                initial={{ opacity: 0 }}
+                                animate={{ opacity: 1 }}
+                                transition={{ delay: 1.0, duration: 0.5 }}
+                            >
+                                Checking keywords and structure against ATS standards.
+                            </motion.p>
+                        </motion.div>
                     )}
 
-                    {/* Error Message */}
-                    {error && !isLoading && (
+                    {!isLoading && error && (
                         <motion.div initial="hidden" animate="visible" variants={fadeInUp} className={`p-3 border-round bg-red-100 text-red-700 my-4 ${styles.errorMessage}`}>
                             <strong>Error:</strong> {error}
                         </motion.div>
                     )}
 
-                    {/* Results Container */}
-                    {apiResponse && !isLoading && (
+                    {!isLoading && apiResponse && !error && (
                         <motion.div initial="hidden" animate="visible" variants={fadeInUp} className={`mt-5 ${styles.resultsContainer}`}>
                             <h3 className="text-xl font-semibold mb-3 border-bottom-1 pb-2">Analysis Results:</h3>
                             <ReactMarkdown
-                               components={{ // Keep custom markdown renderers
-                                    h3: ({node, ...props}) => <h3 className="text-lg font-semibold mt-3 mb-1" {...props} />,
-                                    p: ({node, ...props}) => <p className="mb-2 leading-normal" {...props} />,
-                                    ul: ({node, ...props}) => <ul className="list-disc pl-5 mb-3" {...props} />,
-                                    li: ({node, ...props}) => <li className="mb-1" {...props} />,
-                                    code: ({node, inline, className, children, ...props}) => {
-                                        const match = /language-(\w+)/.exec(className || '')
+                                components={{
+                                    h3: ({ node, ...props }) => <h3 className="text-lg font-semibold mt-3 mb-1" {...props} />,
+                                    p: ({ node, ...props }) => <p className="mb-2 leading-normal" {...props} />,
+                                    ul: ({ node, ...props }) => <ul className="list-disc pl-5 mb-3" {...props} />,
+                                    li: ({ node, ...props }) => <li className="mb-1" {...props} />,
+                                    code: ({ node, inline, className, children, ...props }) => {
+                                        const match = /language-(\w+)/.exec(className || '');
                                         return !inline ? (
-                                          <pre className={styles.codeBlock} {...props}><code>{children}</code></pre>
+                                            <pre className={styles.codeBlock} {...props}><code>{children}</code></pre>
                                         ) : (
-                                          <code className={styles.inlineCode} {...props}>{children}</code>
-                                        )
-                                      }
-                               }}
+                                            <code className={styles.inlineCode} {...props}>{children}</code>
+                                        );
+                                    }
+                                }}
                             >
                                 {apiResponse}
                             </ReactMarkdown>
 
-                            {/* Sign-In / Dashboard Buttons */}
+                            <div className="mt-5 pt-4 border-top-1 text-center">
+                                <motion.div variants={buttonHoverTap} whileHover="hover" whileTap="tap">
+                                    <Button
+                                        label="Start New Scan"
+                                        icon="pi pi-refresh"
+                                        className="p-button-secondary p-button-outlined"
+                                        onClick={handleNewScan}
+                                    />
+                                </motion.div>
+                            </div>
+
                             {status !== 'authenticated' && (
                                 <motion.div initial="hidden" animate="visible" variants={fadeInUp} className="mt-5 pt-4 border-top-1 text-center">
                                     <p className="mb-3 font-semibold">Ready to build your perfect resume?</p>
@@ -381,4 +456,4 @@ const ATSCheckerPage = () => {
     );
 };
 
-export default ATSCheckerPage; // Export as default for the page
+export default ATSCheckerPage;
