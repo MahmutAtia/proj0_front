@@ -13,6 +13,7 @@ import { Tooltip } from 'primereact/tooltip';
 import { Dialog } from 'primereact/dialog'; // Import Dialog
 import styles from './export.module.css';
 import { MOCK_TEMPLATES_WITH_THEMES } from './templates.js';
+import { motion, AnimatePresence } from 'framer-motion'; // Import AnimatePresence
 
 // --- Constants ---
 const PDF_ASPECT_RATIO = 1.414;
@@ -293,6 +294,8 @@ const ResumePreviewPage = ({ params }) => {
                         </div>
                     </div>
 
+
+
                     {/* Preview Area - Adjust height calculation */}
                     <div
                         ref={previewContentRef}
@@ -305,27 +308,41 @@ const ResumePreviewPage = ({ params }) => {
                             style={{ width: `${iframeWidth}px`, height: `${iframeHeight}px` }}
                         >
                             {/* Overlays and Iframe */}
-                            {isLoadingPdf && (
-                                <div className={`absolute top-0 left-0 w-full h-full flex flex-column align-items-center justify-content-center z-2 bg-white-alpha-80 ${styles.overlayBase}`}>
-                                    <ProgressSpinner style={{ width: '40px', height: '40px' }} strokeWidth="3" />
-                                    <p className="mt-3 text-color-secondary">Generating Preview...</p>
-                                </div>
-                            )}
+                            <AnimatePresence> {/* Wrap conditional rendering with AnimatePresence */}
+                                {isLoadingPdf && (
+                                    <motion.div // Use motion.div for animation
+                                        key="pdf-loading-overlay" // Add a unique key for AnimatePresence
+                                        className={`absolute top-0 left-0 w-full h-full flex flex-column align-items-center justify-content-center z-2 bg-white-alpha-80 ${styles.overlayBase}`}
+                                        initial={{ opacity: 0 }} // Start invisible
+                                        animate={{ opacity: 1 }} // Fade in
+                                        exit={{ opacity: 0 }}    // Fade out
+                                        transition={{ duration: 0.3 }} // Control animation speed
+                                    >
+                                        <ProgressSpinner style={{ width: '40px', height: '40px' }} strokeWidth="3" />
+                                        <p className="mt-3 text-color-secondary">Generating Preview...</p>
+                                        {/* Optional: Add a more engaging message or subtle animation here */}
+                                        {/* e.g., <p className="mt-1 text-xs text-color-secondary">Applying styles...</p> */}
+                                    </motion.div>
+                                )}
+                            </AnimatePresence>
+                            {/* Error Overlay (Can also be animated similarly if desired) */}
                             {!isLoadingPdf && errorPdf && (
                                 <div className={`absolute top-0 left-0 w-full h-full flex flex-column align-items-center justify-content-center z-2 bg-red-100 text-red-700 p-4 border-round ${styles.overlayBase}`}>
                                     <i className="pi pi-exclamation-circle text-3xl mb-2"></i>
                                     <p className="text-center">{errorPdf}</p>
                                 </div>
                             )}
+                            {/* PDF Iframe */}
                             {!isLoadingPdf && pdfUrl && !errorPdf && (
-                                <iframe
-                                    key={pdfUrl}
-                                    src={`${pdfUrl}#view=FitH&toolbar=0&navpanes=0&scrollbar=0`}
-                                    title={`Resume Preview - ${selectedTemplate?.name || ''}`}
-                                    className={styles.pdfIframe}
-                                    style={{ width: '100%', height: '100%' }}
-                                />
-                            )}
+                            <iframe
+                                key={pdfUrl} // Key helps React replace the iframe correctly
+                                src={`${pdfUrl}#view=Fit&toolbar=0&navpanes=0&scrollbar=0`} // Changed FitH to Fit
+                                title={`Resume Preview - ${selectedTemplate?.name || ''}`}
+                                className={styles.pdfIframe}
+                                style={{ width: '100%', height: '100%' }}
+                            />
+                        )}
+                            {/* Placeholder */}
                             {!isLoadingPdf && !pdfUrl && !errorPdf && (
                                 <div className={`absolute top-0 left-0 w-full h-full flex flex-column align-items-center justify-content-center z-1 bg-surface-50 text-color-secondary ${styles.overlayBase}`}>
                                     <i className="pi pi-file-edit text-4xl mb-3 text-surface-400"></i>
@@ -336,7 +353,6 @@ const ResumePreviewPage = ({ params }) => {
                     </div>
                 </div>
             </div>
-
             {/* --- Template Preview Modal --- */}
             <Dialog
                 header="Template Preview"
