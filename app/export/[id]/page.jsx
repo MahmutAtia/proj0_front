@@ -20,6 +20,14 @@ const PDF_ASPECT_RATIO = 1.414;
 const BASE_PREVIEW_WIDTH = 800;
 const HEADER_HEIGHT = 60; // Approx height of your main app header (adjust if needed)
 const TOOLBAR_HEIGHT = 53; // Approx height of the new preview toolbar
+const LOADING_MESSAGES = [
+    "Generating Preview...",
+    "Applying styles...",
+    "Rendering layout...",
+    "Fetching fonts...",
+    "Almost ready...",
+    "Just a moment...",
+];
 
 const ResumePreviewPage = ({ params }) => {
     const { data: session, status } = useSession();
@@ -29,10 +37,11 @@ const ResumePreviewPage = ({ params }) => {
     const [templatesData, setTemplatesData] = useState([]);
     const [selectedTemplate, setSelectedTemplate] = useState(null);
     const [selectedThemeValue, setSelectedThemeValue] = useState(null);
-    const [scale, setScale] = useState(70);
+    const [scale, setScale] = useState(100);
     const [pdfUrl, setPdfUrl] = useState(null);
     const [isLoadingOptions, setIsLoadingOptions] = useState(true);
     const [isLoadingPdf, setIsLoadingPdf] = useState(false);
+    const [loadingMessageIndex, setLoadingMessageIndex] = useState(0); // New state for message index
     const [errorOptions, setErrorOptions] = useState(null);
     const [errorPdf, setErrorPdf] = useState(null);
     const [isPreviewVisible, setIsPreviewVisible] = useState(false); // State for modal visibility
@@ -46,6 +55,7 @@ const ResumePreviewPage = ({ params }) => {
     // --- Refs ---
     const pdfBlobCache = useRef({});
     const previewContentRef = useRef(null);
+    const loadingIntervalRef = useRef(null); // Ref to store interval ID
 
     // --- Logic (fetchTemplates, generateCacheKey, fetchPdf, useEffects) ---
     useEffect(() => {
@@ -134,6 +144,23 @@ const ResumePreviewPage = ({ params }) => {
             if (pdfUrl) URL.revokeObjectURL(pdfUrl);
         };
     }, [pdfUrl]);
+
+    // Effect to cycle through loading messages
+    useEffect(() => {
+        if (isLoadingPdf) {
+            setLoadingMessageIndex(0); // Reset to first message on new load
+            loadingIntervalRef.current = setInterval(() => {
+                setLoadingMessageIndex(prevIndex =>
+                    (prevIndex + 1) % LOADING_MESSAGES.length
+                );
+            }, 1000); // Change message every 2 seconds
+        } else {
+            clearInterval(loadingIntervalRef.current); // Clear interval when not loading
+        }
+
+        // Cleanup interval on component unmount
+        return () => clearInterval(loadingIntervalRef.current);
+    }, [isLoadingPdf]);
 
     // --- Handlers ---
     const handleTemplateSelect = (template) => {
@@ -319,9 +346,8 @@ const ResumePreviewPage = ({ params }) => {
                                         transition={{ duration: 0.3 }} // Control animation speed
                                     >
                                         <ProgressSpinner style={{ width: '40px', height: '40px' }} strokeWidth="3" />
-                                        <p className="mt-3 text-color-secondary">Generating Preview...</p>
-                                        {/* Optional: Add a more engaging message or subtle animation here */}
-                                        {/* e.g., <p className="mt-1 text-xs text-color-secondary">Applying styles...</p> */}
+                                        {/* Display cycling loading message */}
+                                        <p className="mt-3 text-color-secondary">{LOADING_MESSAGES[loadingMessageIndex]}</p>
                                     </motion.div>
                                 )}
                             </AnimatePresence>
