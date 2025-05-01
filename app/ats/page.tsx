@@ -243,7 +243,7 @@ const ATSCheckerPage = () => {
 
     const checkStatus = async (taskId: string, isPostAuthCheck: boolean = false) => {
         if (!isCheckingStatus) setIsCheckingStatus(true);
-        if (isPostAuthCheck || pollingAttempts === 0) {
+        if (pollingAttempts === 0) {
             setStatusError(null);
         }
 
@@ -261,11 +261,9 @@ const ATSCheckerPage = () => {
 
             if (!response.ok) {
                 console.error(`Status check failed with status: ${response.status}`);
-                if (!isPostAuthCheck && pollingAttempts + 1 >= MAX_POLLING_ATTEMPTS) {
+                if (pollingAttempts + 1 >= MAX_POLLING_ATTEMPTS) {
+                    setIsCheckingStatus(false);
                     throw new Error("Checking editor status timed out or failed repeatedly.");
-                }
-                if (isPostAuthCheck) {
-                    throw new Error(`Status check failed (${response.status}). Please retry.`);
                 }
                 setPollingAttempts(prev => prev + 1);
                 return;
@@ -273,66 +271,53 @@ const ATSCheckerPage = () => {
 
             const statusResult = await response.json();
 
-            if (isPostAuthCheck) {
-                switch (statusResult.status) {
-                    case 'SUCCESS':
-                        if (statusResult.result?.status === 'SUCCESS') {
-                            await saveGeneratedResume(taskId);
-                        } else {
-                            throw new Error(statusResult.result?.error || 'Background task completed but data processing failed.');
-                        }
-                        break;
-                    case 'RETRY':
-                        await saveGeneratedResume(taskId);
-                        break;
-                    case 'FAILURE':
-                        throw new Error(statusResult.error || 'Analysis task failed previously.');
-                    case 'PENDING':
-                    default:
-                        setStatusError(null);
-                        setIsCheckingStatus(true);
-                        toast.current?.show({ severity: 'info', summary: 'Processing', detail: 'Resume preparation is still in progress. Please wait.', life: 4000 });
-                        setPostAuthCheckComplete(true);
-                        break;
-                }
-            } else {
-                switch (statusResult.status) {
-                    case 'SUCCESS':
-                        if (statusResult.result?.status === 'SUCCESS') {
-                            if (pollingIntervalRef.current) clearInterval(pollingIntervalRef.current);
-                            pollingIntervalRef.current = null;
-                            setPollingAttempts(0);
-                            await saveGeneratedResume(taskId);
-                        } else {
-                            if (pollingIntervalRef.current) clearInterval(pollingIntervalRef.current);
-                            pollingIntervalRef.current = null;
-                            throw new Error(statusResult.result?.error || 'Background task completed but data processing failed.');
-                        }
-                        break;
-                    case 'FAILURE':
-                        if (pollingIntervalRef.current) clearInterval(pollingIntervalRef.current);
-                        pollingIntervalRef.current = null;
-                        const errorDetail = statusResult.error || 'Preparing editor failed.';
-                        setStatusError(errorDetail);
-                        toast.current?.show({ severity: 'error', summary: 'Editor Status Failed', detail: errorDetail });
+            switch (statusResult.status) {
+                case 'SUCCESS':
+                    if (isPostAuthCheck) {
+                        // Post-Auth Flow: Task succeeded, now call the save endpoint
+                        console.log(`Post-auth check SUCCESS for task ${taskId}, calling saveGeneratedResume.`);
+                        // Stop the main loading indicator, save function has its own
                         setIsCheckingStatus(false);
                         setPollingAttempts(0);
-                        break;
-                    case 'PENDING':
-                    default:
-                        if (pollingAttempts + 1 >= MAX_POLLING_ATTEMPTS) {
-                            if (pollingIntervalRef.current) clearInterval(pollingIntervalRef.current);
-                            pollingIntervalRef.current = null;
-                            throw new Error("Checking editor status is taking longer than expected.");
+                        // Clear interval if it was somehow running (shouldn't be for post-auth, but safety)
+                        if (pollingIntervalRef.current) {
+                             clearInterval(pollingIntervalRef.current);
+                             pollingIntervalRef.current = null;
                         }
-                        setPollingAttempts(prev => prev + 1);
-                        break;
-                }
+                        await saveGeneratedResume(taskId); // Call the dedicated save function
+                        // saveGeneratedResume will handle setting generatedResumeId and postAuthCheckComplete
+                    } else {
+                        // Authenticated Polling Flow: Get resume_id directly
+                        const resumeIdFromResult = statusResult.result?.resume_id;
+                        if (resumeIdFromResult) {
+                            // Found resume ID, stop polling and update state
+                            setGeneratedResumeId(String(resumeIdFromResult));
+                            setStatusError(null);
+                            toast.current?.show({ severity: 'info', summary: 'Ready', detail: 'Editor is ready.', life: 2000 });
+                            try { localStorage.removeItem('data'); } catch (e) {}
+                            setIsCheckingStatus(false); // Stop loading on success
+                            setPollingAttempts(0);
+                            // Interval cleared by useEffect cleanup
+                        } else {
+                             // If resume_id is missing even on SUCCESS, treat as error
+                             setIsCheckingStatus(false); // Stop loading
+                             console.warn("Polling status SUCCESS but 'resume_id' was missing in result:", statusResult.result);
+                             throw new Error("Editor prepared, but the resume ID was not found.");
+                        }
+                    }
+                case 'PENDING':
+                default:
+                    if (pollingAttempts + 1 >= MAX_POLLING_ATTEMPTS) {
+                        setIsCheckingStatus(false);
+                        throw new Error("Checking editor status is taking longer than expected.");
+                    }
+                    setPollingAttempts(prev => prev + 1);
+                    break;
             }
 
         } catch (err: any) {
             console.error("Status check error:", err);
-            if (!isPostAuthCheck && pollingIntervalRef.current) {
+            if (pollingIntervalRef.current) {
                 clearInterval(pollingIntervalRef.current);
                 pollingIntervalRef.current = null;
             }
@@ -341,50 +326,63 @@ const ATSCheckerPage = () => {
             setIsCheckingStatus(false);
             if (isPostAuthCheck) {
                 setPostAuthCheckComplete(true);
-            } else {
-                setPollingAttempts(0);
             }
+            setPollingAttempts(0);
         }
     };
 
     useEffect(() => {
-        if (postAuthTaskIdToCheck && session?.accessToken && !postAuthCheckComplete && !isCheckingStatus) {
-            checkStatus(postAuthTaskIdToCheck, true);
-        }
-    }, [postAuthTaskIdToCheck, session?.accessToken, postAuthCheckComplete, isCheckingStatus]);
+        const activeTaskId = postAuthTaskIdToCheck || generationTaskId;
+        const isPostAuth = !!postAuthTaskIdToCheck;
 
-    useEffect(() => {
-        if (generationTaskId && !postAuthTaskIdToCheck && !generatedResumeId && !statusError) {
+        if (activeTaskId && !generatedResumeId && !statusError) {
             if (!isCheckingStatus) {
                 setIsCheckingStatus(true);
-                setPollingAttempts(0);
-
-                if (pollingIntervalRef.current) {
-                    clearInterval(pollingIntervalRef.current);
-                }
-                checkStatus(generationTaskId, false);
-                pollingIntervalRef.current = setInterval(() => {
-                    if (!generatedResumeId && !statusError) {
-                        checkStatus(generationTaskId, false);
-                    } else {
-                        if (pollingIntervalRef.current) clearInterval(pollingIntervalRef.current);
-                    }
-                }, POLLING_INTERVAL);
             }
-        } else {
+
+            const poll = () => {
+                if (activeTaskId && !generatedResumeId && !statusError) {
+                    checkStatus(activeTaskId, isPostAuth);
+                } else {
+                    if (pollingIntervalRef.current) {
+                        clearInterval(pollingIntervalRef.current);
+                        pollingIntervalRef.current = null;
+                    }
+                }
+            };
+
             if (pollingIntervalRef.current) {
                 clearInterval(pollingIntervalRef.current);
                 pollingIntervalRef.current = null;
+            }
+
+            setPollingAttempts(0);
+
+            console.log(`Starting polling/check for task ${activeTaskId}, isPostAuth: ${isPostAuth}`);
+            checkStatus(activeTaskId, isPostAuth);
+
+            pollingIntervalRef.current = setInterval(poll, POLLING_INTERVAL);
+            console.log(`Interval set for task ${activeTaskId}`);
+
+        } else {
+            if (pollingIntervalRef.current) {
+                console.log("Polling conditions not met, clearing interval.");
+                clearInterval(pollingIntervalRef.current);
+                pollingIntervalRef.current = null;
+            }
+            if (isCheckingStatus && !activeTaskId) {
+                setIsCheckingStatus(false);
             }
         }
 
         return () => {
             if (pollingIntervalRef.current) {
+                console.log("Cleanup: Clearing interval.");
                 clearInterval(pollingIntervalRef.current);
                 pollingIntervalRef.current = null;
             }
         };
-    }, [generationTaskId, postAuthTaskIdToCheck, generatedResumeId, statusError, session?.accessToken, isCheckingStatus]);
+    }, [generationTaskId, postAuthTaskIdToCheck, generatedResumeId, statusError, session?.accessToken]);
 
     const handleSubmit = async () => {
         const isResumeProvided = (resumeInputMethod === 'upload' && resumeFile) || (resumeInputMethod === 'paste' && resumeText.trim());
@@ -467,9 +465,9 @@ const ATSCheckerPage = () => {
             toast.current?.show({ severity: 'success', summary: 'Analysis Complete', detail: 'Your resume has been scanned.', life: 3000 });
 
             if (taskId) {
-                if (status === 'authenticated') {
+                if (status === 'authenticated' && generateNewResume) {
                     setGenerationTaskId(taskId);
-                } else {
+                } else if (status !== 'authenticated') {
                     sessionStorage.setItem('pendingTaskId', taskId);
                     if (markdownOutput) {
                         sessionStorage.setItem('pendingApiResponse', markdownOutput);
@@ -478,8 +476,11 @@ const ATSCheckerPage = () => {
             } else {
                 if (status === 'authenticated' && !generateNewResume) {
                     console.log("generate_new_resume was false, no task ID received.");
+                } else if (status !== 'authenticated') {
+                    console.warn("Backend did not return a 'generation_task_id' for unauthenticated user.");
+                    setStatusError("Could not initiate save process after sign-in (missing task ID).");
                 } else {
-                    console.warn("Backend did not return a 'generation_task_id' when expected.");
+                    console.warn("Backend did not return a 'generation_task_id' when expected (authenticated user).");
                     setStatusError("Could not initiate editor status check (missing task ID).");
                 }
             }
@@ -509,11 +510,9 @@ const ATSCheckerPage = () => {
             setPollingAttempts(0);
             if (postAuthTaskIdToCheck) {
                 setPostAuthCheckComplete(false);
-            }
-            if (postAuthTaskIdToCheck) {
                 checkStatus(taskIdToRetry, true);
             } else {
-                checkStatus(taskIdToRetry, false);
+                setIsCheckingStatus(true);
             }
         } else {
             toast.current?.show({ severity: 'error', summary: 'Error', detail: 'Cannot retry, task ID is missing.' });
@@ -522,13 +521,10 @@ const ATSCheckerPage = () => {
 
     const handleSignInAndRedirect = () => {
         const taskIdToStore = sessionStorage.getItem('pendingTaskId');
-
-        if (taskIdToStore) {
-        } else {
-            console.warn("Attempting to sign in, but no pending task ID found in sessionStorage.");
+        if (!taskIdToStore && generationTaskId) {
+            sessionStorage.setItem('pendingTaskId', generationTaskId);
         }
-
-        if (apiResponse) {
+        if (apiResponse && !sessionStorage.getItem('pendingApiResponse')) {
             sessionStorage.setItem('pendingApiResponse', apiResponse);
         }
         signIn('google', { callbackUrl: '/ats?post_auth_task=true' });
@@ -765,20 +761,25 @@ const ATSCheckerPage = () => {
 
                             <div className="mt-5 pt-4 border-top-1 flex flex-column justify-content-center align-items-center gap-3">
                                 {status !== 'authenticated' && sessionStorage.getItem('pendingTaskId') && !postAuthTaskIdToCheck && !postAuthCheckComplete && (
-                                    <div className="w-full text-center p-4 border-1 surface-border border-round bg-primary-50">
-                                        <h4 className="text-lg font-semibold text-primary-700 mt-0 mb-2">Unlock Full Potential!</h4>
-                                        <p className="text-color-secondary mb-4">Sign in with Google to save this analysis, access the powerful resume editor, and manage all your resumes in one place.</p>
+                                    <div className="w-full text-center p-4 border-1 surface-border border-round bg-gradient-to-r from-primary-100 via-primary-50 to-primary-100 shadow-1">
+                                        <span className="p-3 shadow-2 mb-3 inline-block surface-card" style={{ borderRadius: '10px' }}>
+                                            <i className="pi pi-lock text-4xl text-primary"></i>
+                                        </span>
+                                        <h4 className="text-xl font-semibold text-primary-700 mt-0 mb-2">Save Your Progress & Edit!</h4>
+                                        <p className="text-color-secondary mb-4 px-3">Sign in with Google to securely save this analysis to your dashboard and unlock the resume editor.</p>
                                         <motion.div variants={buttonHoverTap} whileHover="hover" whileTap="tap">
                                             <Button
-                                                label="Continue with Google to Save & Edit"
+                                                label="Continue with Google"
                                                 icon="pi pi-google"
-                                                className="p-button-success p-button-lg w-full sm:w-auto"
+                                                className="p-button-success p-button-lg w-full sm:w-auto shadow-md hover:shadow-lg transition-shadow transition-duration-300"
                                                 onClick={handleSignInAndRedirect}
-                                                tooltip="Sign in to save this analysis and access the editor"
+                                                tooltip="Securely sign in to save & edit"
                                                 tooltipOptions={{ position: 'bottom', showDelay: 300 }}
                                             />
                                         </motion.div>
-                                        <Divider className="my-4" />
+                                        <Divider className="my-4" layout="horizontal" align="center">
+                                            <span className="p-tag">OR</span>
+                                        </Divider>
                                     </div>
                                 )}
 
@@ -795,7 +796,7 @@ const ATSCheckerPage = () => {
                                 {isCheckingStatus && status === 'authenticated' && (
                                     <motion.div variants={buttonHoverTap} whileHover="hover" whileTap="tap">
                                         <Button
-                                            label="Checking Status / Saving..."
+                                            label={"Checking Editor Status..."}
                                             icon="pi pi-spin pi-spinner"
                                             disabled={true}
                                             className="p-button-outlined w-full sm:w-auto"
@@ -831,13 +832,13 @@ const ATSCheckerPage = () => {
                                     </motion.div>
                                 )}
 
-                                {status === 'authenticated' && !generationTaskId && !postAuthTaskIdToCheck && !isCheckingStatus && !statusError && (
+                                {status === 'authenticated' && !generateNewResume && !generationTaskId && !postAuthTaskIdToCheck && !isCheckingStatus && !statusError && (
                                     <motion.div variants={buttonHoverTap} whileHover="hover" whileTap="tap">
                                         <Button
                                             label="Go to Dashboard"
                                             icon="pi pi-th-large"
                                             className="p-button-outlined w-full sm:w-auto"
-                                            onClick={() => router.push('/dashboard')}
+                                            onClick={() => router.push('/main/dashboard')}
                                         />
                                     </motion.div>
                                 )}
