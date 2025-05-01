@@ -44,7 +44,7 @@ const Summary = ({ sectionKey }) => {
     const handleAIUpdate = (updatedData) => {
         saveToHistory();
         const newData = { ...data };
-        newData[sectionKey] = updatedData;
+        newData[sectionKey] = updatedData.summary; // Extract the summary value
         setData(newData);
         toast.current.show({
             severity: "success",
