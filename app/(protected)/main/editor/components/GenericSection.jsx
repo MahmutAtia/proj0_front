@@ -80,7 +80,7 @@ const GenericSection = ({ sectionKey }) => {
         setData(newData);
     };
     const renderFields = (item, index) => {
-        const fields = Object.keys(item);
+        const fields = Object.keys(item).filter(key => key !== 'id'); // Filter out the 'id' field
         if (isItemEditing(index)) {
             return (
                 <div className="flex flex-column gap-3">
