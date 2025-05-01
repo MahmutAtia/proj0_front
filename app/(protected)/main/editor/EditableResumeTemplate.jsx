@@ -321,7 +321,6 @@ const EditableResumeTemplate = ({ resumeId }) => {
                                             >
                                                 {index > 0 && <Divider className="my-4" />}
                                                 <h2 className="text-xl font-semibold mt-0 mb-3">
-                                                    {formatSectionName(sectionKey)}
                                                     <i className="pi pi-info-circle ml-2 text-sm text-color-secondary section-title-help"
                                                        data-pr-tooltip={`Enter your professional ${formatSectionName(sectionKey).toLowerCase()} here.`}
                                                        data-pr-position="right"></i>
