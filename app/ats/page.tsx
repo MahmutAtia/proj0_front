@@ -786,11 +786,11 @@ const ATSCheckerPage = () => {
                           </motion.div>
                                 )}
 
-                                <motion.div variants={buttonHoverTap} whileHover="hover" whileTap="tap">
+<motion.div variants={buttonHoverTap} whileHover="hover" whileTap="tap">
                                     <Button
                                         label="Start New Scan"
                                         icon="pi pi-refresh"
-                                        className="p-button-secondary p-button-outlined w-full sm:w-auto"
+                                        className="p-button-secondary p-button-outlined w-full sm:w-auto" // Secondary, outlined style
                                         onClick={resetFormAndResults}
                                         disabled={isCheckingStatus}
                                     />
@@ -823,16 +823,37 @@ const ATSCheckerPage = () => {
                                 )}
 
                                 {generatedResumeId && !isCheckingStatus && !statusError && (
-                                    <motion.div variants={buttonHoverTap} whileHover="hover" whileTap="tap">
-                                        <Button
-                                            label="Go to Editor"
-                                            icon="pi pi-pencil"
-                                            className="p-button-success p-button-outlined w-full sm:w-auto"
-                                            onClick={handleGoToEditor}
-                                            tooltip="Edit this resume"
-                                            tooltipOptions={{ position: 'bottom', showDelay: 300 }}
-                                        />
-                                    </motion.div>
+                                     <motion.div
+                                     variants={buttonHoverTap} // Keep hover/tap effects
+                                     whileHover="hover"
+                                     whileTap="tap"
+                                     // Add a subtle pulse animation
+                                     animate={{
+                                         scale: [1, 1.03, 1], // Scale up and back down
+                                         boxShadow: [ // Add a subtle glow effect
+                                             "0 0 0 0 rgba(40, 167, 69, 0.4)",
+                                             "0 0 0 6px rgba(40, 167, 69, 0)",
+                                             "0 0 0 0 rgba(40, 167, 69, 0)"
+                                         ]
+                                     }}
+                                     transition={{
+                                         duration: 1.8, // Slower, more noticeable pulse
+                                         repeat: Infinity,
+                                         ease: "easeInOut",
+                                         repeatDelay: 1 // Pause between pulses
+                                     }}
+                                     style={{ borderRadius: '6px' }} // Apply border radius for boxShadow
+                                 >
+                                     <Button
+                                         label="Go to Editor"
+                                         icon="pi pi-pencil"
+                                         // Make it the primary action button style
+                                         className="p-button-success p-button-lg w-full sm:w-auto p-button-raised shadow-md" // Larger, raised, success color
+                                         onClick={handleGoToEditor}
+                                         tooltip="Edit this resume"
+                                         tooltipOptions={{ position: 'bottom', showDelay: 300 }}
+                                     />
+                                 </motion.div>
                                 )}
 
                                 {status === 'authenticated' && !generateNewResume && !generationTaskId && !postAuthTaskIdToCheck && !isCheckingStatus && !statusError && (
