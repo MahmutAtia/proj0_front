@@ -1,274 +1,284 @@
-/* Add a button to toggle the sidebar visibility */
-.sidebarToggleButton {
-    display: none; /* Hide by default */
-    position: fixed;
-    top: 7rem;
-    left: 1rem;
-    z-index: 1001;
-    background-color: var(--primary-color);
-    color: white;
-    border: none;
-    border-radius: 50%;
-    width: 40px;
-    height: 40px;
-    cursor: pointer;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+/* Overall Layout */
+.editorLayout {
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden; /* Prevent body scroll */
+    background-color: var(--surface-ground);
 }
 
-.sidebarToggleButton:hover {
-    background-color: var(--primary-600);
+.editorHeader {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.75rem 1rem;
+    background-color: var(--surface-section);
+    box-shadow: var(--surface-shadow);
+    position: sticky; /* Header is always sticky */
+    top: 0;
+    z-index: 1002;
+    border-bottom: 1px solid var(--surface-border);
+    /* Define a variable for header height if possible, otherwise use a fixed value */
+    /* --header-height: 65px; /* Example */
 }
 
+@media (min-width: 768px) { .editorHeader { padding: 1rem; } }
 
-/* Existing CSS */
-.scrollableContent {
-    scroll-behavior: smooth;
-    scrollbar-width: thin;
-    scrollbar-color: var(--primary-color) var(--surface-ground);
-    height: calc(100vh - 8rem); /* Adjust height to fit within the viewport */
-    overflow-y: auto;
-    margin: 2rem;
-}
-
-.scrollableContent::-webkit-scrollbar {
-    width: 8px;
-}
-
-.scrollableContent::-webkit-scrollbar-track {
-    background: var(--surface-ground);
-}
-
-.scrollableContent::-webkit-scrollbar-thumb {
-    background: var(--primary-color);
-    border-radius: 4px;
-}
-
-.scrollableContent::-webkit-scrollbar-thumb:hover {
-    background: var(--primary-600);
-}
-
-.sectionSpacing {
-    margin-bottom: 2rem; /* Add spacing between sections */
-}
-
-.surfaceCard {
-    padding: 1.5rem;
-    border-radius: 12px;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+.editorMainArea {
+    flex-grow: 1;
+    display: flex;
+    position: relative; /* For overlay and potential absolute positioning inside */
+    overflow: hidden; /* Crucial: Contains sidebar/content scrolling */
+    /* Calculate height based on viewport minus header height */
+    /* height: calc(100vh - 65px); /* Adjust 65px to actual header height */
 }
 
 /* Sidebar Styles */
 .sidebar {
+    width: 280px;
+    /* Height is 100% of the container (.editorMainArea) */
+    height: 100%;
+    /* --- Mobile First: Fixed Positioning --- */
     position: fixed;
-    top: 7rem; /* Position below the header */
+    /* Position below header (adjust value if header height changes) */
+    top: 65px; /* Adjust this value precisely */
     left: 0;
-    width: 22rem;
-    height: calc(100vh - 4rem); /* Adjust height to fit below the header */
-    padding-bottom: 2rem; /* Add bottom padding for last element visibility */
-    background-color: var(--surface-section);
-    z-index: 1000;
+    z-index: 1001;
     transform: translateX(-100%);
-    transition: transform 0.3s ease-in-out;
+    transition: transform 0.3s ease-in-out; /* Only transition transform */
+    background-color: var(--surface-overlay);
+    display: flex;
+    flex-direction: column;
+    border-right: 1px solid var(--surface-border);
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
 }
 
 .sidebarVisible {
     transform: translateX(0);
 }
 
-/* Overlay Styles */
-.overlay {
-    position: fixed;
-    top: 4rem; /* Position below the header */
-    left: 0;
-    width: 100%;
-    height: calc(100vh - 4rem); /* Adjust height to fit below the header */
-    background-color: rgba(0, 0, 0, 0.5);
-    z-index: 999;
+.sidebarHeader {
+    padding: 0.75rem 1rem;
+    border-bottom: 1px solid var(--surface-border);
+    flex-shrink: 0;
 }
-
-/* Main Content Adjustment for Larger Screens */
-@media (min-width: 1024px) {
-    .sidebar {
-        transform: translateX(0); /* Always visible on larger screens */
-    }
-
-    .mainContent {
-        margin-left: 20rem; /* Push main content to the right */
-        width: calc(100% - 20rem); /* Ensure main content takes up remaining space */
-    }
-}
-
-
-
 
 .sidebarContent {
-    max-height: calc(100vh - 12rem); /* Account for header + top bar */
-    overflow-y: auto;
+    flex-grow: 1;
+    overflow-y: auto; /* Enable vertical scrolling ONLY within the content */
+    padding-bottom: 1rem;
     scrollbar-width: thin;
-    scrollbar-color: var(--primary-color) var(--surface-ground);
-    padding: 1rem;
+    scrollbar-color: var(--primary-color) var(--surface-100);
 }
 
-.sidebarContent::-webkit-scrollbar {
-    width: 6px;
+.sidebarContent::-webkit-scrollbar { width: 6px; }
+.sidebarContent::-webkit-scrollbar-track { background: var(--surface-100); border-radius: 3px; }
+.sidebarContent::-webkit-scrollbar-thumb { background-color: var(--primary-color); border-radius: 3px; }
+.sidebarContent::-webkit-scrollbar-thumb:hover { background-color: var(--primary-600); }
+
+.sidebarSectionList {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+    padding: 0.5rem;
+    /* Important for dnd: Ensure list itself doesn't have transforms */
+    transform: none;
 }
 
-.sidebarContent::-webkit-scrollbar-track {
-    background: var(--surface-ground);
-    border-radius: 4px;
+/* Sidebar Item Styles */
+.sidebarItem {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0.5rem 0.75rem;
+    border-radius: var(--border-radius);
+    background-color: transparent;
+    /* Remove transitions that might interfere during drag */
+    /* transition: background-color 0.15s ease, box-shadow 0.15s ease; */
+    cursor: default;
+    border: 1px solid transparent;
+    /* Ensure no transforms are applied by default */
+    transform: none;
+    position: relative; /* Keep for potential stacking context if needed */
 }
-/* Add a button to toggle the sidebar visibility */
+
+.sidebarItem:hover {
+    background-color: var(--surface-hover);
+}
+
+/* Style for the item *while* it's being dragged */
+.sidebarItemDragging {
+    /* Let react-beautiful-dnd handle ALL transforms and positioning. */
+    /* Only apply visual styles that don't affect layout/position. */
+    background-color: var(--surface-200); /* Visual feedback */
+    box-shadow: 0 4px 8px rgba(0,0,0,0.2); /* Enhanced shadow */
+    border-color: var(--primary-color); /* Visual feedback */
+    /* DO NOT add transform, position, top, left, etc. here */
+}
+
+.sidebarItemHidden {
+    opacity: 0.6;
+}
+.sidebarItemHidden .sidebarItemText {
+    text-decoration: line-through;
+    color: var(--text-color-secondary);
+}
+
+.sidebarItemContent {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    overflow: hidden;
+    flex-grow: 1;
+}
+
+.dragHandle {
+    cursor: move;
+    padding: 0.25rem;
+    color: var(--text-color-secondary);
+    flex-shrink: 0;
+    display: inline-flex;
+    align-items: center;
+}
+.dragHandle:hover {
+    color: var(--primary-color);
+}
+
+.sidebarItemText {
+    font-size: 0.875rem;
+    font-weight: 500;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    flex-grow: 1;
+}
+
+.emptyIndicator {
+    font-size: 0.75rem;
+    color: var(--orange-500);
+    margin-left: 0.25rem;
+    flex-shrink: 0;
+}
+
+.visibilityToggle {
+    flex-shrink: 0;
+}
+.sidebarItemHidden .visibilityToggle {
+    color: var(--text-color-secondary) !important;
+}
+
+/* Sidebar Toggle Button (Mobile/Tablet) */
 .sidebarToggleButton {
-    display: none; /* Hide by default */
+    display: inline-flex;
+    z-index: 1002;
+}
+
+/* Overlay for Sidebar on Small Screens */
+.overlay {
     position: fixed;
-    top: 7rem;
-    left: 1rem;
-    z-index: 1001;
-    background-color: var(--primary-color);
-    color: white;
-    border: none;
-    border-radius: 50%;
-    width: 40px;
-    height: 40px;
+    /* Cover area below header */
+    top: 65px; /* Adjust to match sidebar top */
+    left: 0;
+    width: 100%;
+    /* Adjust height to match sidebar */
+    height: calc(100% - 65px); /* Adjust 65px */
+    background-color: rgba(0, 0, 0, 0.4);
+    z-index: 1000;
     cursor: pointer;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+    display: block;
 }
 
-.sidebarToggleButton:hover {
-    background-color: var(--primary-600);
+/* Main Content Area */
+.mainContent {
+    flex-grow: 1;
+    /* Height is 100% of the container (.editorMainArea) */
+    height: 100%;
+    overflow-y: auto; /* Enable vertical scrolling ONLY for the content */
+    transition: margin-left 0.3s ease-in-out;
+    background-color: var(--surface-ground);
 }
 
-/* Show the toggle button on smaller screens */
+.contentPadding { padding: 0.75rem; }
+@media (min-width: 768px) { .contentPadding { padding: 1rem; } }
+@media (min-width: 1024px) { .contentPadding { padding: 1.25rem; } }
+
+.centeredSpinner {
+    /* Position relative to mainContent if needed, or keep absolute */
+    position: absolute;
+    top: 50%;
+    /* Adjust left based on whether sidebar margin exists */
+    left: 50%;
+    transform: translate(-50%, -50%);
+    text-align: center;
+}
+
+/* Resume Paper Styling */
+.resumePaper {
+    max-width: 850px;
+    margin: 0 auto;
+    background-color: var(--surface-card);
+    padding: 1.5rem;
+    box-shadow: var(--card-shadow);
+    border-radius: var(--border-radius);
+    border: 1px solid var(--surface-border);
+}
+@media (min-width: 768px) { .resumePaper { padding: 2rem; } }
+@media (min-width: 1024px) { .resumePaper { padding: 2.5rem; } }
+
+.resumeSectionsContainer {
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
+}
+
+.sectionWrapper { /* No changes needed */ }
+
+.emptySectionMessage {
+    text-align: center;
+    font-size: 0.875rem;
+    color: var(--text-color-secondary);
+    margin-top: 1rem;
+    padding: 1rem;
+    border: 1px dashed var(--surface-300);
+    border-radius: var(--border-radius);
+    background-color: var(--surface-50);
+}
+
+
+/* --- Responsive Adjustments --- */
+
+/* Tablet and smaller (<= 1023px) */
 @media (max-width: 1023px) {
-    .sidebarToggleButton {
-        display: block;
-    }
-
-    .sidebar {
-        transform: translateX(-100%);
-    }
-
-    .sidebarVisible {
-        transform: translateX(0);
-    }
-
-    .mainContent {
-        margin-left: 0;
-        width: 100%;
-    }
+    .sidebarToggleButton { display: inline-flex !important; }
+    .mainContent { margin-left: 0; }
+    .overlay { display: block; }
+    /* Sidebar uses default 'fixed' positioning defined above */
 }
 
-/* Existing CSS */
-.scrollableContent {
-    scroll-behavior: smooth;
-    scrollbar-width: thin;
-    scrollbar-color: var(--primary-color) var(--surface-ground);
-    height: calc(100vh - 8rem); /* Adjust height to fit within the viewport */
-    overflow-y: auto;
-    margin: 2rem;
-}
-
-.scrollableContent::-webkit-scrollbar {
-    width: 8px;
-}
-
-.scrollableContent::-webkit-scrollbar-track {
-    background: var(--surface-ground);
-}
-
-.scrollableContent::-webkit-scrollbar-thumb {
-    background: var(--primary-color);
-    border-radius: 4px;
-}
-
-.scrollableContent::-webkit-scrollbar-thumb:hover {
-    background: var(--primary-600);
-}
-
-.sectionSpacing {
-    margin-bottom: 2rem; /* Add spacing between sections */
-}
-
-.surfaceCard {
-    padding: 1.5rem;
-    border-radius: 12px;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-}
-
-/* Sidebar Styles */
-.sidebar {
-    position: fixed;
-    top: 7rem; /* Position below the header */
-    left: 0;
-    width: 22rem;
-    height: calc(100vh - 4rem); /* Adjust height to fit below the header */
-    padding-bottom: 2rem; /* Add bottom padding for last element visibility */
-    background-color: var(--surface-section);
-    z-index: 1000;
-    transform: translateX(-100%);
-    transition: transform 0.3s ease-in-out;
-}
-
-.sidebarVisible {
-    transform: translateX(0);
-}
-
-/* Overlay Styles */
-.overlay {
-    position: fixed;
-    top: 4rem; /* Position below the header */
-    left: 0;
-    width: 100%;
-    height: calc(100vh - 4rem); /* Adjust height to fit below the header */
-    background-color: rgba(0, 0, 0, 0.5);
-    z-index: 999;
-}
-
-/* Main Content Adjustment for Larger Screens */
+/* Desktop (>= 1024px) */
 @media (min-width: 1024px) {
+    .sidebarToggleButton { display: none !important; }
     .sidebar {
-        transform: translateX(0); /* Always visible on larger screens */
+        /* --- Desktop: Change to Sticky Positioning --- */
+        position: sticky;
+        /* Stick relative to the .editorMainArea */
+        top: 0; /* Stick to the top of its container */
+        /* Height remains 100% of container */
+        transform: translateX(0); /* Override mobile transform */
+        z-index: 1; /* Lower z-index than header */
+        box-shadow: none; /* Remove mobile shadow */
+        /* border-right is already applied */
+        /* No transition needed for sticky positioning */
+        transition: none;
     }
-
     .mainContent {
-        margin-left: 20rem; /* Push main content to the right */
-        width: calc(100% - 20rem); /* Ensure main content takes up remaining space */
+        margin-left: 280px; /* Push content by sidebar width */
     }
-}
-
-
-
-.sidebarContent {
-    max-height: calc(100vh - 12rem); /* Account for header + top bar */
-    overflow-y: auto;
-    scrollbar-width: thin;
-    scrollbar-color: var(--primary-color) var(--surface-ground);
-    padding: 1rem;
-}
-
-.sidebarContent::-webkit-scrollbar {
-    width: 6px;
-}
-
-.sidebarContent::-webkit-scrollbar-track {
-    background: var(--surface-ground);
-    border-radius: 4px;
-}
-
-.sidebarContent::-webkit-scrollbar-thumb {
-    background: var(--primary-color);
-    border-radius: 4px;
-}
-
-.sidebarContent::-webkit-scrollbar-thumb:hover {
-    background: var(--primary-600);
-}
-
-.sidebarContent::-webkit-scrollbar-thumb {
-    background: var(--primary-color);
-    border-radius: 4px;
-}
-
-.sidebarContent::-webkit-scrollbar-thumb:hover {
-    background: var(--primary-600);
+    .overlay {
+        display: none; /* No overlay needed */
+    }
+    .centeredSpinner {
+        /* Adjust left position when sidebar is present */
+        left: calc(50% + 140px); /* Example: 50% of viewport + half sidebar width */
+    }
 }
