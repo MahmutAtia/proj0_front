@@ -4,6 +4,8 @@ import { ProgressSpinner } from 'primereact/progressspinner';
 import { Toast } from 'primereact/toast';
 import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
 import { useRouter } from 'next/navigation';
+import { Divider } from 'primereact/divider'; // Import Divider
+import { Tooltip } from 'primereact/tooltip'; // Import Tooltip
 import { useResume } from "./ResumeContext";
 import PersonalInformation from "./components/PersonalInformation";
 import Summary from "./components/Summary";
@@ -16,13 +18,27 @@ import GenericSection from "./components/GenericSection";
 import 'primeflex/primeflex.css';
 import styles from './EditableResumeTemplate.module.css'; // Ensure CSS Modules are used
 
+const SECTION_ICONS = {
+    personal_information: 'pi pi-user',
+    summary: 'pi pi-align-left',
+    experience: 'pi pi-briefcase',
+    education: 'pi pi-book',
+    projects: 'pi pi-code',
+    skills: 'pi pi-star',
+    languages: 'pi pi-globe',
+    // Add icons for all other keys...
+    default: 'pi pi-file'
+};
+
 const EditableResumeTemplate = ({ resumeId }) => {
-    const { data } = useResume();
-    const [loading, setLoading] = useState(!data); // Initialize loading based on initial data presence
+    const { data, updateData } = useResume(); // Assuming updateData is available if needed later
+    const [loading, setLoading] = useState(!data);
     const [hiddenSections, setHiddenSections] = useState([]);
-    const [sidebarVisible, setSidebarVisible] = useState(true); // Default to visible on larger screens
+    const [sidebarVisible, setSidebarVisible] = useState(true);
+    const [activeSection, setActiveSection] = useState(null);
     const router = useRouter();
     const toast = useRef(null);
+    const mainContentRef = useRef(null); // Ref for the main scrollable area
 
     // Define section keys and non-array sections
     const ALL_SECTION_KEYS = [
@@ -47,8 +63,6 @@ const EditableResumeTemplate = ({ resumeId }) => {
 
         if (Array.isArray(sectionData)) {
             return sectionData.length === 0;
-            // Optional: Add deeper check for arrays of objects if needed
-            // return sectionData.every(item => typeof item === 'object' && item !== null && Object.values(item).every(v => !v || (typeof v === 'string' && v.trim() === '')));
         }
 
         return true; // Default to empty for unexpected types
@@ -74,8 +88,6 @@ const EditableResumeTemplate = ({ resumeId }) => {
         newOrder.splice(result.destination.index, 0, removed);
 
         setSectionOrder(newOrder);
-        // Optional: Persist order changes (e.g., to context/backend)
-        // updateData({ ...data, sectionOrder: newOrder }); // Example if context supports it
     };
 
     // Render the appropriate component for each section
@@ -90,6 +102,15 @@ const EditableResumeTemplate = ({ resumeId }) => {
             case 'skills': return <Skills {...commonProps} />;
             case 'languages': return <Languages {...commonProps} />;
             default: return <GenericSection {...commonProps} />;
+        }
+    };
+
+    // Scroll to Section Function
+    const scrollToSection = (sectionKey) => {
+        setActiveSection(sectionKey); // Set active state first
+        const sectionElement = document.getElementById(`section-${sectionKey}`);
+        if (sectionElement) {
+            sectionElement.scrollIntoView({ behavior: 'smooth', block: 'start' });
         }
     };
 
@@ -121,10 +142,7 @@ const EditableResumeTemplate = ({ resumeId }) => {
             if (existingResumeIndex !== -1) {
                 resumes[existingResumeIndex] = { ...resumes[existingResumeIndex], resume: data };
             } else {
-                // Handle case where resume ID might not be in local storage yet
-                // This might need adjustment based on your app's logic
-                console.warn("Resume ID not found in local storage during save. Adding new entry.");
-                resumes.push({ id: Number(resumeId), name: `Resume ${resumeId}`, resume: data }); // Add name or other metadata if needed
+                resumes.push({ id: Number(resumeId), name: `Resume ${resumeId}`, resume: data });
             }
 
             localStorage.setItem('data', JSON.stringify(resumes));
@@ -146,11 +164,11 @@ const EditableResumeTemplate = ({ resumeId }) => {
     const classNames = (...classes) => classes.filter(Boolean).join(' ');
 
     return (
-        <div className={styles.editorLayout}>
+        <div className={classNames(styles.editorLayout, "flex flex-column h-screen")}>
             <Toast ref={toast} />
 
             {/* Header */}
-            <header className={styles.editorHeader}>
+            <header className={classNames(styles.editorHeader, "flex justify-content-between align-items-center p-3 border-bottom-1 surface-border")}>
                 <div className="flex align-items-center">
                     <Button
                         icon="pi pi-bars"
@@ -190,19 +208,24 @@ const EditableResumeTemplate = ({ resumeId }) => {
             </header>
 
             {/* Main Area */}
-            <div className={styles.editorMainArea}>
+            <div className={classNames(styles.editorMainArea, "flex flex-1 overflow-hidden")}>
 
                 {/* Sidebar */}
                 <aside
                     id="resume-sidebar"
-                    className={classNames(styles.sidebar, sidebarVisible && styles.sidebarVisible)}
+                    className={classNames(
+                        styles.sidebar,
+                        sidebarVisible && styles.sidebarVisible,
+                        "flex flex-column h-full surface-section border-right-1 surface-border"
+                    )}
+                    style={{ transition: 'transform 0.3s ease' }}
                 >
                     <div className={styles.sidebarHeader}>
                         <span className="font-semibold">Sections</span>
                         <p className="text-xs text-color-secondary mt-1 mb-0">Drag to reorder. Click eye to toggle.</p>
                     </div>
 
-                    <div className={styles.sidebarContent}>
+                    <div className={classNames(styles.sidebarContent, "overflow-y-auto")}>
                         <DragDropContext onDragEnd={handleReorderSections}>
                             <Droppable droppableId="sections">
                                 {(provided) => (
@@ -212,7 +235,7 @@ const EditableResumeTemplate = ({ resumeId }) => {
                                         className={styles.sidebarSectionList}
                                     >
                                         {sectionOrder.map((sectionKey, index) => {
-                                            if (!sectionKey) return null; // Should not happen with defined keys
+                                            if (!sectionKey) return null;
                                             const isEmpty = isSectionEmpty(sectionKey);
                                             const isHidden = hiddenSections.includes(sectionKey);
                                             return (
@@ -224,23 +247,28 @@ const EditableResumeTemplate = ({ resumeId }) => {
                                                             className={classNames(
                                                                 styles.sidebarItem,
                                                                 snapshot.isDragging && styles.sidebarItemDragging,
-                                                                isHidden && styles.sidebarItemHidden
+                                                                isHidden && styles.sidebarItemHidden,
+                                                                activeSection === sectionKey && "bg-primary-reverse",
+                                                                "flex align-items-center justify-content-between p-2 surface-border cursor-pointer"
                                                             )}
+                                                            onClick={() => scrollToSection(sectionKey)}
                                                         >
-                                                            <div className={styles.sidebarItemContent}>
-                                                                <span {...provided.dragHandleProps} className={styles.dragHandle}>
-                                                                    <i className="pi pi-bars"></i>
+                                                            <div className={classNames(styles.sidebarItemContent, "flex align-items-center")}>
+                                                                <span {...provided.dragHandleProps} className={classNames(styles.dragHandle, "mr-2", "cursor-grab")}>
+                                                                    <i className={SECTION_ICONS[sectionKey] || SECTION_ICONS.default}></i>
                                                                 </span>
                                                                 <span className={styles.sidebarItemText}>{formatSectionName(sectionKey)}</span>
                                                                 {isEmpty && !isHidden && (
-                                                                    <span className={styles.emptyIndicator}>(Empty)</span>
+                                                                    <span className={classNames(styles.emptyIndicator, "ml-1 text-xs text-color-secondary")}>
+                                                                        (Empty)
+                                                                    </span>
                                                                 )}
                                                             </div>
                                                             <Button
                                                                 icon={isHidden ? 'pi pi-eye-slash' : 'pi pi-eye'}
                                                                 className={classNames("p-button-text p-button-secondary p-button-sm", styles.visibilityToggle)}
                                                                 onClick={(e) => {
-                                                                    e.stopPropagation(); // Prevent drag on button click
+                                                                    e.stopPropagation();
                                                                     toggleSectionVisibility(sectionKey);
                                                                 }}
                                                                 tooltip={isHidden ? 'Show Section' : 'Hide Section'}
@@ -260,13 +288,13 @@ const EditableResumeTemplate = ({ resumeId }) => {
                 </aside>
 
                 {/* Overlay for Sidebar on Small Screens */}
-                {sidebarVisible && <div className={styles.overlay} onClick={() => setSidebarVisible(false)} />}
+                {sidebarVisible && <div className={classNames(styles.overlay, "lg:hidden")} onClick={() => setSidebarVisible(false)} />}
 
                 {/* Main Content */}
-                <main className={styles.mainContent}>
-                    <div className={styles.contentPadding}>
+                <main ref={mainContentRef} className="flex-1 overflow-y-auto surface-ground p-3 md:p-5">
+                    <div className="h-full">
                         {!data && loading && (
-                            <div className={styles.centeredSpinner}>
+                            <div className="flex flex-column justify-content-center align-items-center h-full">
                                 <ProgressSpinner strokeWidth="3" />
                                 <p className="mt-2 text-color-secondary">Loading Resume...</p>
                             </div>
@@ -277,17 +305,31 @@ const EditableResumeTemplate = ({ resumeId }) => {
                             </div>
                         )}
                         {data && (
-                             <div className={styles.resumePaper}>
-                                <div className={styles.resumeSectionsContainer}>
-                                    {sectionOrder.map((sectionKey) => {
+                             <div className="surface-card p-4 md:p-5 shadow-2 border-round max-w-screen-xl mx-auto">
+                                <div className="flex flex-column gap-5">
+                                    <Tooltip target=".section-title-help" />
+                                    {sectionOrder.map((sectionKey, index) => {
                                         if (hiddenSections.includes(sectionKey)) return null;
                                         const isEmpty = isSectionEmpty(sectionKey);
                                         return (
-                                            <section key={sectionKey} id={`section-${sectionKey}`} className={styles.sectionWrapper}>
+                                            <section
+                                                key={sectionKey}
+                                                id={`section-${sectionKey}`}
+                                                className={classNames(
+                                                    activeSection === sectionKey && "outline-1 outline-primary outline-dashed outline-offset-2"
+                                                )}
+                                            >
+                                                {index > 0 && <Divider className="my-4" />}
+                                                <h2 className="text-xl font-semibold mt-0 mb-3">
+                                                    {formatSectionName(sectionKey)}
+                                                    <i className="pi pi-info-circle ml-2 text-sm text-color-secondary section-title-help"
+                                                       data-pr-tooltip={`Enter your professional ${formatSectionName(sectionKey).toLowerCase()} here.`}
+                                                       data-pr-position="right"></i>
+                                                </h2>
                                                 {renderSectionComponent(sectionKey)}
                                                 {isEmpty && (
-                                                    <div className={styles.emptySectionMessage}>
-                                                        This section is empty. Add content or hide it using the <i className="pi pi-eye-slash mx-1"></i> icon in the sidebar.
+                                                    <div className="mt-3 p-3 border-1 border-dashed surface-border border-round bg-black-alpha-5 text-center text-color-secondary">
+                                                        This section is empty. Add content or hide it using the <i className="pi pi-eye-slash mx-1 vertical-align-middle"></i> icon in the sidebar.
                                                     </div>
                                                 )}
                                             </section>
