@@ -54,7 +54,7 @@ const ATSCheckerPage = () => {
     const [showForm, setShowForm] = useState(true);
 
     // New state for authenticated users
-    const [generateNewResume, setGenerateNewResume] = useState(true); // Default to creating a new resume
+    const [generateNewResume, setGenerateNewResume] = useState(false); // Default to creating a new resume
 
     // State for background task polling
     const [generationTaskId, setGenerationTaskId] = useState<string | null>(null);
@@ -761,26 +761,29 @@ const ATSCheckerPage = () => {
 
                             <div className="mt-5 pt-4 border-top-1 flex flex-column justify-content-center align-items-center gap-3">
                                 {status !== 'authenticated' && sessionStorage.getItem('pendingTaskId') && !postAuthTaskIdToCheck && !postAuthCheckComplete && (
-                                    <div className="w-full text-center p-4 border-1 surface-border border-round bg-gradient-to-r from-primary-100 via-primary-50 to-primary-100 shadow-1">
-                                        <span className="p-3 shadow-2 mb-3 inline-block surface-card" style={{ borderRadius: '10px' }}>
-                                            <i className="pi pi-lock text-4xl text-primary"></i>
-                                        </span>
-                                        <h4 className="text-xl font-semibold text-primary-700 mt-0 mb-2">Save Your Progress & Edit!</h4>
-                                        <p className="text-color-secondary mb-4 px-3">Sign in with Google to securely save this analysis to your dashboard and unlock the resume editor.</p>
-                                        <motion.div variants={buttonHoverTap} whileHover="hover" whileTap="tap">
-                                            <Button
-                                                label="Continue with Google"
-                                                icon="pi pi-google"
-                                                className="p-button-success p-button-lg w-full sm:w-auto shadow-md hover:shadow-lg transition-shadow transition-duration-300"
-                                                onClick={handleSignInAndRedirect}
-                                                tooltip="Securely sign in to save & edit"
-                                                tooltipOptions={{ position: 'bottom', showDelay: 300 }}
-                                            />
-                                        </motion.div>
-                                        <Divider className="my-4" layout="horizontal" align="center">
-                                            <span className="p-tag">OR</span>
-                                        </Divider>
-                                    </div>
+                              <motion.div
+                              className="w-full text-center p-5 border-1 surface-border border-round bg-gradient-to-br from-blue-100 via-purple-50 to-pink-100 shadow-lg mb-4" // Enhanced background and shadow
+                              initial={{ opacity: 0, y: 10 }}
+                              animate={{ opacity: 1, y: 0 }}
+                              transition={{ duration: 0.4 }}
+                          >
+                              <span className="p-3 shadow-2 mb-4 inline-block surface-card" style={{ borderRadius: '50%' }}> {/* Circular icon background */}
+                                  <i className="pi pi-google text-4xl text-primary"></i> {/* Changed icon to Google */}
+                              </span>
+                              <h3 className="text-2xl font-bold text-primary-800 mt-0 mb-3">Unlock Full Potential!</h3> {/* Stronger headline */}
+                              <p className="text-color-secondary text-lg mb-5 px-3">Sign in to save this analysis, access the resume editor, and manage your applications.</p> {/* Clearer value proposition */}
+                              <motion.div variants={buttonHoverTap} whileHover="hover" whileTap="tap">
+                                  <Button
+                                      label="Sign In with Google & Continue" // More descriptive label
+                                      icon="pi pi-google"
+                                      className="p-button-success p-button-xl w-full sm:w-auto shadow-md hover:shadow-lg transition-shadow transition-duration-300 p-button-raised" // Larger button (p-button-xl), raised effect
+                                      onClick={handleSignInAndRedirect}
+                                      tooltip="Securely sign in to save & edit"
+                                      tooltipOptions={{ position: 'bottom', showDelay: 300 }}
+                                  />
+                              </motion.div>
+                              {/* Removed Divider */}
+                          </motion.div>
                                 )}
 
                                 <motion.div variants={buttonHoverTap} whileHover="hover" whileTap="tap">
