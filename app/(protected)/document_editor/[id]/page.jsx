@@ -4,11 +4,11 @@ import React, { useState, useEffect, useRef, useCallback } from 'react';
 import axios from 'axios'; // Assuming axios is installed
 import { Toast } from 'primereact/toast';
 import { Button } from 'primereact/button';
-import { Tooltip } from 'primereact/tooltip';
 import { ProgressSpinner } from 'primereact/progressspinner';
-import { Dialog } from 'primereact/dialog';
-import { InputText } from 'primereact/inputtext';
-import { InputTextarea } from 'primereact/inputtextarea';
+import EditorToolbar from './components/EditorToolbar';
+import EditableSection from './components/EditableSection'; // Assuming this uses default export too
+import ManualEditDialog from './components/ManualEditDialog'; // Assuming this uses default export too
+import AiEditDialog from './components/AiEditDialog'; // Assuming this uses default export too
 
 // --- Child Component: LoadingIndicator ---
 const LoadingIndicator = ({ message = "Loading document editor..." }) => {
@@ -41,317 +41,7 @@ const ErrorDisplay = ({ error, onRetry }) => {
 };
 
 
-// --- Child Component: EditableSection ---
-/**
- * A component that wraps a section of the document, providing editing controls.
- * @param {object} props - Component props.
- * @param {string} props.sectionId - Unique identifier for the section (e.g., 'header', 'paragraph-0').
- * @param {Function} props.onEdit - Callback function when the manual edit button is clicked.
- * @param {Function} props.onAiEdit - Callback function when the AI edit button is clicked.
- * @param {Function} props.onUndo - Callback function when the undo button is clicked.
- * @param {Function} props.onRedo - Callback function when the redo button is clicked.
- * @param {boolean} props.canUndo - Whether the undo action is currently possible for this section.
- * @param {boolean} props.canRedo - Whether the redo action is currently possible for this section.
- * @param {React.ReactNode} props.children - The content to be rendered within the editable section (usually an iframe).
- */
-const EditableSection = ({
-    sectionId,
-    onEdit,
-    onAiEdit,
-    onUndo,
-    onRedo,
-    canUndo,
-    canRedo,
-    children
-}) => {
-    const [isHovered, setIsHovered] = useState(false);
 
-    return (
-        <div
-            className="editable-section relative mb-2" // Add margin-bottom for spacing
-            onMouseEnter={() => setIsHovered(true)}
-            onMouseLeave={() => setIsHovered(false)}
-            style={{ outline: isHovered ? '2px dashed var(--primary-color)' : 'none', transition: 'outline-color 0.2s' }}
-        >
-            {/* Render the actual content (iframe) */}
-            {children}
-
-            {/* Overlay controls shown on hover */}
-            {isHovered && (
-                <div
-                    className="edit-overlay absolute top-0 right-0 p-1 flex flex-column align-items-end gap-1 bg-black-alpha-10 border-round-sm" // Subtle background
-                    style={{ zIndex: 10 }} // Ensure controls are above iframe
-                >
-                    <div className="flex gap-1">
-                         {/* AI Edit Button */}
-                         <Button
-                            icon="pi pi-sparkles"
-                            className="p-button-rounded p-button-info p-button-sm"
-                            onClick={onAiEdit}
-                            tooltip={`AI Edit ${sectionId}`}
-                            tooltipOptions={{ position: 'left', showDelay: 500 }}
-                        />
-                        {/* Manual Edit Button */}
-                        <Button
-                            icon="pi pi-pencil"
-                            className="p-button-rounded p-button-secondary p-button-sm"
-                            onClick={onEdit}
-                            tooltip={`Edit ${sectionId}`}
-                            tooltipOptions={{ position: 'left', showDelay: 500 }}
-                        />
-                        {/* Undo Button */}
-                        <Button
-                            icon="pi pi-undo"
-                            className="p-button-rounded p-button-secondary p-button-sm"
-                            onClick={onUndo}
-                            disabled={!canUndo}
-                            tooltip={`Undo ${sectionId}`}
-                            tooltipOptions={{ position: 'left', showDelay: 500 }}
-                        />
-                        {/* Redo Button */}
-                        <Button
-                            icon="pi pi-redo"
-                            className="p-button-rounded p-button-secondary p-button-sm"
-                            onClick={onRedo}
-                            disabled={!canRedo}
-                            tooltip={`Redo ${sectionId}`}
-                            tooltipOptions={{ position: 'left', showDelay: 500 }}
-                        />
-                    </div>
-                </div>
-            )}
-        </div>
-    );
-};
-
-// --- Child Component: EditorToolbar ---
-/**
- * Toolbar for the document editor, providing save functionality.
- * @param {object} props - Component props.
- * @param {Function} props.onSave - Callback function when the save button is clicked.
- * @param {boolean} props.isSaving - Indicates if a save operation is in progress.
- * @param {boolean} props.hasUnsavedChanges - Indicates if there are unsaved changes.
- */
-const EditorToolbar = ({ onSave, isSaving, hasUnsavedChanges }) => {
-    return (
-        <div className="p-3 surface-ground border-bottom-1 surface-border flex justify-content-end align-items-center sticky top-0 z-5 gap-2">
-            {/* Unsaved Changes Indicator */}
-            {hasUnsavedChanges && !isSaving && (
-                <i
-                    className="pi pi-circle-fill text-orange-500 p-mr-2 animation-pulse"
-                    style={{ fontSize: '0.7rem' }}
-                    title="Unsaved changes"
-                ></i>
-            )}
-
-            {/* Save Button */}
-            <Button
-                label={isSaving ? 'Saving...' : 'Save Changes'}
-                icon={isSaving ? <ProgressSpinner style={{ width: '18px', height: '18px' }} strokeWidth="8" /> : "pi pi-save"}
-                className="p-button-sm p-button-success"
-                onClick={onSave}
-                disabled={isSaving || !hasUnsavedChanges}
-                tooltip={hasUnsavedChanges ? "Save your latest changes" : "No changes to save"}
-                tooltipOptions={{ position: 'bottom' }}
-            />
-            <style jsx>{`
-                .animation-pulse {
-                    animation: pulse 1.5s infinite cubic-bezier(0.4, 0, 0.6, 1);
-                }
-                @keyframes pulse {
-                    0%, 100% { opacity: 1; }
-                    50% { opacity: .5; }
-                }
-            `}</style>
-        </div>
-    );
-};
-
-// --- Child Component: ManualEditDialog ---
-/**
- * Dialog for manually editing a cover letter section (header, paragraph, footer).
- * @param {object} props - Component props.
- * @param {boolean} props.visible - Whether the dialog is visible.
- * @param {Function} props.onHide - Callback function when the dialog is hidden.
- * @param {object | null} props.section - Information about the section being edited ({ type, index?, id }).
- * @param {string} props.editText - Current text value for paragraph editing.
- * @param {Function} props.setEditText - Function to update editText state.
- * @param {object} props.editData - Current data object for header/footer editing.
- * @param {Function} props.onDataChange - Function to handle changes in header/footer fields (receives key, value).
- * @param {Function} props.onSave - Callback function when the save button is clicked.
- */
-const ManualEditDialog = ({
-    visible,
-    onHide,
-    section,
-    editText,
-    setEditText,
-    editData,
-    onDataChange,
-    onSave
-}) => {
-
-    const getTitle = () => {
-        if (!section) return 'Edit Section';
-        const typeName = section.type.charAt(0).toUpperCase() + section.type.slice(1);
-        return `Edit ${typeName}${section.index !== undefined ? ` Paragraph ${section.index + 1}` : ''}`;
-    };
-
-    const renderField = (key, value) => {
-        // Skip internal fields if they exist (like ai_feedback)
-        if (key === 'ai_feedback') return null;
-
-        const label = key.split('_').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ');
-        // Determine if field should be textarea (simple heuristic)
-        const isTextArea = typeof value === 'string' && (value.length > 60 || value.includes('\n') || key.includes('address') || key.includes('subject') || key.includes('contact'));
-        const isArray = Array.isArray(value);
-
-        return (
-            <div key={key} className="field col-12 md:col-6 mb-3">
-                <label htmlFor={key} className="block mb-1 font-medium">{label}</label>
-                {isTextArea ? (
-                    <InputTextarea
-                        id={key}
-                        value={value ?? ''} // Handle null/undefined
-                        onChange={(e) => onDataChange(key, e.target.value)}
-                        rows={key === 'signature_contact' ? 3 : (key === 'subject' ? 2 : 4)} // Adjust rows
-                        autoResize
-                        className="w-full mt-1"
-                    />
-                ) : isArray ? (
-                    // Simple comma-separated input for arrays (e.g., attachments)
-                    <InputTextarea
-                        id={key}
-                        value={value.join(', ')} // Join array for display
-                        onChange={(e) => onDataChange(key, e.target.value)} // Value will be processed on save
-                        rows={2}
-                        autoResize
-                        className="w-full mt-1"
-                        tooltip="Enter items separated by commas"
-                        tooltipOptions={{ position: 'top' }}
-                    />
-                ) : (
-                    <InputText
-                        id={key}
-                        value={value ?? ''} // Handle null/undefined
-                        onChange={(e) => onDataChange(key, e.target.value)}
-                        className="w-full mt-1"
-                    />
-                )}
-            </div>
-        );
-    };
-
-    const footer = (
-        <div className='pt-3'>
-            <Button label="Cancel" icon="pi pi-times" onClick={onHide} className="p-button-text" />
-            <Button label="Save Changes" icon="pi pi-check" onClick={onSave} autoFocus />
-        </div>
-    );
-
-    return (
-        <Dialog
-            header={getTitle()}
-            visible={visible}
-            style={{ width: '60vw', maxWidth: '800px' }}
-            breakpoints={{ '960px': '75vw', '641px': '90vw' }}
-            modal
-            onHide={onHide}
-            footer={footer}
-        >
-            {section?.type === 'paragraph' && (
-                <div className="field">
-                    <label htmlFor="paragraphEdit">Paragraph Text</label>
-                    <InputTextarea
-                        id="paragraphEdit"
-                        value={editText}
-                        onChange={(e) => setEditText(e.target.value)}
-                        rows={15}
-                        className="w-full mt-1"
-                        autoFocus
-                    />
-                </div>
-            )}
-            {(section?.type === 'header' || section?.type === 'footer') && (
-                <div className="formgrid grid p-fluid">
-                    {/* Render inputs based on the keys in editData */}
-                    {Object.entries(editData).map(([key, value]) => renderField(key, value))}
-                </div>
-            )}
-        </Dialog>
-    );
-};
-
-// --- Child Component: AiEditDialog ---
-/**
- * Dialog for AI-assisted editing of a cover letter section.
- * @param {object} props - Component props.
- * @param {boolean} props.visible - Whether the dialog is visible.
- * @param {Function} props.onHide - Callback function when the dialog is hidden.
- * @param {object | null} props.section - Information about the section being edited ({ type, index?, id }).
- * @param {string} props.prompt - Current AI prompt value.
- * @param {Function} props.setPrompt - Function to update the AI prompt state.
- * @param {Function} props.onSubmit - Callback function when the submit button is clicked.
- * @param {boolean} props.isProcessing - Indicates if the AI request is in progress.
- */
-const AiEditDialog = ({
-    visible,
-    onHide,
-    section,
-    prompt,
-    setPrompt,
-    onSubmit,
-    isProcessing
-}) => {
-
-    const getTitle = () => {
-        if (!section) return 'AI Edit Section';
-        const typeName = section.type.charAt(0).toUpperCase() + section.type.slice(1);
-        return `AI Edit ${typeName}${section.index !== undefined ? ` Paragraph ${section.index + 1}` : ''}`;
-    };
-
-    const footer = (
-        <div className='pt-3'>
-            <Button label="Cancel" icon="pi pi-times" onClick={onHide} className="p-button-text" disabled={isProcessing} />
-            <Button
-                label={isProcessing ? 'Processing...' : 'Apply AI Edit'}
-                icon={isProcessing ? <ProgressSpinner style={{ width: '18px', height: '18px' }} strokeWidth="8" /> : "pi pi-check"}
-                onClick={onSubmit}
-                disabled={isProcessing || !prompt.trim()}
-                autoFocus
-            />
-        </div>
-    );
-
-    return (
-        <Dialog
-            header={getTitle()}
-            visible={visible}
-            style={{ width: '50vw', maxWidth: '700px' }}
-            breakpoints={{ '960px': '70vw', '641px': '90vw' }}
-            modal
-            onHide={onHide}
-            footer={footer}
-        >
-            <div className="field">
-                <label htmlFor="aiPrompt">Editing Instructions</label>
-                <InputTextarea
-                    id="aiPrompt"
-                    value={prompt}
-                    onChange={(e) => setPrompt(e.target.value)}
-                    rows={8}
-                    className="w-full mt-1"
-                    placeholder={`e.g., "Make this paragraph more formal", "Shorten the closing", "Rewrite the subject line to be more impactful"`}
-                    autoFocus
-                    disabled={isProcessing}
-                />
-                <small className="p-text-secondary mt-1 block">
-                    Describe how you want the AI to change this section.
-                </small>
-            </div>
-        </Dialog>
-    );
-};
 
 
 // --- Initial State and Constants ---
@@ -450,44 +140,9 @@ const generateSrcDoc = (htmlContent, css, sectionId) => {
                 html, body { height: 100%; margin: 0; padding: 0; overflow: hidden; background-color: white; }
             </style>
         </head>
-        <body class="theme-classic"> {# TODO: Make theme dynamic #}
+        <body class="theme-classic">
             ${htmlContent}
-             <script>
-                // --- Iframe Height Adjustment Script ---
-                function adjustHeight() {
-                    let timeoutId;
-                    function debounceAdjust() {
-                        clearTimeout(timeoutId);
-                        timeoutId = setTimeout(() => {
-                            const body = document.body;
-                            const html = document.documentElement;
-                            // Use scrollHeight for potentially taller content than viewport
-                            const height = Math.max(body.scrollHeight, body.offsetHeight, html.scrollHeight, html.offsetHeight);
-                            const adjustedHeight = height + 2; // Small buffer
-                            if (window.parent) {
-                                window.parent.postMessage({ type: 'resize-iframe', height: adjustedHeight, sectionId: '${escapeHtml(sectionId)}' }, '*');
-                            }
-                        }, 50); // Debounce delay
-                    }
-                    debounceAdjust(); // Initial call
-                    // Use ResizeObserver for more reliable element resize detection
-                    if (typeof ResizeObserver !== 'undefined') {
-                        const resizeObserver = new ResizeObserver(debounceAdjust);
-                        resizeObserver.observe(document.body);
-                    } else {
-                        // Fallback for older browsers
-                        window.addEventListener('resize', debounceAdjust);
-                        const observer = new MutationObserver(debounceAdjust);
-                        observer.observe(document.body, { childList: true, subtree: true, attributes: true, characterData: true });
-                    }
-                 }
-                 // Ensure adjustment happens after all content (including fonts) is likely loaded
-                 if (document.readyState === 'complete') {
-                     setTimeout(adjustHeight, 100); // Add slight delay for rendering
-                 } else {
-                     window.addEventListener('load', () => setTimeout(adjustHeight, 100));
-                 }
-            </script>
+
         </body>
         </html>
     `;
@@ -594,8 +249,6 @@ const CoverLetterEditorPage = ({ params }) => {
     const [sectionHistory, setSectionHistory] = useState({}); // { sectionId: [state1, state2, ...] }
     const [historyIndex, setHistoryIndex] = useState({});   // { sectionId: currentIndex }
 
-    // --- Iframe Height State ---
-    const [iframeHeights, setIframeHeights] = useState({}); // { sectionId: height }
 
     // --- Manual Edit Dialog State ---
     const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
@@ -754,24 +407,33 @@ const CoverLetterEditorPage = ({ params }) => {
         fetchData(); // Fetch data on component mount or when documentId changes
     }, [fetchData]); // Use fetchData callback
 
-    // --- Iframe Height Handling ---
-    useEffect(() => {
-        const handleMessage = (event) => {
-            // Add origin check for security in a real application
-            // if (event.origin !== 'expected_origin') return;
-            if (event.data?.type === 'resize-iframe' && event.data.sectionId) {
-                setIframeHeights(prev => {
-                    // Only update if height is different to avoid unnecessary re-renders
-                    if (prev[event.data.sectionId] !== event.data.height) {
-                        return { ...prev, [event.data.sectionId]: event.data.height };
-                    }
-                    return prev;
-                });
+    // --- NEW: Add onLoad Handler Function ---
+    const handleIframeLoad = useCallback((e) => {
+        const iframe = e.target;
+        try {
+            if (iframe.contentDocument && iframe.contentDocument.body) {
+                const body = iframe.contentDocument.body;
+                const html = iframe.contentDocument.documentElement;
+                const bodyStyle = window.getComputedStyle(body);
+                const marginTop = parseInt(bodyStyle.marginTop, 10) || 0;
+                const marginBottom = parseInt(bodyStyle.marginBottom, 10) || 0;
+
+                // Use scrollHeight as the primary measure
+                const contentHeight = Math.max(
+                    body.scrollHeight, body.offsetHeight,
+                    html.clientHeight, html.scrollHeight, html.offsetHeight
+                );
+
+                const totalHeight = contentHeight + marginTop + marginBottom + 5; // Add small buffer
+
+                iframe.style.height = `${totalHeight}px`;
             }
-        };
-        window.addEventListener('message', handleMessage);
-        return () => window.removeEventListener('message', handleMessage);
-    }, []); // Run once on mount
+        } catch (error) {
+            console.error("Error adjusting iframe height:", error);
+            // Set a fallback height in case of error
+            iframe.style.height = '150px';
+        }
+    }, []); // Empty dependency array, this function doesn't depend on component state/props
 
     // --- Core Action Handlers (Undo, Redo, Save) ---
 
@@ -1033,9 +695,10 @@ const CoverLetterEditorPage = ({ params }) => {
                             key={`${getSectionId('header')}-${JSON.stringify(header)}`} // Key changes on data update to force iframe reload
                             title="Cover Letter Header"
                             srcDoc={generateSrcDoc(renderHeaderHtml(header), coverLetterCSS, getSectionId('header'))}
-                            style={{ width: '100%', border: 'none', height: `${iframeHeights[getSectionId('header')] || 150}px`, overflow: 'hidden', display: 'block', transition: 'height 0.2s ease-out' }}
+                            style={{ width: '100%', border: 'none', overflow: 'hidden', display: 'block', minHeight: '100px' }}
                             scrolling="no"
                             sandbox="allow-scripts allow-same-origin" // allow-scripts needed for height adjustment
+                            onLoad={handleIframeLoad}
                         />
                     </EditableSection>
 
@@ -1057,9 +720,10 @@ const CoverLetterEditorPage = ({ params }) => {
                                     key={`${paragraphId}-${paragraph}`} // Key changes on data update
                                     title={`Paragraph ${index + 1}`}
                                     srcDoc={generateSrcDoc(renderParagraphHtml(paragraph), coverLetterCSS, paragraphId)}
-                                    style={{ width: '100%', border: 'none', height: `${iframeHeights[paragraphId] || 60}px`, overflow: 'hidden', display: 'block', transition: 'height 0.2s ease-out' }}
+                                    style={{ width: '100%', border: 'none', overflow: 'hidden', display: 'block', minHeight: '50px' }}
                                     scrolling="no"
                                     sandbox="allow-scripts allow-same-origin"
+                                    onLoad={handleIframeLoad}
                                 />
                             </EditableSection>
                         );
@@ -1082,9 +746,10 @@ const CoverLetterEditorPage = ({ params }) => {
                             key={`${getSectionId('footer')}-${JSON.stringify(footer)}`} // Key changes on data update
                             title="Cover Letter Footer"
                             srcDoc={generateSrcDoc(renderFooterHtml(footer), coverLetterCSS, getSectionId('footer'))}
-                            style={{ width: '100%', border: 'none', height: `${iframeHeights[getSectionId('footer')] || 100}px`, overflow: 'hidden', display: 'block', transition: 'height 0.2s ease-out' }}
+                            style={{ width: '100%', border: 'none', overflow: 'hidden', display: 'block', minHeight: '80px' }}
                             scrolling="no"
                             sandbox="allow-scripts allow-same-origin"
+                            onLoad={handleIframeLoad}
                         />
                     </EditableSection>
                 </div>
