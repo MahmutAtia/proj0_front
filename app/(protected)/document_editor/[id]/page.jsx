@@ -72,7 +72,7 @@ body {
     color: var(--primary-color);
     background-color: var(--bg-color);
     margin: 0;
-    padding: 0;
+    padding: 0; /* Explicitly set padding to 0 */
     height: 100%;
     overflow: hidden; /* Prevent scrollbars within iframe */
 }
@@ -93,6 +93,9 @@ a:hover { text-decoration: underline; }
 .salutation { font-weight: 700; margin-bottom: 15px; font-size: 10.5pt; }
 .salutation p { margin: 0; }
 .body p { margin-bottom: 1em; text-align: justify; }
+body > .body > p {
+    margin-bottom: 0 !important; /* Force removal of bottom margin */
+}
 .footer-section { margin-top: 20px; }
 .closing { margin-top: 15px; margin-bottom: 8px; font-size: 10.5pt; }
 .closing p { margin: 0; }
@@ -407,33 +410,46 @@ const CoverLetterEditorPage = ({ params }) => {
         fetchData(); // Fetch data on component mount or when documentId changes
     }, [fetchData]); // Use fetchData callback
 
-    // --- NEW: Add onLoad Handler Function ---
     const handleIframeLoad = useCallback((e) => {
         const iframe = e.target;
-        try {
-            if (iframe.contentDocument && iframe.contentDocument.body) {
-                const body = iframe.contentDocument.body;
-                const html = iframe.contentDocument.documentElement;
-                const bodyStyle = window.getComputedStyle(body);
-                const marginTop = parseInt(bodyStyle.marginTop, 10) || 0;
-                const marginBottom = parseInt(bodyStyle.marginBottom, 10) || 0;
+        // Introduce a small delay to allow for font rendering/reflow
+        setTimeout(() => {
+            try {
+                if (iframe.contentDocument && iframe.contentDocument.body) {
+                    const doc = iframe.contentDocument;
+                    const body = doc.body;
+                    let contentHeight = 0;
 
-                // Use scrollHeight as the primary measure
-                const contentHeight = Math.max(
-                    body.scrollHeight, body.offsetHeight,
-                    html.clientHeight, html.scrollHeight, html.offsetHeight
-                );
+                    // Try to find the main content element (e.g., .header-section, .body, .footer-section)
+                    // For paragraphs, we expect a single <div class="body">
+                    const contentElement = body.querySelector('.header-section, .body, .footer-section');
 
-                const totalHeight = contentHeight + marginTop + marginBottom + 5; // Add small buffer
+                    if (contentElement) {
+                        // Use the scrollHeight of the specific content element
+                        contentHeight = contentElement.scrollHeight;
+                    } else {
+                        // Fallback to body scrollHeight if specific element not found
+                        console.warn("Could not find specific content element in iframe, falling back to body height.");
+                        contentHeight = body.scrollHeight;
+                    }
 
-                iframe.style.height = `${totalHeight}px`;
+                    // Get body margins (still relevant if contentElement doesn't fill body)
+                    const bodyStyle = window.getComputedStyle(body);
+                    const marginTop = parseInt(bodyStyle.marginTop, 10) || 0;
+                    const marginBottom = parseInt(bodyStyle.marginBottom, 10) || 0;
+
+                    // Calculate total height - minimal buffer
+                    const totalHeight = contentHeight + marginTop + marginBottom + 1; // Minimal 1px buffer
+
+                    iframe.style.height = `${totalHeight}px`;
+
+                }
+            } catch (error) {
+                console.error("Error adjusting iframe height:", error);
+                iframe.style.height = '100px'; // Fallback height
             }
-        } catch (error) {
-            console.error("Error adjusting iframe height:", error);
-            // Set a fallback height in case of error
-            iframe.style.height = '150px';
-        }
-    }, []); // Empty dependency array, this function doesn't depend on component state/props
+        }, 50); // 50ms delay - adjust if needed
+    }, []);
 
     // --- Core Action Handlers (Undo, Redo, Save) ---
 
@@ -720,7 +736,7 @@ const CoverLetterEditorPage = ({ params }) => {
                                     key={`${paragraphId}-${paragraph}`} // Key changes on data update
                                     title={`Paragraph ${index + 1}`}
                                     srcDoc={generateSrcDoc(renderParagraphHtml(paragraph), coverLetterCSS, paragraphId)}
-                                    style={{ width: '100%', border: 'none', overflow: 'hidden', display: 'block', minHeight: '50px' }}
+                                    style={{ width: '100%', border: 'none', overflow: 'hidden', display: 'block' }}
                                     scrolling="no"
                                     sandbox="allow-scripts allow-same-origin"
                                     onLoad={handleIframeLoad}
