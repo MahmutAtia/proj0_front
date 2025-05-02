@@ -332,39 +332,10 @@ const DashboardLayout = ({ children }) => {
                                 </Card>
                             </div>
 
-                            {/* Other Document Templates */}
-                            {selectedPosition.other_docs && selectedPosition.other_docs.map((doc) => (
-                                <div className="col-12 md:col-6 lg:col-4 p-3" key={doc.id || `${selectedPosition.id}-${doc.type}`}>
-                                    <Card className="shadow-2 h-full cursor-pointer hover:shadow-4 transition-duration-300"
-                                        onClick={() => handleTemplateSelect(selectedPosition, doc, doc.type || 'doc')}>
-                                        <div className="flex flex-column h-full">
-                                            <div className="mb-3">
-                                                <div className="flex align-items-center mb-3">
-                                                    <i className={`${getDocumentIcon(doc.type)} text-xl text-primary mr-2`}></i>
-                                                    <span className="font-medium text-lg">{getDocumentTitle(doc)}</span>
-                                                </div>
-                                                <p className="text-600 line-height-3 m-0">{getDocumentDescription(doc.type)}</p>
-                                            </div>
-                                            <div className="mt-auto pt-3">
-                                                <img
-                                                    src={getDocumentPreview(doc)}
-                                                    alt={`${getDocumentTitle(doc)} preview`}
-                                                    className="w-full border-1 surface-border"
-                                                    style={{ maxHeight: '200px', objectFit: 'cover' }}
-                                                />
-                                                <Button
-                                                    label={`Create ${getDocumentTitle(doc)}`}
-                                                    icon="pi pi-file-edit"
-                                                    className="p-button-primary w-full mt-3"
-                                                />
-                                            </div>
-                                        </div>
-                                    </Card>
-                                </div>
-                            ))}
+
 
                             {/* If no other docs */}
-                            {(!selectedPosition.other_docs || selectedPosition.other_docs.length === 0) && (
+                            {/* {(!selectedPosition.other_docs || selectedPosition.other_docs.length === 0) && (
                                 <div className="col-12 md:col-6 lg:col-4 p-3">
                                     <Card className="surface-100 shadow-1 h-full flex align-items-center justify-content-center">
                                         <div className="text-center">
@@ -373,7 +344,7 @@ const DashboardLayout = ({ children }) => {
                                         </div>
                                     </Card>
                                 </div>
-                            )}
+                            )} */}
                         </div>
                     )}
                 </div>
@@ -383,3 +354,4 @@ const DashboardLayout = ({ children }) => {
 };
 
 export default DashboardLayout;
+
