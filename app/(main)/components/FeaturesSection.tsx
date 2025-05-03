@@ -43,7 +43,7 @@ const FeaturesSection = () => {
                     <FiZap className={styles.iconZap} />
                     <h2 className={styles.heading}>Your New Edge: <span className={styles.gradientText}>AI + Your Brilliance</span></h2>
                     <p className={styles.subheading}>
-                        CareerFlow AI isn't just another tool. It's your intelligent partner, designed to amplify your strengths and navigate the complexities of the modern job market.
+                        CareerFlow AI isn&apos;t just another tool. It&apos;s your intelligent partner, designed to amplify your strengths and navigate the complexities of the modern job market.
                     </p>
                 </motion.div>
 

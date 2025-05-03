@@ -73,7 +73,7 @@ const ResumeBuilder = () => {
             case 0:
                 return (
                     <StepContent>
-                        <h2 className="text-2xl font-bold mb-4">What's your purpose?</h2>
+                        <h2 className="text-2xl font-bold mb-4">What&apos;s your purpose?</h2>
                         <div className="flex flex-column gap-4">
                             {['job', 'scholarship'].map((type) => (
                                 <motion.div

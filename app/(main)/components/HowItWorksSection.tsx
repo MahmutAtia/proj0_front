@@ -47,8 +47,7 @@ const HowItWorksSection = () => {
                 <IoSparkles className={styles.iconSparkles} />
                 <h2 className={styles.heading}>AI Is Your Co-Pilot, Not the Pilot</h2>
                 <p className={styles.subheading}>
-                    Forget robotic templates. We blend AI's speed with your unique voice. You're always in control, crafting applications that are both effective and authentically *you*.
-                </p>
+                Forget robotic templates. We blend AI&apos;s speed with your unique voice. You&apos;re always in control, crafting applications that are both effective and authentically *you*.                </p>
             </motion.div>
 
             <div className={styles.howItWorksGrid}>

@@ -32,8 +32,9 @@ const ATSCheckerSection = () => {
                         Is Your Resume Getting <span className={styles.accentText}>Ghosted by Robots?</span>
                     </h2>
                     <p className={styles.subheading}>
-                        Don't guess. Upload your resume now for a 100% FREE, instant ATS compatibility check. Get actionable insights to ensure a human actually sees your application.
+                    Don&apos;t guess. Upload your resume now for a 100% FREE, instant ATS compatibility check. Get actionable insights to ensure a human actually sees your application.
                     </p>
+
                     <motion.button
                         // Combine global button classes with module-specific accent class
                         className={`button ${styles.buttonAccent}`} // Use global .button and module .buttonAccent
