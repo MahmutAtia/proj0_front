@@ -1,7 +1,7 @@
 'use client';
 import { Button } from 'primereact/button';
 import { Card } from 'primereact/card';
-import { Chart } from 'primereact/chart';
+// import { Chart } from 'primereact/chart';
 import { DataTable } from 'primereact/datatable';
 import { Column } from 'primereact/column';
 import { useState, useEffect } from 'react';
@@ -57,7 +57,7 @@ export default function TestPage() {
                 <div className="col-12 md:col-6 mb-4">
                     <Card className="shadow-4">
                         <h3 className="text-xl font-semibold mb-3">Sales Overview</h3>
-                        {chartData.datasets && <Chart type="line" data={chartData} />}
+                        {/* {chartData.datasets && <Chart type="line" data={chartData} />} */}
                     </Card>
                 </div>
 
