@@ -165,7 +165,7 @@ const Header = () => {
                                             >
                                                 <span className={styles.tooltipPointer}></span>
                                                 <div className={styles.tooltipContent}> {/* Wrap text */}
-                                                    <strong className={styles.tooltipHeadline}>What's an ATS? 🤔</strong>
+                                                    <strong className={styles.tooltipHeadline}>What&apos;s an ATS? 🤔</strong>
                                                     {tooltipText}
                                                     {tooltipText !== fullExplanation && <span className={styles.blinkingCursor}>|</span>}
                                                 </div>

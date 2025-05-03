@@ -1,4 +1,3 @@
-// components/DashboardLayout.js
 "use client"; // If this layout component is also client-side
 import React, { useEffect, useState } from 'react';
 import { useSession } from 'next-auth/react';
@@ -8,7 +7,6 @@ import { Card } from 'primereact/card';
 import { ProgressSpinner } from 'primereact/progressspinner';
 import { Ripple } from 'primereact/ripple';
 
-// ...existing code...
 
 // Add these helper functions
 const getDocumentIcon = (type) => {
@@ -71,10 +69,9 @@ const getDocumentPreview = (doc) => {
     return previews[doc.type] || '/images/placeholders/document-placeholder.png';
 };
 
-// ...existing code...
-// ...existing code...
 
-const DashboardLayout = ({ children }) => {
+
+const DashboardLayout = () => {
     const [selectedPosition, setSelectedPosition] = useState(null);
     const [positions, setPositions] = useState([]);
     const [loading, setLoading] = useState(true);

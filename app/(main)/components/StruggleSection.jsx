@@ -57,7 +57,7 @@ const StruggleSection = () => {
                         Stuck in the Application <span className={styles.strikethrough}>Abyss?</span>
                     </h2>
                     <p className={styles.subtitle}>
-                        You're qualified, driven, and ready. Yet, the cycle repeats: effort, rejection, doubt. Let's break free from what's holding you back.
+                        You&#39;re qualified, driven, and ready. Yet, the cycle repeats: effort, rejection, doubt. Let&#39;s break free from what&#39;s holding you back.
                     </p>
                 </motion.div>
 
@@ -100,9 +100,9 @@ const StruggleSection = () => {
                     <FiTarget className={styles.missingOutIcon} />
                     <div className={styles.missingOutContent}>
                         {/* Using h3 and p tags styled by the CSS Module */}
-                        <h3>Don't Let Outdated Tactics Cost You</h3>
+                        <h3>Don&#39;t Let Outdated Tactics Cost You</h3>
                         <p>
-                            A generic application isn't enough in {new Date().getFullYear()}. Standout portfolios, targeted resumes, and showcasing your unique value are essential. Are your materials truly competitive?
+                            A generic application isn&apos;t enough in {new Date().getFullYear()}. Standout portfolios, targeted resumes, and showcasing your unique value are essential. Are your materials truly competitive?
                         </p>
                     </div>
                 </motion.div>

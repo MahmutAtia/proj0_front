@@ -184,7 +184,7 @@ const ChatPage = () => {
     };
 
     if (!browserSupportsSpeechRecognition) {
-        return <div>Browser doesn't support speech recognition.</div>;
+        return <div>Browser doesn&apos;t support speech recognition.</div>;
     }
 
     return (

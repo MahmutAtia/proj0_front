@@ -51,13 +51,13 @@ const HeroSection = () => {
                 >
                     {/* --- Content remains the same --- */}
                     <motion.h1 variants={fadeInUp} className={styles.heroTitle}>
-                        Resume <span className={styles.highlightRejected}>Rejected</span>? Again? <br /> Let's Fix That.
+                        Resume <span className={styles.highlightRejected}>Rejected</span>? Again? <br /> Let&apos;s Fix That.
                     </motion.h1>
                     <motion.p variants={fadeInUp} className={styles.heroSubtitle}>
                         Escape the soul-crushing job hunt. Did you know most jobs need a <span className="gradient-text">tailored resume</span> just to pass the bots? We build them *with* you, using AI.
                     </motion.p>
                     <motion.p variants={fadeInUp} className={styles.heroParagraph}>
-                        You're brilliant, skilled, and ready. But your application vanishes into the ATS abyss. It's not you, it's the system. CareerFlow AI crafts resumes & portfolios that get you noticed.
+                        You&apos;re brilliant, skilled, and ready. But your application vanishes into the ATS abyss. It&apos;s not you, it&apos;s the system. CareerFlow AI crafts resumes & portfolios that get you noticed.
                     </motion.p>
                     <motion.div variants={fadeInUp} className={styles.heroActions}>
                         {/* --- Apply new animations --- */}
