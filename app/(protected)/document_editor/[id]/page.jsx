@@ -40,19 +40,6 @@ const ErrorDisplay = ({ error, onRetry }) => {
     );
 };
 
-
-
-
-
-// --- Initial State and Constants ---
-const initialCoverLetterState = {
-    cover_letter: {
-        header: null,
-        body_paragraphs: [],
-        footer: null
-    }
-};
-
 const coverLetterCSS = `
 :root {
     --font-family-body: 'Lato', sans-serif;
@@ -106,6 +93,9 @@ body > .body > p {
 .attachments p { margin: 0 0 5px 0; font-weight: 700; color: var(--secondary-color); }
 .attachments ul { list-style: none; padding: 0; margin: 0; }
 .attachments li { margin-bottom: 3px; }
+.recommender-info, .signature-title, .signature-organization { /* Example */
+    /* Add specific styles */
+}
 `;
 
 // --- Helper Functions ---
@@ -151,34 +141,86 @@ const generateSrcDoc = (htmlContent, css, sectionId) => {
     `;
 };
 
-/**
- * Renders HTML for the header section, handling potentially missing data.
- * @param {object | null} headerData - The header data object.
- * @returns {string} HTML string for the header.
- */
-const renderHeaderHtml = (headerData) => {
+/** Escapes HTML characters */
+const escapeHtml = (str) => str ? String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#039;') : '';
+
+/** Renders HTML for Cover Letter header */
+const renderCoverLetterHeaderHtml = (headerData) => {
     if (!headerData) return '<div class="header-section"><p><i>Header data missing</i></p></div>';
-    const escape = (str) => str ? String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#039;') : '';
     return `
         <div class="header-section">
             <div class="sender-info">
-                ${headerData.sender_name ? `<p class="sender-name">${escape(headerData.sender_name)}</p>` : ''}
-                ${headerData.sender_address ? `<p>${escape(headerData.sender_address)}</p>` : ''}
-                ${headerData.sender_city_postal ? `<p>${escape(headerData.sender_city_postal)}</p>` : ''}
-                ${headerData.sender_phone ? `<p>${escape(headerData.sender_phone)}</p>` : ''}
-                ${headerData.sender_email ? `<p><a href="mailto:${escape(headerData.sender_email)}">${escape(headerData.sender_email)}</a></p>` : ''}
-                ${headerData.sender_linkedin ? `<p><a href="${escape(headerData.sender_linkedin)}" target="_blank">${escape(headerData.sender_linkedin)}</a></p>` : ''}
+                ${headerData.sender_name ? `<p class="sender-name">${escapeHtml(headerData.sender_name)}</p>` : ''}
+                ${headerData.sender_address ? `<p>${escapeHtml(headerData.sender_address)}</p>` : ''}
+                ${headerData.sender_city_postal ? `<p>${escapeHtml(headerData.sender_city_postal)}</p>` : ''}
+                ${headerData.sender_phone ? `<p>${escapeHtml(headerData.sender_phone)}</p>` : ''}
+                ${headerData.sender_email ? `<p><a href="mailto:${escapeHtml(headerData.sender_email)}">${escapeHtml(headerData.sender_email)}</a></p>` : ''}
+                ${headerData.sender_linkedin ? `<p><a href="${escapeHtml(headerData.sender_linkedin)}" target="_blank">${escapeHtml(headerData.sender_linkedin)}</a></p>` : ''}
             </div>
-            ${headerData.date ? `<div class="date"><p>${escape(headerData.date)}</p></div>` : ''}
+            ${headerData.date ? `<div class="date"><p>${escapeHtml(headerData.date)}</p></div>` : ''}
             <div class="recipient-info">
-                 ${headerData.recipient_name ? `<p class="recipient-name">${escape(headerData.recipient_name)}</p>` : ''}
-                 ${headerData.recipient_title ? `<p class="recipient-title">${escape(headerData.recipient_title)}</p>` : ''}
-                 ${headerData.recipient_company ? `<p>${escape(headerData.recipient_company)}</p>` : ''}
-                 ${headerData.recipient_address ? `<p>${escape(headerData.recipient_address)}</p>` : ''}
-                 ${headerData.recipient_city_postal ? `<p>${escape(headerData.recipient_city_postal)}</p>` : ''}
+                 ${headerData.recipient_name ? `<p class="recipient-name">${escapeHtml(headerData.recipient_name)}</p>` : ''}
+                 ${headerData.recipient_title ? `<p class="recipient-title">${escapeHtml(headerData.recipient_title)}</p>` : ''}
+                 ${headerData.recipient_company ? `<p>${escapeHtml(headerData.recipient_company)}</p>` : ''}
+                 ${headerData.recipient_address ? `<p>${escapeHtml(headerData.recipient_address)}</p>` : ''}
+                 ${headerData.recipient_city_postal ? `<p>${escapeHtml(headerData.recipient_city_postal)}</p>` : ''}
             </div>
-             ${headerData.subject ? `<div class="subject"><p>${escape(headerData.subject)}</p></div>` : ''}
-             ${headerData.salutation ? `<div class="salutation"><p>${escape(headerData.salutation)}</p></div>` : ''}
+             ${headerData.subject ? `<div class="subject"><p>${escapeHtml(headerData.subject)}</p></div>` : ''}
+             ${headerData.salutation ? `<div class="salutation"><p>${escapeHtml(headerData.salutation)}</p></div>` : ''}
+        </div>
+    `;
+};
+
+/** Renders HTML for Recommendation Letter header */
+const renderRecommendationHeaderHtml = (headerData) => {
+    if (!headerData) return '<div class="header-section"><p><i>Header data missing</i></p></div>';
+    return `
+        <div class="header-section">
+            <div class="recommender-info"> {/* Use specific class if needed */}
+                ${headerData.recommender_name ? `<p class="sender-name">${escapeHtml(headerData.recommender_name)}</p>` : ''}
+                ${headerData.recommender_title ? `<p>${escapeHtml(headerData.recommender_title)}</p>` : ''}
+                ${headerData.recommender_organization ? `<p>${escapeHtml(headerData.recommender_organization)}</p>` : ''}
+                ${headerData.recommender_address ? `<p>${escapeHtml(headerData.recommender_address)}</p>` : ''}
+                ${headerData.recommender_city_postal ? `<p>${escapeHtml(headerData.recommender_city_postal)}</p>` : ''}
+                ${headerData.recommender_phone ? `<p>${escapeHtml(headerData.recommender_phone)}</p>` : ''}
+                ${headerData.recommender_email ? `<p><a href="mailto:${escapeHtml(headerData.recommender_email)}">${escapeHtml(headerData.recommender_email)}</a></p>` : ''}
+            </div>
+            ${headerData.date ? `<div class="date"><p>${escapeHtml(headerData.date)}</p></div>` : ''}
+            <div class="recipient-info">
+                 ${headerData.recipient_name ? `<p class="recipient-name">${escapeHtml(headerData.recipient_name)}</p>` : ''}
+                 ${headerData.recipient_title ? `<p class="recipient-title">${escapeHtml(headerData.recipient_title)}</p>` : ''}
+                 ${headerData.recipient_organization ? `<p>${escapeHtml(headerData.recipient_organization)}</p>` : ''}
+                 ${headerData.recipient_address ? `<p>${escapeHtml(headerData.recipient_address)}</p>` : ''}
+                 ${headerData.recipient_city_postal ? `<p>${escapeHtml(headerData.recipient_city_postal)}</p>` : ''}
+            </div>
+             ${headerData.subject ? `<div class="subject"><p>${escapeHtml(headerData.subject)}</p></div>` : ''}
+             ${headerData.salutation ? `<div class="salutation"><p>${escapeHtml(headerData.salutation)}</p></div>` : ''}
+        </div>
+    `;
+};
+
+/** Renders HTML for Motivation Letter header */
+const renderMotivationHeaderHtml = (headerData) => {
+    if (!headerData) return '<div class="header-section"><p><i>Header data missing</i></p></div>';
+     return `
+        <div class="header-section">
+            <div class="sender-info"> {/* Reusing sender-info class */}
+                ${headerData.sender_name ? `<p class="sender-name">${escapeHtml(headerData.sender_name)}</p>` : ''}
+                ${headerData.sender_address ? `<p>${escapeHtml(headerData.sender_address)}</p>` : ''}
+                ${headerData.sender_city_postal ? `<p>${escapeHtml(headerData.sender_city_postal)}</p>` : ''}
+                ${headerData.sender_phone ? `<p>${escapeHtml(headerData.sender_phone)}</p>` : ''}
+                ${headerData.sender_email ? `<p><a href="mailto:${escapeHtml(headerData.sender_email)}">${escapeHtml(headerData.sender_email)}</a></p>` : ''}
+            </div>
+            ${headerData.date ? `<div class="date"><p>${escapeHtml(headerData.date)}</p></div>` : ''}
+            <div class="recipient-info">
+                 ${headerData.recipient_name ? `<p class="recipient-name">${escapeHtml(headerData.recipient_name)}</p>` : ''}
+                 ${headerData.recipient_title ? `<p class="recipient-title">${escapeHtml(headerData.recipient_title)}</p>` : ''}
+                 ${headerData.recipient_organization ? `<p>${escapeHtml(headerData.recipient_organization)}</p>` : ''}
+                 ${headerData.recipient_address ? `<p>${escapeHtml(headerData.recipient_address)}</p>` : ''}
+                 ${headerData.recipient_city_postal ? `<p>${escapeHtml(headerData.recipient_city_postal)}</p>` : ''}
+            </div>
+             ${headerData.subject ? `<div class="subject"><p>${escapeHtml(headerData.subject)}</p></div>` : ''}
+             ${headerData.salutation ? `<div class="salutation"><p>${escapeHtml(headerData.salutation)}</p></div>` : ''}
         </div>
     `;
 };
@@ -196,34 +238,28 @@ const renderParagraphHtml = (paragraphText) => {
     return `<div class="body"><p>${formattedText || '<i>Empty paragraph</i>'}</p></div>`;
 };
 
-/**
- * Renders HTML for the footer section, handling potentially missing data.
- * @param {object | null} footerData - The footer data object.
- * @returns {string} HTML string for the footer.
- */
-const renderFooterHtml = (footerData) => {
+/** Renders HTML for Cover Letter footer */
+const renderCoverLetterFooterHtml = (footerData) => {
     if (!footerData) return '<div class="footer-section"><p><i>Footer data missing</i></p></div>';
-    const escape = (str) => str ? String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#039;') : '';
     let attachmentsHtml = '';
     if (footerData.attachments_mentioned && Array.isArray(footerData.attachments_mentioned) && footerData.attachments_mentioned.length > 0) {
         attachmentsHtml = `
             <div class="attachments">
                 <p>Attachment${footerData.attachments_mentioned.length > 1 ? 's' : ''}</p>
                 <ul>
-                    ${footerData.attachments_mentioned.map(att => `<li>${escape(att)}</li>`).join('')}
+                    ${footerData.attachments_mentioned.map(att => `<li>${escapeHtml(att)}</li>`).join('')}
                 </ul>
             </div>
         `;
     }
-    // Replace newlines in signature contact with <br>
-    const signatureContactHtml = footerData.signature_contact ? escape(String(footerData.signature_contact).trim()).replace(/\n/g, '<br>') : '';
+    const signatureContactHtml = footerData.signature_contact ? escapeHtml(String(footerData.signature_contact).trim()).replace(/\n/g, '<br>') : '';
     return `
         <div class="footer-section">
             <div class="closing">
-                <p>${escape(footerData.closing || 'Sincerely,')}</p>
+                <p>${escapeHtml(footerData.closing || 'Sincerely,')}</p>
             </div>
             <div class="signature">
-                ${footerData.signature_name ? `<p class="signature-name">${escape(footerData.signature_name)}</p>` : ''}
+                ${footerData.signature_name ? `<p class="signature-name">${escapeHtml(footerData.signature_name)}</p>` : ''}
                 ${signatureContactHtml ? `<p class="signature-contact">${signatureContactHtml}</p>` : ''}
             </div>
             ${attachmentsHtml}
@@ -231,37 +267,70 @@ const renderFooterHtml = (footerData) => {
     `;
 };
 
+/** Renders HTML for Recommendation Letter footer */
+const renderRecommendationFooterHtml = (footerData) => {
+    if (!footerData) return '<div class="footer-section"><p><i>Footer data missing</i></p></div>';
+    const signatureContactHtml = footerData.signature_contact ? escapeHtml(String(footerData.signature_contact).trim()).replace(/\n/g, '<br>') : '';
+    return `
+        <div class="footer-section">
+            <div class="closing">
+                <p>${escapeHtml(footerData.closing || 'Sincerely,')}</p>
+            </div>
+            <div class="signature">
+                ${footerData.signature_name ? `<p class="signature-name">${escapeHtml(footerData.signature_name)}</p>` : ''}
+                ${footerData.signature_title ? `<p class="signature-title">${escapeHtml(footerData.signature_title)}</p>` : ''}
+                ${footerData.signature_organization ? `<p class="signature-organization">${escapeHtml(footerData.signature_organization)}</p>` : ''}
+                ${signatureContactHtml ? `<p class="signature-contact">${signatureContactHtml}</p>` : ''}
+            </div>
+        </div>
+    `;
+};
+
+/** Renders HTML for Motivation Letter footer */
+const renderMotivationFooterHtml = (footerData) => {
+    if (!footerData) return '<div class="footer-section"><p><i>Footer data missing</i></p></div>';
+    return `
+        <div class="footer-section">
+            <div class="closing">
+                <p>${escapeHtml(footerData.closing || 'Sincerely,')}</p>
+            </div>
+            <div class="signature">
+                ${footerData.signature_name ? `<p class="signature-name">${escapeHtml(footerData.signature_name)}</p>` : ''}
+            </div>
+        </div>
+    `;
+};
 
 // --- Main Editor Page Component ---
 
-const CoverLetterEditorPage = ({ params }) => {
+const DocumentEditorPage = ({ params }) => {
     const documentId = params.id;
     const toast = useRef(null);
 
     // --- Core State ---
-    const [coverLetterData, setCoverLetterData] = useState(initialCoverLetterState);
+    const [documentType, setDocumentType] = useState(null);
+    const [documentData, setDocumentData] = useState(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
 
     // --- Editing & Saving State ---
     const [isSaving, setIsSaving] = useState(false);
     const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
-    const initialDataRef = useRef(null); // Stores stringified data on load/save
+    const initialDataRef = useRef(null);
 
     // --- History State (Undo/Redo) ---
-    const [sectionHistory, setSectionHistory] = useState({}); // { sectionId: [state1, state2, ...] }
-    const [historyIndex, setHistoryIndex] = useState({});   // { sectionId: currentIndex }
-
+    const [sectionHistory, setSectionHistory] = useState({});
+    const [historyIndex, setHistoryIndex] = useState({});
 
     // --- Manual Edit Dialog State ---
     const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
-    const [currentEditingSection, setCurrentEditingSection] = useState(null); // { type, index?, id }
-    const [editText, setEditText] = useState(''); // For paragraphs
-    const [editData, setEditData] = useState({}); // For header/footer
+    const [currentEditingSection, setCurrentEditingSection] = useState(null);
+    const [editText, setEditText] = useState('');
+    const [editData, setEditData] = useState({});
 
     // --- AI Edit Dialog State ---
     const [isAiEditDialogOpen, setIsAiEditDialogOpen] = useState(false);
-    const [currentEditingSectionForAI, setCurrentEditingSectionForAI] = useState(null); // { type, index?, id }
+    const [currentEditingSectionForAI, setCurrentEditingSectionForAI] = useState(null);
     const [aiPrompt, setAiPrompt] = useState('');
     const [isAiProcessing, setIsAiProcessing] = useState(false);
 
@@ -274,15 +343,15 @@ const CoverLetterEditorPage = ({ params }) => {
 
     /** Retrieves the current data for a given section from the main state. */
     const getSectionData = useCallback((sectionInfo) => {
-        if (!sectionInfo || !coverLetterData.cover_letter) return null;
+        if (!sectionInfo || !documentData) return null;
         const { type, index } = sectionInfo;
         switch (type) {
-            case 'header': return coverLetterData.cover_letter.header;
-            case 'paragraph': return coverLetterData.cover_letter.body_paragraphs?.[index];
-            case 'footer': return coverLetterData.cover_letter.footer;
+            case 'header': return documentData.header;
+            case 'paragraph': return documentData.body_paragraphs?.[index];
+            case 'footer': return documentData.footer;
             default: return null;
         }
-    }, [coverLetterData]);
+    }, [documentData]);
 
     /** Parses a section ID string back into type and index. */
     const parseSectionId = (sectionId) => {
@@ -296,13 +365,12 @@ const CoverLetterEditorPage = ({ params }) => {
 
     /** Initializes the history state based on the loaded document data. */
     const initializeHistory = useCallback((data) => {
-        if (!data || !data.cover_letter) return;
+        if (!data) return;
         const initialHistory = {};
         const initialIndices = {};
-        const { header, body_paragraphs, footer } = data.cover_letter;
+        const { header, body_paragraphs, footer } = data;
 
         const addStateToHistory = (id, state) => {
-            // Use deep copy for objects, direct value for primitives (like paragraph strings)
             const stateToAdd = (typeof state === 'object' && state !== null) ? JSON.parse(JSON.stringify(state)) : state;
             initialHistory[id] = [stateToAdd];
             initialIndices[id] = 0;
@@ -321,98 +389,78 @@ const CoverLetterEditorPage = ({ params }) => {
 
     /** Updates the history for a specific section after an edit. */
     const updateHistory = useCallback((sectionId, newState) => {
-        // Use deep copy for objects, direct value for primitives
         const stateToAdd = (typeof newState === 'object' && newState !== null) ? JSON.parse(JSON.stringify(newState)) : newState;
 
         setSectionHistory(prev => {
             const currentHistory = prev[sectionId] || [];
             const currentIndex = historyIndex[sectionId] ?? -1;
-            // Discard redo states by slicing up to current index + 1
             const relevantHistory = currentHistory.slice(0, currentIndex + 1);
             return { ...prev, [sectionId]: [...relevantHistory, stateToAdd] };
         });
-        // Update the index to point to the newly added state
         setHistoryIndex(prev => ({ ...prev, [sectionId]: (prev[sectionId] ?? -1) + 1 }));
-        setHasUnsavedChanges(true); // Mark changes as unsaved
-    }, [historyIndex]); // Depends on historyIndex to correctly slice
+        setHasUnsavedChanges(true);
+    }, [historyIndex]);
 
     // --- Data Fetching and Initialization ---
     const fetchData = useCallback(async () => {
         setLoading(true);
         setError(null);
         setHasUnsavedChanges(false);
+        setDocumentType(null);
+        setDocumentData(null);
         try {
-            console.log(`Simulating fetch for document: ${documentId}`);
-            await new Promise(resolve => setTimeout(resolve, 700)); // Simulate network delay
+            // Ensure the environment variable is correctly loaded
+            const backendUrl = process.env.NEXT_PUBLIC_BACKEND_URL;
+            if (!backendUrl) {
+                throw new Error("Backend URL is not configured. Check NEXT_PUBLIC_BACKEND_URL environment variable.");
+            }
+            const response = await axios.get(`${backendUrl}/api/resumes/document_bloks/${documentId}/`);
+            const { document_type, json_data } = response.data;
 
-            // --- Simulated API Response ---
-            const fetchedData = {
-              "cover_letter": {
-                "header": {
-                  "sender_name": "John Doe",
-                  "sender_address": "123 Main Street",
-                  "sender_city_postal": "Anytown, CA 90210",
-                  "sender_phone": "555-123-4567",
-                  "sender_email": "john.doe@email.com",
-                  "sender_linkedin": "https://linkedin.com/in/johndoe",
-                  "date": "2025-05-01",
-                  "recipient_name": "Jane Smith",
-                  "recipient_title": "Hiring Manager",
-                  "recipient_company": "Tech Solutions Inc.",
-                  "recipient_address": "456 Corporate Blvd",
-                  "recipient_city_postal": "Metropolis, NY 10001",
-                  "subject": "Application for Software Engineer - John Doe",
-                  "salutation": "Dear Ms. Smith,"
-                },
-                "body_paragraphs": [
-                    // Start with empty paragraphs as per example
-                    "This is the first paragraph. It demonstrates how text flows and justifies within the container. We need enough text to see how line breaks and spacing work.",
-                    "Here is a second paragraph, providing further details or context. It might discuss specific qualifications or experiences relevant to the application.",
-                    "A third paragraph can be used to conclude the main points or express enthusiasm for the role. Ensuring proper spacing between paragraphs is important for readability."
-                ],
-                "footer": {
-                  "closing": "Sincerely,",
-                  "signature_name": "John Doe",
-                  "signature_contact": "555-123-4567\njohn.doe@email.com", // Example with newline
-                  "attachments_mentioned": [
-                    "Resume/CV",
-                    "Portfolio Link"
-                  ]
-                }
-                // footer: null, // To test missing footer
-              }
-            };
-            // --- End Simulation ---
+            if (!document_type || !json_data) {
+                throw new Error("Invalid data structure received from API: Missing document_type or json_data.");
+            }
 
-            // Validate and provide defaults for missing top-level sections
+            // --- MODIFICATION START ---
+            // Access the actual document data nested under the document_type key
+            const actualDocumentData = json_data[document_type];
+
+            if (!actualDocumentData) {
+                 throw new Error(`Data for document type '${document_type}' not found within json_data.`);
+            }
+            // --- MODIFICATION END ---
+
+
+            console.log(`Fetched document: ${documentId}, Type: ${document_type}`);
+
+            // Use the correctly accessed data
             const validatedData = {
-                cover_letter: {
-                    header: fetchedData.cover_letter?.header ?? null,
-                    body_paragraphs: fetchedData.cover_letter?.body_paragraphs ?? [],
-                    footer: fetchedData.cover_letter?.footer ?? null,
-                }
+                header: actualDocumentData.header ?? null,
+                body_paragraphs: actualDocumentData.body_paragraphs ?? [],
+                footer: actualDocumentData.footer ?? null,
             };
 
-            setCoverLetterData(validatedData);
-            initialDataRef.current = JSON.stringify(validatedData); // Store initial state
-            initializeHistory(validatedData); // Initialize history
+            setDocumentType(document_type);
+            setDocumentData(validatedData);
+            initialDataRef.current = JSON.stringify(validatedData);
+            initializeHistory(validatedData);
 
         } catch (err) {
             console.error("Error fetching document:", err);
-            setError(`Failed to load document data. ${err.message || ''}`);
-            toast.current?.show({ severity: 'error', summary: 'Load Error', detail: 'Failed to load document.', life: 5000 });
+            const errorMsg = err.response?.data?.error || err.message || 'Failed to load document data.';
+            setError(`Failed to load document data. ${errorMsg}`);
+            toast.current?.show({ severity: 'error', summary: 'Load Error', detail: `Failed to load document. ${errorMsg}`, life: 5000 });
         } finally {
             setLoading(false);
         }
-    }, [documentId, initializeHistory]); // Add initializeHistory dependency
+    }, [documentId, initializeHistory]);
 
     useEffect(() => {
-        fetchData(); // Fetch data on component mount or when documentId changes
-    }, [fetchData]); // Use fetchData callback
+        fetchData();
+    }, [fetchData]);
 
     const handleIframeLoad = useCallback((e) => {
         const iframe = e.target;
-        // Introduce a small delay to allow for font rendering/reflow
         setTimeout(() => {
             try {
                 if (iframe.contentDocument && iframe.contentDocument.body) {
@@ -420,58 +468,51 @@ const CoverLetterEditorPage = ({ params }) => {
                     const body = doc.body;
                     let contentHeight = 0;
 
-                    // Try to find the main content element (e.g., .header-section, .body, .footer-section)
-                    // For paragraphs, we expect a single <div class="body">
                     const contentElement = body.querySelector('.header-section, .body, .footer-section');
 
                     if (contentElement) {
-                        // Use the scrollHeight of the specific content element
                         contentHeight = contentElement.scrollHeight;
                     } else {
-                        // Fallback to body scrollHeight if specific element not found
                         console.warn("Could not find specific content element in iframe, falling back to body height.");
                         contentHeight = body.scrollHeight;
                     }
 
-                    // Get body margins (still relevant if contentElement doesn't fill body)
                     const bodyStyle = window.getComputedStyle(body);
                     const marginTop = parseInt(bodyStyle.marginTop, 10) || 0;
                     const marginBottom = parseInt(bodyStyle.marginBottom, 10) || 0;
 
-                    // Calculate total height - minimal buffer
-                    const totalHeight = contentHeight + marginTop + marginBottom + 1; // Minimal 1px buffer
+                    const totalHeight = contentHeight + marginTop + marginBottom + 1;
 
                     iframe.style.height = `${totalHeight}px`;
 
                 }
             } catch (error) {
                 console.error("Error adjusting iframe height:", error);
-                iframe.style.height = '100px'; // Fallback height
+                iframe.style.height = '100px';
             }
-        }, 50); // 50ms delay - adjust if needed
+        }, 50);
     }, []);
 
     // --- Core Action Handlers (Undo, Redo, Save) ---
 
-    /** Applies the state change for undo/redo to the main coverLetterData. */
+    /** Applies the state change for undo/redo to the main documentData. */
     const applyStateChange = (sectionId, newState) => {
-        setCoverLetterData(prevData => {
-            const newData = JSON.parse(JSON.stringify(prevData)); // Deep copy
+        setDocumentData(prevData => {
+            const newData = JSON.parse(JSON.stringify(prevData));
             const sectionInfo = parseSectionId(sectionId);
-            if (!sectionInfo) return prevData; // Should not happen
+            if (!sectionInfo) return prevData;
 
             if (sectionInfo.type === 'paragraph') {
-                // Ensure array exists if needed (though unlikely during undo/redo)
-                if (!newData.cover_letter.body_paragraphs) newData.cover_letter.body_paragraphs = [];
-                newData.cover_letter.body_paragraphs[sectionInfo.index] = newState;
+                if (!newData.body_paragraphs) newData.body_paragraphs = [];
+                newData.body_paragraphs[sectionInfo.index] = newState;
             } else if (sectionInfo.type === 'header') {
-                newData.cover_letter.header = newState;
+                newData.header = newState;
             } else if (sectionInfo.type === 'footer') {
-                newData.cover_letter.footer = newState;
+                newData.footer = newState;
             }
             return newData;
         });
-        setHasUnsavedChanges(true); // Undo/Redo counts as an unsaved change
+        setHasUnsavedChanges(true);
     };
 
     const handleUndo = (sectionId) => {
@@ -480,8 +521,8 @@ const CoverLetterEditorPage = ({ params }) => {
         if (currentIndex > 0) {
             const previousIndex = currentIndex - 1;
             const previousState = history[previousIndex];
-            applyStateChange(sectionId, previousState); // Update main data
-            setHistoryIndex(prev => ({ ...prev, [sectionId]: previousIndex })); // Update index
+            applyStateChange(sectionId, previousState);
+            setHistoryIndex(prev => ({ ...prev, [sectionId]: previousIndex }));
             toast.current?.show({ severity: 'info', summary: 'Undo', detail: `Reverted ${sectionId}`, life: 1500 });
         } else {
             toast.current?.show({ severity: 'warn', summary: 'Undo', detail: `No previous state for ${sectionId}`, life: 1500 });
@@ -494,8 +535,8 @@ const CoverLetterEditorPage = ({ params }) => {
         if (currentIndex < history.length - 1) {
             const nextIndex = currentIndex + 1;
             const nextState = history[nextIndex];
-            applyStateChange(sectionId, nextState); // Update main data
-            setHistoryIndex(prev => ({ ...prev, [sectionId]: nextIndex })); // Update index
+            applyStateChange(sectionId, nextState);
+            setHistoryIndex(prev => ({ ...prev, [sectionId]: nextIndex }));
             toast.current?.show({ severity: 'info', summary: 'Redo', detail: `Restored ${sectionId}`, life: 1500 });
         } else {
             toast.current?.show({ severity: 'warn', summary: 'Redo', detail: `No future state for ${sectionId}`, life: 1500 });
@@ -506,14 +547,16 @@ const CoverLetterEditorPage = ({ params }) => {
         setIsSaving(true);
         try {
             console.log("Simulating save for document:", documentId);
-            console.log("Data to save:", coverLetterData);
-            await new Promise(resolve => setTimeout(resolve, 1000)); // Simulate save delay
+            const dataToSave = {
+                document_type: documentType,
+                json_content: documentData
+            };
+            console.log("Data to save:", dataToSave);
 
-            // --- In a real app, replace simulation with API call: ---
-            // await axios.put(`/api/documents/${documentId}`, coverLetterData);
+            await new Promise(resolve => setTimeout(resolve, 1000));
 
-            initialDataRef.current = JSON.stringify(coverLetterData); // Update reference state
-            setHasUnsavedChanges(false); // Mark as saved
+            initialDataRef.current = JSON.stringify(documentData);
+            setHasUnsavedChanges(false);
             toast.current?.show({ severity: 'success', summary: 'Saved', detail: 'Document saved successfully!', life: 3000 });
         } catch (err) {
             console.error("Error saving document:", err);
@@ -528,13 +571,12 @@ const CoverLetterEditorPage = ({ params }) => {
     const openEditDialog = (sectionInfo) => {
         const currentData = getSectionData(sectionInfo);
         const sectionId = getSectionId(sectionInfo.type, sectionInfo.index);
-        setCurrentEditingSection({ ...sectionInfo, id: sectionId });
+        setCurrentEditingSection({ ...sectionInfo, id: sectionId, documentType: documentType });
 
         if (sectionInfo.type === 'paragraph') {
-            setEditText(currentData ?? ''); // Use empty string if null/undefined
+            setEditText(currentData ?? '');
             setEditData({});
         } else {
-            // Header/Footer: Use current data or empty object if null
             setEditData(currentData ? { ...currentData } : {});
             setEditText('');
         }
@@ -554,35 +596,32 @@ const CoverLetterEditorPage = ({ params }) => {
 
     const handleEditSave = () => {
         if (!currentEditingSection) return;
-        const { type, index, id: sectionId } = currentEditingSection;
+        const { type, index, id: sectionId, documentType: currentDocType } = currentEditingSection;
         let newState;
 
         try {
             if (type === 'paragraph') {
-                newState = editText; // Already a string
+                newState = editText;
             } else if (type === 'header') {
-                newState = { ...editData }; // Simple object copy
+                newState = { ...editData };
             } else if (type === 'footer') {
-                // Process attachments string back to array
                 const processedData = { ...editData };
-                if (processedData.attachments_mentioned && typeof processedData.attachments_mentioned === 'string') {
-                    // Split by comma, trim whitespace, remove empty strings
-                    processedData.attachments_mentioned = processedData.attachments_mentioned
-                        .split(',')
-                        .map(s => s.trim())
-                        .filter(Boolean);
-                } else if (!Array.isArray(processedData.attachments_mentioned)) {
-                    // Ensure it's an array if it wasn't a string or already an array
-                    processedData.attachments_mentioned = [];
+                if (currentDocType === 'cover_letter') {
+                    if (processedData.attachments_mentioned && typeof processedData.attachments_mentioned === 'string') {
+                        processedData.attachments_mentioned = processedData.attachments_mentioned
+                            .split(',')
+                            .map(s => s.trim())
+                            .filter(Boolean);
+                    } else if (!Array.isArray(processedData.attachments_mentioned)) {
+                        processedData.attachments_mentioned = [];
+                    }
                 }
                 newState = processedData;
             } else {
                 throw new Error("Unknown section type");
             }
 
-            // Update main state directly (will trigger re-render)
             applyStateChange(sectionId, newState);
-            // Update history
             updateHistory(sectionId, newState);
 
             closeEditDialog();
@@ -597,8 +636,8 @@ const CoverLetterEditorPage = ({ params }) => {
 
     const openAiEditDialog = (sectionInfo) => {
         const sectionId = getSectionId(sectionInfo.type, sectionInfo.index);
-        setCurrentEditingSectionForAI({ ...sectionInfo, id: sectionId });
-        setAiPrompt(''); // Reset prompt
+        setCurrentEditingSectionForAI({ ...sectionInfo, id: sectionId, documentType: documentType });
+        setAiPrompt('');
         setIsAiEditDialogOpen(true);
     };
 
@@ -615,45 +654,34 @@ const CoverLetterEditorPage = ({ params }) => {
         }
 
         setIsAiProcessing(true);
-        const { type, index, id: sectionId } = currentEditingSectionForAI;
+        const { type, index, id: sectionId, documentType: currentDocType } = currentEditingSectionForAI;
         const currentData = getSectionData(currentEditingSectionForAI);
 
         try {
-            // --- Simulate AI API Call ---
-            console.log(`Simulating AI edit for section: ${sectionId}`);
+            console.log(`Simulating AI edit for section: ${sectionId} (Type: ${currentDocType})`);
             console.log("Prompt:", aiPrompt);
             console.log("Current Data:", currentData);
-            await new Promise(resolve => setTimeout(resolve, 1500)); // Simulate processing time
+            await new Promise(resolve => setTimeout(resolve, 1500));
 
             let aiResult;
             if (type === 'paragraph') {
                 aiResult = `AI modified paragraph based on prompt: "${aiPrompt}". Original was: "${currentData || ''}"`;
             } else if (type === 'header') {
-                // Simulate a more realistic change
                 aiResult = {
                     ...(currentData || {}),
-                    subject: `Re: ${currentData?.subject || 'Application'} (AI Enhanced: ${aiPrompt.substring(0, 20)}...)`,
-                    salutation: `Dear ${currentData?.recipient_name || 'Hiring Manager'} (AI suggestion),`
+                    subject: `Re: ${currentData?.subject || 'Subject'} (AI: ${currentDocType})`,
                 };
             } else if (type === 'footer') {
                  aiResult = {
                     ...(currentData || {}),
-                    closing: `Best regards (AI: ${aiPrompt.substring(0, 15)}...)`,
-                    signature_name: `${currentData?.signature_name || 'AI'} (AI Edited)`
+                    closing: `Best regards (AI: ${currentDocType})`,
                  };
             } else {
                 throw new Error("Unknown section type for AI edit");
             }
             console.log("Simulated AI Result:", aiResult);
-            // --- End Simulation ---
 
-            // --- In a real app, replace simulation with API call: ---
-            // const response = await axios.post('/api/ai-edit', { documentId, sectionId, currentData, prompt });
-            // const aiResult = response.data.updatedData;
-
-            // Update main state
             applyStateChange(sectionId, aiResult);
-            // Update history
             updateHistory(sectionId, aiResult);
 
             closeAiEditDialog();
@@ -672,32 +700,44 @@ const CoverLetterEditorPage = ({ params }) => {
     if (loading) {
         return <LoadingIndicator />;
     }
-    if (error) {
-        return <ErrorDisplay error={error} onRetry={fetchData} />;
+    if (error || !documentData || !documentType) {
+        return <ErrorDisplay error={error || "Document data or type is missing."} onRetry={fetchData} />;
     }
 
-    // Safely access data after loading/error checks
-    const { header = null, body_paragraphs = [], footer = null } = coverLetterData.cover_letter || {};
+    const { header = null, body_paragraphs = [], footer = null } = documentData;
+
+    let renderHeaderFn, renderFooterFn;
+    switch (documentType) {
+        case 'recommendation_letter':
+            renderHeaderFn = renderRecommendationHeaderHtml;
+            renderFooterFn = renderRecommendationFooterHtml;
+            break;
+        case 'motivation_letter':
+            renderHeaderFn = renderMotivationHeaderHtml;
+            renderFooterFn = renderMotivationFooterHtml;
+            break;
+        case 'cover_letter':
+        default:
+            renderHeaderFn = renderCoverLetterHeaderHtml;
+            renderFooterFn = renderCoverLetterFooterHtml;
+            break;
+    }
 
     return (
         <div className="document-editor flex flex-column h-screen">
             <Toast ref={toast} />
 
-            {/* Toolbar */}
             <EditorToolbar
                 onSave={handleSaveChanges}
                 isSaving={isSaving}
                 hasUnsavedChanges={hasUnsavedChanges}
             />
 
-            {/* Scrollable A4 Page Container */}
             <div className="flex-grow-1 overflow-auto p-4 surface-100 flex justify-content-center">
-                {/* A4 Page Element */}
                 <div
                     className="a4-page bg-white shadow-3 border-1 border-300"
                     style={{ width: '210mm', minHeight: '297mm', padding: '1.5cm', boxSizing: 'border-box' }}
                 >
-                    {/* Header Section */}
                     <EditableSection
                         sectionId={getSectionId('header')}
                         onEdit={() => openEditDialog({ type: 'header' })}
@@ -708,22 +748,21 @@ const CoverLetterEditorPage = ({ params }) => {
                         canRedo={(sectionHistory[getSectionId('header')]?.length ?? 0) > (historyIndex[getSectionId('header')] ?? 0) + 1}
                     >
                         <iframe
-                            key={`${getSectionId('header')}-${JSON.stringify(header)}`} // Key changes on data update to force iframe reload
-                            title="Cover Letter Header"
-                            srcDoc={generateSrcDoc(renderHeaderHtml(header), coverLetterCSS, getSectionId('header'))}
+                            key={`${getSectionId('header')}-${documentType}-${JSON.stringify(header)}`}
+                            title={`${documentType} Header`}
+                            srcDoc={generateSrcDoc(renderHeaderFn(header), coverLetterCSS, getSectionId('header'))}
                             style={{ width: '100%', border: 'none', overflow: 'hidden', display: 'block', minHeight: '100px' }}
                             scrolling="no"
-                            sandbox="allow-scripts allow-same-origin" // allow-scripts needed for height adjustment
+                            sandbox="allow-scripts allow-same-origin"
                             onLoad={handleIframeLoad}
                         />
                     </EditableSection>
 
-                    {/* Body Paragraphs */}
                     {body_paragraphs.map((paragraph, index) => {
                         const paragraphId = getSectionId('paragraph', index);
                         return (
                             <EditableSection
-                                key={paragraphId} // Unique key for each paragraph section
+                                key={paragraphId}
                                 sectionId={paragraphId}
                                 onEdit={() => openEditDialog({ type: 'paragraph', index })}
                                 onAiEdit={() => openAiEditDialog({ type: 'paragraph', index })}
@@ -733,7 +772,7 @@ const CoverLetterEditorPage = ({ params }) => {
                                 canRedo={(sectionHistory[paragraphId]?.length ?? 0) > (historyIndex[paragraphId] ?? 0) + 1}
                             >
                                 <iframe
-                                    key={`${paragraphId}-${paragraph}`} // Key changes on data update
+                                    key={`${paragraphId}-${paragraph}`}
                                     title={`Paragraph ${index + 1}`}
                                     srcDoc={generateSrcDoc(renderParagraphHtml(paragraph), coverLetterCSS, paragraphId)}
                                     style={{ width: '100%', border: 'none', overflow: 'hidden', display: 'block' }}
@@ -744,11 +783,7 @@ const CoverLetterEditorPage = ({ params }) => {
                             </EditableSection>
                         );
                     })}
-                    {/* Optional: Add button to add new paragraph */}
-                    {/* <Button label="Add Paragraph" icon="pi pi-plus" className="p-button-text p-button-sm mt-2" onClick={handleAddParagraph} /> */}
 
-
-                    {/* Footer Section */}
                     <EditableSection
                         sectionId={getSectionId('footer')}
                         onEdit={() => openEditDialog({ type: 'footer' })}
@@ -759,9 +794,9 @@ const CoverLetterEditorPage = ({ params }) => {
                         canRedo={(sectionHistory[getSectionId('footer')]?.length ?? 0) > (historyIndex[getSectionId('footer')] ?? 0) + 1}
                     >
                         <iframe
-                            key={`${getSectionId('footer')}-${JSON.stringify(footer)}`} // Key changes on data update
-                            title="Cover Letter Footer"
-                            srcDoc={generateSrcDoc(renderFooterHtml(footer), coverLetterCSS, getSectionId('footer'))}
+                            key={`${getSectionId('footer')}-${documentType}-${JSON.stringify(footer)}`}
+                            title={`${documentType} Footer`}
+                            srcDoc={generateSrcDoc(renderFooterFn(footer), coverLetterCSS, getSectionId('footer'))}
                             style={{ width: '100%', border: 'none', overflow: 'hidden', display: 'block', minHeight: '80px' }}
                             scrolling="no"
                             sandbox="allow-scripts allow-same-origin"
@@ -771,7 +806,6 @@ const CoverLetterEditorPage = ({ params }) => {
                 </div>
             </div>
 
-            {/* Manual Edit Dialog */}
             <ManualEditDialog
                 visible={isEditDialogOpen}
                 onHide={closeEditDialog}
@@ -783,7 +817,6 @@ const CoverLetterEditorPage = ({ params }) => {
                 onSave={handleEditSave}
             />
 
-            {/* AI Edit Dialog */}
             <AiEditDialog
                 visible={isAiEditDialogOpen}
                 onHide={closeAiEditDialog}
@@ -797,4 +830,4 @@ const CoverLetterEditorPage = ({ params }) => {
     );
 };
 
-export default CoverLetterEditorPage;
+export default DocumentEditorPage;
