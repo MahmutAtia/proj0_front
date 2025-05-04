@@ -1,3 +1,27 @@
+
+// hello world component
+
+export default function HelloWorld() {
+    return (
+        <div>
+            <h1>Hello, World!</h1>
+            <p>This is a simple component.</p>
+        </div>
+    );
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
 // 'use client';
 // import React, { useState, useRef, useEffect } from 'react';
 // import Link from 'next/link';
