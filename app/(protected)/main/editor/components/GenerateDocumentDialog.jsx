@@ -77,8 +77,8 @@ const GenerateDocumentDialog = ({ visible, onHide, resumeId }) => {
                 otherInfo: otherInfo,
             });
 
-            // Check for successful creation status (201) and response data
-            if (response.status === 201 && response.data?.document_uuid) {
+            // Check for successful creation status (201) or 200 with document_uuid
+            if ((response.status === 201 || response.status === 200) && response.data?.document_uuid) {
                 const newDocId = response.data.document_uuid;
                 setGeneratedDocId(newDocId); // Store the ID
                 console.log("Document generation successful:", newDocId);
