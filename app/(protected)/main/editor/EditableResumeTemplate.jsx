@@ -15,6 +15,8 @@ import Projects from "./components/Projects";
 import Skills from "./components/Skills";
 import Languages from "./components/Languages";
 import GenericSection from "./components/GenericSection";
+import GenerateDocumentDialog from "./components/GenerateDocumentDialog"; // <-- Import the new component
+
 import 'primeflex/primeflex.css';
 import styles from './EditableResumeTemplate.module.css'; // Ensure CSS Modules are used
 
@@ -36,6 +38,7 @@ const EditableResumeTemplate = ({ resumeId }) => {
     const [hiddenSections, setHiddenSections] = useState([]);
     const [sidebarVisible, setSidebarVisible] = useState(true);
     const [activeSection, setActiveSection] = useState(null);
+    const [showGenerateDialog, setShowGenerateDialog] = useState(false); // <-- Add state for dialog
     const router = useRouter();
     const toast = useRef(null);
     const mainContentRef = useRef(null); // Ref for the main scrollable area
@@ -198,6 +201,14 @@ const EditableResumeTemplate = ({ resumeId }) => {
                         disabled={loading}
                     />
                     <Button
+                        icon="pi pi-file-edit" // Or pi-plus, pi-book, etc.
+                        tooltip="Generate Document"
+                        tooltipOptions={{ position: 'bottom' }}
+                        className="p-button-outlined p-button-secondary"
+                        onClick={() => setShowGenerateDialog(true)} // <-- Open the dialog
+                        disabled={loading || !data} // Disable if loading or no data
+                    />
+                    <Button
                         icon="pi pi-save"
                         label="Save"
                         severity="success"
@@ -340,6 +351,13 @@ const EditableResumeTemplate = ({ resumeId }) => {
                     </div>
                 </main>
             </div>
+
+            {/* Render the Dialog */}
+            <GenerateDocumentDialog
+                visible={showGenerateDialog}
+                onHide={() => setShowGenerateDialog(false)}
+                resumeId={resumeId} // Pass the resumeId
+            />
         </div>
     );
 };
