@@ -1,0 +1,133 @@
+
+/* CreatePortfolioPage.module.css */
+
+.pageContainer {
+    font-family: 'Inter', sans-serif;
+}
+
+.contentWrapper {
+    max-width: 1200px;
+}
+
+.selectionCard {
+    cursor: pointer;
+    transition: all 0.2s ease-in-out;
+    border: 2px solid var(--surface-border);
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+}
+
+.selectionCard:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+    border-color: var(--primary-color-light);
+}
+
+.selectedCard {
+    border-color: var(--primary-color) !important;
+    box-shadow: 0 0 0 2px var(--primary-color), 0 5px 15px rgba(0,0,0,0.1);
+    background-color: var(--surface-ground);
+}
+
+.visualElementContainer {
+    height: 100px;
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 1rem;
+    border-radius: var(--border-radius);
+    background-color: var(--surface-b);
+    padding: 0.5rem;
+}
+
+.visualIcon {
+    font-size: 3rem;
+}
+
+.colorPalettePreview .visualElementContainer {
+    padding: 1rem;
+}
+
+/* Styles for Add-on Features (Step 2) */
+.addOnCard {
+    cursor: pointer;
+    padding: 1rem;
+    border: 1px solid var(--surface-border);
+    border-radius: var(--border-radius);
+    transition: all 0.2s ease-in-out;
+    background-color: var(--surface-card);
+    height: 100%; /* Ensure cards in a row have same height */
+    display: flex; /* Added for flex children */
+    flex-direction: column; /* Added for flex children */
+    justify-content: center; /* Center content vertically */
+}
+
+.addOnCard:hover {
+    border-color: var(--primary-color-light);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+}
+
+.selectedAddOnCard {
+    border-color: var(--primary-color) !important;
+    background-color: var(--surface-50); /* Slightly different background for selected add-on */
+    box-shadow: 0 0 0 1px var(--primary-color);
+}
+
+.addOnVisualElementContainer {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px; /* Fixed width for icon container */
+    height: 40px; /* Fixed height for icon container */
+    border-radius: 50%; /* Circular background */
+    background-color: var(--surface-c); /* Slightly darker background for icon */
+    margin-right: 0.75rem; /* Spacing between icon and text */
+}
+
+.addOnVisualIcon {
+    font-size: 1.5rem; /* Adjust icon size for add-ons */
+    color: var(--text-color-secondary);
+}
+
+.selectedAddOnCard .addOnVisualIcon {
+    color: var(--primary-color);
+}
+
+
+.grid .col-12, .grid .col-6, .grid .col-4 {
+    padding-bottom: 1rem;
+}
+
+/* Hint Message Style */
+.hintMessage {
+    border-left: 4px solid var(--primary-color);
+}
+
+
+@media (max-width: 768px) {
+    .visualElementContainer {
+        height: 80px;
+    }
+    .visualIcon {
+        font-size: 2.5rem;
+    }
+    .selectionCard h3 {
+        font-size: 1rem;
+    }
+    .selectionCard p {
+        font-size: 0.875rem;
+    }
+    .addOnCard {
+        padding: 0.75rem;
+    }
+    .addOnVisualElementContainer {
+        width: 32px;
+        height: 32px;
+    }
+    .addOnVisualIcon {
+        font-size: 1.25rem;
+    }
+}
+
