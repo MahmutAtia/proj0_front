@@ -515,29 +515,39 @@ const PersonalSiteEditorPage = ({ params }) => {
                         title={`Preview ${block.name}`}
                         style={{ width: '100%', border: 'none', minHeight: 'inherit' }}
                         sandbox="allow-scripts allow-same-origin"
-                        srcDoc={`
-        <!DOCTYPE html>
-        <html>
-        <head>
-            <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-      ${yamlData.global?.html || ''}
-            <style>
-                /* Include a CSS reset or normalize here */
-                body, h1, h2, h3, p, ul, li { margin: 0; padding: 0; } /* Example reset */
+                        srcDoc={`<html>
+<head>
 
-                ${yamlData.global?.css || ''}
-                ${block.css || ''}
-            </style>
+    <!-- Global HTML head content -->
+    ${yamlData.global?.html || ''}
+
+    <style>
+        /* Basic Reset */
+        body, h1, h2, h3, p, ul, li { margin: 0; padding: 0; }
+
+        /* Global styles */
+        ${yamlData.global?.css || ''}
+
+        /* Block-specific styles */
+        ${block.css || ''}
+    </style>
+
+        <script>
+        // Global scripts
+        ${yamlData.global?.js || ''}
+
+        // Block-specific scripts
+        ${block.js || ''}
+    <\/script>
+
+</head>
+<body>
+    <!-- Block HTML content -->
+    ${block.html || ''}
 
 
-        </head>
-            ${block.html || ''}
-            <script>
-                ${yamlData.global?.js || ''}
-                ${block.js || ''}
-            </script>
-        </html>
+</body>
+</html>
     `}
                         onLoad={(e) => {
                             try {
