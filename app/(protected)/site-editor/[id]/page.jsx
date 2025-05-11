@@ -140,7 +140,7 @@ const PersonalSiteEditorPage = ({ params }) => {
         //         }
         //     });
         // } else {
-            fetchAndProcess(); // Fetch if no backup
+        fetchAndProcess(); // Fetch if no backup
         // }
 
     }, [resumeId, getLocalStorageKey, initializeHistory, isRestoring]); // Dependencies
@@ -237,7 +237,7 @@ const PersonalSiteEditorPage = ({ params }) => {
         }
 
         setIsAiProcessing(true);
-        let responseData = null; // Initialize variable to hold response data
+        let responseData = null;
 
         try {
             const validArtifacts = artifacts.filter(art => art.key.trim() !== '');
@@ -251,10 +251,8 @@ const PersonalSiteEditorPage = ({ params }) => {
                 artifacts: validArtifacts,
             });
 
-            // --- Correctly assign response data ---
             responseData = response.data;
 
-            // --- Validate response data (basic check) ---
             if (!responseData || typeof responseData !== 'object') {
                 console.error("Invalid response data structure:", responseData);
                 throw new Error("Received invalid data from AI edit endpoint.");
@@ -262,69 +260,60 @@ const PersonalSiteEditorPage = ({ params }) => {
 
             const blockName = currentBlock.name;
 
-            // --- Create the new state object using response data safely ---
+            // Create the new state object using response data safely
             const newState = {
-                html: responseData?.html ?? currentBlock.html, // Fallback to current if null/undefined
-                css: responseData?.css ?? currentBlock.css,   // Fallback to current
-                js: responseData?.js ?? currentBlock.js,     // Fallback to current
+                html: responseData?.html ?? currentBlock.html,
+                css: responseData?.css ?? currentBlock.css,
+                js: responseData?.js ?? currentBlock.js,
             };
-            // --- Get the new feedback separately ---
-            const newFeedback = responseData?.feedback ?? currentBlock.feedback; // Fallback to current
 
-            let finalNewIndex = 0; // To store the calculated index
+            // Get the new feedback separately
+            const newFeedback = responseData?.feedback ?? currentBlock.feedback;
+            const feedbackMessage = responseData?.feedback_message;
 
-            // --- Update History State ---
+            // Store feedback_message in the block data but don't display in dialog
+            let finalNewIndex = 0;
+
+            // Update History State
             setBlockHistory(prevHistory => {
+                // History update code...
                 const currentHistory = prevHistory[blockName] || [];
-                // Use the current historyIndex state value for slicing
                 const currentIndex = historyIndex[blockName] ?? -1;
-
-                // Slice history up to the current index + 1
                 const relevantHistory = currentHistory.slice(0, currentIndex + 1);
-
-                // Add the new state object to the history
-                const updatedHistory = [...relevantHistory, newState]; // Add the CONTENT state
-
-                // --- Calculate the index of the newly added state ---
+                const updatedHistory = [...relevantHistory, newState];
                 finalNewIndex = updatedHistory.length - 1;
-
-                console.log(`[${blockName}] History updated. New calculated index: ${finalNewIndex}`, updatedHistory);
-
                 return {
                     ...prevHistory,
                     [blockName]: updatedHistory,
                 };
             });
 
-            // --- Update History Index State ---
-            // This setter receives the *calculated* finalNewIndex from the scope above
-            setHistoryIndex(prevIndex => {
-                console.log(`[${blockName}] Setting history index state to: ${finalNewIndex}`);
-                return {
-                    ...prevIndex,
-                    [blockName]: finalNewIndex
-                };
-            });
+            // Update History Index State
+            setHistoryIndex(prevIndex => ({
+                ...prevIndex,
+                [blockName]: finalNewIndex
+            }));
 
-            // --- Update Main Data State (yamlData) ---
-            // This needs to run to reflect the changes visually
+            // Update Main Data State (yamlData)
             setYamlData(prevData => {
-                console.log(`[${blockName}] Updating yamlData with newState and newFeedback.`);
                 const updatedBlocks = prevData.code_bloks.map(block => {
                     if (block.name === blockName) {
                         return {
                             ...block,
-                            ...newState,      // Apply the new HTML, CSS, JS
-                            feedback: newFeedback // Apply the new feedback
+                            ...newState,
+                            feedback: newFeedback,
+                            feedback_message: feedbackMessage // Still store it in the data
                         };
                     }
                     return block;
                 });
+
                 const updatedGlobal = prevData.global.name === blockName ?
                     {
                         ...prevData.global,
-                        ...newState,      // Apply the new HTML, CSS, JS
-                        feedback: newFeedback // Apply the new feedback
+                        ...newState,
+                        feedback: newFeedback,
+                        feedback_message: feedbackMessage
                     } : prevData.global;
 
                 return {
@@ -334,16 +323,40 @@ const PersonalSiteEditorPage = ({ params }) => {
                 };
             });
 
-            // --- Mark changes as unsaved ---
             setHasUnsavedChanges(true);
 
-            toast.current?.show({ severity: 'success', summary: 'Success', detail: `${blockName} updated!`, life: 3000 });
+            // Show success toast
+            toast.current?.show({
+                severity: 'success',
+                summary: 'Success',
+                detail: `${blockName} updated!`,
+                life: 3000
+            });
+
+            // SHOW FEEDBACK MESSAGE TOAST if available
+            if (feedbackMessage) {
+                // Slightly delay the feedback toast so it appears after the success toast
+                setTimeout(() => {
+                    toast.current?.show({
+                        severity: 'info',
+                        summary: 'AI Feedback',
+                        detail: (
+                            <div className="feedback-toast-content">
+                                {feedbackMessage}
+                            </div>
+                        ),
+                        life: 8000, // Longer display time for feedback
+                        closable: true,
+                        className: 'ai-feedback-toast'
+                    });
+                }, 500);
+            }
+
             closeEditDialog();
 
         } catch (err) {
             console.error("Error during AI edit submission:", err);
             const blockNameToToast = currentBlock?.name || 'Block';
-            // Improved error message
             let detailMessage = `Failed to update ${blockNameToToast}.`;
             if (err.response?.data?.detail) {
                 detailMessage += ` Server Error: ${err.response.data.detail}`;
@@ -511,11 +524,11 @@ const PersonalSiteEditorPage = ({ params }) => {
                     onMouseLeave={handleMouseLeave}
                     style={{ minHeight: '50px', outline: hoveredBlock === block.name ? '2px dashed var(--primary-color)' : 'none', transition: 'outline-color 0.2s' }}
                 >
-<iframe
-    title={`Preview ${block.name}`}
-    style={{ width: '100%', border: 'none', minHeight: '150px' }} // Set a minimum starting height
-    sandbox="allow-scripts allow-same-origin"
-    srcDoc={`<!DOCTYPE html>
+                    <iframe
+                        title={`Preview ${block.name}`}
+                        style={{ width: '100%', border: 'none', minHeight: '150px' }} // Set a minimum starting height
+                        sandbox="allow-scripts allow-same-origin"
+                        srcDoc={`<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -565,44 +578,44 @@ const PersonalSiteEditorPage = ({ params }) => {
     </script>
 </body>
 </html>`}
-    onLoad={(e) => {
-        try {
-            const iframe = e.target;
-            // Make sure we have access to the iframe
-            if (!iframe || !iframe.contentDocument) {
-                return;
-            }
+                        onLoad={(e) => {
+                            try {
+                                const iframe = e.target;
+                                // Make sure we have access to the iframe
+                                if (!iframe || !iframe.contentDocument) {
+                                    return;
+                                }
 
-            // Wait a bit to ensure all content is processed
-            setTimeout(() => {
-                try {
-                    const doc = iframe.contentDocument;
-                    const body = doc.body;
-                    const html = doc.documentElement;
+                                // Wait a bit to ensure all content is processed
+                                setTimeout(() => {
+                                    try {
+                                        const doc = iframe.contentDocument;
+                                        const body = doc.body;
+                                        const html = doc.documentElement;
 
-                    // Calculate the real height of content (maximum of all possible height measurements)
-                    const contentHeight = Math.max(
-                        body.scrollHeight,
-                        body.offsetHeight,
-                        html.clientHeight,
-                        html.scrollHeight,
-                        html.offsetHeight,
-                        150 // Minimum height
-                    );
+                                        // Calculate the real height of content (maximum of all possible height measurements)
+                                        const contentHeight = Math.max(
+                                            body.scrollHeight,
+                                            body.offsetHeight,
+                                            html.clientHeight,
+                                            html.scrollHeight,
+                                            html.offsetHeight,
+                                            150 // Minimum height
+                                        );
 
-                    // Set iframe height with a slight buffer
-                    iframe.style.height = `${contentHeight + 20}px`;
-                } catch (error) {
-                    console.warn("Height adjustment error:", error);
-                    iframe.style.height = "300px"; // Fallback height
-                }
-            }, 100); // Short delay to ensure content is rendered
-        } catch (error) {
-            console.error("Iframe onLoad error:", error);
-        }
-    }}
-    scrolling="no"
-/>
+                                        // Set iframe height with a slight buffer
+                                        iframe.style.height = `${contentHeight + 20}px`;
+                                    } catch (error) {
+                                        console.warn("Height adjustment error:", error);
+                                        iframe.style.height = "300px"; // Fallback height
+                                    }
+                                }, 100); // Short delay to ensure content is rendered
+                            } catch (error) {
+                                console.error("Iframe onLoad error:", error);
+                            }
+                        }}
+                        scrolling="no"
+                    />
                     {hoveredBlock === block.name && (
                         <div
                             className="edit-overlay absolute top-0 right-0 p-2 flex flex-column align-items-end gap-2 z-1000"
@@ -656,80 +669,113 @@ const PersonalSiteEditorPage = ({ params }) => {
                 </div>
             ))}
             {/* AI Editor Dialog */}
-            <Dialog
-                header={`Edit Block: ${currentBlock?.name || ''}`}
-                visible={isAiDialogOpen}
-                style={{ width: '50vw' }}
-                breakpoints={{ '960px': '75vw', '641px': '90vw' }}
-                modal
-                className="p-fluid"
-                onHide={closeEditDialog}
-            >
-                <div className="p-mb-4">
-                    <p className="text-600">Current Block Feedback: {currentBlock?.feedback || 'No feedback available.'}</p>
-                    <small className="text-500">Enter your prompt to modify the HTML, CSS, or JS of this specific block.</small>
+<Dialog
+    header={`Edit Block: ${currentBlock?.name || ''}`}
+    visible={isAiDialogOpen}
+    style={{ width: '50vw' }}
+    breakpoints={{ '960px': '75vw', '641px': '90vw' }}
+    modal
+    className="p-fluid"
+    onHide={closeEditDialog}
+>
+    <div className="p-mb-4">
+        <p className="text-600">Current Block Feedback: {currentBlock?.feedback || 'No feedback available.'}</p>
+        <small className="text-500">Enter your prompt to modify the HTML, CSS, or JS of this specific block.</small>
+    </div>
+
+    <Divider />
+
+    {/* AI Assistant Component */}
+    <div className="p-mb-4">
+        <h6 className="p-mb-3">AI Prompt</h6>
+        <AIAssistant
+            prompt={aiPrompt}
+            setPrompt={setAiPrompt}
+            onSubmit={handleAIEditSubmit}
+            isProcessing={isAiProcessing}
+        />
+    </div>
+
+    {/* New AI Feedback Message Section */}
+    {currentBlock?.feedback_message && (
+        <React.Fragment>
+            <Divider />
+            <div className="p-mb-4">
+                <h6 className="p-mb-2">AI Feedback</h6>
+                <div className="p-3 border-1 border-round-sm border-primary bg-primary-50 text-primary-900">
+                    <i className="pi pi-info-circle mr-2"></i>
+                    {currentBlock.feedback_message}
                 </div>
+            </div>
+        </React.Fragment>
+    )}
 
-                <Divider />
+    <Divider />
 
-                {/* AI Assistant Component */}
-                <div className="p-mb-4">
-                    <h6 className="p-mb-3">AI Prompt</h6>
-                    <AIAssistant
-                        prompt={aiPrompt}
-                        setPrompt={setAiPrompt}
-                        onSubmit={handleAIEditSubmit}
-                        isProcessing={isAiProcessing}
-                    />
-                </div>
-
-                <Divider />
-
-                {/* Artifacts (Key-Value Pairs) */}
-                <div className="p-mb-4">
-                    <h6 className="p-mb-3">Artifacts (Optional)</h6>
-                    <small className="p-d-block p-mb-3 text-500">Add key-value pairs for specific data like image URLs, video links, specific text snippets, etc.</small>
-                    <div className="p-grid p-formgrid nested-grid">
-                        {artifacts.map((artifact, index) => (
-                            <div key={index} className="p-col-12 p-md-6 flex align-items-center p-mb-2">
-                                <div className="p-field p-col p-m-0">
-                                    <InputText
-                                        value={artifact.key}
-                                        onChange={(e) => handleArtifactKeyChange(index, e.target.value)}
-                                        placeholder="Key (e.g., avatar_url)"
-                                        className="w-full"
-                                    />
-                                </div>
-                                <div className="p-field p-col p-m-0 p-px-2">
-                                    <InputText
-                                        value={artifact.value}
-                                        onChange={(e) => handleArtifactValueChange(index, e.target.value)}
-                                        placeholder="Value (e.g., https://...)"
-                                        className="w-full"
-                                    />
-                                </div>
-                                {artifacts.length > 1 && (
-                                    <Button
-                                        icon="pi pi-trash"
-                                        className="p-button-rounded p-button-danger p-button-text"
-                                        onClick={() => removeArtifactPair(index)}
-                                        tooltip="Remove artifact"
-                                    />
-                                )}
-                            </div>
-                        ))}
-                    </div>
-                    <div className="p-text-right p-mt-2">
-                        <Button
-                            label="Add Artifact"
-                            icon="pi pi-plus"
-                            className="p-button-text p-button-sm"
-                            onClick={addArtifactPair}
+    {/* Artifacts (Key-Value Pairs) */}
+    <div className="p-mb-4">
+        <h6 className="p-mb-3">Artifacts (Optional)</h6>
+        <small className="p-d-block p-mb-3 text-500">Add key-value pairs for specific data like image URLs, video links, specific text snippets, etc.</small>
+        <div className="p-grid p-formgrid nested-grid">
+            {artifacts.map((artifact, index) => (
+                <div key={index} className="p-col-12 p-md-6 flex align-items-center p-mb-2">
+                    <div className="p-field p-col p-m-0">
+                        <InputText
+                            value={artifact.key}
+                            onChange={(e) => handleArtifactKeyChange(index, e.target.value)}
+                            placeholder="Key (e.g., avatar_url)"
+                            className="w-full"
                         />
                     </div>
+                    <div className="p-field p-col p-m-0 p-px-2">
+                        <InputText
+                            value={artifact.value}
+                            onChange={(e) => handleArtifactValueChange(index, e.target.value)}
+                            placeholder="Value (e.g., https://...)"
+                            className="w-full"
+                        />
+                    </div>
+                    {artifacts.length > 1 && (
+                        <Button
+                            icon="pi pi-trash"
+                            className="p-button-rounded p-button-danger p-button-text"
+                            onClick={() => removeArtifactPair(index)}
+                            tooltip="Remove artifact"
+                        />
+                    )}
                 </div>
-                {/* Dialog footer is handled by the Button's onSubmit triggered by AIAssistant */}
-            </Dialog>
+            ))}
+        </div>
+        <div className="p-text-right p-mt-2">
+            <Button
+                label="Add Artifact"
+                icon="pi pi-plus"
+                className="p-button-text p-button-sm"
+                onClick={addArtifactPair}
+            />
+        </div>
+    </div>
+    {/* Dialog footer is handled by the Button's onSubmit triggered by AIAssistant */}
+</Dialog>
+            <style jsx global>{`
+                .ai-feedback-toast {
+                    min-width: 350px;
+                    background-color: #e3f2fd !important;
+                    border-left: 4px solid #2196f3 !important;
+                }
+                .ai-feedback-toast .p-toast-message-icon {
+                    font-size: 1.5rem;
+                    color: #0d47a1;
+                }
+                .ai-feedback-toast .p-toast-message-content {
+                    padding: 0.5rem 1rem;
+                }
+                .feedback-toast-content {
+                    max-height: 200px;
+                    overflow-y: auto;
+                    line-height: 1.5;
+                }
+            `}</style>
         </div>
     );
 };
