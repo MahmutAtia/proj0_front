@@ -511,65 +511,98 @@ const PersonalSiteEditorPage = ({ params }) => {
                     onMouseLeave={handleMouseLeave}
                     style={{ minHeight: '50px', outline: hoveredBlock === block.name ? '2px dashed var(--primary-color)' : 'none', transition: 'outline-color 0.2s' }}
                 >
-                    <iframe
-                        title={`Preview ${block.name}`}
-                        style={{ width: '100%', border: 'none', minHeight: 'inherit' }}
-                        sandbox="allow-scripts allow-same-origin"
-                        srcDoc={`<html>
+<iframe
+    title={`Preview ${block.name}`}
+    style={{ width: '100%', border: 'none', minHeight: '150px' }} // Set a minimum starting height
+    sandbox="allow-scripts allow-same-origin"
+    srcDoc={`<!DOCTYPE html>
+<html lang="en">
 <head>
-
-    <!-- Global HTML head content -->
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     ${yamlData.global?.html || ''}
-
     <style>
-        /* Basic Reset */
-        body, h1, h2, h3, p, ul, li { margin: 0; padding: 0; }
+        /* Reset styles to ensure consistent rendering */
+        html, body {
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            min-height: 100%;
+            box-sizing: border-box;
+            overflow-x: hidden;
+        }
 
-        /* Global styles */
+        /* Global CSS */
         ${yamlData.global?.css || ''}
 
-        /* Block-specific styles */
+        /* Block CSS */
         ${block.css || ''}
     </style>
-
-        <script>
-        // Global scripts
-        ${yamlData.global?.js || ''}
-
-        // Block-specific scripts
-        ${block.js || ''}
-    <\/script>
-
 </head>
 <body>
-    <!-- Block HTML content -->
-    ${block.html || ''}
+    ${block.html || '<!-- No content defined -->'}
 
+    <script>
+    // Self-executing function to isolate variables and handle errors
+    (function() {
+        try {
+            // Global JavaScript
+            ${yamlData.global?.js || ''}
+        } catch(err) {
+            console.error('Error in global JavaScript:', err);
+        }
+    })();
 
+    // Self-executing function for block-specific code
+    (function() {
+        try {
+            // Block JavaScript
+            ${block.js || ''}
+        } catch(err) {
+            console.error('Error in block JavaScript:', err);
+        }
+    })();
+    </script>
 </body>
-</html>
-    `}
-                        onLoad={(e) => {
-                            try {
-                                const iframe = e.target;
-                                const body = iframe.contentDocument.body;
-                                const htmlElement = iframe.contentDocument.documentElement;
+</html>`}
+    onLoad={(e) => {
+        try {
+            const iframe = e.target;
+            // Make sure we have access to the iframe
+            if (!iframe || !iframe.contentDocument) {
+                return;
+            }
 
-                                // Calculate the maximum of scrollHeight and clientHeight to account for content and viewport
-                                const contentHeight = Math.max(body.scrollHeight, body.offsetHeight, htmlElement.clientHeight, htmlElement.scrollHeight, htmlElement.offsetHeight);
+            // Wait a bit to ensure all content is processed
+            setTimeout(() => {
+                try {
+                    const doc = iframe.contentDocument;
+                    const body = doc.body;
+                    const html = doc.documentElement;
 
-                                // Get the computed styles of the body to account for margins
-                                const bodyStyle = window.getComputedStyle(body);
-                                const marginTop = parseInt(bodyStyle.marginTop, 10) || 0;
-                                const marginBottom = parseInt(bodyStyle.marginBottom, 10) || 0;
+                    // Calculate the real height of content (maximum of all possible height measurements)
+                    const contentHeight = Math.max(
+                        body.scrollHeight,
+                        body.offsetHeight,
+                        html.clientHeight,
+                        html.scrollHeight,
+                        html.offsetHeight,
+                        150 // Minimum height
+                    );
 
-                                iframe.style.height = `${contentHeight + marginTop + marginBottom}px`;
-                            } catch (error) {
-                                console.error("Error adjusting iframe height with margins:", error);
-                            }
-                        }}
-                        scrolling="no"
-                    />
+                    // Set iframe height with a slight buffer
+                    iframe.style.height = `${contentHeight + 20}px`;
+                } catch (error) {
+                    console.warn("Height adjustment error:", error);
+                    iframe.style.height = "300px"; // Fallback height
+                }
+            }, 100); // Short delay to ensure content is rendered
+        } catch (error) {
+            console.error("Iframe onLoad error:", error);
+        }
+    }}
+    scrolling="no"
+/>
                     {hoveredBlock === block.name && (
                         <div
                             className="edit-overlay absolute top-0 right-0 p-2 flex flex-column align-items-end gap-2 z-1000"
