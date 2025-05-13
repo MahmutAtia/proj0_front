@@ -106,42 +106,7 @@ const PersonalSiteEditorPage = ({ params }) => {
             }
         };
 
-        // if (backup) {
-        //     setIsRestoring(true); // Set flag to prevent re-triggering
-        //     confirmDialog({
-        //         message: 'You have unsaved changes from a previous session. Do you want to restore them?',
-        //         header: 'Restore Session?',
-        //         icon: 'pi pi-exclamation-triangle',
-        //         acceptLabel: 'Restore',
-        //         rejectLabel: 'Discard & Load Saved',
-        //         accept: () => {
-        //             try {
-        //                 const parsedBackup = JSON.parse(backup);
-        //                 setYamlData(parsedBackup);
-        //                 initialDataRef.current = null; // Restored data IS unsaved compared to server
-        //                 initializeHistory(parsedBackup); // Init history from backup
-        //                 setHasUnsavedChanges(true); // Mark as having unsaved changes
-        //                 setLoading(false); // Stop loading
-        //                 toast.current?.show({ severity: 'info', summary: 'Restored', detail: 'Restored previous unsaved work.', life: 3000 });
-        //             } catch (e) {
-        //                 console.error("Error parsing backup:", e);
-        //                 toast.current?.show({ severity: 'warn', summary: 'Restore Failed', detail: 'Could not parse local backup. Loading saved version.', life: 4000 });
-        //                 localStorage.removeItem(localStorageKey); // Remove corrupted backup
-        //                 fetchAndProcess(); // Fetch fresh data
-        //             } finally {
-        //                 setIsRestoring(false);
-        //             }
-        //         },
-        //         reject: () => {
-        //             localStorage.removeItem(localStorageKey); // Remove backup if discarded
-        //             toast.current?.show({ severity: 'info', summary: 'Discarded', detail: 'Discarded local changes. Loading saved version.', life: 3000 });
-        //             fetchAndProcess(); // Fetch fresh data
-        //             setIsRestoring(false);
-        //         }
-        //     });
-        // } else {
         fetchAndProcess(); // Fetch if no backup
-        // }
 
     }, [resumeId, getLocalStorageKey, initializeHistory, isRestoring]); // Dependencies
 
@@ -197,11 +162,6 @@ const PersonalSiteEditorPage = ({ params }) => {
 
     // --- Modify functions that change yamlData to set hasUnsavedChanges ---
     const updateYamlDataAndHistory = (blockName, newState, newFeedback) => {
-        // Logic to update yamlData, blockHistory, historyIndex
-        // ... (as implemented in previous steps for AI edit, rollback, forward) ...
-
-        // ** Add this line in handleAIEditSubmit, rollbackBlock, forwardBlock
-        // ** AFTER the state updates are scheduled
         setHasUnsavedChanges(true);
     };
 
@@ -276,7 +236,6 @@ const PersonalSiteEditorPage = ({ params }) => {
 
             // Update History State
             setBlockHistory(prevHistory => {
-                // History update code...
                 const currentHistory = prevHistory[blockName] || [];
                 const currentIndex = historyIndex[blockName] ?? -1;
                 const relevantHistory = currentHistory.slice(0, currentIndex + 1);
@@ -335,7 +294,6 @@ const PersonalSiteEditorPage = ({ params }) => {
 
             // SHOW FEEDBACK MESSAGE TOAST if available
             if (feedbackMessage) {
-                // Slightly delay the feedback toast so it appears after the success toast
                 setTimeout(() => {
                     toast.current?.show({
                         severity: 'info',
@@ -345,7 +303,7 @@ const PersonalSiteEditorPage = ({ params }) => {
                                 {feedbackMessage}
                             </div>
                         ),
-                        life: 8000, // Longer display time for feedback
+                        life: 8000,
                         closable: true,
                         className: 'ai-feedback-toast'
                     });
@@ -375,18 +333,15 @@ const PersonalSiteEditorPage = ({ params }) => {
 
         console.log(`[${blockName}] Rollback Attempt - Current Index: ${currentIndex}, History Length: ${history.length}`);
 
-        // Can rollback if the current index is greater than 0
         if (currentIndex > 0) {
             const previousIndex = currentIndex - 1;
             const previousState = history[previousIndex];
 
             console.log(`[${blockName}] Rolling back to Index: ${previousIndex}`);
 
-            // Update yamlData to the previous state
             setYamlData(prevData => {
                 const updatedBlocks = prevData.code_bloks.map(block => {
                     if (block.name === blockName) {
-                        // Restore html, css, js. Keep current feedback or restore it too if it's in history state
                         return { ...block, ...previousState };
                     }
                     return block;
@@ -397,13 +352,11 @@ const PersonalSiteEditorPage = ({ params }) => {
                 return { ...prevData, global: updatedGlobal, code_bloks: updatedBlocks };
             });
 
-            // Update the history index
             setHistoryIndex(prevIndex => ({
                 ...prevIndex,
                 [blockName]: previousIndex,
             }));
 
-            // --- Mark changes as unsaved ---
             setHasUnsavedChanges(true);
 
             toast.current?.show({ severity: 'info', summary: 'Rolled Back', detail: `Rolled back ${blockName}`, life: 1500 });
@@ -419,18 +372,15 @@ const PersonalSiteEditorPage = ({ params }) => {
 
         console.log(`[${blockName}] Forward Attempt - Current Index: ${currentIndex}, History Length: ${history.length}`);
 
-        // Can forward if the current index is less than the last index in the history array
         if (currentIndex < history.length - 1) {
             const nextIndex = currentIndex + 1;
             const nextState = history[nextIndex];
 
             console.log(`[${blockName}] Forwarding to Index: ${nextIndex}`);
 
-            // Update yamlData to the next state
             setYamlData(prevData => {
                 const updatedBlocks = prevData.code_bloks.map(block => {
                     if (block.name === blockName) {
-                        // Restore html, css, js from the next state
                         return { ...block, ...nextState };
                     }
                     return block;
@@ -441,13 +391,11 @@ const PersonalSiteEditorPage = ({ params }) => {
                 return { ...prevData, global: updatedGlobal, code_bloks: updatedBlocks };
             });
 
-            // Update the history index
             setHistoryIndex(prevIndex => ({
                 ...prevIndex,
                 [blockName]: nextIndex,
             }));
 
-            // --- Mark changes as unsaved ---
             setHasUnsavedChanges(true);
 
             toast.current?.show({ severity: 'info', summary: 'Forwarded', detail: `Forwarded ${blockName}`, life: 1500 });
@@ -479,8 +427,7 @@ const PersonalSiteEditorPage = ({ params }) => {
     };
 
 
-    // --- Render Logic ---
-    if (loading && !isRestoring) { // Show loading only if not handling restore prompt
+    if (loading && !isRestoring) {
         return (
             <div className="flex justify-content-center align-items-center min-h-screen">
                 <ProgressSpinner />
@@ -502,16 +449,15 @@ const PersonalSiteEditorPage = ({ params }) => {
     return (
         <div className="personal-site-editor relative">
             <Toast ref={toast} />
-            <ConfirmDialog /> {/* Add this for the restore prompt */}
+            <ConfirmDialog />
 
-            {/* --- Render the Toolbar --- */}
-            {!loading && yamlData.global && ( // Render toolbar only when data is loaded
+            {!loading && yamlData.global && (
                 <EditorToolbar
                     resumeId={resumeId}
                     onSave={handleSaveChanges}
                     isSaving={isSaving}
                     hasUnsavedChanges={hasUnsavedChanges}
-                    onEditGlobal={() => openEditDialog(yamlData.global)} // Pass global block
+                    onEditGlobal={() => openEditDialog(yamlData.global)}
                 />
             )}
 
@@ -526,7 +472,7 @@ const PersonalSiteEditorPage = ({ params }) => {
                 >
                     <iframe
                         title={`Preview ${block.name}`}
-                        style={{ width: '100%', border: 'none', minHeight: '150px' }} // Set a minimum starting height
+                        style={{ width: '100%', border: 'none', minHeight: '150px' }}
                         sandbox="allow-scripts allow-same-origin"
                         srcDoc={`<!DOCTYPE html>
 <html lang="en">
@@ -536,7 +482,6 @@ const PersonalSiteEditorPage = ({ params }) => {
 
     ${yamlData.head || ''}
     <style>
-        /* Reset styles to ensure consistent rendering */
         html, body {
             margin: 0;
             padding: 0;
@@ -546,35 +491,27 @@ const PersonalSiteEditorPage = ({ params }) => {
             overflow-x: hidden;
         }
 
-        /* Global CSS */
         ${yamlData.global?.css || ''}
 
-        /* Block CSS */
         ${block.css || ''}
     </style>
 </head>
 <body>
     ${yamlData.global?.html || ''}
 
-    <!-- Block HTML -->
-
     ${block.html || '<!-- No content defined -->'}
 
     <script>
-    // Self-executing function to isolate variables and handle errors
     (function() {
         try {
-            // Global JavaScript
             ${yamlData.global?.js || ''}
         } catch(err) {
             console.error('Error in global JavaScript:', err);
         }
     })();
 
-    // Self-executing function for block-specific code
     (function() {
         try {
-            // Block JavaScript
             ${block.js || ''}
         } catch(err) {
             console.error('Error in block JavaScript:', err);
@@ -586,37 +523,103 @@ const PersonalSiteEditorPage = ({ params }) => {
                         onLoad={(e) => {
                             try {
                                 const iframe = e.target;
-                                // Make sure we have access to the iframe
-                                if (!iframe || !iframe.contentDocument) {
+                                if (!iframe || !iframe.contentWindow || !iframe.contentWindow.document) {
+                                    console.warn(`Iframe or its document not available for height adjustment. Block: ${block?.name || 'Unknown'}`);
+                                    iframe.style.height = "300px"; // Fallback
                                     return;
                                 }
 
-                                // Wait a bit to ensure all content is processed
+                                // Consider a slightly longer timeout to ensure iframe's internal scripts (like its own window.onload)
+                                // have a higher chance of completing their initial run.
                                 setTimeout(() => {
-                                    try {
-                                        const doc = iframe.contentDocument;
-                                        const body = doc.body;
-                                        const html = doc.documentElement;
+                                    const iWindow = iframe.contentWindow;
+                                    if (!iWindow) {
+                                        console.warn(`Iframe contentWindow not available in setTimeout. Block: ${block?.name || 'Unknown'}`);
+                                        iframe.style.height = "300px"; // Fallback
+                                        return;
+                                    }
+                                    const doc = iWindow.document;
+                                    const body = doc.body;
+                                    const html = doc.documentElement;
 
-                                        // Calculate the real height of content (maximum of all possible height measurements)
+                                    if (!body || !html) {
+                                        console.warn(`Iframe body or html element not available in setTimeout. Block: ${block?.name || 'Unknown'}`);
+                                        iframe.style.height = "300px"; // Fallback
+                                        return;
+                                    }
+
+                                    try {
+                                        const originalStyles = [];
+                                        // Iterate over all potentially relevant elements, not just direct children,
+                                        // if content might be nested deeper. For now, body.children is kept.
+                                        const elementsToReset = Array.from(body.children);
+
+                                        elementsToReset.forEach(el => {
+                                            if (el instanceof HTMLElement) {
+                                                originalStyles.push({
+                                                    element: el,
+                                                    opacity: el.style.opacity,
+                                                    transform: el.style.transform,
+                                                    display: el.style.display,
+                                                    visibility: el.style.visibility,
+                                                    position: el.style.position,
+                                                    height: el.style.height
+                                                });
+
+                                                el.style.setProperty('opacity', '1', 'important');
+                                                el.style.setProperty('transform', 'none', 'important');
+                                                if (iWindow.getComputedStyle(el).display === 'none') {
+                                                    el.style.setProperty('display', 'block', 'important');
+                                                }
+                                                el.style.setProperty('visibility', 'visible', 'important');
+                                                if (iWindow.getComputedStyle(el).height === '0px') {
+                                                    el.style.setProperty('height', 'auto', 'important');
+                                                }
+                                            }
+                                        });
+
+                                        // Force a reflow
+                                        // eslint-disable-next-line @typescript-eslint/no-unused-vars
+                                        const _ = body.offsetHeight;
+
                                         const contentHeight = Math.max(
-                                            body.scrollHeight,
-                                            body.offsetHeight,
-                                            html.clientHeight,
-                                            html.scrollHeight,
-                                            html.offsetHeight,
-                                            150 // Minimum height
+                                            body.scrollHeight, body.offsetHeight,
+                                            html.clientHeight, html.scrollHeight, html.offsetHeight,
+                                            150 // Minimum fallback height
                                         );
 
-                                        // Set iframe height with a slight buffer
-                                        iframe.style.height = `${contentHeight + 20}px`;
-                                    } catch (error) {
-                                        console.warn("Height adjustment error:", error);
-                                        iframe.style.height = "300px"; // Fallback height
+                                        iframe.style.height = `${contentHeight + 20}px`; // Add a small buffer
+
+                                        // Restore original inline styles
+                                        originalStyles.forEach(item => {
+                                            item.element.style.opacity = item.opacity;
+                                            item.element.style.transform = item.transform;
+                                            item.element.style.display = item.display;
+                                            item.element.style.visibility = item.visibility;
+                                            item.element.style.position = item.position;
+                                            item.element.style.height = item.height;
+                                        });
+
+                                        // NEW: After setting height and restoring styles, dispatch events
+                                        // to trigger recalculations within the iframe.
+                                        iWindow.dispatchEvent(new Event('resize'));
+                                        iWindow.dispatchEvent(new Event('scroll'));
+                                        // Forcing a reflow again *after* restoring styles and before dispatching events
+                                        // might also help ensure the iframe's internal scripts see the correct state.
+                                        // eslint-disable-next-line @typescript-eslint/no-unused-vars
+                                        const __ = body.offsetHeight;
+                                        iWindow.dispatchEvent(new Event('resize'));
+                                        iWindow.dispatchEvent(new Event('scroll'));
+
+
+                                    } catch (innerError) {
+                                        console.warn(`Error during iframe height adjustment for block: ${block?.name || 'Unknown'}`, innerError);
+                                        iframe.style.height = "300px"; // Fallback height on inner error
                                     }
-                                }, 100); // Short delay to ensure content is rendered
-                            } catch (error) {
-                                console.error("Iframe onLoad error:", error);
+                                }, 300); // Timeout increased slightly to 300ms
+                            } catch (outerError) {
+                                console.error(`Error in iframe onLoad handler for block: ${block?.name || 'Unknown'}`, outerError);
+                                if (e.target) e.target.style.height = "300px"; // Fallback on outer error
                             }
                         }}
                         scrolling="no"
@@ -647,7 +650,6 @@ const PersonalSiteEditorPage = ({ params }) => {
                                     tooltip={`Rollback ${block.name}`}
                                     tooltipOptions={{ position: 'left' }}
                                     style={{ zIndex: 1001 }}
-                                    // Disable if history doesn't exist or index is 0 (or less)
                                     disabled={!blockHistory[block.name] || (historyIndex[block.name] ?? 0) <= 0}
                                 />
                                 <Button
@@ -657,7 +659,6 @@ const PersonalSiteEditorPage = ({ params }) => {
                                     tooltip={`Forward ${block.name}`}
                                     tooltipOptions={{ position: 'left' }}
                                     style={{ zIndex: 1001 }}
-                                    // Disable if history doesn't exist or index is already the last one
                                     disabled={!blockHistory[block.name] || (historyIndex[block.name] ?? 0) >= blockHistory[block.name].length - 1}
                                 />
                                 <Button
@@ -673,7 +674,6 @@ const PersonalSiteEditorPage = ({ params }) => {
                     )}
                 </div>
             ))}
-            {/* AI Editor Dialog */}
             <Dialog
                 header={`Edit Block: ${currentBlock?.name || ''}`}
                 visible={isAiDialogOpen}
@@ -690,7 +690,6 @@ const PersonalSiteEditorPage = ({ params }) => {
 
                 <Divider />
 
-                {/* AI Assistant Component */}
                 <div className="p-mb-4">
                     <h6 className="p-mb-3">AI Prompt</h6>
                     <AIAssistant
@@ -701,7 +700,6 @@ const PersonalSiteEditorPage = ({ params }) => {
                     />
                 </div>
 
-                {/* New AI Feedback Message Section */}
                 {currentBlock?.feedback_message && (
                     <React.Fragment>
                         <Divider />
@@ -717,7 +715,6 @@ const PersonalSiteEditorPage = ({ params }) => {
 
                 <Divider />
 
-                {/* Artifacts (Key-Value Pairs) */}
                 <div className="p-mb-4">
                     <h6 className="p-mb-3">Artifacts (Optional)</h6>
                     <small className="p-d-block p-mb-3 text-500">Add key-value pairs for specific data like image URLs, video links, specific text snippets, etc.</small>
@@ -760,7 +757,6 @@ const PersonalSiteEditorPage = ({ params }) => {
                         />
                     </div>
                 </div>
-                {/* Dialog footer is handled by the Button's onSubmit triggered by AIAssistant */}
             </Dialog>
             <style jsx global>{`
                 .ai-feedback-toast {
@@ -794,16 +790,13 @@ const EditorToolbar = ({
     resumeId,
     onSave,
     isSaving,
-    hasUnsavedChanges, // New prop to indicate pending changes
+    hasUnsavedChanges,
     onEditGlobal
 }) => {
-    // Construct the URL for the live site preview
-    // Ensure the base URL ends with a slash if needed, or adjust accordingly
     const siteUrl = `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/${resumeId}/`;
 
     return (
-        <div className="p-3 surface-ground border-bottom-1 surface-border flex flex-wrap justify-content-between align-items-center sticky top-0 z-5 gap-2" style={{ zIndex: 1010 }}> {/* Higher z-index */}
-            {/* Left Side: Global Edit */}
+        <div className="p-3 surface-ground border-bottom-1 surface-border flex flex-wrap justify-content-between align-items-center sticky top-0 z-5 gap-2" style={{ zIndex: 1010 }}>
             <div>
                 <Button
                     label="Edit Global Settings"
@@ -815,9 +808,7 @@ const EditorToolbar = ({
                 />
             </div>
 
-            {/* Right Side: View Site & Save */}
             <div className="flex align-items-center gap-2">
-                {/* Link to Live Site */}
                 <a href={siteUrl} target="_blank" rel="noopener noreferrer" style={{ textDecoration: 'none' }}>
                     <Button
                         label="View My Site"
@@ -828,17 +819,15 @@ const EditorToolbar = ({
                     />
                 </a>
 
-                {/* Save Button */}
                 <Button
                     label={isSaving ? 'Saving...' : 'Save Changes'}
                     icon={isSaving ? <ProgressSpinner style={{ width: '18px', height: '18px' }} strokeWidth="8" /> : "pi pi-save"}
-                    className="p-button-sm p-button-success" // Make save button prominent
+                    className="p-button-sm p-button-success"
                     onClick={onSave}
-                    disabled={isSaving || !hasUnsavedChanges} // Disable if saving or no changes
+                    disabled={isSaving || !hasUnsavedChanges}
                     tooltip={hasUnsavedChanges ? "Save your latest changes to the server" : "No changes to save"}
                     tooltipOptions={{ position: 'bottom' }}
                 />
-                {/* Optional: Visual indicator for unsaved changes */}
                 {hasUnsavedChanges && !isSaving && (
                     <i className="pi pi-circle-fill text-orange-500 p-ml-1 animation-pulse" style={{ fontSize: '0.7rem' }} title="Unsaved changes"></i>
                 )}
