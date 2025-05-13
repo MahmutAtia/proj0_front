@@ -169,16 +169,7 @@ const colorStyleOptions = [
             dark: "Apply a 'Vibrant & Energetic' color style. Use a deep, dark neutral background (near-black or very dark grey). The vibrant accent colors from the light mode should be adapted to 'glow' or stand out intensely against the dark background (e.g., their luminosity might be increased, or they might be paired with subtle outer glows). Text should be a bright, contrasting light color."
         }
     },
-    {
-        id: 'earthyOrganic',
-        userFacingText: 'Earthy & Organic',
-        description: 'Warm and natural. Uses colors found in nature – browns, greens, muted oranges, and stone greys – for a grounded, approachable feel.',
-        visualElement: () => <ColorPaletteVisual colors={['#A0A083', '#6A744F', '#CC7A66', '#D3D3D3']} />, // Muted green, darker green, terracotta, stone grey
-        aiInstructions: {
-            light: "Apply an 'Earthy & Organic' color style. Use backgrounds in warm off-whites, creams, or very light tans/beiges. Accent colors should be drawn from nature: various shades of green (olive, forest, sage), browns (terracotta, sepia, tan), muted oranges, and stone greys. Text in dark brown or charcoal.",
-            dark: "Apply an 'Earthy & Organic' color style. Use backgrounds in deep browns, rich forest greens, or dark charcoal/slate greys. Text in a light cream or beige. Accent colors should be adapted from the light mode palette, perhaps slightly desaturated or lightened to provide contrast while maintaining the natural feel (e.g., a muted gold, lighter sage)."
-        }
-    },
+
     {
         id: 'techNoirCyberpunk',
         userFacingText: 'Tech Noir / Cyberpunk Glow',
@@ -217,7 +208,7 @@ const addOnFeatureOptions = [
         userFacingText: 'Custom Cursor',
         description: 'Enable a unique custom cursor that matches the site\'s theme and enhances interactivity.',
         visualElement: () => <i className={`pi pi-mouse ${styles.addOnVisualIcon} text-700`}></i>,
-        aiInstruction: "Implement a custom cursor that replaces the default system cursor. The custom cursor should be visually unique and align with the overall design concept's theme and aesthetic. It should also provide clear visual feedback on interactive elements (e.g., changing appearance on hover). Make sure that the cursor is visible and functional."
+        aiInstruction: "Implement a custom cursor that replaces the default system cursor. The custom cursor should be visually unique and align with the overall design concept's theme and aesthetic. It should also provide clear visual feedback on interactive elements (e.g., changing appearance on hover). Make sure that the cursor is visible and functional. Add the custom cursor to global parts"
     },
     {
         id: 'typingAnimation',

@@ -533,7 +533,8 @@ const PersonalSiteEditorPage = ({ params }) => {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    ${yamlData.global?.html || ''}
+
+    ${yamlData.head || ''}
     <style>
         /* Reset styles to ensure consistent rendering */
         html, body {
@@ -553,6 +554,10 @@ const PersonalSiteEditorPage = ({ params }) => {
     </style>
 </head>
 <body>
+    ${yamlData.global?.html || ''}
+
+    <!-- Block HTML -->
+
     ${block.html || '<!-- No content defined -->'}
 
     <script>
@@ -669,94 +674,94 @@ const PersonalSiteEditorPage = ({ params }) => {
                 </div>
             ))}
             {/* AI Editor Dialog */}
-<Dialog
-    header={`Edit Block: ${currentBlock?.name || ''}`}
-    visible={isAiDialogOpen}
-    style={{ width: '50vw' }}
-    breakpoints={{ '960px': '75vw', '641px': '90vw' }}
-    modal
-    className="p-fluid"
-    onHide={closeEditDialog}
->
-    <div className="p-mb-4">
-        <p className="text-600">Current Block Feedback: {currentBlock?.feedback || 'No feedback available.'}</p>
-        <small className="text-500">Enter your prompt to modify the HTML, CSS, or JS of this specific block.</small>
-    </div>
-
-    <Divider />
-
-    {/* AI Assistant Component */}
-    <div className="p-mb-4">
-        <h6 className="p-mb-3">AI Prompt</h6>
-        <AIAssistant
-            prompt={aiPrompt}
-            setPrompt={setAiPrompt}
-            onSubmit={handleAIEditSubmit}
-            isProcessing={isAiProcessing}
-        />
-    </div>
-
-    {/* New AI Feedback Message Section */}
-    {currentBlock?.feedback_message && (
-        <React.Fragment>
-            <Divider />
-            <div className="p-mb-4">
-                <h6 className="p-mb-2">AI Feedback</h6>
-                <div className="p-3 border-1 border-round-sm border-primary bg-primary-50 text-primary-900">
-                    <i className="pi pi-info-circle mr-2"></i>
-                    {currentBlock.feedback_message}
+            <Dialog
+                header={`Edit Block: ${currentBlock?.name || ''}`}
+                visible={isAiDialogOpen}
+                style={{ width: '50vw' }}
+                breakpoints={{ '960px': '75vw', '641px': '90vw' }}
+                modal
+                className="p-fluid"
+                onHide={closeEditDialog}
+            >
+                <div className="p-mb-4">
+                    <p className="text-600">Current Block Feedback: {currentBlock?.feedback || 'No feedback available.'}</p>
+                    <small className="text-500">Enter your prompt to modify the HTML, CSS, or JS of this specific block.</small>
                 </div>
-            </div>
-        </React.Fragment>
-    )}
 
-    <Divider />
+                <Divider />
 
-    {/* Artifacts (Key-Value Pairs) */}
-    <div className="p-mb-4">
-        <h6 className="p-mb-3">Artifacts (Optional)</h6>
-        <small className="p-d-block p-mb-3 text-500">Add key-value pairs for specific data like image URLs, video links, specific text snippets, etc.</small>
-        <div className="p-grid p-formgrid nested-grid">
-            {artifacts.map((artifact, index) => (
-                <div key={index} className="p-col-12 p-md-6 flex align-items-center p-mb-2">
-                    <div className="p-field p-col p-m-0">
-                        <InputText
-                            value={artifact.key}
-                            onChange={(e) => handleArtifactKeyChange(index, e.target.value)}
-                            placeholder="Key (e.g., avatar_url)"
-                            className="w-full"
-                        />
+                {/* AI Assistant Component */}
+                <div className="p-mb-4">
+                    <h6 className="p-mb-3">AI Prompt</h6>
+                    <AIAssistant
+                        prompt={aiPrompt}
+                        setPrompt={setAiPrompt}
+                        onSubmit={handleAIEditSubmit}
+                        isProcessing={isAiProcessing}
+                    />
+                </div>
+
+                {/* New AI Feedback Message Section */}
+                {currentBlock?.feedback_message && (
+                    <React.Fragment>
+                        <Divider />
+                        <div className="p-mb-4">
+                            <h6 className="p-mb-2">AI Feedback</h6>
+                            <div className="p-3 border-1 border-round-sm border-primary bg-primary-50 text-primary-900">
+                                <i className="pi pi-info-circle mr-2"></i>
+                                {currentBlock.feedback_message}
+                            </div>
+                        </div>
+                    </React.Fragment>
+                )}
+
+                <Divider />
+
+                {/* Artifacts (Key-Value Pairs) */}
+                <div className="p-mb-4">
+                    <h6 className="p-mb-3">Artifacts (Optional)</h6>
+                    <small className="p-d-block p-mb-3 text-500">Add key-value pairs for specific data like image URLs, video links, specific text snippets, etc.</small>
+                    <div className="p-grid p-formgrid nested-grid">
+                        {artifacts.map((artifact, index) => (
+                            <div key={index} className="p-col-12 p-md-6 flex align-items-center p-mb-2">
+                                <div className="p-field p-col p-m-0">
+                                    <InputText
+                                        value={artifact.key}
+                                        onChange={(e) => handleArtifactKeyChange(index, e.target.value)}
+                                        placeholder="Key (e.g., avatar_url)"
+                                        className="w-full"
+                                    />
+                                </div>
+                                <div className="p-field p-col p-m-0 p-px-2">
+                                    <InputText
+                                        value={artifact.value}
+                                        onChange={(e) => handleArtifactValueChange(index, e.target.value)}
+                                        placeholder="Value (e.g., https://...)"
+                                        className="w-full"
+                                    />
+                                </div>
+                                {artifacts.length > 1 && (
+                                    <Button
+                                        icon="pi pi-trash"
+                                        className="p-button-rounded p-button-danger p-button-text"
+                                        onClick={() => removeArtifactPair(index)}
+                                        tooltip="Remove artifact"
+                                    />
+                                )}
+                            </div>
+                        ))}
                     </div>
-                    <div className="p-field p-col p-m-0 p-px-2">
-                        <InputText
-                            value={artifact.value}
-                            onChange={(e) => handleArtifactValueChange(index, e.target.value)}
-                            placeholder="Value (e.g., https://...)"
-                            className="w-full"
-                        />
-                    </div>
-                    {artifacts.length > 1 && (
+                    <div className="p-text-right p-mt-2">
                         <Button
-                            icon="pi pi-trash"
-                            className="p-button-rounded p-button-danger p-button-text"
-                            onClick={() => removeArtifactPair(index)}
-                            tooltip="Remove artifact"
+                            label="Add Artifact"
+                            icon="pi pi-plus"
+                            className="p-button-text p-button-sm"
+                            onClick={addArtifactPair}
                         />
-                    )}
+                    </div>
                 </div>
-            ))}
-        </div>
-        <div className="p-text-right p-mt-2">
-            <Button
-                label="Add Artifact"
-                icon="pi pi-plus"
-                className="p-button-text p-button-sm"
-                onClick={addArtifactPair}
-            />
-        </div>
-    </div>
-    {/* Dialog footer is handled by the Button's onSubmit triggered by AIAssistant */}
-</Dialog>
+                {/* Dialog footer is handled by the Button's onSubmit triggered by AIAssistant */}
+            </Dialog>
             <style jsx global>{`
                 .ai-feedback-toast {
                     min-width: 350px;
