@@ -8,7 +8,6 @@ import { Button } from 'primereact/button';
  * @param {object} props - Component props.
  * @param {string} props.sectionId - Unique identifier for the section (e.g., 'header', 'paragraph-0').
  * @param {Function} props.onEdit - Callback function when the manual edit button is clicked.
- * @param {Function} props.onAiEdit - Callback function when the AI edit button is clicked.
  * @param {Function} props.onUndo - Callback function when the undo button is clicked.
  * @param {Function} props.onRedo - Callback function when the redo button is clicked.
  * @param {boolean} props.canUndo - Whether the undo action is currently possible for this section.
@@ -18,7 +17,6 @@ import { Button } from 'primereact/button';
 const EditableSection = ({
     sectionId,
     onEdit,
-    onAiEdit,
     onUndo,
     onRedo,
     canUndo,
@@ -44,14 +42,6 @@ const EditableSection = ({
                     style={{ zIndex: 10 }} // Ensure controls are above iframe
                 >
                     <div className="flex gap-1">
-                         {/* AI Edit Button */}
-                         <Button
-                            icon="pi pi-sparkles"
-                            className="p-button-rounded p-button-info p-button-sm"
-                            onClick={onAiEdit}
-                            tooltip={`AI Edit ${sectionId}`}
-                            tooltipOptions={{ position: 'left', showDelay: 500 }}
-                        />
                         {/* Manual Edit Button */}
                         <Button
                             icon="pi pi-pencil"

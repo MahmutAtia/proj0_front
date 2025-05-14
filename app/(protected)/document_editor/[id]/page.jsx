@@ -8,7 +8,6 @@ import { ProgressSpinner } from 'primereact/progressspinner';
 import EditorToolbar from './components/EditorToolbar';
 import EditableSection from './components/EditableSection'; // Assuming this uses default export too
 import ManualEditDialog from './components/ManualEditDialog'; // Assuming this uses default export too
-import AiEditDialog from './components/AiEditDialog'; // Assuming this uses default export too
 
 // --- Child Component: LoadingIndicator ---
 const LoadingIndicator = ({ message = "Loading document editor..." }) => {
@@ -328,12 +327,6 @@ const DocumentEditorPage = ({ params }) => {
     const [editText, setEditText] = useState('');
     const [editData, setEditData] = useState({});
 
-    // --- AI Edit Dialog State ---
-    const [isAiEditDialogOpen, setIsAiEditDialogOpen] = useState(false);
-    const [currentEditingSectionForAI, setCurrentEditingSectionForAI] = useState(null);
-    const [aiPrompt, setAiPrompt] = useState('');
-    const [isAiProcessing, setIsAiProcessing] = useState(false);
-
     // --- Helper Functions ---
 
     /** Generates a unique ID for a section based on type and optional index. */
@@ -632,69 +625,6 @@ const DocumentEditorPage = ({ params }) => {
         }
     };
 
-    // --- AI Edit Dialog Handlers ---
-
-    const openAiEditDialog = (sectionInfo) => {
-        const sectionId = getSectionId(sectionInfo.type, sectionInfo.index);
-        setCurrentEditingSectionForAI({ ...sectionInfo, id: sectionId, documentType: documentType });
-        setAiPrompt('');
-        setIsAiEditDialogOpen(true);
-    };
-
-    const closeAiEditDialog = () => {
-        setIsAiEditDialogOpen(false);
-        setCurrentEditingSectionForAI(null);
-        setAiPrompt('');
-    };
-
-    const handleAiEditSubmit = async () => {
-        if (!currentEditingSectionForAI || !aiPrompt.trim()) {
-            toast.current?.show({ severity: 'warn', summary: 'Warning', detail: 'Please enter a prompt.', life: 3000 });
-            return;
-        }
-
-        setIsAiProcessing(true);
-        const { type, index, id: sectionId, documentType: currentDocType } = currentEditingSectionForAI;
-        const currentData = getSectionData(currentEditingSectionForAI);
-
-        try {
-            console.log(`Simulating AI edit for section: ${sectionId} (Type: ${currentDocType})`);
-            console.log("Prompt:", aiPrompt);
-            console.log("Current Data:", currentData);
-            await new Promise(resolve => setTimeout(resolve, 1500));
-
-            let aiResult;
-            if (type === 'paragraph') {
-                aiResult = `AI modified paragraph based on prompt: "${aiPrompt}". Original was: "${currentData || ''}"`;
-            } else if (type === 'header') {
-                aiResult = {
-                    ...(currentData || {}),
-                    subject: `Re: ${currentData?.subject || 'Subject'} (AI: ${currentDocType})`,
-                };
-            } else if (type === 'footer') {
-                aiResult = {
-                    ...(currentData || {}),
-                    closing: `Best regards (AI: ${currentDocType})`,
-                };
-            } else {
-                throw new Error("Unknown section type for AI edit");
-            }
-            console.log("Simulated AI Result:", aiResult);
-
-            applyStateChange(sectionId, aiResult);
-            updateHistory(sectionId, aiResult);
-
-            closeAiEditDialog();
-            toast.current?.show({ severity: 'success', summary: 'AI Update', detail: `Section updated by AI!`, life: 3000 });
-
-        } catch (err) {
-            console.error("Error during AI edit:", err);
-            toast.current?.show({ severity: 'error', summary: 'AI Error', detail: `Failed to update section with AI: ${err.message}`, life: 5000 });
-        } finally {
-            setIsAiProcessing(false);
-        }
-    };
-
     // --- Rendering Logic ---
 
     if (loading) {
@@ -754,7 +684,6 @@ const DocumentEditorPage = ({ params }) => {
                         <EditableSection
                             sectionId={getSectionId('header')}
                             onEdit={() => openEditDialog({ type: 'header' })}
-                            onAiEdit={() => openAiEditDialog({ type: 'header' })}
                             onUndo={() => handleUndo(getSectionId('header'))}
                             onRedo={() => handleRedo(getSectionId('header'))}
                             canUndo={(historyIndex[getSectionId('header')] ?? 0) > 0}
@@ -778,7 +707,6 @@ const DocumentEditorPage = ({ params }) => {
                                     key={paragraphId}
                                     sectionId={paragraphId}
                                     onEdit={() => openEditDialog({ type: 'paragraph', index })}
-                                    onAiEdit={() => openAiEditDialog({ type: 'paragraph', index })}
                                     onUndo={() => handleUndo(paragraphId)}
                                     onRedo={() => handleRedo(paragraphId)}
                                     canUndo={(historyIndex[paragraphId] ?? 0) > 0}
@@ -800,7 +728,6 @@ const DocumentEditorPage = ({ params }) => {
                         <EditableSection
                             sectionId={getSectionId('footer')}
                             onEdit={() => openEditDialog({ type: 'footer' })}
-                            onAiEdit={() => openAiEditDialog({ type: 'footer' })}
                             onUndo={() => handleUndo(getSectionId('footer'))}
                             onRedo={() => handleRedo(getSectionId('footer'))}
                             canUndo={(historyIndex[getSectionId('footer')] ?? 0) > 0}
@@ -828,16 +755,6 @@ const DocumentEditorPage = ({ params }) => {
                     editData={editData}
                     onDataChange={handleDialogInputChange}
                     onSave={handleEditSave}
-                />
-
-                <AiEditDialog
-                    visible={isAiEditDialogOpen}
-                    onHide={closeAiEditDialog}
-                    section={currentEditingSectionForAI}
-                    prompt={aiPrompt}
-                    setPrompt={setAiPrompt}
-                    onSubmit={handleAiEditSubmit}
-                    isProcessing={isAiProcessing}
                 />
             </div>
             );
