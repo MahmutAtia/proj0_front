@@ -497,11 +497,30 @@ const PersonalSiteEditorPage = ({ params }) => {
     </style>
 </head>
 <body>
+    <script>
+        // This script runs immediately to set the theme class, preventing FOUC.
+        (function() {
+            try {
+                const storedTheme = localStorage.getItem('theme');
+                if (storedTheme) {
+                    document.body.classList.add(storedTheme);
+                } else {
+                    document.body.classList.add('light-mode'); // Default to light-mode
+                }
+            } catch (e) {
+                // Fallback in case of errors (e.g., localStorage access denied)
+                console.warn('Error applying initial theme from inline script:', e);
+                document.body.classList.add('light-mode');
+            }
+        })();
+    </script>
+
     ${yamlData.global?.html || ''}
 
     ${block.html || '<!-- No content defined -->'}
 
     <script>
+    // Main Global JS (from yamlData.global.js)
     (function() {
         try {
             ${yamlData.global?.js || ''}
@@ -510,6 +529,7 @@ const PersonalSiteEditorPage = ({ params }) => {
         }
     })();
 
+    // Block JS (from block.js)
     (function() {
         try {
             ${block.js || ''}
@@ -529,8 +549,6 @@ const PersonalSiteEditorPage = ({ params }) => {
                                     return;
                                 }
 
-                                // Consider a slightly longer timeout to ensure iframe's internal scripts (like its own window.onload)
-                                // have a higher chance of completing their initial run.
                                 setTimeout(() => {
                                     const iWindow = iframe.contentWindow;
                                     if (!iWindow) {
@@ -550,8 +568,6 @@ const PersonalSiteEditorPage = ({ params }) => {
 
                                     try {
                                         const originalStyles = [];
-                                        // Iterate over all potentially relevant elements, not just direct children,
-                                        // if content might be nested deeper. For now, body.children is kept.
                                         const elementsToReset = Array.from(body.children);
 
                                         elementsToReset.forEach(el => {
@@ -578,19 +594,17 @@ const PersonalSiteEditorPage = ({ params }) => {
                                             }
                                         });
 
-                                        // Force a reflow
                                         // eslint-disable-next-line @typescript-eslint/no-unused-vars
                                         const _ = body.offsetHeight;
 
                                         const contentHeight = Math.max(
                                             body.scrollHeight, body.offsetHeight,
                                             html.clientHeight, html.scrollHeight, html.offsetHeight,
-                                            150 // Minimum fallback height
+                                            150
                                         );
 
-                                        iframe.style.height = `${contentHeight + 20}px`; // Add a small buffer
+                                        iframe.style.height = `${contentHeight + 20}px`;
 
-                                        // Restore original inline styles
                                         originalStyles.forEach(item => {
                                             item.element.style.opacity = item.opacity;
                                             item.element.style.transform = item.transform;
@@ -600,26 +614,19 @@ const PersonalSiteEditorPage = ({ params }) => {
                                             item.element.style.height = item.height;
                                         });
 
-                                        // NEW: After setting height and restoring styles, dispatch events
-                                        // to trigger recalculations within the iframe.
-                                        iWindow.dispatchEvent(new Event('resize'));
-                                        iWindow.dispatchEvent(new Event('scroll'));
-                                        // Forcing a reflow again *after* restoring styles and before dispatching events
-                                        // might also help ensure the iframe's internal scripts see the correct state.
                                         // eslint-disable-next-line @typescript-eslint/no-unused-vars
                                         const __ = body.offsetHeight;
                                         iWindow.dispatchEvent(new Event('resize'));
                                         iWindow.dispatchEvent(new Event('scroll'));
 
-
                                     } catch (innerError) {
                                         console.warn(`Error during iframe height adjustment for block: ${block?.name || 'Unknown'}`, innerError);
-                                        iframe.style.height = "300px"; // Fallback height on inner error
+                                        iframe.style.height = "300px";
                                     }
-                                }, 300); // Timeout increased slightly to 300ms
+                                }, 300);
                             } catch (outerError) {
                                 console.error(`Error in iframe onLoad handler for block: ${block?.name || 'Unknown'}`, outerError);
-                                if (e.target) e.target.style.height = "300px"; // Fallback on outer error
+                                if (e.target) e.target.style.height = "300px";
                             }
                         }}
                         scrolling="no"
