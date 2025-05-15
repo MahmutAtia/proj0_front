@@ -547,8 +547,11 @@ const DocumentEditorPage = ({ params }) => {
                 throw new Error("Backend URL is not configured. Check NEXT_PUBLIC_BACKEND_URL environment variable.");
             }
 
+            // Fix: Nest the document data under the document type key
             const dataToSave = {
-                ...documentData
+                [documentType]: {
+                    ...documentData
+                }
             };
 
             const apiUrl = `${backendUrl}/api/resumes/document/${documentId}/update/`;
