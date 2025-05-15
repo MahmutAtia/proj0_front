@@ -542,21 +542,37 @@ const DocumentEditorPage = ({ params }) => {
     const handleSaveChanges = async () => {
         setIsSaving(true);
         try {
-            console.log("Simulating save for document:", documentId);
+            const backendUrl = process.env.NEXT_PUBLIC_BACKEND_URL;
+            if (!backendUrl) {
+                throw new Error("Backend URL is not configured. Check NEXT_PUBLIC_BACKEND_URL environment variable.");
+            }
+
             const dataToSave = {
-                document_type: documentType,
-                json_content: documentData
+                ...documentData
             };
+
+            const apiUrl = `${backendUrl}/api/resumes/document/${documentId}/update/`;
+            console.log("Saving document to:", apiUrl);
             console.log("Data to save:", dataToSave);
 
-            await new Promise(resolve => setTimeout(resolve, 1000));
+            await axios.put(apiUrl, dataToSave, {
+                headers: {
+                    'Content-Type': 'application/json',
+                }
+            });
 
             initialDataRef.current = JSON.stringify(documentData);
             setHasUnsavedChanges(false);
             toast.current?.show({ severity: 'success', summary: 'Saved', detail: 'Document saved successfully!', life: 3000 });
         } catch (err) {
             console.error("Error saving document:", err);
-            toast.current?.show({ severity: 'error', summary: 'Save Error', detail: `Failed to save document. ${err.message || ''}`, life: 5000 });
+            let detailMessage = `Failed to save document. ${err.message || ''}`;
+            if (err.response) {
+                console.error("Backend error response:", err.response.data);
+                const backendError = err.response.data?.detail || err.response.data?.error || JSON.stringify(err.response.data);
+                detailMessage = `Failed to save document: ${backendError}`;
+            }
+            toast.current?.show({ severity: 'error', summary: 'Save Error', detail: detailMessage, life: 5000 });
         } finally {
             setIsSaving(false);
         }
@@ -581,30 +597,12 @@ const DocumentEditorPage = ({ params }) => {
             const blob = new Blob([response.data], { type: 'application/pdf' });
             const blobUrl = window.URL.createObjectURL(blob);
 
-            // Open PDF in a new tab
             const pdfWindow = window.open(blobUrl, '_blank');
             if (pdfWindow) {
-                pdfWindow.focus(); // Optional: Bring the new tab to the forefront
+                pdfWindow.focus();
             } else {
-                // Fallback for browsers that block popups, though less common for user-initiated actions
                 toast.current?.show({ severity: 'warn', summary: 'Popup Blocked', detail: 'Could not open PDF in a new tab. Please check your popup blocker settings.', life: 5000 });
-                // As a fallback, you could re-enable the old download behavior here if desired
-                // const link = document.createElement('a');
-                // link.href = blobUrl;
-                // const contentDisposition = response.headers['content-disposition'];
-                // let filename = `document_${documentId}.pdf`;
-                // if (contentDisposition) {
-                //     const filenameMatch = contentDisposition.match(/filename="?(.+)"?/i);
-                //     if (filenameMatch && filenameMatch.length === 2) {
-                //         filename = filenameMatch[1];
-                //     }
-                // }
-                // link.download = filename;
-                // document.body.appendChild(link);
-                // link.click();
-                // document.body.removeChild(link);
             }
-            // Revoke the object URL after a short delay to ensure the new tab has loaded it
             setTimeout(() => window.URL.revokeObjectURL(blobUrl), 100);
 
         } catch (error) {
@@ -727,19 +725,16 @@ const DocumentEditorPage = ({ params }) => {
 
                 className="flex-grow-1 overflow-auto p-4 surface-100 flex justify-content-center"
                 style={{
-                    // Add a repeating background to simulate page breaks
-                    // Adjust 297mm based on your padding/margins if needed
-                    // This creates a faint line every A4 height
                     background: `linear-gradient(to bottom, transparent 0, transparent calc(297mm - 1px), #ccc calc(297mm - 1px), #ccc 297mm)`,
                     backgroundSize: `100% 297mm`,
                     backgroundRepeat: 'repeat-y',
-                    backgroundPosition: 'center top' // Align background with the page
+                    backgroundPosition: 'center top'
                 }}
             >
 
                     <div
                         className="a4-page bg-white shadow-3 border-1 border-300"
-                        style={{ width: '210mm', minHeight: '297mm', padding: '0.9cm', boxSizing: 'border-box', marginBottom: '20px' /* Add some space at the bottom */ }}
+                        style={{ width: '210mm', minHeight: '297mm', padding: '0.9cm', boxSizing: 'border-box', marginBottom: '20px' }}
                     >
                         <EditableSection
                             sectionId={getSectionId('header')}
