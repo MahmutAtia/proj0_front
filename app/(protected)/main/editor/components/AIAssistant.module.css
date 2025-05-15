@@ -1,0 +1,519 @@
+/* AIAssistant.module.css */
+
+/* Main container */
+.aiAssistantContainer {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 4px;
+  background-color: var(--surface-card);
+  border-radius: 8px;
+}
+
+/* Input field styling */
+.inputWrapper {
+  position: relative;
+  flex: 1;
+}
+
+.inputIcon {
+  position: absolute;
+  left: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--text-color-secondary);
+  font-size: 1rem;
+}
+
+.promptInput {
+  width: 100% !important;
+  height: 40px !important;
+  padding: 8px 12px 8px 36px !important;
+  border-radius: 20px !important;
+  font-size: 0.95rem !important;
+  border: 1px solid var(--surface-300) !important;
+  transition: all 0.2s !important;
+}
+
+.promptInput:focus {
+  border-color: var(--primary-400) !important;
+  box-shadow: 0 0 0 1px var(--primary-200) !important;
+}
+
+/* Controls container */
+.controls {
+  display: flex;
+  gap: 6px;
+  align-items: center;
+}
+
+/* Language selector */
+.languageSelectorButton {
+  background-color: var(--surface-200) !important;
+  border: none !important;
+  color: var(--text-color) !important;
+  height: 40px !important;
+  padding: 0 12px !important;
+  border-radius: 20px !important;
+  transition: all 0.2s !important;
+}
+
+.languageSelectorButton:hover:not(:disabled) {
+  background-color: var(--surface-300) !important;
+}
+
+.langButtonContent {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.langFlag {
+  font-size: 1.1rem;
+}
+
+.langCode {
+  font-size: 0.9rem;
+  font-weight: 600;
+  text-transform: uppercase;
+}
+
+/* Language menu styling */
+.langMenu {
+  border-radius: 8px !important;
+  overflow: hidden !important;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15) !important;
+}
+
+.langMenuItem {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 4px 0;
+}
+
+.activeLangItem {
+  background-color: var(--primary-50) !important;
+  font-weight: 600 !important;
+}
+
+/* Voice button styling */
+.voiceButton {
+  width: 40px !important;
+  height: 40px !important;
+  border-radius: 20px !important;
+  background: linear-gradient(to bottom right, var(--red-400), var(--red-500)) !important;
+  border: none !important;
+  color: white !important;
+  font-size: 1.1rem !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  transition: all 0.2s !important;
+  box-shadow: 0 2px 5px rgba(215, 40, 40, 0.3) !important;
+}
+
+.voiceButton:hover:not(:disabled) {
+  background: linear-gradient(to bottom right, var(--red-500), var(--red-600)) !important;
+  transform: translateY(-1px) !important;
+  box-shadow: 0 3px 7px rgba(215, 40, 40, 0.4) !important;
+}
+
+.voiceButton:active:not(:disabled) {
+  transform: translateY(1px) !important;
+  box-shadow: 0 1px 2px rgba(215, 40, 40, 0.4) !important;
+}
+
+.voiceButton.listening {
+  background: var(--red-600) !important;
+  animation: pulse 1.5s infinite !important;
+}
+
+/* Submit button */
+.submitButton {
+  width: 40px !important;
+  height: 40px !important;
+  border-radius: 20px !important;
+  background: linear-gradient(to bottom right, var(--primary-400), var(--primary-500)) !important;
+  border: none !important;
+  color: white !important;
+  font-size: 1.1rem !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  transition: all 0.2s !important;
+  box-shadow: 0 2px 5px rgba(55, 115, 230, 0.3) !important;
+}
+
+.submitButton:hover:not(:disabled) {
+  background: linear-gradient(to bottom right, var(--primary-500), var(--primary-600)) !important;
+  transform: translateY(-1px) !important;
+  box-shadow: 0 3px 7px rgba(55, 115, 230, 0.4) !important;
+}
+
+.submitButton:active:not(:disabled) {
+  transform: translateY(1px) !important;
+  box-shadow: 0 1px 2px rgba(55, 115, 230, 0.4) !important;
+}
+
+/* Completely redesigned voice dialog styles */
+
+/* Main dialog styling */
+.voiceDialog {
+  border-radius: 12px !important;
+  overflow: hidden !important;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2) !important;
+}
+
+.voiceDialog > div {
+  border-radius: 12px !important;
+  overflow: hidden !important;
+  padding: 0 !important;
+}
+
+.voiceDialogContent {
+  display: flex;
+  flex-direction: column;
+  padding-top: 0 !important;
+}
+
+/* Visualizer with animated waves */
+.voiceVisualizer {
+  background: linear-gradient(135deg, var(--primary-600), var(--primary-800));
+  height: 150px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  position: relative;
+  overflow: hidden;
+}
+
+.voiceVisualizer::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: url("data:image/svg+xml,%3Csvg width='100' height='20' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M0 10 C 30 20, 70 0, 100 10 L 100 20 L 0 20 Z' fill='rgba(255,255,255,0.05)'/%3E%3C/svg%3E");
+  background-size: 100px 20px;
+  opacity: 0.3;
+}
+
+.microphoneContainer {
+  width: 70px;
+  height: 70px;
+  background-color: rgba(255, 255, 255, 0.15);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+}
+
+.microphoneContainer i {
+  color: white;
+  font-size: 28px;
+  z-index: 2;
+}
+
+/* Animated sound waves around microphone */
+.visualizerWaves {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+}
+
+.visualizerWaves span {
+  position: absolute;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  animation: wave 4s infinite ease-out;
+  opacity: 0;
+}
+
+.visualizerWaves span:nth-child(1) {
+  animation-delay: 0s;
+}
+
+.visualizerWaves span:nth-child(2) {
+  animation-delay: 1s;
+}
+
+.visualizerWaves span:nth-child(3) {
+  animation-delay: 2s;
+}
+
+.visualizerWaves span:nth-child(4) {
+  animation-delay: 3s;
+}
+
+/* Dialog header with title and language */
+.dialogHeader {
+  padding: 20px 24px 10px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  border-bottom: 1px solid var(--surface-200);
+}
+
+.dialogHeader h2 {
+  margin: 0 0 8px;
+  font-weight: 600;
+  font-size: 1.5rem;
+  color: var(--text-color);
+}
+
+.languageDisplay {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 12px;
+  background-color: var(--surface-100);
+  border-radius: 20px;
+  font-size: 0.9rem;
+  color: var(--text-color-secondary);
+  margin-bottom: 10px;
+}
+
+.languageDisplay i {
+  font-size: 0.9rem;
+  color: var(--primary-500);
+}
+
+/* Add these styles for the custom header */
+.dialogCustomHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0;
+  background: transparent;
+  border: none;
+}
+
+.dialogCustomHeader span {
+  font-weight: 600;
+  font-size: 1.2rem;
+  color: var(--text-color);
+}
+
+.closeButton {
+  width: 32px !important;
+  height: 32px !important;
+  background: transparent !important;
+  border: none !important;
+  color: var(--text-color-secondary) !important;
+}
+
+.closeButton:hover {
+  background: var(--surface-200) !important;
+  color: var(--text-color) !important;
+}
+
+/* Transcript container styling */
+.transcriptContainer {
+  padding: 16px 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+/* Section headers */
+.sectionHeader {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 8px;
+  font-size: 0.9rem;
+  color: var(--text-color-secondary);
+  font-weight: 600;
+}
+
+.sectionHeader i {
+  font-size: 1rem;
+  color: var(--primary-500);
+}
+
+/* Final transcript section */
+.finalTranscriptSection {
+  background-color: var(--surface-50);
+  border-radius: 10px;
+  padding: 12px 16px;
+  border-left: 3px solid var(--primary-500);
+}
+
+.finalText {
+  color: var(--text-color);
+  line-height: 1.5;
+  font-size: 1rem;
+  margin: 0;
+}
+
+/* Current listening section */
+.currentListeningSection {
+  background-color: var(--surface-50);
+  border-radius: 10px;
+  padding: 12px 16px;
+}
+
+.listeningIndicator {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-height: 60px;
+}
+
+/* Sound wave animation in listening indicator */
+.soundWaves {
+  display: flex;
+  align-items: center;
+  gap: 3px;
+  height: 30px;
+  width: 30px;
+}
+
+.soundWaves .bar {
+  display: block;
+  width: 3px;
+  height: 100%;
+  background-color: var(--primary-500);
+  border-radius: 3px;
+  animation: soundWave 1.5s infinite ease-in-out;
+  transform-origin: bottom;
+}
+
+.soundWaves .bar:nth-child(1) {
+  animation-delay: 0.1s;
+  height: 30%;
+}
+
+.soundWaves .bar:nth-child(2) {
+  animation-delay: 0.3s;
+  height: 60%;
+}
+
+.soundWaves .bar:nth-child(3) {
+  animation-delay: 0.5s;
+  height: 80%;
+}
+
+.soundWaves .bar:nth-child(4) {
+  animation-delay: 0.3s;
+  height: 60%;
+}
+
+.soundWaves .bar:nth-child(5) {
+  animation-delay: 0.1s;
+  height: 30%;
+}
+
+/* Text containers */
+.interimTextContainer {
+  flex: 1;
+}
+
+.interimText {
+  margin: 0;
+  color: var(--text-color);
+  font-size: 1rem;
+  line-height: 1.5;
+}
+
+.placeholderText {
+  margin: 0;
+  color: var(--text-color-secondary);
+  font-style: italic;
+  font-size: 0.95rem;
+}
+
+/* Instructions area */
+.instructions {
+  padding: 10px 24px 20px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--text-color-secondary);
+  font-size: 0.85rem;
+  border-top: 1px solid var(--surface-200);
+}
+
+.instructions i {
+  color: var(--primary-500);
+  font-size: 1rem;
+}
+
+/* Dialog footer */
+.dialogFooter {
+  padding: 12px 24px !important;
+  display: flex;
+  justify-content: center !important;
+  background-color: var(--surface-50) !important;
+  border-top: 1px solid var(--surface-200) !important;
+}
+
+.doneButton {
+  background: var(--primary-500) !important;
+  border: none !important;
+  border-radius: 20px !important;
+  min-width: 120px !important;
+  font-weight: 600 !important;
+  box-shadow: 0 2px 6px rgba(0, 104, 231, 0.2) !important;
+  transition: all 0.2s !important;
+}
+
+.doneButton:hover {
+  background: var(--primary-600) !important;
+  transform: translateY(-1px) !important;
+  box-shadow: 0 4px 8px rgba(0, 104, 231, 0.3) !important;
+}
+
+/* Animations */
+@keyframes pulse {
+  0% {
+    box-shadow: 0 0 0 0 rgba(220, 53, 69, 0.7);
+  }
+  70% {
+    box-shadow: 0 0 0 12px rgba(220, 53, 69, 0);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(220, 53, 69, 0);
+  }
+}
+
+@keyframes wave {
+  0% {
+    transform: scale(0.8);
+    opacity: 0.8;
+  }
+  70% {
+    opacity: 0;
+  }
+  100% {
+    transform: scale(2);
+    opacity: 0;
+  }
+}
+
+@keyframes soundWave {
+  0%, 100% {
+    transform: scaleY(0.3);
+  }
+  50% {
+    transform: scaleY(1);
+  }
+}
+
+@keyframes pulse-dot {
+  0%, 100% {
+    opacity: 0.3;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1.3);
+  }
+}
