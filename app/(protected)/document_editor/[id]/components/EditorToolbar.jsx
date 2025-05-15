@@ -6,13 +6,23 @@ import { ProgressSpinner } from 'primereact/progressspinner';
 
 // --- Child Component: EditorToolbar ---
 /**
- * Toolbar for the document editor, providing save functionality.
+ * Toolbar for the document editor, providing save and download functionality.
  * @param {object} props - Component props.
  * @param {Function} props.onSave - Callback function when the save button is clicked.
  * @param {boolean} props.isSaving - Indicates if a save operation is in progress.
  * @param {boolean} props.hasUnsavedChanges - Indicates if there are unsaved changes.
+ * @param {string} [props.documentId] - The ID of the document, required for PDF download.
+ * @param {Function} [props.onDownloadPdf] - Callback function to trigger PDF download.
+ * @param {boolean} [props.isDownloadingPdf] - Indicates if PDF download is in progress.
  */
-const EditorToolbar = ({ onSave, isSaving, hasUnsavedChanges }) => {
+const EditorToolbar = ({
+    onSave,
+    isSaving,
+    hasUnsavedChanges,
+    documentId,
+    onDownloadPdf,
+    isDownloadingPdf
+}) => {
     return (
         <div className="p-3 surface-ground border-bottom-1 surface-border flex justify-content-end align-items-center sticky top-0 z-5 gap-2">
             {/* Unsaved Changes Indicator */}
@@ -22,6 +32,19 @@ const EditorToolbar = ({ onSave, isSaving, hasUnsavedChanges }) => {
                     style={{ fontSize: '0.7rem' }}
                     title="Unsaved changes"
                 ></i>
+            )}
+
+            {/* Download PDF Button */}
+            {onDownloadPdf && documentId && (
+                <Button
+                    label={isDownloadingPdf ? 'Downloading...' : 'Download PDF'}
+                    icon={isDownloadingPdf ? <ProgressSpinner style={{ width: '18px', height: '18px' }} strokeWidth="8" /> : "pi pi-file-pdf"}
+                    className="p-button-sm p-button-secondary"
+                    onClick={onDownloadPdf}
+                    disabled={isDownloadingPdf || isSaving}
+                    tooltip="Download as PDF"
+                    tooltipOptions={{ position: 'bottom' }}
+                />
             )}
 
             {/* Save Button */}

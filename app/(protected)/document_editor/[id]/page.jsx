@@ -327,6 +327,9 @@ const DocumentEditorPage = ({ params }) => {
     const [editText, setEditText] = useState('');
     const [editData, setEditData] = useState({});
 
+    // --- PDF Download State ---
+    const [isDownloadingPdf, setIsDownloadingPdf] = useState(false);
+
     // --- Helper Functions ---
 
     /** Generates a unique ID for a section based on type and optional index. */
@@ -559,6 +562,42 @@ const DocumentEditorPage = ({ params }) => {
         }
     };
 
+    const handleDownloadPdf = async () => {
+        if (!documentId) {
+            console.error("Document ID is missing, cannot download PDF.");
+            return;
+        }
+        setIsDownloadingPdf(true);
+        try {
+            const pdfUrl = `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/resumes/document/${documentId}/`;
+            const response = await axios.get(pdfUrl, {
+                responseType: 'blob',
+            });
+            const blob = new Blob([response.data], { type: 'application/pdf' });
+            const link = document.createElement('a');
+            link.href = window.URL.createObjectURL(blob);
+
+            const contentDisposition = response.headers['content-disposition'];
+            let filename = `document_${documentId}.pdf`;
+            if (contentDisposition) {
+                const filenameMatch = contentDisposition.match(/filename="?(.+)"?/i);
+                if (filenameMatch && filenameMatch.length === 2) {
+                    filename = filenameMatch[1];
+                }
+            }
+            link.download = filename;
+
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            window.URL.revokeObjectURL(link.href);
+        } catch (error) {
+            console.error("Error downloading PDF:", error);
+        } finally {
+            setIsDownloadingPdf(false);
+        }
+    };
+
     // --- Manual Edit Dialog Handlers ---
 
     const openEditDialog = (sectionInfo) => {
@@ -661,6 +700,9 @@ const DocumentEditorPage = ({ params }) => {
                 onSave={handleSaveChanges}
                 isSaving={isSaving}
                 hasUnsavedChanges={hasUnsavedChanges}
+                documentId={documentId}
+                onDownloadPdf={handleDownloadPdf}
+                isDownloadingPdf={isDownloadingPdf}
             />
 
             <div
@@ -679,7 +721,7 @@ const DocumentEditorPage = ({ params }) => {
 
                     <div
                         className="a4-page bg-white shadow-3 border-1 border-300"
-                        style={{ width: '210mm', minHeight: '297mm', padding: '1cm', boxSizing: 'border-box', marginBottom: '20px' /* Add some space at the bottom */ }}
+                        style={{ width: '210mm', minHeight: '297mm', padding: '0.9cm', boxSizing: 'border-box', marginBottom: '20px' /* Add some space at the bottom */ }}
                     >
                         <EditableSection
                             sectionId={getSectionId('header')}
