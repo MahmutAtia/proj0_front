@@ -14,6 +14,8 @@ import { ProgressSpinner } from 'primereact/progressspinner';
  * @param {string} [props.documentId] - The ID of the document, required for PDF download.
  * @param {Function} [props.onDownloadPdf] - Callback function to trigger PDF download.
  * @param {boolean} [props.isDownloadingPdf] - Indicates if PDF download is in progress.
+ * @param {Function} [props.onDownloadWord] - Callback function to trigger Word download.
+ * @param {boolean} [props.isDownloadingWord] - Indicates if Word download is in progress.
  */
 const EditorToolbar = ({
     onSave,
@@ -21,7 +23,9 @@ const EditorToolbar = ({
     hasUnsavedChanges,
     documentId,
     onDownloadPdf,
-    isDownloadingPdf
+    isDownloadingPdf,
+    onDownloadWord,
+    isDownloadingWord
 }) => {
     return (
         <div className="p-3 surface-ground border-bottom-1 surface-border flex justify-content-end align-items-center sticky top-0 z-5 gap-2">
@@ -41,8 +45,21 @@ const EditorToolbar = ({
                     icon={isDownloadingPdf ? <ProgressSpinner style={{ width: '18px', height: '18px' }} strokeWidth="8" /> : "pi pi-file-pdf"}
                     className="p-button-sm p-button-secondary"
                     onClick={onDownloadPdf}
-                    disabled={isDownloadingPdf || isSaving}
+                    disabled={isDownloadingPdf || isSaving || isDownloadingWord}
                     tooltip="Download as PDF"
+                    tooltipOptions={{ position: 'bottom' }}
+                />
+            )}
+
+            {/* Download Word Button */}
+            {onDownloadWord && documentId && (
+                <Button
+                    label={isDownloadingWord ? 'Downloading...' : 'Download Word'}
+                    icon={isDownloadingWord ? <ProgressSpinner style={{ width: '18px', height: '18px' }} strokeWidth="8" /> : "pi pi-file-word"}
+                    className="p-button-sm p-button-info"
+                    onClick={onDownloadWord}
+                    disabled={isDownloadingWord || isSaving || isDownloadingPdf}
+                    tooltip="Download as Microsoft Word document"
                     tooltipOptions={{ position: 'bottom' }}
                 />
             )}
@@ -53,7 +70,7 @@ const EditorToolbar = ({
                 icon={isSaving ? <ProgressSpinner style={{ width: '18px', height: '18px' }} strokeWidth="8" /> : "pi pi-save"}
                 className="p-button-sm p-button-success"
                 onClick={onSave}
-                disabled={isSaving || !hasUnsavedChanges}
+                disabled={isSaving || !hasUnsavedChanges || isDownloadingPdf || isDownloadingWord}
                 tooltip={hasUnsavedChanges ? "Save your latest changes" : "No changes to save"}
                 tooltipOptions={{ position: 'bottom' }}
             />

@@ -330,6 +330,9 @@ const DocumentEditorPage = ({ params }) => {
     // --- PDF Download State ---
     const [isDownloadingPdf, setIsDownloadingPdf] = useState(false);
 
+    // --- Word Download State ---
+    const [isDownloadingWord, setIsDownloadingWord] = useState(false);
+
     // --- Helper Functions ---
 
     /** Generates a unique ID for a section based on type and optional index. */
@@ -477,7 +480,7 @@ const DocumentEditorPage = ({ params }) => {
                     const marginTop = parseInt(bodyStyle.marginTop, 10) || 0;
                     const marginBottom = parseInt(bodyStyle.marginBottom, 10) || 0;
 
-                    const totalHeight = contentHeight + marginTop + marginBottom ;
+                    const totalHeight = contentHeight + marginTop + marginBottom;
 
                     iframe.style.height = `${totalHeight}px`;
 
@@ -617,6 +620,48 @@ const DocumentEditorPage = ({ params }) => {
         }
     };
 
+    const handleDownloadWord = async () => {
+        if (!documentId) {
+            console.error("Document ID is missing, cannot download Word document.");
+            toast.current?.show({ severity: 'warn', summary: 'Download Error', detail: 'Document ID is missing.', life: 3000 });
+            return;
+        }
+        if (hasUnsavedChanges) {
+            toast.current?.show({ severity: 'warn', summary: 'Unsaved Changes', detail: 'Please save your changes before downloading the Word document.', life: 4000 });
+            return;
+        }
+        setIsDownloadingWord(true);
+        try {
+            const wordUrl = `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/resumes/document/${documentId}/word/`;
+            const response = await axios.get(wordUrl, {
+                responseType: 'blob',
+            });
+
+            // Create blob and download link
+            const blob = new Blob([response.data], { type: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document' });
+            const url = window.URL.createObjectURL(blob);
+
+            // Create temporary link and trigger download
+            const link = document.createElement('a');
+            link.href = url;
+            link.setAttribute('download', `document-${documentId}.docx`);
+            document.body.appendChild(link);
+            link.click();
+
+            // Clean up
+            document.body.removeChild(link);
+            setTimeout(() => window.URL.revokeObjectURL(url), 100);
+
+            toast.current?.show({ severity: 'success', summary: 'Download Success', detail: 'Word document downloaded successfully.', life: 3000 });
+        } catch (error) {
+            console.error("Error downloading Word document:", error);
+            const errorMsg = error.response?.data?.detail || error.message || "An unknown error occurred.";
+            toast.current?.show({ severity: 'error', summary: 'Download Failed', detail: `Could not download Word document. ${errorMsg}`, life: 5000 });
+        } finally {
+            setIsDownloadingWord(false);
+        }
+    };
+
     // --- Manual Edit Dialog Handlers ---
 
     const openEditDialog = (sectionInfo) => {
@@ -722,6 +767,8 @@ const DocumentEditorPage = ({ params }) => {
                 documentId={documentId}
                 onDownloadPdf={handleDownloadPdf}
                 isDownloadingPdf={isDownloadingPdf}
+                onDownloadWord={handleDownloadWord}
+                isDownloadingWord={isDownloadingWord}
             />
 
             <div
@@ -735,87 +782,87 @@ const DocumentEditorPage = ({ params }) => {
                 }}
             >
 
-                    <div
-                        className="a4-page bg-white shadow-3 border-1 border-300"
-                        style={{ width: '210mm', minHeight: '297mm', padding: '0.9cm', boxSizing: 'border-box', marginBottom: '20px' }}
+                <div
+                    className="a4-page bg-white shadow-3 border-1 border-300"
+                    style={{ width: '210mm', minHeight: '297mm', padding: '0.9cm', boxSizing: 'border-box', marginBottom: '20px' }}
+                >
+                    <EditableSection
+                        sectionId={getSectionId('header')}
+                        onEdit={() => openEditDialog({ type: 'header' })}
+                        onUndo={() => handleUndo(getSectionId('header'))}
+                        onRedo={() => handleRedo(getSectionId('header'))}
+                        canUndo={(historyIndex[getSectionId('header')] ?? 0) > 0}
+                        canRedo={(sectionHistory[getSectionId('header')]?.length ?? 0) > (historyIndex[getSectionId('header')] ?? 0) + 1}
                     >
-                        <EditableSection
-                            sectionId={getSectionId('header')}
-                            onEdit={() => openEditDialog({ type: 'header' })}
-                            onUndo={() => handleUndo(getSectionId('header'))}
-                            onRedo={() => handleRedo(getSectionId('header'))}
-                            canUndo={(historyIndex[getSectionId('header')] ?? 0) > 0}
-                            canRedo={(sectionHistory[getSectionId('header')]?.length ?? 0) > (historyIndex[getSectionId('header')] ?? 0) + 1}
-                        >
-                            <iframe
-                                key={`${getSectionId('header')}-${documentType}-${JSON.stringify(header)}`}
-                                title={`${documentType} Header`}
-                                srcDoc={generateSrcDoc(renderHeaderFn(header), coverLetterCSS, getSectionId('header'))}
-                                style={{ width: '100%', border: 'none', overflow: 'hidden', display: 'block', minHeight: '100px' }}
-                                scrolling="no"
-                                sandbox="allow-scripts allow-same-origin"
-                                onLoad={handleIframeLoad}
-                            />
-                        </EditableSection>
+                        <iframe
+                            key={`${getSectionId('header')}-${documentType}-${JSON.stringify(header)}`}
+                            title={`${documentType} Header`}
+                            srcDoc={generateSrcDoc(renderHeaderFn(header), coverLetterCSS, getSectionId('header'))}
+                            style={{ width: '100%', border: 'none', overflow: 'hidden', display: 'block', minHeight: '100px' }}
+                            scrolling="no"
+                            sandbox="allow-scripts allow-same-origin"
+                            onLoad={handleIframeLoad}
+                        />
+                    </EditableSection>
 
-                        {body_paragraphs.map((paragraph, index) => {
-                            const paragraphId = getSectionId('paragraph', index);
-                            return (
-                                <EditableSection
-                                    key={paragraphId}
-                                    sectionId={paragraphId}
-                                    onEdit={() => openEditDialog({ type: 'paragraph', index })}
-                                    onUndo={() => handleUndo(paragraphId)}
-                                    onRedo={() => handleRedo(paragraphId)}
-                                    canUndo={(historyIndex[paragraphId] ?? 0) > 0}
-                                    canRedo={(sectionHistory[paragraphId]?.length ?? 0) > (historyIndex[paragraphId] ?? 0) + 1}
-                                >
-                                    <iframe
-                                        key={`${paragraphId}-${paragraph}`}
-                                        title={`Paragraph ${index + 1}`}
-                                        srcDoc={generateSrcDoc(renderParagraphHtml(paragraph), coverLetterCSS, paragraphId)}
-                                        style={{ width: '100%', border: 'none', overflow: 'hidden', display: 'block' }}
-                                        scrolling="no"
-                                        sandbox="allow-scripts allow-same-origin"
-                                        onLoad={handleIframeLoad}
-                                    />
-                                </EditableSection>
-                            );
-                        })}
+                    {body_paragraphs.map((paragraph, index) => {
+                        const paragraphId = getSectionId('paragraph', index);
+                        return (
+                            <EditableSection
+                                key={paragraphId}
+                                sectionId={paragraphId}
+                                onEdit={() => openEditDialog({ type: 'paragraph', index })}
+                                onUndo={() => handleUndo(paragraphId)}
+                                onRedo={() => handleRedo(paragraphId)}
+                                canUndo={(historyIndex[paragraphId] ?? 0) > 0}
+                                canRedo={(sectionHistory[paragraphId]?.length ?? 0) > (historyIndex[paragraphId] ?? 0) + 1}
+                            >
+                                <iframe
+                                    key={`${paragraphId}-${paragraph}`}
+                                    title={`Paragraph ${index + 1}`}
+                                    srcDoc={generateSrcDoc(renderParagraphHtml(paragraph), coverLetterCSS, paragraphId)}
+                                    style={{ width: '100%', border: 'none', overflow: 'hidden', display: 'block' }}
+                                    scrolling="no"
+                                    sandbox="allow-scripts allow-same-origin"
+                                    onLoad={handleIframeLoad}
+                                />
+                            </EditableSection>
+                        );
+                    })}
 
-                        <EditableSection
-                            sectionId={getSectionId('footer')}
-                            onEdit={() => openEditDialog({ type: 'footer' })}
-                            onUndo={() => handleUndo(getSectionId('footer'))}
-                            onRedo={() => handleRedo(getSectionId('footer'))}
-                            canUndo={(historyIndex[getSectionId('footer')] ?? 0) > 0}
-                            canRedo={(sectionHistory[getSectionId('footer')]?.length ?? 0) > (historyIndex[getSectionId('footer')] ?? 0) + 1}
-                        >
-                            <iframe
-                                key={`${getSectionId('footer')}-${documentType}-${JSON.stringify(footer)}`}
-                                title={`${documentType} Footer`}
-                                srcDoc={generateSrcDoc(renderFooterFn(footer), coverLetterCSS, getSectionId('footer'))}
-                                style={{ width: '100%', border: 'none', overflow: 'hidden', display: 'block', minHeight: '80px' }}
-                                scrolling="no"
-                                sandbox="allow-scripts allow-same-origin"
-                                onLoad={handleIframeLoad}
-                            />
-                        </EditableSection>
-                    </div>
+                    <EditableSection
+                        sectionId={getSectionId('footer')}
+                        onEdit={() => openEditDialog({ type: 'footer' })}
+                        onUndo={() => handleUndo(getSectionId('footer'))}
+                        onRedo={() => handleRedo(getSectionId('footer'))}
+                        canUndo={(historyIndex[getSectionId('footer')] ?? 0) > 0}
+                        canRedo={(sectionHistory[getSectionId('footer')]?.length ?? 0) > (historyIndex[getSectionId('footer')] ?? 0) + 1}
+                    >
+                        <iframe
+                            key={`${getSectionId('footer')}-${documentType}-${JSON.stringify(footer)}`}
+                            title={`${documentType} Footer`}
+                            srcDoc={generateSrcDoc(renderFooterFn(footer), coverLetterCSS, getSectionId('footer'))}
+                            style={{ width: '100%', border: 'none', overflow: 'hidden', display: 'block', minHeight: '80px' }}
+                            scrolling="no"
+                            sandbox="allow-scripts allow-same-origin"
+                            onLoad={handleIframeLoad}
+                        />
+                    </EditableSection>
                 </div>
-
-                <ManualEditDialog
-                    visible={isEditDialogOpen}
-                    onHide={closeEditDialog}
-                    section={currentEditingSection}
-                    editText={editText}
-                    setEditText={setEditText}
-                    editData={editData}
-                    onDataChange={handleDialogInputChange}
-                    onSave={handleEditSave}
-                />
             </div>
-            );
+
+            <ManualEditDialog
+                visible={isEditDialogOpen}
+                onHide={closeEditDialog}
+                section={currentEditingSection}
+                editText={editText}
+                setEditText={setEditText}
+                editData={editData}
+                onDataChange={handleDialogInputChange}
+                onSave={handleEditSave}
+            />
+        </div>
+    );
 };
 
-            export default DocumentEditorPage;
+export default DocumentEditorPage;
