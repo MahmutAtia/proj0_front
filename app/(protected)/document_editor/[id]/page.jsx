@@ -62,21 +62,21 @@ body {
     height: 100%;
     overflow: hidden; /* Prevent scrollbars within iframe */
 }
-p { margin: 0 0 0.8em 0; }
+p { margin: 0 0 0.1em 0; }
 a { color: var(--link-color); text-decoration: none; }
 a:hover { text-decoration: underline; }
 
-.header-section { margin-bottom: 15px; position: relative; }
-.sender-info { text-align: left; margin-bottom: 8px; font-size: 9.5pt; color: var(--secondary-color); line-height: 1.3; }
-.sender-info p { margin: 0; }
-.sender-info .sender-name { font-family: var(--font-family-heading); font-weight: 700; font-size: 13pt; color: var(--accent-color); margin-bottom: 4px; }
-.date { text-align: right; font-size: 10pt; color: var(--secondary-color); margin-top: -15px; margin-bottom: 15px; }
-.recipient-info { text-align: left; margin-bottom: 15px; font-size: 10.5pt; line-height: 1.4; }
+.header-section { margin-bottom: 15px; position: relative; } /* Reduced margin */
+.sender-info { text-align: left; margin-bottom: 5px; font-size: 9.5pt; color: var(--secondary-color); line-height: 1.2; } /* Reduced margin & line-height */
+.sender-info p { margin: 0 0 2px 0; } /* Added small bottom margin for paragraphs within sender-info */
+.sender-info .sender-name { font-family: var(--font-family-heading); font-weight: 700; font-size: 13pt; color: var(--accent-color); margin-bottom: 3px; } /* Reduced margin */
+.date { text-align: right; font-size: 10pt; color: var(--secondary-color); margin-top: -10px; margin-bottom: 10px; } /* Adjusted margins */
+.recipient-info { text-align: left; margin-bottom: 10px; font-size: 10.5pt; line-height: 1.3; } /* Reduced margin & line-height */
 .recipient-info p { margin: 1px 0; }
 .recipient-info .recipient-name, .recipient-info .recipient-title { font-weight: 700; color: var(--primary-color); }
-.subject { font-family: var(--font-family-heading); font-weight: 700; margin-top: 20px; margin-bottom: 15px; font-size: 11.5pt; color: var(--accent-color); }
+.subject { font-family: var(--font-family-heading); font-weight: 700; margin-top: 15px; margin-bottom: 10px; font-size: 11.5pt; color: var(--accent-color); } /* Reduced margins */
 .subject p { margin: 0; }
-.salutation { font-weight: 700; margin-bottom: 15px; font-size: 10.5pt; }
+.salutation { font-weight: 700; margin-bottom: 10px; font-size: 10.5pt; } /* Reduced margin */
 .salutation p { margin: 0; }
 .body p { margin-bottom: 1em; text-align: justify; }
 body > .body > p {
@@ -565,6 +565,11 @@ const DocumentEditorPage = ({ params }) => {
     const handleDownloadPdf = async () => {
         if (!documentId) {
             console.error("Document ID is missing, cannot download PDF.");
+            toast.current?.show({ severity: 'warn', summary: 'Download Error', detail: 'Document ID is missing.', life: 3000 });
+            return;
+        }
+        if (hasUnsavedChanges) {
+            toast.current?.show({ severity: 'warn', summary: 'Unsaved Changes', detail: 'Please save your changes before downloading the PDF.', life: 4000 });
             return;
         }
         setIsDownloadingPdf(true);
@@ -574,25 +579,38 @@ const DocumentEditorPage = ({ params }) => {
                 responseType: 'blob',
             });
             const blob = new Blob([response.data], { type: 'application/pdf' });
-            const link = document.createElement('a');
-            link.href = window.URL.createObjectURL(blob);
+            const blobUrl = window.URL.createObjectURL(blob);
 
-            const contentDisposition = response.headers['content-disposition'];
-            let filename = `document_${documentId}.pdf`;
-            if (contentDisposition) {
-                const filenameMatch = contentDisposition.match(/filename="?(.+)"?/i);
-                if (filenameMatch && filenameMatch.length === 2) {
-                    filename = filenameMatch[1];
-                }
+            // Open PDF in a new tab
+            const pdfWindow = window.open(blobUrl, '_blank');
+            if (pdfWindow) {
+                pdfWindow.focus(); // Optional: Bring the new tab to the forefront
+            } else {
+                // Fallback for browsers that block popups, though less common for user-initiated actions
+                toast.current?.show({ severity: 'warn', summary: 'Popup Blocked', detail: 'Could not open PDF in a new tab. Please check your popup blocker settings.', life: 5000 });
+                // As a fallback, you could re-enable the old download behavior here if desired
+                // const link = document.createElement('a');
+                // link.href = blobUrl;
+                // const contentDisposition = response.headers['content-disposition'];
+                // let filename = `document_${documentId}.pdf`;
+                // if (contentDisposition) {
+                //     const filenameMatch = contentDisposition.match(/filename="?(.+)"?/i);
+                //     if (filenameMatch && filenameMatch.length === 2) {
+                //         filename = filenameMatch[1];
+                //     }
+                // }
+                // link.download = filename;
+                // document.body.appendChild(link);
+                // link.click();
+                // document.body.removeChild(link);
             }
-            link.download = filename;
+            // Revoke the object URL after a short delay to ensure the new tab has loaded it
+            setTimeout(() => window.URL.revokeObjectURL(blobUrl), 100);
 
-            document.body.appendChild(link);
-            link.click();
-            document.body.removeChild(link);
-            window.URL.revokeObjectURL(link.href);
         } catch (error) {
             console.error("Error downloading PDF:", error);
+            const errorMsg = error.response?.data?.detail || error.message || "An unknown error occurred.";
+            toast.current?.show({ severity: 'error', summary: 'Download Failed', detail: `Could not download PDF. ${errorMsg}`, life: 5000 });
         } finally {
             setIsDownloadingPdf(false);
         }
