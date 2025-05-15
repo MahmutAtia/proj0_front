@@ -143,32 +143,39 @@ const ManualEditDialog = ({
         <Dialog
             header={getTitle()}
             visible={visible}
-            style={{ width: '70vw', maxWidth: '900px' }}
+            style={{ width: '70vw', maxWidth: '900px', maxHeight: '85vh' }}
             breakpoints={{ '960px': '80vw', '641px': '95vw' }}
             modal
             onHide={onHide}
             footer={footer}
+            contentStyle={{ display: 'flex', flexDirection: 'column', overflow: 'hidden' }}
         >
-            {section?.type === 'paragraph' && (
-                <div className="field mb-3">
-                    <label htmlFor="paragraphEdit" className="block mb-1 font-medium">Paragraph Text</label>
-                    <InputTextarea
-                        id="paragraphEdit"
-                        value={editText}
-                        onChange={(e) => setEditText(e.target.value)}
-                        rows={10}
-                        className="w-full mt-1"
-                        autoFocus
-                    />
-                </div>
-            )}
-            {(section?.type === 'header' || section?.type === 'footer') && (
-                <div className="formgrid grid p-fluid mb-3">
-                    {Object.entries(editData).map(([key, value]) => renderField(key, value))}
-                </div>
-            )}
+            <div style={{ flexGrow: 1, overflowY: 'auto', paddingRight: '0.5em' }}>
+                {section?.type === 'paragraph' && (
+                    <div className="field mb-3">
+                        <label htmlFor="paragraphEdit" className="block mb-1 font-medium">Paragraph Text</label>
+                        <InputTextarea
+                            id="paragraphEdit"
+                            value={editText}
+                            onChange={(e) => setEditText(e.target.value)}
+                            rows={10}
+                            className="w-full mt-1"
+                            autoFocus
+                            style={{ fontSize: '1.1em', minHeight: '200px' }}
+                        />
+                    </div>
+                )}
+                {(section?.type === 'header' || section?.type === 'footer') && (
+                    <div className="formgrid grid p-fluid mb-3">
+                        {Object.entries(editData).map(([key, value]) => renderField(key, value))}
+                    </div>
+                )}
+            </div>
 
-            <div className="mt-4 p-3 border-top-1 surface-border">
+            <div
+                className="mt-3 p-3 border-top-1 surface-border"
+                style={{ flexShrink: 0 }}
+            >
                 <h5 className="mb-2">AI Assistant</h5>
                 <AIAssistant
                     prompt={aiPrompt}
