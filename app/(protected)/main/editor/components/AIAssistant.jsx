@@ -204,23 +204,32 @@ const AIAssistant = ({ prompt = "", setPrompt, onSubmit, isProcessing }) => {
         }
     };
 
-    const footerContent = (
-        <div className={styles.dialogFooter}>
-            <Button
-                label="Done"
-                icon="pi pi-check"
-                className={styles.doneButton}
-                onClick={() => {
-                    if (recognition) {
-                        // Set the manual stop flag
-                        recognition._manualStop = true;
-                        recognition.stop();
-                    }
-                }}
-            />
-        </div>
-    );
-
+const footerContent = (
+    <div className={styles.dialogFooter}>
+        <Button
+            label="Cancel"
+            icon="pi pi-times"
+            className={styles.cancelButton}
+            onClick={() => {
+                if (recognition) {
+                    recognition._manualStop = true;
+                    recognition.stop();
+                }
+            }}
+        />
+        <Button
+            label="Done"
+            icon="pi pi-check"
+            className={styles.doneButton}
+            onClick={() => {
+                if (recognition) {
+                    recognition._manualStop = true;
+                    recognition.stop();
+                }
+            }}
+        />
+    </div>
+);
     return (
         <>
             <div className={styles.aiAssistantContainer}>
@@ -287,22 +296,8 @@ const AIAssistant = ({ prompt = "", setPrompt, onSubmit, isProcessing }) => {
             <Dialog
                 visible={isListening}
                 className={styles.voiceDialog}
-                showHeader={true}
-                header={
-                    <div className={styles.dialogCustomHeader}>
-                        <span>Voice Input</span>
-                        <Button
-                            icon="pi pi-times"
-                            className={styles.closeButton}
-                            onClick={() => {
-                                if (recognition) {
-                                    recognition._manualStop = true;
-                                    recognition.stop();
-                                }
-                            }}
-                        />
-                    </div>
-                }
+                showHeader={false} // Changed to false to use custom header
+                header={null}
                 dismissableMask={false}
                 closeOnEscape={true}
                 onEscape={() => {
@@ -321,8 +316,21 @@ const AIAssistant = ({ prompt = "", setPrompt, onSubmit, isProcessing }) => {
                 footer={footerContent}
             >
                 <div className={styles.voiceDialogContent}>
-                    {/* Redesigned header with better visual appeal */}
+                    {/* Visualizer with integrated header */}
                     <div className={styles.voiceVisualizer}>
+                        <div className={styles.customDialogHeader}>
+                            <span>Voice Recognition</span>
+                            <Button
+                                icon="pi pi-times"
+                                className={styles.closeButton}
+                                onClick={() => {
+                                    if (recognition) {
+                                        recognition._manualStop = true;
+                                        recognition.stop();
+                                    }
+                                }}
+                            />
+                        </div>
                         <div className={styles.microphoneContainer}>
                             <i className="pi pi-microphone"></i>
                             <div className={styles.visualizerWaves}>
@@ -331,12 +339,10 @@ const AIAssistant = ({ prompt = "", setPrompt, onSubmit, isProcessing }) => {
                         </div>
                     </div>
 
-                    <div className={styles.dialogHeader}>
-                        <h2>Voice Recognition</h2>
-                        <div className={styles.languageDisplay}>
-                            <i className="pi pi-globe"></i>
-                            <span>{selectedLanguage.flag} {selectedLanguage.name}</span>
-                        </div>
+                    {/* Language display - Keep this */}
+                    <div className={styles.languageDisplay}>
+                        <i className="pi pi-globe"></i>
+                        <span>{selectedLanguage.flag} {selectedLanguage.name}</span>
                     </div>
 
                     {/* Enhanced transcript area with better separations */}

@@ -160,9 +160,13 @@
 
 /* Main dialog styling */
 .voiceDialog {
-  border-radius: 12px !important;
+  border-radius: 16px !important; /* Slightly larger radius for a softer look */
   overflow: hidden !important;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2) !important;
+  /* A more nuanced shadow for depth */
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.07),
+              0 6px 16px rgba(0, 0, 0, 0.07),
+              0 12px 28px rgba(0, 0, 0, 0.07) !important;
+  border: 1px solid var(--surface-200) !important; /* Optional: adds a subtle border */
 }
 
 .voiceDialog > div {
@@ -252,37 +256,17 @@
 }
 
 /* Dialog header with title and language */
-.dialogHeader {
-  padding: 20px 24px 10px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  text-align: center;
-  border-bottom: 1px solid var(--surface-200);
-}
-
-.dialogHeader h2 {
-  margin: 0 0 8px;
-  font-weight: 600;
-  font-size: 1.5rem;
-  color: var(--text-color);
-}
-
 .languageDisplay {
+  margin: 20px auto 12px; /* Adjusted margin for better spacing */
   display: flex;
   align-items: center;
   gap: 8px;
-  padding: 6px 12px;
+  padding: 8px 14px; /* Slightly more padding */
   background-color: var(--surface-100);
   border-radius: 20px;
   font-size: 0.9rem;
   color: var(--text-color-secondary);
-  margin-bottom: 10px;
-}
-
-.languageDisplay i {
-  font-size: 0.9rem;
-  color: var(--primary-500);
+  border: 1px solid var(--surface-200); /* Subtle border for definition */
 }
 
 /* Add these styles for the custom header */
@@ -302,16 +286,47 @@
 }
 
 .closeButton {
-  width: 32px !important;
-  height: 32px !important;
-  background: transparent !important;
+  width: 36px !important; /* Slightly larger */
+  height: 36px !important; /* Slightly larger */
+  background: rgba(255, 255, 255, 0.15) !important; /* Slightly less transparent */
   border: none !important;
-  color: var(--text-color-secondary) !important;
+  color: white !important;
+  border-radius: 50% !important; /* Fully rounded */
+  transition: all 0.25s ease-out !important; /* Smoother transition */
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
 }
 
 .closeButton:hover {
-  background: var(--surface-200) !important;
-  color: var(--text-color) !important;
+  background: rgba(255, 255, 255, 0.3) !important;
+  transform: scale(1.1) rotate(90deg); /* Added rotation and slightly more scale */
+  box-shadow: 0 0 10px rgba(255,255,255,0.3);
+}
+
+.closeButton:active {
+  background: rgba(255, 255, 255, 0.2) !important;
+  transform: scale(1) rotate(45deg); /* Adjusted active state */
+}
+
+/* Custom header styling */
+.customDialogHeader {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 16px;
+  z-index: 5;
+}
+
+.customDialogHeader span {
+  color: white;
+  font-weight: 600;
+  font-size: 1.2rem;
+  text-shadow: 0 1px 2px rgba(0,0,0,0.2);
 }
 
 /* Transcript container styling */
@@ -358,13 +373,7 @@
   background-color: var(--surface-50);
   border-radius: 10px;
   padding: 12px 16px;
-}
-
-.listeningIndicator {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  min-height: 60px;
+  border: 1px solid var(--surface-200); /* Add a subtle border for consistency */
 }
 
 /* Sound wave animation in listening indicator */
@@ -448,10 +457,11 @@
 
 /* Dialog footer */
 .dialogFooter {
-  padding: 12px 24px !important;
   display: flex;
-  justify-content: center !important;
-  background-color: var(--surface-50) !important;
+  justify-content: flex-end !important;
+  gap: 12px;
+  padding: 16px 24px !important; /* Increased padding for more breathing room */
+  background-color: var(--surface-ground) !important; /* Use surface-ground for slight differentiation */
   border-top: 1px solid var(--surface-200) !important;
 }
 
@@ -459,7 +469,7 @@
   background: var(--primary-500) !important;
   border: none !important;
   border-radius: 20px !important;
-  min-width: 120px !important;
+  min-width: 100px !important;
   font-weight: 600 !important;
   box-shadow: 0 2px 6px rgba(0, 104, 231, 0.2) !important;
   transition: all 0.2s !important;
@@ -469,6 +479,20 @@
   background: var(--primary-600) !important;
   transform: translateY(-1px) !important;
   box-shadow: 0 4px 8px rgba(0, 104, 231, 0.3) !important;
+}
+
+.cancelButton {
+  background: var(--surface-200) !important;
+  border: none !important;
+  border-radius: 20px !important;
+  min-width: 100px !important;
+  color: var(--text-color) !important;
+  font-weight: 600 !important;
+  transition: all 0.2s !important;
+}
+
+.cancelButton:hover {
+  background: var(--surface-300) !important;
 }
 
 /* Animations */
