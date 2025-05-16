@@ -329,7 +329,7 @@ export default function CreatePortfolioPage({params}) {
                 <div className={`surface-card p-3 sm:p-5 shadow-2 border-round w-full mx-auto ${styles.contentWrapper}`}>
                     <div className="text-center mb-5">
                         <h1 className="text-3xl md:text-4xl font-bold text-gray-800">Customize Your Portfolio</h1>
-                        <p className="text-gray-600 text-lg">Follow the steps to define your website's unique style.</p>
+                        <p className="text-gray-600 text-lg">Follow the steps to define your website&apos;s unique style.</p>
                     </div>
 
                     {/* Hint/Warning Message */}

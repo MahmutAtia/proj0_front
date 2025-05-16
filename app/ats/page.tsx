@@ -14,7 +14,7 @@ import { Dropdown, DropdownChangeEvent } from 'primereact/dropdown';
 import { Message } from 'primereact/message';
 import { Divider } from 'primereact/divider';
 import { motion, AnimatePresence } from 'framer-motion';
-import ReactMarkdown from 'react-markdown';
+import ReactMarkdown, { Components } from 'react-markdown';
 import { signIn, useSession } from 'next-auth/react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import styles from './ats.module.css';
@@ -746,7 +746,13 @@ const ATSCheckerPage = () => {
                                     p: ({ node, ...props }) => <p className="mb-2 leading-normal" {...props} />,
                                     ul: ({ node, ...props }) => <ul className="list-disc pl-5 mb-3" {...props} />,
                                     li: ({ node, ...props }) => <li className="mb-1" {...props} />,
-                                    code: ({ node, inline, className, children, ...props }) => {
+                                    code: ({ node, inline, className, children, ...props }: {
+                                        node?: any;
+                                        inline?: boolean;
+                                        className?: string;
+                                        children?: React.ReactNode;
+                                        [key: string]: any;
+                                    }) => {
                                         const match = /language-(\w+)/.exec(className || '');
                                         return !inline ? (
                                             <pre className={styles.codeBlock} {...props}><code>{children}</code></pre>

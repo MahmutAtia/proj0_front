@@ -1,22 +1,21 @@
-import { NextApiRequest, NextApiResponse } from 'next'
-import { getSession } from 'next-auth/react'
-import axios from 'axios'
+import { NextResponse } from 'next/server';
+import { getServerSession } from 'next-auth/next';
+import { authOptions } from '../[...nextauth]/options';
+import axios from 'axios';
 
-async function handler(req: NextApiRequest, res: NextApiResponse) {
+export async function GET() {
     console.log("GET /api/auth/user");
 
-
     try {
-        const session = await getSession({ req });
+        const session = await getServerSession(authOptions);
         console.log("session", session);
 
-        if (!session) {
-            return res.status(401).json({ error: 'Unauthorized' });
+        if (!session || !session.accessToken) {
+            return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
         }
 
-
         const { data } = await axios.get(
-            `${process.env.BACKEND_URL}/accounts/user`,
+            `${process.env.NEXTAUTH_BACKEND_URL}/accounts/user`,
             {
                 headers: {
                     Authorization: `Bearer ${session.accessToken}`,
@@ -25,15 +24,12 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
             }
         );
 
-        return res.status(200).json(data);
-
-    } catch (error) {
+        return NextResponse.json(data);
+    } catch (error: any) {
         console.error('Error fetching user:', error);
-        return res.status(500).json({
+        return NextResponse.json({
             error: 'Failed to fetch user data',
             details: error.message,
-        });
+        }, { status: 500 });
     }
 }
-
-export const GET = handler;

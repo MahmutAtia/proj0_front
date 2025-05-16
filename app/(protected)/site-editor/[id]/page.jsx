@@ -594,7 +594,6 @@ const PersonalSiteEditorPage = ({ params }) => {
                                             }
                                         });
 
-                                        // eslint-disable-next-line @typescript-eslint/no-unused-vars
                                         const _ = body.offsetHeight;
 
                                         const contentHeight = Math.max(
@@ -614,7 +613,6 @@ const PersonalSiteEditorPage = ({ params }) => {
                                             item.element.style.height = item.height;
                                         });
 
-                                        // eslint-disable-next-line @typescript-eslint/no-unused-vars
                                         const __ = body.offsetHeight;
                                         iWindow.dispatchEvent(new Event('resize'));
                                         iWindow.dispatchEvent(new Event('scroll'));
