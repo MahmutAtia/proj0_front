@@ -35,7 +35,7 @@ const SidebarLogo = ({ collapsed }) => (
 );
 
 const SidebarNav = ({ items, currentPath, router, collapsed }) => (
-    <div className="flex-grow-1 overflow-y-auto py-3" style={{ scrollbarWidth: 'thin' }}>
+    <div>
         <ul className="list-none p-3 m-0">
             {items.map(item => (
                 <li key={item.label}>
@@ -338,25 +338,28 @@ const DashboardPage = () => {
     };
 
     return (
-        <div className={`${styles.dashboardLayout} flex min-h-screen overflow-hidden`}>
+        <div className={`${styles.dashboardLayout}`}>
             <Toast ref={toast} />
 
             {/* Sidebar */}
             <div
                 ref={sidebarRef}
-                className={`${styles.sidebar} ${sidebarCollapsed ? styles.sidebarCollapsed : ''} shadow-2 flex-shrink-0 hidden lg:flex lg:flex-column fixed lg:sticky`}
-                style={{ width: sidebarCollapsed ? '80px' : '280px', top: '0', height: '100vh' }}
+                className={`${styles.sidebar} ${sidebarCollapsed ? styles.sidebarCollapsed : ''} shadow-2 flex-shrink-0 hidden lg:flex lg:flex-column`}
+                style={{ width: sidebarCollapsed ? '80px' : '280px' }}
             >
                 <SidebarLogo collapsed={sidebarCollapsed} />
-                <div className="flex-grow-1 overflow-hidden flex flex-column">
+
+                {/* Scrollable sidebar nav area */}
+                <div className={`${styles.sidebarNavContainer} ${styles.sidebarScrollbar}`}>
                     <SidebarNav
                         items={sidebarNavItems}
                         currentPath={router.pathname}
                         router={router}
                         collapsed={sidebarCollapsed}
                     />
-                    <SidebarFooter router={router} collapsed={sidebarCollapsed} />
                 </div>
+
+                <SidebarFooter router={router} collapsed={sidebarCollapsed} />
             </div>
 
             {/* Main Content */}
@@ -372,7 +375,8 @@ const DashboardPage = () => {
                     sidebarCollapsed={sidebarCollapsed}
                 />
 
-                <main className="flex-grow-1 overflow-y-auto p-4 lg:p-6">
+                {/* This is the ONLY scrollable main area */}
+                <div className={`${styles.mainScrollArea} ${styles.mainScrollbar}`}>
                     <WelcomeBanner userName={session?.user?.name} />
                     <QuickActionsGrid actions={quickActions} router={router} />
 
@@ -415,7 +419,7 @@ const DashboardPage = () => {
                             </div>
                         </div>
                     </div>
-                </main>
+                </div>
             </div>
         </div>
     );
