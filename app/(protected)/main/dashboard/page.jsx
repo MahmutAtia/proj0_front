@@ -135,7 +135,7 @@ const TopBar = ({ session, userMenuRef, userMenuItems, sidebarRef, onToggleSideb
 const WelcomeBanner = ({ userName }) => (
     <div className="mb-6">
         <h1 className={styles.pageHeader}>Welcome back, {userName || "User"}!</h1>
-        <p className={styles.pageSubheader}>Here's your career dashboard overview.</p>
+        <p className={styles.pageSubheader}>Here&apos;s your career dashboard overview.</p>
     </div>
 );
 
