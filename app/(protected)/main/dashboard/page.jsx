@@ -16,7 +16,7 @@ import { InputText } from 'primereact/inputtext';
 import { IoSparkles } from "react-icons/io5";
 import {
     FiGrid, FiFileText, FiBriefcase, FiGlobe, FiCheckSquare, FiAward, FiSettings,
-    FiLogOut, FiBell, FiSearch, FiChevronDown, FiUser, FiStar, FiEdit, 
+    FiLogOut, FiBell, FiSearch, FiChevronDown, FiUser, FiStar, FiEdit,
     FiList, FiFolder, FiInfo, FiMenu, FiChevronLeft, FiChevronRight
 } from 'react-icons/fi';
 import styles from './Dashboard.module.css';
@@ -96,26 +96,26 @@ const TopBar = ({ session, userMenuRef, userMenuItems, sidebarRef, onToggleSideb
                 tooltip={sidebarCollapsed ? "Expand Sidebar" : "Collapse Sidebar"}
                 tooltipOptions={{ position: 'bottom' }}
             />
-            
+
             <div className="p-input-icon-left w-full max-w-30rem hidden md:block ml-3">
                 <i className="pi pi-search" />
                 <InputText className="w-full" placeholder="Search dashboard..." />
             </div>
         </div>
-        
+
         <div className="flex align-items-center gap-3">
-            <Button 
-                icon={<FiBell size={20} />} 
+            <Button
+                icon={<FiBell size={20} />}
                 className="p-button-rounded p-button-text p-button-plain"
-                badge="2" 
+                badge="2"
                 badgeClassName="p-badge-danger"
             />
             <div className="flex align-items-center gap-2 cursor-pointer p-3 border-round hover:surface-100 transition-colors transition-duration-150" onClick={(e) => userMenuRef.current.toggle(e)}>
-                <Avatar 
+                <Avatar
                     image={session?.user?.image || undefined}
-                    label={session?.user?.name ? session.user.name.charAt(0).toUpperCase() : "U"} 
-                    shape="circle" 
-                    className="bg-primary" 
+                    label={session?.user?.name ? session.user.name.charAt(0).toUpperCase() : "U"}
+                    shape="circle"
+                    className="bg-primary"
                 />
                 <span className="font-medium hidden md:inline">{session?.user?.name || "User"}</span>
                 <FiChevronDown className="text-600" />
@@ -172,7 +172,7 @@ const DefaultResumeDisplay = ({ resume, onSetDefault, onEdit, onViewAll, router 
                 />
             )}
         </div>
-        
+
         {resume ? (
             <div>
                 <div className="mb-3">
@@ -228,7 +228,7 @@ const FeedCard = ({ title, items, viewAllLink, router, emptyMessage = "No items 
             <h3 className="text-xl font-bold m-0">{title}</h3>
             {viewAllLink && <Button label="View All" icon="pi pi-arrow-right" iconPos="right" className="p-button-text p-button-sm" onClick={() => router.push(viewAllLink)} />}
         </div>
-        
+
         {items.length > 0 ? (
             <ul className="list-none p-0 m-0">
                 {items.map(item => (
@@ -335,24 +335,24 @@ const DashboardPage = () => {
             <Toast ref={toast} />
 
             {/* Sidebar */}
-            <div 
-                ref={sidebarRef} 
-                className={`${styles.sidebar} ${sidebarCollapsed ? styles.sidebarCollapsed : ''} shadow-2 flex-shrink-0 hidden lg:flex lg:flex-column fixed lg:sticky`} 
+            <div
+                ref={sidebarRef}
+                className={`${styles.sidebar} ${sidebarCollapsed ? styles.sidebarCollapsed : ''} shadow-2 flex-shrink-0 hidden lg:flex lg:flex-column fixed lg:sticky`}
                 style={{ width: sidebarCollapsed ? '80px' : '280px', top: '0', height: '100vh' }}
             >
                 <SidebarLogo collapsed={sidebarCollapsed} />
-                <SidebarNav 
-                    items={sidebarNavItems} 
-                    currentPath={router.pathname} 
-                    router={router} 
-                    collapsed={sidebarCollapsed} 
+                <SidebarNav
+                    items={sidebarNavItems}
+                    currentPath={router.pathname}
+                    router={router}
+                    collapsed={sidebarCollapsed}
                 />
                 <SidebarFooter router={router} collapsed={sidebarCollapsed} />
             </div>
 
             {/* Main Content */}
-            <div 
-                className={`${styles.mainContent} ${sidebarCollapsed ? styles.mainContentExpanded : ''} flex flex-column flex-grow-1`} 
+            <div
+                className={`${styles.mainContent} ${sidebarCollapsed ? styles.mainContentExpanded : ''} flex flex-column flex-grow-1`}
             >
                 <TopBar
                     session={session}
