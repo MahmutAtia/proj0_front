@@ -3,11 +3,24 @@
 }
 
 .sidebar {
-    background-color: var(--surface-overlay);
-    transition: transform 0.3s ease-in-out, width 0.3s ease-in-out;
+    background: linear-gradient(180deg, var(--surface-overlay) 0%, var(--surface-card) 100%);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     border-right: 1px solid var(--surface-border);
-    box-shadow: 0 3px 5px rgba(0,0,0,.02), 0 0 2px rgba(0,0,0,.05), 0 1px 4px rgba(0,0,0,.08);
+    box-shadow: 0 4px 10px rgba(0,0,0,.03), 0 0 2px rgba(0,0,0,.06);
     z-index: 999;
+    position: relative;
+    overflow-x: hidden;
+}
+
+.sidebar::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 4px;
+    height: 100%;
+    background: linear-gradient(180deg, var(--primary-color) 0%, var(--primary-color-shade) 100%);
+    opacity: 0.7;
 }
 
 .sidebarCollapsed {
@@ -43,55 +56,82 @@
     align-items: center;
     cursor: pointer;
     padding: 0.85rem 1.25rem;
-    border-radius: 8px;
+    border-radius: 10px;
     color: var(--text-color-secondary);
-    transition: all 0.2s;
-    margin-bottom: 0.35rem;
-    width: calc(100% - 1.5rem);
+    transition: all 0.2s ease;
+    margin-bottom: 0.5rem;
+    width: calc(100% - 1.75rem);
     margin-left: auto;
     margin-right: auto;
     text-align: left;
     background-color: transparent;
     border: none;
+    position: relative;
 }
 
 .sidebarLink:hover {
     background-color: rgba(var(--primary-color-rgb), 0.04);
     color: var(--primary-color);
-    transform: translateY(-1px);
+    transform: translateY(-2px);
+    box-shadow: 0 2px 5px rgba(0,0,0,0.05);
 }
 
 .sidebarLinkIcon {
     margin-right: 1rem;
     font-size: 1.25rem;
     min-width: 20px;
+    transition: all 0.2s;
 }
 
 .sidebarLinkText {
     font-weight: 500;
-    font-size: 0.9rem;
+    font-size: 0.95rem;
+    transition: all 0.2s;
 }
 
 .sidebarItemActive {
-    background-color: var(--primary-50) !important;
-    color: var(--primary-600) !important;
+    background: linear-gradient(
+        90deg,
+        rgba(var(--primary-color-rgb), 0.08) 0%,
+        rgba(var(--primary-color-rgb), 0.15) 100%
+    ) !important;
+    color: var(--primary-700) !important;
+    font-weight: 600;
+}
+
+.sidebarItemActive::before {
+    content: '';
+    position: absolute;
+    left: -7px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 4px;
+    height: 65%;
+    background: var(--primary-color);
+    border-radius: 0 5px 5px 0;
 }
 
 .sidebarItemActive .sidebarLinkIcon,
 .sidebarItemActive .sidebarLinkText {
-    color: var(--primary-color) !important;
+    color: var(--primary-700) !important;
 }
 
 .sidebarItemActive:hover {
-    background-color: var(--primary-100) !important;
+    background: linear-gradient(
+        90deg,
+        rgba(var(--primary-color-rgb), 0.12) 0%,
+        rgba(var(--primary-color-rgb), 0.2) 100%
+    ) !important;
 }
 
+/* Logo styling improvements */
 .logo {
     display: flex;
     align-items: center;
     text-decoration: none;
     color: var(--text-color);
     transition: all 0.3s;
+    height: 70px; /* Match the toolbar height */
 }
 
 .logoIconContainer {
@@ -101,17 +141,24 @@
     margin-right: 0.75rem;
     color: var(--primary-color);
     transition: all 0.3s;
+    width: 40px;
+    height: 40px;
+    background: rgba(var(--primary-color-rgb), 0.1);
+    border-radius: 10px;
 }
 
 .logoIcon {
-    font-size: 2.25rem;
+    font-size: 1.75rem;
 }
 
 .logoText {
-    font-size: 1.5rem;
+    font-size: 1.35rem;
     font-weight: 600;
-    letter-spacing: 0px;
-    color: var(--text-color);
+    letter-spacing: 0.5px;
+    background: linear-gradient(120deg, var(--text-color) 0%, var(--primary-color) 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
 }
 
 .mainContent {
@@ -120,19 +167,76 @@
     transition: all 0.3s ease;
 }
 
+/* Improved Topbar */
 .topbar {
-    background-color: var(--surface-card);
+    background: linear-gradient(to right, var(--surface-card), var(--surface-ground), var(--surface-card));
     height: 70px;
     border-bottom: 1px solid var(--surface-border);
-    padding-left: 1.5rem;
-    padding-right: 1.5rem;
-    box-shadow: 0 2px 4px rgba(0,0,0,.03);
+    padding: 0 1.75rem;
+    box-shadow: 0 2px 10px rgba(0,0,0,.025);
+    display: flex;
+    align-items: center;
 }
 
 .toggleButton {
     width: 2.5rem;
     height: 2.5rem;
+    transition: all 0.2s;
+    background-color: rgba(var(--primary-color-rgb), 0.05);
+    color: var(--primary-600);
+    border-radius: 8px;
+}
+
+.toggleButton:hover {
+    background-color: rgba(var(--primary-color-rgb), 0.1);
+    transform: scale(1.05);
+}
+
+.searchInput {
+    border-radius: 20px !important;
+    background-color: var(--surface-ground) !important;
+    border-color: var(--surface-border) !important;
     transition: all 0.3s;
+    box-shadow: inset 0 1px 3px rgba(0,0,0,0.04);
+}
+
+.searchInput:hover, .searchInput:focus {
+    background-color: var(--surface-section) !important;
+    border-color: var(--primary-400) !important;
+    box-shadow: 0 0 0 2px rgba(var(--primary-color-rgb), 0.1);
+}
+
+.profileButton {
+    transition: all 0.2s;
+    border-radius: 10px;
+    background-color: var(--surface-ground);
+    padding: 0.5rem 1rem;
+}
+
+.profileButton:hover {
+    background-color: rgba(var(--primary-color-rgb), 0.08);
+}
+
+/* Notification badge improvements */
+.notificationButton {
+    position: relative;
+}
+
+.notificationBadge {
+    position: absolute;
+    top: -2px;
+    right: -2px;
+    background-color: var(--primary-color);
+    color: var(--primary-color-text);
+    font-size: 0.65rem;
+    font-weight: 700;
+    padding: 0 0.35rem;
+    min-width: 1.25rem;
+    height: 1.25rem;
+    border-radius: 1.25rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
 .quickActionCard {
@@ -267,4 +371,21 @@
     .pageSubheader {
         margin-bottom: 1.5rem;
     }
+}
+
+/* Mobile sidebar overlay */
+.sidebarMobileOverlay {
+    position: fixed;
+    left: 0;
+    top: 0;
+    height: 100vh;
+    width: 280px !important;
+    z-index: 1000;
+    animation: slideInDrawer 0.3s forwards cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: 0 0 15px rgba(0,0,0,0.1), 0 0 5px rgba(0,0,0,0.1);
+}
+
+@keyframes slideInDrawer {
+    from { transform: translateX(-100%); }
+    to { transform: translateX(0); }
 }

@@ -24,7 +24,7 @@ import styles from './Dashboard.module.css';
 // --- Child Components (defined in the same file) ---
 
 const SidebarLogo = ({ collapsed }) => (
-    <div className={`flex align-items-center ${collapsed ? 'justify-content-center' : ''} px-4 py-5`}>
+    <div className={`border-bottom-1 surface-border ${collapsed ? 'justify-content-center' : ''} px-4 flex align-items-center`}>
         <Link href="/main/dashboard" className={styles.logo}>
             <div className={styles.logoIconContainer}>
                 <IoSparkles className={styles.logoIcon} />
@@ -35,7 +35,7 @@ const SidebarLogo = ({ collapsed }) => (
 );
 
 const SidebarNav = ({ items, currentPath, router, collapsed }) => (
-    <div className="overflow-y-auto">
+    <div className="overflow-y-auto mt-2">
         <ul className="list-none p-3 m-0">
             {items.map(item => (
                 <li key={item.label}>
@@ -76,11 +76,11 @@ const SidebarFooter = ({ router, collapsed }) => (
 );
 
 const TopBar = ({ session, userMenuRef, userMenuItems, sidebarRef, onToggleSidebar, sidebarCollapsed }) => (
-    <div className={`${styles.topbar} surface-card shadow-1 p-3 flex justify-content-between align-items-center sticky top-0 z-5`}>
-        <div className="flex align-items-center">
+    <div className={`${styles.topbar} surface-card shadow-1 flex justify-content-between align-items-center sticky top-0 z-5`}>
+        <div className="flex align-items-center gap-3">
             <Button
                 icon={<FiMenu size={20} />}
-                className="p-button-rounded p-button-text p-button-plain mr-3 lg:hidden"
+                className="p-button-rounded p-button-text p-button-plain mr-2 lg:hidden"
                 onClick={() => {
                     const sidebar = sidebarRef.current;
                     if (sidebar) {
@@ -91,7 +91,7 @@ const TopBar = ({ session, userMenuRef, userMenuItems, sidebarRef, onToggleSideb
             />
             <Button
                 icon={sidebarCollapsed ? <FiChevronRight size={18} /> : <FiChevronLeft size={18} />}
-                className={`${styles.toggleButton} p-button-rounded p-button-text p-button-plain hidden lg:inline-flex`}
+                className={`${styles.toggleButton} p-button-text hidden lg:inline-flex`}
                 onClick={onToggleSidebar}
                 tooltip={sidebarCollapsed ? "Expand Sidebar" : "Collapse Sidebar"}
                 tooltipOptions={{ position: 'bottom' }}
@@ -99,28 +99,36 @@ const TopBar = ({ session, userMenuRef, userMenuItems, sidebarRef, onToggleSideb
 
             <div className="p-input-icon-left w-full max-w-30rem hidden md:block ml-3">
                 <i className="pi pi-search" />
-                <InputText className="w-full" placeholder="Search dashboard..." />
+                <InputText
+                    className={`w-full ${styles.searchInput}`}
+                    placeholder="Search dashboard..."
+                />
             </div>
         </div>
 
         <div className="flex align-items-center gap-3">
-            <Button
-                icon={<FiBell size={20} />}
-                className="p-button-rounded p-button-text p-button-plain"
-                badge="2"
-                badgeClassName="p-badge-danger"
-            />
-            <div className="flex align-items-center gap-2 cursor-pointer p-3 border-round hover:surface-100 transition-colors transition-duration-150" onClick={(e) => userMenuRef.current.toggle(e)}>
+            <div className={styles.notificationButton}>
+                <Button
+                    icon={<FiBell size={20} />}
+                    className="p-button-rounded p-button-text"
+                />
+                <span className={styles.notificationBadge}>2</span>
+            </div>
+            <div
+                className={`${styles.profileButton} flex align-items-center gap-2 cursor-pointer`}
+                onClick={(e) => userMenuRef.current.toggle(e)}
+            >
                 <Avatar
                     image={session?.user?.image || undefined}
                     label={session?.user?.name ? session.user.name.charAt(0).toUpperCase() : "U"}
                     shape="circle"
                     className="bg-primary"
+                    style={{ width: '2.2rem', height: '2.2rem' }}
                 />
                 <span className="font-medium hidden md:inline">{session?.user?.name || "User"}</span>
                 <FiChevronDown className="text-600" />
             </div>
-            <Menu model={userMenuItems} popup ref={userMenuRef} id="user_menu" />
+            <Menu model={userMenuItems} popup ref={userMenuRef} id="user_menu" className="shadow-4" />
         </div>
     </div>
 );
