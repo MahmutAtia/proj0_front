@@ -35,7 +35,7 @@ const SidebarLogo = ({ collapsed }) => (
 );
 
 const SidebarNav = ({ items, currentPath, router, collapsed }) => (
-    <div className="overflow-y-auto mt-2">
+    <div className="flex-grow-1 overflow-y-auto py-3" style={{ scrollbarWidth: 'thin' }}>
         <ul className="list-none p-3 m-0">
             {items.map(item => (
                 <li key={item.label}>
@@ -76,7 +76,7 @@ const SidebarFooter = ({ router, collapsed }) => (
 );
 
 const TopBar = ({ session, userMenuRef, userMenuItems, sidebarRef, onToggleSidebar, sidebarCollapsed }) => (
-    <div className={`${styles.topbar} surface-card shadow-1 flex justify-content-between align-items-center sticky top-0 z-5`}>
+    <div className={`${styles.topbar} flex justify-content-between align-items-center sticky top-0 z-5`}>
         <div className="flex align-items-center gap-3">
             <Button
                 icon={<FiMenu size={20} />}
@@ -97,23 +97,22 @@ const TopBar = ({ session, userMenuRef, userMenuItems, sidebarRef, onToggleSideb
                 tooltipOptions={{ position: 'bottom' }}
             />
 
-            <div className="p-input-icon-left w-full max-w-30rem hidden md:block ml-3">
+            <div className={`${styles.searchContainer} p-input-icon-left hidden md:block ml-3`}>
                 <i className="pi pi-search" />
                 <InputText
-                    className={`w-full ${styles.searchInput}`}
+                    className={`${styles.searchInput}`}
                     placeholder="Search dashboard..."
                 />
             </div>
         </div>
 
         <div className="flex align-items-center gap-3">
-            <div className={styles.notificationButton}>
-                <Button
-                    icon={<FiBell size={20} />}
-                    className="p-button-rounded p-button-text"
-                />
-                <span className={styles.notificationBadge}>2</span>
-            </div>
+            <Button
+                icon={<FiBell size={20} />}
+                className={`${styles.iconButton} p-button-rounded p-button-text`}
+                badge="2"
+                badgeClassName="p-badge-danger"
+            />
             <div
                 className={`${styles.profileButton} flex align-items-center gap-2 cursor-pointer`}
                 onClick={(e) => userMenuRef.current.toggle(e)}
@@ -122,7 +121,7 @@ const TopBar = ({ session, userMenuRef, userMenuItems, sidebarRef, onToggleSideb
                     image={session?.user?.image || undefined}
                     label={session?.user?.name ? session.user.name.charAt(0).toUpperCase() : "U"}
                     shape="circle"
-                    className="bg-primary"
+                    className={styles.profileAvatar}
                     style={{ width: '2.2rem', height: '2.2rem' }}
                 />
                 <span className="font-medium hidden md:inline">{session?.user?.name || "User"}</span>
@@ -339,7 +338,7 @@ const DashboardPage = () => {
     };
 
     return (
-        <div className={`${styles.dashboardLayout} flex min-h-screen`}>
+        <div className={`${styles.dashboardLayout} flex min-h-screen overflow-hidden`}>
             <Toast ref={toast} />
 
             {/* Sidebar */}
@@ -349,13 +348,15 @@ const DashboardPage = () => {
                 style={{ width: sidebarCollapsed ? '80px' : '280px', top: '0', height: '100vh' }}
             >
                 <SidebarLogo collapsed={sidebarCollapsed} />
-                <SidebarNav
-                    items={sidebarNavItems}
-                    currentPath={router.pathname}
-                    router={router}
-                    collapsed={sidebarCollapsed}
-                />
-                <SidebarFooter router={router} collapsed={sidebarCollapsed} />
+                <div className="flex-grow-1 overflow-hidden flex flex-column">
+                    <SidebarNav
+                        items={sidebarNavItems}
+                        currentPath={router.pathname}
+                        router={router}
+                        collapsed={sidebarCollapsed}
+                    />
+                    <SidebarFooter router={router} collapsed={sidebarCollapsed} />
+                </div>
             </div>
 
             {/* Main Content */}
