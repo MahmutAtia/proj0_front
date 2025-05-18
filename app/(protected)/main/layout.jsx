@@ -183,21 +183,15 @@ export default function Layout({ children }) {
     ];
 
     const sidebarNavItems = [
-        { label: 'Overview', icon: <FiGrid />, route: '/main/dashboard' },
+        { label: 'Overview', icon: <FiGrid />, route: '/main' },
         { label: 'Resumes', icon: <FiFileText />, route: '/main/resumes' },
         { label: 'Documents', icon: <FiBriefcase />, route: '/main/documents' },
         { label: 'My Website', icon: <FiGlobe />, route: defaultResume ? `/main/site-editor/${defaultResume.id}` : '/main/site-editor' },
-        { label: 'ATS Checker', icon: <FiCheckSquare />, route: '/main/ats-checker' },
+        { label: 'ATS Checker', icon: <FiCheckSquare />, route: '/ats' },
         { label: 'Job Feed', icon: <FiBriefcase />, route: '/main/job-feed' },
         { label: 'Scholarships', icon: <FiAward />, route: '/main/scholarship-feed' },
     ];
 
-    const quickActions = [
-        { title: "ATS Checker", icon: <FiCheckSquare />, description: "Optimize your resume for Applicant Tracking Systems.", route: '/main/ats-checker', buttonLabel: "Scan Resume" },
-        { title: "New Resume", icon: <FiFileText />, description: "Craft a new standout resume from scratch or a template.", route: '/main/resumes/new', buttonLabel: "Create Now" },
-        { title: "My Portfolio", icon: <FiGlobe />, description: "Manage and publish your personal career website.", route: defaultResume ? `/main/site-editor/${defaultResume.id}` : '/main/site-editor', buttonLabel: "Edit Site" },
-        { title: "Job Search", icon: <FiBriefcase />, description: "Discover and track relevant job opportunities.", route: '/main/job-feed', buttonLabel: "Find Jobs" },
-    ];
 
     if (status === "loading") {
         return (

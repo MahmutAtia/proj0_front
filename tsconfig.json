@@ -36,7 +36,7 @@
     "**/*.ts",
     "**/*.tsx",
     ".next/types/**/*.ts"
-, "app/(full-page)/(functionality)/pdf/page.jsx", "app/api/auth/[...nextauth]/options.js"  ],
+, "app/(full-page)/(functionality)/pdf/page.jsx", "app/api/auth/[...nextauth]/options.js", "app/(protected)/layout.jsx"  ],
   "exclude": [
     "node_modules"
   ]

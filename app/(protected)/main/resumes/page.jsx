@@ -236,7 +236,7 @@ const ResumeListPage = () => {
     if (loading && !resumes.length) {
         return (
             <div className="flex justify-content-center align-items-center" style={{ height: 'calc(100vh - 200px)' /* Adjust based on your layout's header/footer */ }}>
-                <ProgressSpinner strokeWidth="3" style={{width: '50px', height: '50px'}} />
+                <ProgressSpinner strokeWidth="3" style={{ width: '50px', height: '50px' }} />
             </div>
         );
     }
@@ -280,10 +280,10 @@ const ResumeListPage = () => {
                         if (!globalFilter) return true;
                         const filter = globalFilter.toLowerCase();
                         return (resume.title?.toLowerCase().includes(filter) ||
-                                resume.candidateName?.toLowerCase().includes(filter) ||
-                                resume.status?.toLowerCase().includes(filter) ||
-                                resume.id?.toString().toLowerCase().includes(filter)
-                               );
+                            resume.candidateName?.toLowerCase().includes(filter) ||
+                            resume.status?.toLowerCase().includes(filter) ||
+                            resume.id?.toString().toLowerCase().includes(filter)
+                        );
                     })}
                     itemTemplate={resumeItemTemplate}
                     layout={layout}

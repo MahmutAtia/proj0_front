@@ -30,7 +30,7 @@ const LoginPage = () => {
                 router.back();
             } else {
                 // else go to dashboard
-                router.push('/main/dashboard');
+                router.push('/main');
             }
 
 
