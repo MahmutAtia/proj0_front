@@ -1,6 +1,8 @@
-# syntax=docker.io/docker/dockerfile:1
-
 FROM node:22-alpine AS base
+
+# Set them as environment variables available during the build
+ARG NEXT_PUBLIC_BACKEND_URL
+ENV NEXT_PUBLIC_BACKEND_URL=$NEXT_PUBLIC_BACKEND_URL
 
 # Install dependencies only when needed
 FROM base AS deps
@@ -29,7 +31,7 @@ COPY . .
 # Uncomment the following line in case you want to disable telemetry during the build.
 # ENV NEXT_TELEMETRY_DISABLED=1
 
-RUN \
+RUN echo "Building with NEXT_PUBLIC_BACKEND_URL = $NEXT_PUBLIC_BACKEND_URL" && \
   if [ -f yarn.lock ]; then yarn run build; \
   elif [ -f package-lock.json ]; then npm run build; \
   elif [ -f pnpm-lock.yaml ]; then corepack enable pnpm && pnpm run build; \
