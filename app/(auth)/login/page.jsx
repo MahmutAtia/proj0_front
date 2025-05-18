@@ -39,7 +39,7 @@ const LoginPage = () => {
 
 const handleSocialLogin = async (provider) => {
     try {
-        await signIn(provider, { callbackUrl: '/main/dashboard' });
+        await signIn(provider, { callbackUrl: '/main' });
     } catch (error) {
         toast.current?.show({
             severity: 'error',
