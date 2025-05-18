@@ -13,6 +13,7 @@ const nextConfig = {
         serverComponentsExternalPackages: ['@react-pdf/renderer'],
       },
 
+      output: 'standalone',
 }
 
 module.exports = nextConfig
