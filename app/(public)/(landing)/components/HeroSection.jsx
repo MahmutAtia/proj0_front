@@ -3,6 +3,7 @@ import React from 'react';
 import { motion } from 'framer-motion';
 import { FiArrowRight, FiShield } from 'react-icons/fi';
 import styles from '../styles/HeroSection.module.css'; // Import CSS Module
+import { useRouter } from 'next/navigation'; // Import useRouter
 
 // Animation Variants
 const staggerContainer = (staggerChildren, delayChildren) => ({
@@ -40,6 +41,8 @@ const primaryButtonPulse = {
 
 
 const HeroSection = () => {
+    const router = useRouter(); // Initialize useRouter
+
     return (
         <section id="hero" className={`${styles.heroSection} section-padding`}>
             <div className={`container ${styles.heroContainer}`}>
@@ -62,21 +65,20 @@ const HeroSection = () => {
                     <motion.div variants={fadeInUp} className={styles.heroActions}>
                         {/* --- Apply new animations --- */}
                         <motion.button
-                           className={`button button-primary ${styles.heroButton}`}
-                           variants={buttonHoverTap} // Use enhanced hover/tap
-                           whileHover="hover"
-                           whileTap="tap"
-                           animate={primaryButtonPulse} // Add idle pulse animation
-                        >
+                            className={`button button-primary ${styles.heroButton}`}
+                            variants={buttonHoverTap} // Use enhanced hover/tap
+                            whileHover="hover"
+                            whileTap="tap"
+                            animate={primaryButtonPulse} // Add idle pulse animation
+                            onClick={() => router.push('/ats')}>
                             Start My Free AI Resume <FiArrowRight size="1.1em" />
                         </motion.button>
                         <motion.button
-                           className={`button button-secondary ${styles.heroButton}`}
-                           variants={buttonHoverTap} // Use enhanced hover/tap
-                           whileHover="hover"
-                           whileTap="tap"
-                           // No idle pulse for secondary button to keep focus on primary
-                        >
+                            className={`button button-secondary ${styles.heroButton}`}
+                            variants={buttonHoverTap} // Use enhanced hover/tap
+                            whileHover="hover"
+                            whileTap="tap"
+                            onClick={() => router.push('/ats')}>
                             Check My ATS Score <FiShield size="1.1em" />
                         </motion.button>
                     </motion.div>

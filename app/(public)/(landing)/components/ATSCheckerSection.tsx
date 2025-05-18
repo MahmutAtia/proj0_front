@@ -3,6 +3,7 @@ import React from 'react';
 import { motion } from 'framer-motion';
 import { FiShield, FiUploadCloud } from 'react-icons/fi';
 import styles from '../styles/ATSCheckerSection.module.css'; // Import the CSS module
+import { useRouter } from 'next/navigation'; // Import useRouter
 
 // --- Framer Motion Variants (assuming these are defined elsewhere or pass as props) ---
 const fadeInUp = {
@@ -17,6 +18,8 @@ const buttonHover = {
 
 // --- ATS Checker Section ---
 const ATSCheckerSection = () => {
+        const router = useRouter(); // Initialize useRouter
+
     return (
         <section id="ats-checker" className={`${styles.sectionBgDark} section-padding`}>
             <div className={`${styles.container} ${styles.atsContainer}`}>
@@ -41,6 +44,7 @@ const ATSCheckerSection = () => {
                         variants={buttonHover}
                         whileHover="hover"
                         whileTap="tap"
+                        onClick={() => { router.push('/ats'); }}
                     >
                         Scan My Resume FREE <FiUploadCloud style={{ marginLeft: '0.5rem' }}/>
                     </motion.button>

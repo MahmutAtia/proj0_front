@@ -188,7 +188,7 @@ const Header = () => {
                                 Login
                             </motion.a>
                         </Link>
-                        <Link href="/signup" passHref legacyBehavior>
+                        <Link href="/ats" passHref legacyBehavior>
                             <motion.a
                                 className="button button-primary button-sm"
                                 variants={buttonHoverTap} whileHover="hover" whileTap="tap"
