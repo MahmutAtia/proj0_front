@@ -254,45 +254,30 @@ const FeedCard = ({ title, items, viewAllLink, router, emptyMessage = "No items 
 // --- Main Dashboard Page Component ---
 const DashboardPage = () => {
     const { data: session, status } = useSession();
-    const router = useRouter();
-    const toast = useRef(null);
-    const userMenuRef = useRef(null);
-    const sidebarRef = useRef(null);
-    const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
+        const router = useRouter();
+        const toast = useRef(null);
 
-    // Placeholder data - replace with actual data fetching
+          const [relatedDocuments, setRelatedDocuments] = useState([
+                { id: 'doc1', name: 'Cover Letter' }, { id: 'doc2', name: 'Motivation Letter' }
+            ]);
+            const [recentJobs, setRecentJobs] = useState([
+                { id: 1, title: "Frontend Developer", company: "Tech Solutions Inc.", location: "Remote" },
+                { id: 2, title: "Product Manager", company: "Innovate Hub", location: "New York, NY" },
+                { id: 3, title: "UX Designer", company: "Creative Minds LLC", location: "San Francisco, CA" },
+            ]);
+            const [scholarships, setScholarships] = useState([
+                { id: 1, title: "Future Leaders Scholarship", provider: "Education Foundation", deadline: "2025-08-01" },
+                { id: 2, title: "Tech Innovators Grant", provider: "Science & Tech Fund", deadline: "2025-09-15" },
+            ]);
+
+
     const [defaultResume, setDefaultResume] = useState({
         title: "Senior Software Engineer",
         lastUpdated: "2025-05-15",
         is_default: true,
         id: '123'
     });
-    const [relatedDocuments, setRelatedDocuments] = useState([
-        { id: 'doc1', name: 'Cover Letter' }, { id: 'doc2', name: 'Motivation Letter' }
-    ]);
-    const [recentJobs, setRecentJobs] = useState([
-        { id: 1, title: "Frontend Developer", company: "Tech Solutions Inc.", location: "Remote" },
-        { id: 2, title: "Product Manager", company: "Innovate Hub", location: "New York, NY" },
-        { id: 3, title: "UX Designer", company: "Creative Minds LLC", location: "San Francisco, CA" },
-    ]);
-    const [scholarships, setScholarships] = useState([
-        { id: 1, title: "Future Leaders Scholarship", provider: "Education Foundation", deadline: "2025-08-01" },
-        { id: 2, title: "Tech Innovators Grant", provider: "Science & Tech Fund", deadline: "2025-09-15" },
-    ]);
 
-    // Load sidebar state from localStorage
-    useEffect(() => {
-        const storedState = localStorage.getItem('sidebarCollapsed');
-        if (storedState !== null) {
-            setSidebarCollapsed(JSON.parse(storedState));
-        }
-    }, []);
-
-    const toggleSidebar = () => {
-        const newState = !sidebarCollapsed;
-        setSidebarCollapsed(newState);
-        localStorage.setItem('sidebarCollapsed', JSON.stringify(newState));
-    };
 
     const userMenuItems = [
         { label: 'Profile', icon: 'pi pi-user', command: () => router.push('/main/profile') },
@@ -338,45 +323,9 @@ const DashboardPage = () => {
     };
 
     return (
-        <div className={`${styles.dashboardLayout}`}>
-            <Toast ref={toast} />
-
-            {/* Sidebar */}
-            <div
-                ref={sidebarRef}
-                className={`${styles.sidebar} ${sidebarCollapsed ? styles.sidebarCollapsed : ''} shadow-2 flex-shrink-0 hidden lg:flex lg:flex-column`}
-                style={{ width: sidebarCollapsed ? '80px' : '280px' }}
-            >
-                <SidebarLogo collapsed={sidebarCollapsed} />
-
-                {/* Scrollable sidebar nav area */}
-                <div className={`${styles.sidebarNavContainer} ${styles.sidebarScrollbar}`}>
-                    <SidebarNav
-                        items={sidebarNavItems}
-                        currentPath={router.pathname}
-                        router={router}
-                        collapsed={sidebarCollapsed}
-                    />
-                </div>
-
-                <SidebarFooter router={router} collapsed={sidebarCollapsed} />
-            </div>
-
-            {/* Main Content */}
-            <div
-                className={`${styles.mainContent} ${sidebarCollapsed ? styles.mainContentExpanded : ''} flex flex-column flex-grow-1`}
-            >
-                <TopBar
-                    session={session}
-                    userMenuRef={userMenuRef}
-                    userMenuItems={userMenuItems}
-                    sidebarRef={sidebarRef}
-                    onToggleSidebar={toggleSidebar}
-                    sidebarCollapsed={sidebarCollapsed}
-                />
+        <>
 
                 {/* This is the ONLY scrollable main area */}
-                <div className={`${styles.mainScrollArea} ${styles.mainScrollbar}`}>
                     <WelcomeBanner userName={session?.user?.name} />
                     <QuickActionsGrid actions={quickActions} router={router} />
 
@@ -416,12 +365,11 @@ const DashboardPage = () => {
                                     router={router}
                                     emptyMessage="No scholarships available right now."
                                 />
-                            </div>
+
+                          </div>
                         </div>
                     </div>
-                </div>
-            </div>
-        </div>
+        </>
     );
 };
 
