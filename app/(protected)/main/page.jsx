@@ -7,10 +7,8 @@ import { Button } from 'primereact/button';
 import { Card } from 'primereact/card';
 import { Avatar } from 'primereact/avatar';
 import { Menu } from 'primereact/menu';
-import { Toast } from 'primereact/toast';
 import { Ripple } from 'primereact/ripple';
 import { ProgressSpinner } from 'primereact/progressspinner';
-import { Badge } from 'primereact/badge';
 import { Divider } from 'primereact/divider';
 import { InputText } from 'primereact/inputtext';
 import { IoSparkles } from "react-icons/io5";
@@ -20,6 +18,9 @@ import {
     FiList, FiFolder, FiInfo, FiMenu, FiChevronLeft, FiChevronRight
 } from 'react-icons/fi';
 import styles from './Dashboard.module.css';
+import JobPostings from './mainComponets/JobPostings';
+import ScholarshipList from './mainComponets/ScholarshipList';
+
 
 // --- Child Components (defined in the same file) ---
 
@@ -254,21 +255,21 @@ const FeedCard = ({ title, items, viewAllLink, router, emptyMessage = "No items 
 // --- Main Dashboard Page Component ---
 const DashboardPage = () => {
     const { data: session, status } = useSession();
-        const router = useRouter();
-        const toast = useRef(null);
+    const router = useRouter();
+    const toast = useRef(null);
 
-          const [relatedDocuments, setRelatedDocuments] = useState([
-                { id: 'doc1', name: 'Cover Letter' }, { id: 'doc2', name: 'Motivation Letter' }
-            ]);
-            const [recentJobs, setRecentJobs] = useState([
-                { id: 1, title: "Frontend Developer", company: "Tech Solutions Inc.", location: "Remote" },
-                { id: 2, title: "Product Manager", company: "Innovate Hub", location: "New York, NY" },
-                { id: 3, title: "UX Designer", company: "Creative Minds LLC", location: "San Francisco, CA" },
-            ]);
-            const [scholarships, setScholarships] = useState([
-                { id: 1, title: "Future Leaders Scholarship", provider: "Education Foundation", deadline: "2025-08-01" },
-                { id: 2, title: "Tech Innovators Grant", provider: "Science & Tech Fund", deadline: "2025-09-15" },
-            ]);
+    const [relatedDocuments, setRelatedDocuments] = useState([
+        { id: 'doc1', name: 'Cover Letter' }, { id: 'doc2', name: 'Motivation Letter' }
+    ]);
+    const [recentJobs, setRecentJobs] = useState([
+        { id: 1, title: "Frontend Developer", company: "Tech Solutions Inc.", location: "Remote" },
+        { id: 2, title: "Product Manager", company: "Innovate Hub", location: "New York, NY" },
+        { id: 3, title: "UX Designer", company: "Creative Minds LLC", location: "San Francisco, CA" },
+    ]);
+    const [scholarships, setScholarships] = useState([
+        { id: 1, title: "Future Leaders Scholarship", provider: "Education Foundation", deadline: "2025-08-01" },
+        { id: 2, title: "Tech Innovators Grant", provider: "Science & Tech Fund", deadline: "2025-09-15" },
+    ]);
 
 
     const [defaultResume, setDefaultResume] = useState({
@@ -289,7 +290,7 @@ const DashboardPage = () => {
     if (status === "loading") {
         return (
             <div className="flex justify-content-center align-items-center min-h-screen surface-ground">
-                <ProgressSpinner style={{width: '50px', height: '50px'}} strokeWidth="4" animationDuration=".5s" />
+                <ProgressSpinner style={{ width: '50px', height: '50px' }} strokeWidth="4" animationDuration=".5s" />
             </div>
         );
     }
@@ -308,50 +309,38 @@ const DashboardPage = () => {
     return (
         <>
 
-                {/* This is the ONLY scrollable main area */}
-                    <WelcomeBanner userName={session?.user?.name} />
-                    <QuickActionsGrid actions={quickActions} router={router} />
+            {/* This is the ONLY scrollable main area */}
+            <WelcomeBanner userName={session?.user?.name} />
+            <QuickActionsGrid actions={quickActions} router={router} />
 
-                    <div className="grid mt-5">
-                        <div className="col-12 lg:col-7 xl:col-8 p-3">
-                            <DefaultResumeDisplay
-                                resume={defaultResume}
-                                onSetDefault={handleSetDefaultResume}
-                                onEdit={(id) => router.push(`/main/editor/${id}`)}
-                                onViewAll={() => router.push('/main/resumes')}
-                                router={router}
+            <div className="grid mt-5">
+                <div className="col-12 lg:col-7 xl:col-8 p-3">
+                    <DefaultResumeDisplay
+                        resume={defaultResume}
+                        onSetDefault={handleSetDefaultResume}
+                        onEdit={(id) => router.push(`/main/editor/${id}`)}
+                        onViewAll={() => router.push('/main/resumes')}
+                        router={router}
+                    />
+                    {defaultResume && (
+                        <div className="mt-4">
+                            <RelatedDocumentsList
+                                documents={relatedDocuments}
+                                resumeTitle={defaultResume.title}
+                                onManageDocuments={() => router.push('/main/documents')}
                             />
-                            {defaultResume && (
-                                <div className="mt-4">
-                                    <RelatedDocumentsList
-                                        documents={relatedDocuments}
-                                        resumeTitle={defaultResume.title}
-                                        onManageDocuments={() => router.push('/main/documents')}
-                                    />
-                                </div>
-                            )}
                         </div>
+                    )}
+                </div>
 
-                        <div className="col-12 lg:col-5 xl:col-4 p-3">
-                            <div className="flex flex-column gap-4">
-                                <FeedCard
-                                    title="Latest Job Postings"
-                                    items={recentJobs}
-                                    viewAllLink="/main/job-feed"
-                                    router={router}
-                                    emptyMessage="No new job postings found."
-                                />
-                                <FeedCard
-                                    title="Scholarship Opportunities"
-                                    items={scholarships}
-                                    viewAllLink="/main/scholarship-feed"
-                                    router={router}
-                                    emptyMessage="No scholarships available right now."
-                                />
+                <div className="col-12 lg:col-5 xl:col-4 p-3">
+                    <div className="flex flex-column gap-4">
+                        <JobPostings router={router} />
+                        <ScholarshipList router={router} />
 
-                          </div>
-                        </div>
                     </div>
+                </div>
+            </div>
         </>
     );
 };

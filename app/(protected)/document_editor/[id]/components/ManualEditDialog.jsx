@@ -5,7 +5,7 @@ import { InputTextarea } from 'primereact/inputtextarea';
 import { Button } from 'primereact/button';
 import { Message } from 'primereact/message';
 import axios from 'axios';
-import AIAssistant from '../../../main/editor/components/AIAssistant';
+import AIAssistant from '../../../main/(pages)/editor/components/AIAssistant';
 
 /**
  * Dialog for manually editing a cover letter section (header, paragraph, footer).
