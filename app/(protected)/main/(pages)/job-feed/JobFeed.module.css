@@ -1,0 +1,98 @@
+.jobFeedContainer {
+    padding: 1rem;
+    background-color: var(--surface-b); /* Use theme variables */
+    min-height: calc(100vh - 70px); /* Adjust if you have a fixed top navbar */
+}
+
+.pageCard {
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+}
+
+.header {
+    border-bottom: 1px solid var(--surface-d);
+    background-color: var(--surface-a); /* Slightly different background for header */
+}
+
+.jobListItem {
+    transition: transform 0.2s ease-out, box-shadow 0.2s ease-out;
+    border-radius: var(--border-radius);
+}
+.jobListItem:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 4px 15px rgba(0,0,0,0.12);
+}
+.jobListItem .p-card-body {
+    padding: 1rem; /* Adjust padding for list items */
+}
+
+
+.jobGridItem .p-card {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    transition: transform 0.2s ease-out, box-shadow 0.2s ease-out;
+}
+.jobGridItem .p-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 6px 20px rgba(0,0,0,0.15);
+}
+
+.jobGridItem .p-card-body {
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+    padding: 1rem; /* Consistent padding */
+}
+
+.jobGridItem .p-card-content {
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+}
+
+.jobGridItem .mt-auto {
+    margin-top: auto;
+}
+
+/* Responsive adjustments for filter bar */
+@media screen and (max-width: 991px) { /* md breakpoint for PrimeFlex */
+    .header {
+        flex-direction: column;
+        align-items: stretch;
+    }
+    .header .p-inputgroup {
+        width: 100%;
+        margin-bottom: 1rem; /* Space between input group and controls */
+    }
+    .header .p-inputgroup .p-inputtext {
+        margin-bottom: 0.5rem; /* Space between inputs in the group on mobile */
+    }
+    .header .p-inputgroup .p-button {
+        width: 100%; /* Full width search button */
+    }
+    .header > div:last-child { /* Targeting the controls container */
+        flex-direction: column; /* Stack controls vertically */
+        gap: 0.75rem; /* Adjust gap for stacked controls */
+    }
+    .header .p-dropdown,
+    .header .p-dataview-layout-options {
+        width: 100%;
+    }
+    .header .flex.align-items-center { /* Remote checkbox container */
+        justify-content: flex-start; /* Align checkbox to the left */
+        width: 100%;
+    }
+}
+
+@media screen and (max-width: 767px) { /* sm breakpoint */
+    .jobGridItem {
+        /* On smaller screens, grid items might take full width or 2 per row */
+        /* This is handled by col-12 sm:col-6 in JSX, CSS can refine appearance */
+    }
+    .jobListItem .p-card-body {
+        padding: 0.75rem;
+    }
+    .jobGridItem .p-card-body {
+        padding: 0.75rem;
+    }
+}
