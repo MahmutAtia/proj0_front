@@ -405,6 +405,43 @@
     box-shadow: 0 4px 12px rgba(0,0,0,0.12);
 }
 
+.dashboardCardCompact {
+    padding: 1.25rem;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+    transition: box-shadow 0.2s;
+}
+
+.dashboardCardCompact:hover {
+    box-shadow: 0 4px 12px rgba(0,0,0,0.12);
+}
+
+.noResumeCard {
+    border: 2px dashed var(--surface-300);
+    background-color: var(--surface-50);
+}
+
+.sectionTitleCompact {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: var(--text-color-secondary);
+}
+
+.relatedDocsSection {
+    padding: 1rem;
+    background-color: var(--surface-ground);
+    border-radius: var(--border-radius);
+    margin-top: 1rem;
+}
+
+.documentItem {
+    transition: background-color 0.2s;
+    cursor: pointer;
+}
+
+.documentItem:hover {
+    background-color: var(--surface-200) !important;
+}
+
 @keyframes slideInLeft {
     from { transform: translateX(-100%); }
     to { transform: translateX(0); }

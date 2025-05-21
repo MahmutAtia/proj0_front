@@ -20,9 +20,18 @@ import {
 import styles from './Dashboard.module.css';
 import JobPostings from './mainComponets/JobPostings';
 import ScholarshipList from './mainComponets/ScholarshipList';
+import axios from 'axios';
+import { Toast } from 'primereact/toast';
 
 
-// --- Child Components (defined in the same file) ---
+// Make sure RESUMES_CACHE_KEY and CACHE_EXPIRY_DURATION are accessible here or re-defined
+// Or better, use a shared context/hook for resume data and default resume logic.
+
+const RESUMES_CACHE_KEY_DASHBOARD = 'all_resumes_list_cache'; // Same key as ResumeListPage
+const CACHE_EXPIRY_DURATION_DASHBOARD = 15 * 60 * 1000;
+
+
+// --- Child Components (Updated) ---
 
 const SidebarLogo = ({ collapsed }) => (
     <div className={`border-bottom-1 surface-border ${collapsed ? 'justify-content-center' : ''} px-4 flex align-items-center`}>
@@ -167,127 +176,257 @@ const QuickActionsGrid = ({ actions, router }) => (
     </div>
 );
 
-const DefaultResumeDisplay = ({ resume, onSetDefault, onEdit, onViewAll, router }) => (
-    <Card className={`${styles.dashboardCard} h-full`}>
-        <div className="flex justify-content-between align-items-center mb-4">
-            <h2 className="text-xl font-bold m-0">Master Resume</h2>
-            {resume && (
+const DefaultResumeDisplay = ({ resume, onViewAll, router, isLoading }) => {
+    if (isLoading) {
+        return (
+            <Card className={`${styles.dashboardCardCompact}`}>
+                <div className="flex align-items-center">
+                    <ProgressSpinner style={{ width: '30px', height: '30px' }} strokeWidth="4" />
+                    <span className="ml-2 text-color-secondary">Loading Default Resume...</span>
+                </div>
+            </Card>
+        );
+    }
+
+    return (
+        <Card className={`${styles.dashboardCardCompact} ${!resume ? styles.noResumeCard : ''}`}>
+            <div className="flex flex-column md:flex-row justify-content-between align-items-start md:align-items-center">
+                <div className="mb-3 md:mb-0">
+                    <h3 className="text-lg font-bold m-0 flex align-items-center">
+                        <FiStar className="mr-2 text-yellow-500" />
+                        Default Resume
+                    </h3>
+                    {resume ? (
+                        <>
+                            <p className="text-md text-primary mt-1 mb-0">{resume.title}</p>
+                            <p className="text-xs text-color-secondary mt-1">
+                                Last updated: {resume.updated_at ? new Date(resume.updated_at).toLocaleDateString() : 'N/A'}
+                            </p>
+                        </>
+                    ) : (
+                        <p className="text-sm text-color-secondary mt-1">No default resume selected.</p>
+                    )}
+                </div>
+                <div className="flex flex-wrap gap-2 align-self-start md:align-self-center">
+                    {resume && (
+                        <>
+                            <Button
+                                icon={<FiEdit />}
+                                label="Edit"
+                                className="p-button-sm"
+                                onClick={() => router.push(`/main/editor/${resume.id}`)}
+                                tooltip="Edit Resume"
+                                tooltipOptions={{position: 'top'}}
+                            />
+                        </>
+                    )}
+                    <Button
+                        label="All Resumes"
+                        icon={<FiList />}
+                        className="p-button-sm p-button-text"
+                        onClick={onViewAll}
+                        tooltip="View All Resumes"
+                        tooltipOptions={{position: 'top'}}
+                    />
+                </div>
+            </div>
+            {!resume && (
+                <div className="mt-3 text-center">
+                    <Button
+                        label="Select a Default Resume"
+                        className="p-button-primary p-button-sm"
+                        onClick={onViewAll}
+                    />
+                </div>
+            )}
+        </Card>
+    );
+};
+
+const RelatedDocumentsList = ({ documents, resumeTitle, onManageDocuments, isLoading }) => {
+    if (isLoading) {
+        return (
+            <div className="mt-4">
+                <h4 className={`${styles.sectionTitleCompact} mb-2`}>Linked Documents</h4>
+                 <div className="flex align-items-center">
+                    <ProgressSpinner style={{ width: '25px', height: '25px' }} strokeWidth="4" />
+                    <span className="ml-2 text-color-secondary text-sm">Loading documents...</span>
+                </div>
+            </div>
+        );
+    }
+    if (!resumeTitle) { // No default resume, so no related documents to show here
+        return null;
+    }
+
+    return (
+        <div className={`mt-4 ${styles.relatedDocsSection}`}>
+            <div className="flex justify-content-between align-items-center mb-2">
+                <h4 className={`${styles.sectionTitleCompact} m-0`}>
+                    Documents for <span className="text-primary">{'"' + resumeTitle + '"'}</span>
+                </h4>
                 <Button
-                    label={resume.is_default ? "Default" : "Set as Default"}
-                    icon={<FiStar className={resume.is_default ? 'text-yellow-500' : ''} />}
-                    className={`p-button-sm ${resume.is_default ? 'p-button-success p-button-outlined' : 'p-button-outlined'}`}
-                    onClick={onSetDefault}
+                    label="Manage All"
+                    icon={<FiFolder />}
+                    className="p-button-text p-button-sm"
+                    onClick={onManageDocuments}
+                    tooltip="Go to Documents Page"
+                    tooltipOptions={{position: 'top'}}
                 />
+            </div>
+            {documents && documents.length > 0 ? (
+                <ul className="list-none p-0 m-0">
+                    {documents.slice(0, 3).map(doc => ( // Show max 3
+                        <li key={doc.unique_id || doc.id} className={`${styles.documentItem} p-2 mb-1 border-round surface-100 flex align-items-center justify-content-between`}>
+                            <div className="flex align-items-center">
+                                <FiFileText className="text-primary mr-2" />
+                                <span className="text-sm text-color">{doc.document_type.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase())}</span>
+                            </div>
+                            <span className="text-xs text-color-secondary">
+                                Created: {new Date(doc.created_at).toLocaleDateString()}
+                            </span>
+                        </li>
+                    ))}
+                    {documents.length > 3 && (
+                        <li className="text-center mt-2">
+                            <Button label={`View ${documents.length - 3} more...`} className="p-button-link p-button-sm" onClick={onManageDocuments} />
+                        </li>
+                    )}
+                </ul>
+            ) : (
+                <p className="text-sm text-color-secondary p-2 border-round surface-50 text-center">
+                    No documents linked to this resume yet.
+                </p>
             )}
         </div>
+    );
+};
 
-        {resume ? (
-            <div>
-                <div className="mb-3">
-                    <h3 className="text-lg font-semibold m-0">{resume.title}</h3>
-                    <p className="text-sm text-color-secondary mt-2">Last updated: {resume.lastUpdated}</p>
-                </div>
-                <p className="text-color-secondary mb-4">This resume is used for quick actions like website generation and targeted applications.</p>
-                <div className="flex flex-wrap gap-2">
-                    <Button label="Edit Resume" icon={<FiEdit />} className="p-button-raised" onClick={() => onEdit(resume.id)} />
-                    <Button label="All Resumes" icon={<FiList />} className="p-button-outlined" onClick={onViewAll} />
-                </div>
-            </div>
-        ) : (
-            <div className="text-center p-3">
-                <div className="flex align-items-center justify-content-center mb-3">
-                    <div className="p-3 bg-blue-50 border-round-xl">
-                        <FiInfo className="text-4xl text-primary" />
-                    </div>
-                </div>
-                <p className="text-lg font-medium mb-2">No default resume selected.</p>
-                <p className="text-sm text-color-secondary mb-4">Please select or create a resume to set as default.</p>
-                <Button label="Go to Resumes" className="p-button-primary" onClick={onViewAll} />
-            </div>
-        )}
-    </Card>
-);
 
-const RelatedDocumentsList = ({ documents, resumeTitle, onManageDocuments }) => (
-    <>
-        <Divider />
-        <h4 className={`${styles.sectionTitle} mb-2`}>Linked Documents</h4>
-        {documents && documents.length > 0 ? (
-            <ul className="list-none p-0 m-0 text-color-secondary">
-                {documents.map(doc => (
-                    <li key={doc.id} className="py-1 flex align-items-center">
-                        <div className="p-2 surface-200 border-round mr-2">
-                            <FiFileText className="text-primary" />
-                        </div>
-                        <span>{doc.name} for {resumeTitle || "Selected Position"}</span>
-                    </li>
-                ))}
-            </ul>
-        ) : (
-            <p className="text-sm text-color-secondary">No documents linked to this resume yet.</p>
-        )}
-        <Button label="Manage All Documents" icon={<FiFolder />} className="p-button-text p-button-sm mt-3" onClick={onManageDocuments} />
-    </>
-);
-
-const FeedCard = ({ title, items, viewAllLink, router, emptyMessage = "No items to display." }) => (
-    <Card className={`${styles.dashboardCard} h-full`}>
-        <div className="flex justify-content-between align-items-center mb-3">
-            <h3 className="text-xl font-bold m-0">{title}</h3>
-            {viewAllLink && <Button label="View All" icon="pi pi-arrow-right" iconPos="right" className="p-button-text p-button-sm" onClick={() => router.push(viewAllLink)} />}
-        </div>
-
-        {items.length > 0 ? (
-            <ul className="list-none p-0 m-0">
-                {items.map(item => (
-                    <li key={item.id} className={`${styles.feedItem} p-2 border-round cursor-pointer`}>
-                        <div className={styles.feedItemTitle}>{item.title}</div>
-                        <div className={styles.feedItemSubtitle}>
-                            {item.company || item.provider} {item.location && `- ${item.location}`} {item.deadline && `- Deadline: ${item.deadline}`}
-                        </div>
-                    </li>
-                ))}
-            </ul>
-        ) : <p className="text-color-secondary">{emptyMessage}</p>}
-    </Card>
-);
-
-// --- Main Dashboard Page Component ---
+// --- Main Dashboard Page Component (Updated) ---
 const DashboardPage = () => {
-    const { data: session, status } = useSession();
+    const { data: session, status: sessionStatus } = useSession();
     const router = useRouter();
     const toast = useRef(null);
 
-    const [relatedDocuments, setRelatedDocuments] = useState([
-        { id: 'doc1', name: 'Cover Letter' }, { id: 'doc2', name: 'Motivation Letter' }
-    ]);
-    const [recentJobs, setRecentJobs] = useState([
-        { id: 1, title: "Frontend Developer", company: "Tech Solutions Inc.", location: "Remote" },
-        { id: 2, title: "Product Manager", company: "Innovate Hub", location: "New York, NY" },
-        { id: 3, title: "UX Designer", company: "Creative Minds LLC", location: "San Francisco, CA" },
-    ]);
-    const [scholarships, setScholarships] = useState([
-        { id: 1, title: "Future Leaders Scholarship", provider: "Education Foundation", deadline: "2025-08-01" },
-        { id: 2, title: "Tech Innovators Grant", provider: "Science & Tech Fund", deadline: "2025-09-15" },
-    ]);
+    const [allResumes, setAllResumes] = useState([]);
+    const [defaultResume, setDefaultResume] = useState(null);
+    const [relatedDocuments, setRelatedDocuments] = useState([]);
+    const [loadingResumes, setLoadingResumes] = useState(true);
+
+    // Fetch all resumes and identify default
+    useEffect(() => {
+        const loadInitialData = async () => {
+            if (sessionStatus === 'loading' || !session) return;
+
+            setLoadingResumes(true);
+            try {
+                // Use caching logic similar to ResumeListPage
+                const localData = localStorage.getItem(RESUMES_CACHE_KEY_DASHBOARD);
+                let resumesData = null;
+                if (localData) {
+                    const parsedCache = JSON.parse(localData);
+                    if (parsedCache.data && parsedCache.timestamp && (Date.now() - parsedCache.timestamp < CACHE_EXPIRY_DURATION_DASHBOARD)) {
+                        resumesData = parsedCache.data;
+                    } else {
+                        localStorage.removeItem(RESUMES_CACHE_KEY_DASHBOARD);
+                    }
+                }
+
+                if (!resumesData) {
+                    const headers = { 'Content-Type': 'application/json' };
+                    if (session.accessToken) headers['Authorization'] = `Bearer ${session.accessToken}`;
+                    const response = await axios.get(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/resumes/`, { headers });
+                    resumesData = response.data;
+                    localStorage.setItem(RESUMES_CACHE_KEY_DASHBOARD, JSON.stringify({ data: resumesData, timestamp: Date.now() }));
+                }
+
+                setAllResumes(resumesData || []);
+                const currentDefault = (resumesData || []).find(r => r.is_default);
+                setDefaultResume(currentDefault || null);
+                if (currentDefault) {
+                    setRelatedDocuments(currentDefault.generated_documents_data || []);
+                } else {
+                    setRelatedDocuments([]);
+                }
+
+            } catch (err) {
+                console.error("Error fetching resumes for dashboard:", err);
+                toast.current?.show({ severity: 'error', summary: 'Error', detail: 'Could not load resume data.' });
+                setAllResumes([]);
+                setDefaultResume(null);
+                setRelatedDocuments([]);
+            } finally {
+                setLoadingResumes(false);
+            }
+        };
+        loadInitialData();
+    }, [session, sessionStatus]);
 
 
-    const [defaultResume, setDefaultResume] = useState({
-        title: "Senior Software Engineer",
-        lastUpdated: "2025-05-15",
-        is_default: true,
-        id: '123'
-    });
+    const handleSetDefaultResume = async () => {
+        if (!defaultResume && allResumes.length > 0) {
+            // If no default is set, and there are resumes, prompt to select one or go to resumes page
+            toast.current?.show({ severity: 'info', summary: 'Action Required', detail: 'Please select a resume to set as default from the "All Resumes" page.' });
+            router.push('/main/resumes'); // Or open a dialog to select
+            return;
+        }
+        if (!defaultResume) {
+             toast.current?.show({ severity: 'warn', summary: 'No Resume', detail: 'No resume selected to change default status.' });
+            return;
+        }
 
+
+        const newDefaultState = !defaultResume.is_default;
+        // Optimistic UI update
+        const oldDefaultResume = { ...defaultResume };
+        const oldAllResumes = [...allResumes];
+
+        setDefaultResume(prev => prev ? { ...prev, is_default: newDefaultState } : null);
+        setAllResumes(prevResumes => prevResumes.map(r => {
+            if (r.id === defaultResume.id) return { ...r, is_default: newDefaultState };
+            if (newDefaultState && r.is_default) return { ...r, is_default: false }; // Unset other defaults
+            return r;
+        }));
+
+
+        try {
+            // API call to update the default status
+            const headers = { 'Content-Type': 'application/json' };
+            if (session.accessToken) headers['Authorization'] = `Bearer ${session.accessToken}`;
+            // This endpoint should handle setting one resume as default and unsetting others.
+            // If your backend doesn't do that, you might need two calls or a more specific endpoint.
+            await axios.patch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/resumes/${defaultResume.id}/`,
+                { is_default: newDefaultState },
+                { headers }
+            );
+
+            // Update cache
+            const updatedCacheResumes = allResumes.map(r => {
+                 if (r.id === defaultResume.id) return { ...r, is_default: newDefaultState };
+                 if (newDefaultState && r.is_default && r.id !== defaultResume.id) return { ...r, is_default: false };
+                 return r;
+            });
+            localStorage.setItem(RESUMES_CACHE_KEY_DASHBOARD, JSON.stringify({ data: updatedCacheResumes, timestamp: Date.now() }));
+
+            toast.current?.show({ severity: 'success', summary: 'Success', detail: `Master resume status updated.` });
+        } catch (err) {
+            console.error("Error setting default resume:", err);
+            toast.current?.show({ severity: 'error', summary: 'Error', detail: 'Could not update master resume status.' });
+            // Revert optimistic update
+            setDefaultResume(oldDefaultResume);
+            setAllResumes(oldAllResumes);
+        }
+    };
 
     const quickActions = [
         { title: "ATS Checker", icon: <FiCheckSquare />, description: "Optimize your resume for Applicant Tracking Systems.", route: '/ats', buttonLabel: "Scan Resume" },
         { title: "New Resume", icon: <FiFileText />, description: "Craft a new standout resume from scratch or a template.", route: '/main/resumes/new', buttonLabel: "Create Now" },
-        { title: "My Portfolio", icon: <FiGlobe />, description: "Manage and publish your personal career website.", route: defaultResume ? `/main/site-editor/${defaultResume.id}` : '/main/site-editor', buttonLabel: "Edit Site" },
+        { title: "My Portfolio", icon: <FiGlobe />, description: "Manage and publish your personal career website.", route: defaultResume ? `/main/site-editor/${defaultResume.personal_website_uuid || defaultResume.id}` : '/main/site-editor', buttonLabel: "Edit Site" }, // Use personal_website_uuid if available
         { title: "Job Search", icon: <FiBriefcase />, description: "Discover and track relevant job opportunities.", route: '/main/job-feed', buttonLabel: "Find Jobs" },
     ];
 
-    if (status === "loading") {
+    if (sessionStatus === "loading") {
         return (
             <div className="flex justify-content-center align-items-center min-h-screen surface-ground">
                 <ProgressSpinner style={{ width: '50px', height: '50px' }} strokeWidth="4" animationDuration=".5s" />
@@ -295,49 +434,41 @@ const DashboardPage = () => {
         );
     }
 
-    if (status === "unauthenticated") {
+    if (sessionStatus === "unauthenticated") {
         router.push('/login');
-        return null; // Important to return null or a loader while redirecting
+        return null;
     }
-
-    const handleSetDefaultResume = () => {
-        // Placeholder: Implement actual logic to update backend/state
-        setDefaultResume(prev => ({ ...prev, is_default: !prev.is_default }));
-        toast.current.show({ severity: 'success', summary: 'Success', detail: `Resume ${defaultResume.is_default ? 'unset as' : 'set as'} default.`, life: 3000 });
-    };
 
     return (
         <>
-
-            {/* This is the ONLY scrollable main area */}
+            <Toast ref={toast} />
             <WelcomeBanner userName={session?.user?.name} />
             <QuickActionsGrid actions={quickActions} router={router} />
 
             <div className="grid mt-5">
                 <div className="col-12 lg:col-7 xl:col-8 p-3">
+                    {/* Master Resume Section */}
                     <DefaultResumeDisplay
                         resume={defaultResume}
-                        onSetDefault={handleSetDefaultResume}
-                        onEdit={(id) => router.push(`/main/editor/${id}`)}
                         onViewAll={() => router.push('/main/resumes')}
                         router={router}
+                        isLoading={loadingResumes}
                     />
-                    {defaultResume && (
-                        <div className="mt-4">
-                            <RelatedDocumentsList
-                                documents={relatedDocuments}
-                                resumeTitle={defaultResume.title}
-                                onManageDocuments={() => router.push('/main/documents')}
-                            />
-                        </div>
+                    {/* Related Documents for Master Resume */}
+                    {!loadingResumes && defaultResume && (
+                        <RelatedDocumentsList
+                            documents={relatedDocuments}
+                            resumeTitle={defaultResume.title}
+                            onManageDocuments={() => router.push('/main/documents')}
+                            isLoading={loadingResumes}
+                        />
                     )}
                 </div>
 
                 <div className="col-12 lg:col-5 xl:col-4 p-3">
                     <div className="flex flex-column gap-4">
-                        <JobPostings router={router} />
+                        <JobPostings router={router} defaultResume={defaultResume} />
                         <ScholarshipList router={router} />
-
                     </div>
                 </div>
             </div>
@@ -346,3 +477,31 @@ const DashboardPage = () => {
 };
 
 export default DashboardPage;
+
+// Add to your Dashboard.module.css:
+/*
+.dashboardCardCompact {
+    // Standard card styles, maybe less padding if needed
+}
+.noResumeCard {
+    border: 2px dashed var(--surface-400); // Example style for no resume
+    background-color: var(--surface-50);
+}
+.sectionTitleCompact {
+    font-size: 1.1rem; // Slightly smaller title
+    font-weight: 600;
+    color: var(--text-color-secondary);
+}
+.relatedDocsSection {
+    padding: 1rem;
+    background-color: var(--surface-ground); // Slightly different background
+    border-radius: var(--border-radius);
+    margin-top: 1rem; // Ensure spacing
+}
+.documentItem {
+    transition: background-color 0.2s;
+}
+.documentItem:hover {
+    background-color: var(--surface-200) !important;
+}
+*/
