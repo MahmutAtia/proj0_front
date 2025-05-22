@@ -1,5 +1,5 @@
 "use client";
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef, useEffect, useMemo } from 'react';
 import { useSession } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
@@ -13,9 +13,9 @@ import { Divider } from 'primereact/divider';
 import { InputText } from 'primereact/inputtext';
 import { IoSparkles } from "react-icons/io5";
 import {
-    FiGrid, FiFileText, FiBriefcase, FiGlobe, FiCheckSquare, FiAward, FiSettings,
+    FiArchive, FiFileText, FiBriefcase, FiGlobe, FiCheckSquare, FiAward, FiSettings,
     FiLogOut, FiBell, FiSearch, FiChevronDown, FiUser, FiStar, FiEdit,
-    FiList, FiFolder, FiInfo, FiMenu, FiChevronLeft, FiChevronRight
+    FiList, FiFolder, FiInfo, FiMenu, FiChevronLeft, FiChevronRight, FiPlusSquare
 } from 'react-icons/fi';
 import styles from './Dashboard.module.css';
 import JobPostings from './mainComponets/JobPostings';
@@ -23,6 +23,8 @@ import ScholarshipList from './mainComponets/ScholarshipList';
 import axios from 'axios';
 import { Toast } from 'primereact/toast';
 
+import { Dialog } from 'primereact/dialog'; // If not already there for other purposes
+import GenerateDocumentDialog from './(pages)/editor/components/GenerateDocumentDialog'; // Adjust path as needed
 
 // Make sure RESUMES_CACHE_KEY and CACHE_EXPIRY_DURATION are accessible here or re-defined
 // Or better, use a shared context/hook for resume data and default resume logic.
@@ -44,103 +46,6 @@ const SidebarLogo = ({ collapsed }) => (
     </div>
 );
 
-const SidebarNav = ({ items, currentPath, router, collapsed }) => (
-    <div>
-        <ul className="list-none p-3 m-0">
-            {items.map(item => (
-                <li key={item.label}>
-                    <button
-                        type="button"
-                        onClick={() => router.push(item.route)}
-                        className={`${styles.sidebarLink} p-ripple ${currentPath === item.route ? styles.sidebarItemActive : ''}`}
-                        title={collapsed ? item.label : ''}
-                    >
-                        <span className={styles.sidebarLinkIcon}>{item.icon}</span>
-                        {!collapsed && <span className={styles.sidebarLinkText}>{item.label}</span>}
-                        <Ripple />
-                    </button>
-                </li>
-            ))}
-        </ul>
-    </div>
-);
-
-const SidebarFooter = ({ router, collapsed }) => (
-    <div className="mt-auto">
-        <Divider className="mb-3 mx-3" />
-        <ul className="list-none p-3 m-0">
-            <li>
-                <button
-                    type="button"
-                    onClick={() => router.push('/main/settings')}
-                    className={`${styles.sidebarLink} p-ripple`}
-                    title={collapsed ? "Settings" : ''}
-                >
-                    <span className={styles.sidebarLinkIcon}><FiSettings /></span>
-                    {!collapsed && <span className={styles.sidebarLinkText}>Settings</span>}
-                    <Ripple />
-                </button>
-            </li>
-        </ul>
-    </div>
-);
-
-const TopBar = ({ session, userMenuRef, userMenuItems, sidebarRef, onToggleSidebar, sidebarCollapsed }) => (
-    <div className={`${styles.topbar} flex justify-content-between align-items-center sticky top-0 z-5`}>
-        <div className="flex align-items-center gap-3">
-            <Button
-                icon={<FiMenu size={20} />}
-                className="p-button-rounded p-button-text p-button-plain mr-2 lg:hidden"
-                onClick={() => {
-                    const sidebar = sidebarRef.current;
-                    if (sidebar) {
-                        sidebar.classList.toggle('hidden');
-                        sidebar.classList.toggle(styles.sidebarMobileOverlay);
-                    }
-                }}
-            />
-            <Button
-                icon={sidebarCollapsed ? <FiChevronRight size={18} /> : <FiChevronLeft size={18} />}
-                className={`${styles.toggleButton} p-button-text hidden lg:inline-flex`}
-                onClick={onToggleSidebar}
-                tooltip={sidebarCollapsed ? "Expand Sidebar" : "Collapse Sidebar"}
-                tooltipOptions={{ position: 'bottom' }}
-            />
-
-            <div className={`${styles.searchContainer} p-input-icon-left hidden md:block ml-3`}>
-                <i className="pi pi-search" />
-                <InputText
-                    className={`${styles.searchInput}`}
-                    placeholder="Search dashboard..."
-                />
-            </div>
-        </div>
-
-        <div className="flex align-items-center gap-3">
-            <Button
-                icon={<FiBell size={20} />}
-                className={`${styles.iconButton} p-button-rounded p-button-text`}
-                badge="2"
-                badgeClassName="p-badge-danger"
-            />
-            <div
-                className={`${styles.profileButton} flex align-items-center gap-2 cursor-pointer`}
-                onClick={(e) => userMenuRef.current.toggle(e)}
-            >
-                <Avatar
-                    image={session?.user?.image || undefined}
-                    label={session?.user?.name ? session.user.name.charAt(0).toUpperCase() : "U"}
-                    shape="circle"
-                    className={styles.profileAvatar}
-                    style={{ width: '2.2rem', height: '2.2rem' }}
-                />
-                <span className="font-medium hidden md:inline">{session?.user?.name || "User"}</span>
-                <FiChevronDown className="text-600" />
-            </div>
-            <Menu model={userMenuItems} popup ref={userMenuRef} id="user_menu" className="shadow-4" />
-        </div>
-    </div>
-);
 
 const WelcomeBanner = ({ userName }) => (
     <div className="mb-6">
@@ -149,28 +54,45 @@ const WelcomeBanner = ({ userName }) => (
     </div>
 );
 
-const ActionCard = ({ title, icon, description, onClick, buttonLabel = "Explore" }) => (
-    <Card className={`${styles.quickActionCard}`}>
-        <div className="flex flex-column justify-content-between h-full text-center">
-            <div className="mb-4 flex align-items-center justify-content-center">
-                <div className={styles.actionIcon}>
-                    {icon}
-                </div>
-            </div>
-            <div>
-                <h3 className="text-xl font-semibold mb-3">{title}</h3>
-                <p className="text-color-secondary mb-4 px-2">{description}</p>
-            </div>
-            <Button label={buttonLabel} icon="pi pi-arrow-right" iconPos="right" className="p-button-raised w-full mt-auto" onClick={onClick} />
-        </div>
-    </Card>
-);
+const ActionCard = ({ title, icon, description, onClick, route, buttonLabel = "Explore" }) => {
+    const router = useRouter();
+    const handleClick = () => {
+        if (onClick) {
+            onClick();
+        } else if (route) {
+            router.push(route);
+        }
+    };
 
-const QuickActionsGrid = ({ actions, router }) => (
+    return (
+        <Card className={`${styles.quickActionCard} h-full`}> {/* Ensure h-full for consistent height */}
+            <div className="flex flex-column justify-content-between h-full text-center">
+                <div className="mb-4 flex align-items-center justify-content-center">
+                    <div className={styles.actionIconWrapper}> {/* Wrapper for better icon styling */}
+                        {icon}
+                    </div>
+                </div>
+                <div>
+                    <h3 className="text-xl font-semibold mb-2">{title}</h3> {/* Reduced margin */}
+                    <p className={`${styles.actionDescription} text-color-secondary mb-4 px-2`}>{description}</p>
+                </div>
+                <Button
+                    label={buttonLabel}
+                    icon="pi pi-arrow-right"
+                    iconPos="right"
+                    className="p-button-primary w-full mt-auto" // Changed to p-button-primary
+                    onClick={handleClick}
+                />
+            </div>
+        </Card>
+    );
+};
+
+const QuickActionsGrid = ({ actions }) => ( // Removed router prop as ActionCard handles its own routing/onClick
     <div className="grid mb-5">
         {actions.map(action => (
-            <div key={action.title} className="col-12 md:col-6 lg:col-3 p-3">
-                <ActionCard {...action} onClick={() => router.push(action.route)} />
+            <div key={action.title} className="col-12 md:col-6 lg:col-3 p-2"> {/* Adjusted padding */}
+                <ActionCard {...action} />
             </div>
         ))}
     </div>
@@ -189,52 +111,54 @@ const DefaultResumeDisplay = ({ resume, onViewAll, router, isLoading }) => {
     }
 
     return (
-        <Card className={`${styles.dashboardCardCompact} ${!resume ? styles.noResumeCard : ''}`}>
+        <Card className={`${styles.dashboardCard} ${!resume ? styles.noDefaultResumeCard : ''}`}>
             <div className="flex flex-column md:flex-row justify-content-between align-items-start md:align-items-center">
                 <div className="mb-3 md:mb-0">
-                    <h3 className="text-lg font-bold m-0 flex align-items-center">
-                        <FiStar className="mr-2 text-yellow-500" />
-                        Default Resume
-                    </h3>
+                    <div className="flex align-items-center mb-1">
+                        <FiStar className={`mr-2 ${resume ? 'text-yellow-500' : 'text-gray-400'}`} style={{ fontSize: '1.3rem' }} />
+                        <h3 className="text-lg font-bold m-0">
+                            Default Resume
+                        </h3>
+                    </div>
                     {resume ? (
                         <>
-                            <p className="text-md text-primary mt-1 mb-0">{resume.title}</p>
+                            <p className={`${styles.defaultResumeTitle} text-primary mt-1 mb-0 cursor-pointer hover:underline`} onClick={() => router.push(`/main/editor/${resume.id}`)}>
+                                {resume.title}
+                            </p>
                             <p className="text-xs text-color-secondary mt-1">
                                 Last updated: {resume.updated_at ? new Date(resume.updated_at).toLocaleDateString() : 'N/A'}
                             </p>
                         </>
                     ) : (
-                        <p className="text-sm text-color-secondary mt-1">No default resume selected.</p>
+                        <p className="text-sm text-color-secondary mt-1">No default resume selected. Choose one to personalize your dashboard.</p>
                     )}
                 </div>
-                <div className="flex flex-wrap gap-2 align-self-start md:align-self-center">
+                <div className="flex flex-wrap gap-2 align-self-start md:align-self-center mt-2 md:mt-0">
                     {resume && (
-                        <>
-                            <Button
-                                icon={<FiEdit />}
-                                label="Edit"
-                                className="p-button-sm"
-                                onClick={() => router.push(`/main/editor/${resume.id}`)}
-                                tooltip="Edit Resume"
-                                tooltipOptions={{position: 'top'}}
-                            />
-                        </>
+                        <Button
+                            icon={<FiEdit />}
+                            label="Edit"
+                            className="p-button-sm p-button-outlined"
+                            onClick={() => router.push(`/main/editor/${resume.id}`)}
+                            tooltip="Edit Default Resume"
+                            tooltipOptions={{ position: 'top' }}
+                        />
                     )}
                     <Button
-                        label="All Resumes"
+                        label={resume ? "Change Default" : "Select Default"}
                         icon={<FiList />}
-                        className="p-button-sm p-button-text"
-                        onClick={onViewAll}
-                        tooltip="View All Resumes"
-                        tooltipOptions={{position: 'top'}}
+                        className="p-button-sm p-button-secondary"
+                        onClick={onViewAll} // Navigates to resumes list page
+                        tooltip="View all resumes to select or change default"
+                        tooltipOptions={{ position: 'top' }}
                     />
                 </div>
             </div>
-            {!resume && (
-                <div className="mt-3 text-center">
+            {!resume && !isLoading && (
+                <div className="mt-4 pt-3 border-top-1 surface-border text-center">
                     <Button
-                        label="Select a Default Resume"
-                        className="p-button-primary p-button-sm"
+                        label="Choose Your Default Resume"
+                        className="p-button-primary"
                         onClick={onViewAll}
                     />
                 </div>
@@ -243,47 +167,61 @@ const DefaultResumeDisplay = ({ resume, onViewAll, router, isLoading }) => {
     );
 };
 
-const RelatedDocumentsList = ({ documents, resumeTitle, onManageDocuments, isLoading }) => {
+const RelatedDocumentsList = ({ documents, resumeTitle, onManageDocuments, isLoading, router }) => {
     if (isLoading) {
         return (
             <div className="mt-4">
                 <h4 className={`${styles.sectionTitleCompact} mb-2`}>Linked Documents</h4>
-                 <div className="flex align-items-center">
+                <div className="flex align-items-center">
                     <ProgressSpinner style={{ width: '25px', height: '25px' }} strokeWidth="4" />
                     <span className="ml-2 text-color-secondary text-sm">Loading documents...</span>
                 </div>
             </div>
         );
     }
-    if (!resumeTitle) { // No default resume, so no related documents to show here
-        return null;
+    if (!resumeTitle && !isLoading) {
+        return (
+            <div className={`mt-4 ${styles.relatedDocsSection} ${styles.emptyDocsSection}`}>
+                <div className="flex justify-content-between align-items-center mb-2">
+                    <h4 className={`${styles.sectionTitle} m-0`}>Linked Documents</h4>
+                </div>
+                <p className="text-sm text-color-secondary p-3 border-round surface-50 text-center">
+                    Select a default resume to see its linked documents here.
+                </p>
+            </div>
+        );
     }
 
     return (
         <div className={`mt-4 ${styles.relatedDocsSection}`}>
-            <div className="flex justify-content-between align-items-center mb-2">
-                <h4 className={`${styles.sectionTitleCompact} m-0`}>
-                    Documents for <span className="text-primary">{'"' + resumeTitle + '"'}</span>
+            <div className="flex justify-content-between align-items-center mb-3">
+                <h4 className={`${styles.sectionTitle} m-0`}>
+                    Documents for <span className="text-primary font-semibold">{'"' + resumeTitle + '"'}</span>
                 </h4>
                 <Button
                     label="Manage All"
                     icon={<FiFolder />}
-                    className="p-button-text p-button-sm"
+                    className="p-button-text p-button-sm p-button-secondary"
                     onClick={onManageDocuments}
                     tooltip="Go to Documents Page"
-                    tooltipOptions={{position: 'top'}}
+                    tooltipOptions={{ position: 'top' }}
                 />
             </div>
             {documents && documents.length > 0 ? (
                 <ul className="list-none p-0 m-0">
-                    {documents.slice(0, 3).map(doc => ( // Show max 3
-                        <li key={doc.unique_id || doc.id} className={`${styles.documentItem} p-2 mb-1 border-round surface-100 flex align-items-center justify-content-between`}>
+                    {documents.slice(0, 3).map(doc => (
+                        <li
+                            key={doc.unique_id || doc.id}
+                            className={`${styles.documentItem} p-3 mb-2 border-round surface-card border-1 surface-border flex align-items-center justify-content-between cursor-pointer hover:shadow-2 transition-shadow`}
+                            onClick={() => router.push(`/document_editor/${doc.unique_id}`)}
+                            title={`Edit ${doc.document_type.replace(/_/g, ' ')}`}
+                        >
                             <div className="flex align-items-center">
-                                <FiFileText className="text-primary mr-2" />
-                                <span className="text-sm text-color">{doc.document_type.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase())}</span>
+                                <FiFileText className="text-primary mr-3" style={{ fontSize: '1.2rem' }} />
+                                <span className="text-sm font-medium text-color">{doc.document_type.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase())}</span>
                             </div>
                             <span className="text-xs text-color-secondary">
-                                Created: {new Date(doc.created_at).toLocaleDateString()}
+                                {new Date(doc.created_at).toLocaleDateString()}
                             </span>
                         </li>
                     ))}
@@ -294,9 +232,13 @@ const RelatedDocumentsList = ({ documents, resumeTitle, onManageDocuments, isLoa
                     )}
                 </ul>
             ) : (
-                <p className="text-sm text-color-secondary p-2 border-round surface-50 text-center">
-                    No documents linked to this resume yet.
-                </p>
+                <div className={`${styles.emptyDocsContent} text-center p-4 border-1 border-dashed surface-border border-round`}>
+                    <FiArchive className="text-4xl text-color-secondary mb-2" />
+                    <p className="text-sm text-color-secondary m-0">
+                        No documents linked to this resume yet.
+                    </p>
+                    <Button label="Add Document" icon={<FiPlusSquare />} className="p-button-sm p-button-text mt-2" onClick={() => router.push(`/main/editor/${defaultResume?.id}`)} />
+                </div>
             )}
         </div>
     );
@@ -313,6 +255,7 @@ const DashboardPage = () => {
     const [defaultResume, setDefaultResume] = useState(null);
     const [relatedDocuments, setRelatedDocuments] = useState([]);
     const [loadingResumes, setLoadingResumes] = useState(true);
+    const [isGenerateDocDialogVisible, setIsGenerateDocDialogVisible] = useState(false);
 
     // Fetch all resumes and identify default
     useEffect(() => {
@@ -363,7 +306,25 @@ const DashboardPage = () => {
         loadInitialData();
     }, [session, sessionStatus]);
 
-
+    const transformedResumesForDialog = useMemo(() => {
+        return allResumes.map(resume => {
+            const docTypesObject = {};
+            if (resume.generated_documents_data && Array.isArray(resume.generated_documents_data)) {
+                resume.generated_documents_data.forEach(doc => {
+                    if (doc.document_type) {
+                        // The dialog only needs to know *that* a document type exists.
+                        // Storing 'true' or a minimal object is sufficient.
+                        docTypesObject[doc.document_type] = true;
+                    }
+                });
+            }
+            return {
+                id: resume.id, // Ensure 'id' is used consistently
+                // title: resume.title, // Not strictly needed by the dialog's cache logic but good for debugging
+                json_content: docTypesObject // This structure is expected by GenerateDocumentDialog
+            };
+        });
+    }, [allResumes]);
     const handleSetDefaultResume = async () => {
         if (!defaultResume && allResumes.length > 0) {
             // If no default is set, and there are resumes, prompt to select one or go to resumes page
@@ -372,7 +333,7 @@ const DashboardPage = () => {
             return;
         }
         if (!defaultResume) {
-             toast.current?.show({ severity: 'warn', summary: 'No Resume', detail: 'No resume selected to change default status.' });
+            toast.current?.show({ severity: 'warn', summary: 'No Resume', detail: 'No resume selected to change default status.' });
             return;
         }
 
@@ -403,9 +364,9 @@ const DashboardPage = () => {
 
             // Update cache
             const updatedCacheResumes = allResumes.map(r => {
-                 if (r.id === defaultResume.id) return { ...r, is_default: newDefaultState };
-                 if (newDefaultState && r.is_default && r.id !== defaultResume.id) return { ...r, is_default: false };
-                 return r;
+                if (r.id === defaultResume.id) return { ...r, is_default: newDefaultState };
+                if (newDefaultState && r.is_default && r.id !== defaultResume.id) return { ...r, is_default: false };
+                return r;
             });
             localStorage.setItem(RESUMES_CACHE_KEY_DASHBOARD, JSON.stringify({ data: updatedCacheResumes, timestamp: Date.now() }));
 
@@ -419,12 +380,44 @@ const DashboardPage = () => {
         }
     };
 
-    const quickActions = [
-        { title: "ATS Checker", icon: <FiCheckSquare />, description: "Optimize your resume for Applicant Tracking Systems.", route: '/ats', buttonLabel: "Scan Resume" },
-        { title: "New Resume", icon: <FiFileText />, description: "Craft a new standout resume from scratch or a template.", route: '/main/resumes/new', buttonLabel: "Create Now" },
-        { title: "My Portfolio", icon: <FiGlobe />, description: "Manage and publish your personal career website.", route: defaultResume ? `/main/site-editor/${defaultResume.personal_website_uuid || defaultResume.id}` : '/main/site-editor', buttonLabel: "Edit Site" }, // Use personal_website_uuid if available
-        { title: "Job Search", icon: <FiBriefcase />, description: "Discover and track relevant job opportunities.", route: '/main/job-feed', buttonLabel: "Find Jobs" },
+    const getQuickActions = (currentDefaultResume) => [
+        {
+            title: "Create New Document",
+            icon: <FiFileText size={28} className={styles.actionIconForeground} />, // Enhanced icon
+            description: "Generate a cover letter, recommendation, or other professional document.",
+            onClick: () => {
+                if (allResumes.length === 0) {
+                    toast.current?.show({ severity: 'warn', summary: 'No Resumes', detail: 'Please create a resume first before generating documents.', life: 4000 });
+                    return;
+                }
+                setIsGenerateDocDialogVisible(true);
+            },
+            buttonLabel: "Generate Now"
+        },
+        {
+            title: "New Resume",
+            icon: <FiPlusSquare size={28} className={styles.actionIconForeground} />, // Changed icon for consistency
+            description: "Craft a new standout resume from scratch or a template.",
+            route: '/main/editor/new', // Corrected route assuming editor/new
+            buttonLabel: "Create Resume"
+        },
+        {
+            title: "My Portfolio",
+            icon: <FiGlobe size={28} className={styles.actionIconForeground} />,
+            description: "Manage and publish your personal career website.",
+            route: currentDefaultResume ? `/main/site-editor/${currentDefaultResume.personal_website_uuid || currentDefaultResume.id}` : '/main/site-editor',
+            buttonLabel: "Edit Site"
+        },
+        {
+            title: "Job Search",
+            icon: <FiBriefcase size={28} className={styles.actionIconForeground} />,
+            description: "Discover and track relevant job opportunities.",
+            route: '/main/job-feed',
+            buttonLabel: "Find Jobs"
+        },
     ];
+
+    const quickActions = getQuickActions(defaultResume);
 
     if (sessionStatus === "loading") {
         return (
@@ -443,7 +436,7 @@ const DashboardPage = () => {
         <>
             <Toast ref={toast} />
             <WelcomeBanner userName={session?.user?.name} />
-            <QuickActionsGrid actions={quickActions} router={router} />
+            <QuickActionsGrid actions={quickActions} />
 
             <div className="grid mt-5">
                 <div className="col-12 lg:col-7 xl:col-8 p-3">
@@ -472,6 +465,28 @@ const DashboardPage = () => {
                     </div>
                 </div>
             </div>
+            <GenerateDocumentDialog
+                visible={isGenerateDocDialogVisible}
+                onHide={() => setIsGenerateDocDialogVisible(false)}
+                initialResumeId={null}
+                availableResumes={allResumes.map(r => ({ label: r.title || `Resume ID: ${r.id}`, value: r.id }))}
+                allResumesListCache={transformedResumesForDialog} // Pass the transformed data
+                onGenerationSuccess={(genDetails) => {
+                    toast.current?.show({
+                        severity: 'success',
+                        summary: 'Document Generation Started',
+                        detail: `Your document is being generated.`,
+                        life: 3000
+                    });
+                    setIsGenerateDocDialogVisible(false);
+                    if (defaultResume && genDetails.resume_id_used === defaultResume.id) {
+                        // Consider a more targeted refresh or update if loadInitialData is heavy
+                        // For now, assuming loadInitialData can be called to refresh
+                        // loadInitialData(true); // You might need to adapt loadInitialData to accept forceRefresh
+                    }
+                    router.push(`/document_editor/${genDetails.document_uuid}`);
+                }}
+            />
         </>
     );
 };
