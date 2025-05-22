@@ -37,7 +37,7 @@ const CACHE_EXPIRY_DURATION_DASHBOARD = 15 * 60 * 1000;
 
 const SidebarLogo = ({ collapsed }) => (
     <div className={`border-bottom-1 surface-border ${collapsed ? 'justify-content-center' : ''} px-4 flex align-items-center`}>
-        <Link href="/main/dashboard" className={styles.logo}>
+        <Link href="/main" className={styles.logo}>
             <div className={styles.logoIconContainer}>
                 <IoSparkles className={styles.logoIcon} />
             </div>
