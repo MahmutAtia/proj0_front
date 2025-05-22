@@ -6,6 +6,8 @@ import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
 import { useRouter } from 'next/navigation';
 import { Divider } from 'primereact/divider'; // Import Divider
 import { Tooltip } from 'primereact/tooltip'; // Import Tooltip
+import { DataView } from 'primereact/dataview'; // Added DataView import
+import { Dialog } from 'primereact/dialog'; // Added Dialog import 
 import { useResume } from "./ResumeContext";
 import PersonalInformation from "./components/PersonalInformation";
 import Summary from "./components/Summary";
@@ -32,13 +34,17 @@ const SECTION_ICONS = {
     default: 'pi pi-file'
 };
 
-const EditableResumeTemplate = ({ resumeId }) => {
+const EditableResumeTemplate = ({
+    resumeId,
+    linkedDocuments
+}) => {
     const { data, updateData } = useResume(); // Assuming updateData is available if needed later
     const [loading, setLoading] = useState(!data);
     const [hiddenSections, setHiddenSections] = useState([]);
     const [sidebarVisible, setSidebarVisible] = useState(true);
     const [activeSection, setActiveSection] = useState(null);
     const [showGenerateDialog, setShowGenerateDialog] = useState(false); // <-- Add state for dialog
+    const [showDocumentsDialog, setShowDocumentsDialog] = useState(false); // <-- Add state for documents dialog
     const router = useRouter();
     const toast = useRef(null);
     const mainContentRef = useRef(null); // Ref for the main scrollable area
@@ -166,6 +172,52 @@ const EditableResumeTemplate = ({ resumeId }) => {
     // Combine class names conditionally
     const classNames = (...classes) => classes.filter(Boolean).join(' ');
 
+
+
+    // Item template for documents in the dialog
+    const documentItemTemplate = (doc) => {
+        return (
+            <div className="col-12 p-2">
+                <div className="p-3 border-1 surface-border border-round surface-card mb-2 shadow-1 hover:shadow-3 transition-all transition-duration-300">
+                    <div className="flex flex-column md:flex-row md:justify-content-between md:align-items-center">
+                        <div className="flex align-items-center mb-3 md:mb-0">
+                            <i className={`${SECTION_ICONS[doc.document_type] || 'pi pi-file'} text-xl mr-3 p-3 border-circle bg-primary-50`}></i>
+                            <div>
+                                <div className="text-xl font-semibold mb-1">{formatDocumentType(doc.document_type)}</div>
+                                <div className="text-sm text-color-secondary">
+                                    {doc.created_at ? `Created: ${new Date(doc.created_at).toLocaleDateString()}` : 'Creation date not available'}
+                                </div>
+                            </div>
+                        </div>
+                        <Button
+                            icon="pi pi-pencil"
+                            label="Edit Document"
+                            className="p-button-sm"
+                            onClick={() => {
+                                if (!doc.unique_id) {
+                                    toast.current?.show({
+                                        severity: 'error',
+                                        summary: 'Navigation Error',
+                                        detail: 'Document ID is missing. Cannot open editor.',
+                                        life: 3000
+                                    });
+                                    return;
+                                }
+                                setShowDocumentsDialog(false); // Close the dialog
+                                router.push(`/document_editor/${doc.unique_id}`);
+                            }}
+                        />
+                    </div>
+                </div>
+            </div>
+        );
+    };
+
+    const formatDocumentType = (type) => {
+        return type ? type.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase()) : 'Unknown Document';
+    };
+
+
     return (
         <div className={classNames(styles.editorLayout, "flex flex-column h-screen")}>
             <Toast ref={toast} />
@@ -183,7 +235,7 @@ const EditableResumeTemplate = ({ resumeId }) => {
                     <h1 className="text-xl md:text-2xl font-semibold m-0">Resume Editor</h1>
                 </div>
                 <div className="flex gap-2 align-items-center">
-                    {loading && <ProgressSpinner style={{width: '2rem', height: '2rem'}} strokeWidth="6" />}
+                    {loading && <ProgressSpinner style={{ width: '2rem', height: '2rem' }} strokeWidth="6" />}
                     <Button
                         icon="pi pi-globe"
                         tooltip="Generate Website"
@@ -199,6 +251,17 @@ const EditableResumeTemplate = ({ resumeId }) => {
                         className="p-button-outlined p-button-secondary"
                         onClick={() => router.push(`/export/${resumeId}`)}
                         disabled={loading}
+                    />
+
+                    <Button
+                        icon="pi pi-folder-open"
+                        tooltip="Browse Documents"
+                        tooltipOptions={{ position: 'bottom' }}
+                        className="p-button-outlined p-button-secondary"
+                        onClick={() => setShowDocumentsDialog(true)}
+                        disabled={loading}
+                        badge={linkedDocuments?.length || 0}
+                        badgeClassName={linkedDocuments?.length ? "p-badge-warning" : ""}
                     />
                     <Button
                         icon="pi pi-file-edit" // Or pi-plus, pi-book, etc.
@@ -316,7 +379,7 @@ const EditableResumeTemplate = ({ resumeId }) => {
                             </div>
                         )}
                         {data && (
-                             <div className="surface-card p-4 md:p-5 shadow-2 border-round max-w-screen-xl mx-auto">
+                            <div className="surface-card p-4 md:p-5 shadow-2 border-round max-w-screen-xl mx-auto">
                                 <div className="flex flex-column gap-5">
                                     <Tooltip target=".section-title-help" />
                                     {sectionOrder.map((sectionKey, index) => {
@@ -333,8 +396,8 @@ const EditableResumeTemplate = ({ resumeId }) => {
                                                 {index > 0 && <Divider className="my-4" />}
                                                 <h2 className="text-xl font-semibold mt-0 mb-3">
                                                     <i className="pi pi-info-circle ml-2 text-sm text-color-secondary section-title-help"
-                                                       data-pr-tooltip={`Enter your professional ${formatSectionName(sectionKey).toLowerCase()} here.`}
-                                                       data-pr-position="right"></i>
+                                                        data-pr-tooltip={`Enter your professional ${formatSectionName(sectionKey).toLowerCase()} here.`}
+                                                        data-pr-position="right"></i>
                                                 </h2>
                                                 {renderSectionComponent(sectionKey)}
                                                 {isEmpty && (
@@ -352,12 +415,80 @@ const EditableResumeTemplate = ({ resumeId }) => {
                 </main>
             </div>
 
+            {/* Documents Dialog */}
+            <Dialog
+                header="Resume Documents"
+                visible={showDocumentsDialog}
+                style={{ width: '80vw', maxWidth: '900px' }}
+                modal
+                onHide={() => setShowDocumentsDialog(false)}
+                footer={
+                    <div className="flex justify-content-between">
+                        <Button
+                            label="Create New Document"
+                            icon="pi pi-plus"
+                            onClick={() => {
+                                setShowDocumentsDialog(false);
+                                setShowGenerateDialog(true);
+                            }}
+                        />
+                        <Button
+                            label="Close"
+                            icon="pi pi-times"
+                            className="p-button-text"
+                            onClick={() => setShowDocumentsDialog(false)}
+                        />
+                    </div>
+                }
+            >
+                {linkedDocuments && linkedDocuments.length > 0 ? (
+                    <DataView
+                        value={linkedDocuments}
+                        itemTemplate={documentItemTemplate}
+                        layout="list"
+                        emptyMessage="No documents have been generated for this resume yet."
+                    />
+                ) : (
+                    <div className="p-4 text-center">
+                        <i className="pi pi-folder-open text-4xl mb-3 text-color-secondary"></i>
+                        <p className="m-0 text-lg font-medium">No Documents Available</p>
+                        <p className="mt-2 text-color-secondary">You haven&apos;t created any documents for this resume yet.</p>
+                        <Button
+                            label="Create Your First Document"
+                            icon="pi pi-plus"
+                            className="mt-4"
+                            onClick={() => {
+                                setShowDocumentsDialog(false);
+                                setShowGenerateDialog(true);
+                            }}
+                        />
+                    </div>
+                )}
+            </Dialog>
+
+
+
+
             {/* Render the Dialog */}
-            <GenerateDocumentDialog
-                visible={showGenerateDialog}
-                onHide={() => setShowGenerateDialog(false)}
-                resumeId={resumeId} // Pass the resumeId
-            />
+            {data && ( // Ensure data is loaded before rendering dialog with resume-specific props
+                <GenerateDocumentDialog
+                    visible={showGenerateDialog}
+                    onHide={() => setShowGenerateDialog(false)}
+                    initialResumeId={resumeId} // Pass the current resumeId
+                    existingDocTypes={linkedDocuments.map(doc => doc.document_type)} // Pass existing document types
+
+                    onGenerationSuccess={(genDetails) => {
+                        setShowGenerateDialog(false);
+
+                        toast.current?.show({
+                            severity: 'success',
+                            summary: 'Document Generation Started',
+                            detail: `Your document is being generated.`,
+                            life: 3000
+                        })
+                    }}
+                />
+            )}
         </div>
     );
 };
