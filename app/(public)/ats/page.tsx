@@ -281,8 +281,8 @@ const ATSCheckerPage = () => {
                         setPollingAttempts(0);
                         // Clear interval if it was somehow running (shouldn't be for post-auth, but safety)
                         if (pollingIntervalRef.current) {
-                             clearInterval(pollingIntervalRef.current);
-                             pollingIntervalRef.current = null;
+                            clearInterval(pollingIntervalRef.current);
+                            pollingIntervalRef.current = null;
                         }
                         await saveGeneratedResume(taskId); // Call the dedicated save function
                         // saveGeneratedResume will handle setting generatedResumeId and postAuthCheckComplete
@@ -294,15 +294,15 @@ const ATSCheckerPage = () => {
                             setGeneratedResumeId(String(resumeIdFromResult));
                             setStatusError(null);
                             toast.current?.show({ severity: 'info', summary: 'Ready', detail: 'Editor is ready.', life: 2000 });
-                            try { localStorage.removeItem('data'); } catch (e) {}
+                            try { localStorage.removeItem('data'); } catch (e) { }
                             setIsCheckingStatus(false); // Stop loading on success
                             setPollingAttempts(0);
                             // Interval cleared by useEffect cleanup
                         } else {
-                             // If resume_id is missing even on SUCCESS, treat as error
-                             setIsCheckingStatus(false); // Stop loading
-                             console.warn("Polling status SUCCESS but 'resume_id' was missing in result:", statusResult.result);
-                             throw new Error("Editor prepared, but the resume ID was not found.");
+                            // If resume_id is missing even on SUCCESS, treat as error
+                            setIsCheckingStatus(false); // Stop loading
+                            console.warn("Polling status SUCCESS but 'resume_id' was missing in result:", statusResult.result);
+                            throw new Error("Editor prepared, but the resume ID was not found.");
                         }
                     }
                 case 'PENDING':
@@ -767,32 +767,32 @@ const ATSCheckerPage = () => {
 
                             <div className="mt-5 pt-4 border-top-1 flex flex-column justify-content-center align-items-center gap-3">
                                 {status !== 'authenticated' && sessionStorage.getItem('pendingTaskId') && !postAuthTaskIdToCheck && !postAuthCheckComplete && (
-                              <motion.div
-                              className="w-full text-center p-5 border-1 surface-border border-round bg-gradient-to-br from-blue-100 via-purple-50 to-pink-100 shadow-lg mb-4" // Enhanced background and shadow
-                              initial={{ opacity: 0, y: 10 }}
-                              animate={{ opacity: 1, y: 0 }}
-                              transition={{ duration: 0.4 }}
-                          >
-                              <span className="p-3 shadow-2 mb-4 inline-block surface-card" style={{ borderRadius: '50%' }}> {/* Circular icon background */}
-                                  <i className="pi pi-google text-4xl text-primary"></i> {/* Changed icon to Google */}
-                              </span>
-                              <h3 className="text-2xl font-bold text-primary-800 mt-0 mb-3">Unlock Full Potential!</h3> {/* Stronger headline */}
-                              <p className="text-color-secondary text-lg mb-5 px-3">Sign in to save this analysis, access the resume editor, and manage your applications.</p> {/* Clearer value proposition */}
-                              <motion.div variants={buttonHoverTap} whileHover="hover" whileTap="tap">
-                                  <Button
-                                      label="Sign In with Google & Continue" // More descriptive label
-                                      icon="pi pi-google"
-                                      className="p-button-success p-button-xl w-full sm:w-auto shadow-md hover:shadow-lg transition-shadow transition-duration-300 p-button-raised" // Larger button (p-button-xl), raised effect
-                                      onClick={handleSignInAndRedirect}
-                                      tooltip="Securely sign in to save & edit"
-                                      tooltipOptions={{ position: 'bottom', showDelay: 300 }}
-                                  />
-                              </motion.div>
-                              {/* Removed Divider */}
-                          </motion.div>
+                                    <motion.div
+                                        className="w-full text-center p-5 border-1 surface-border border-round bg-gradient-to-br from-blue-100 via-purple-50 to-pink-100 shadow-lg mb-4" // Enhanced background and shadow
+                                        initial={{ opacity: 0, y: 10 }}
+                                        animate={{ opacity: 1, y: 0 }}
+                                        transition={{ duration: 0.4 }}
+                                    >
+                                        <span className="p-3 shadow-2 mb-4 inline-block surface-card" style={{ borderRadius: '50%' }}> {/* Circular icon background */}
+                                            <i className="pi pi-google text-4xl text-primary"></i> {/* Changed icon to Google */}
+                                        </span>
+                                        <h3 className="text-2xl font-bold text-primary-800 mt-0 mb-3">Unlock Full Potential!</h3> {/* Stronger headline */}
+                                        <p className="text-color-secondary text-lg mb-5 px-3">Sign in to save this analysis, access the resume editor, and manage your applications.</p> {/* Clearer value proposition */}
+                                        <motion.div variants={buttonHoverTap} whileHover="hover" whileTap="tap">
+                                            <Button
+                                                label="Sign In with Google & Continue" // More descriptive label
+                                                icon="pi pi-google"
+                                                className="p-button-success p-button-xl w-full sm:w-auto shadow-md hover:shadow-lg transition-shadow transition-duration-300 p-button-raised" // Larger button (p-button-xl), raised effect
+                                                onClick={handleSignInAndRedirect}
+                                                tooltip="Securely sign in to save & edit"
+                                                tooltipOptions={{ position: 'bottom', showDelay: 300 }}
+                                            />
+                                        </motion.div>
+                                        {/* Removed Divider */}
+                                    </motion.div>
                                 )}
 
-<motion.div variants={buttonHoverTap} whileHover="hover" whileTap="tap">
+                                <motion.div variants={buttonHoverTap} whileHover="hover" whileTap="tap">
                                     <Button
                                         label="Start New Scan"
                                         icon="pi pi-refresh"
@@ -803,15 +803,53 @@ const ATSCheckerPage = () => {
                                 </motion.div>
 
                                 {isCheckingStatus && status === 'authenticated' && (
-                                    <motion.div variants={buttonHoverTap} whileHover="hover" whileTap="tap">
-                                        <Button
-                                            label={"Checking Editor Status..."}
-                                            icon="pi pi-spin pi-spinner"
-                                            disabled={true}
-                                            className="p-button-outlined w-full sm:w-auto"
-                                            tooltip="Please wait..."
-                                            tooltipOptions={{ position: 'bottom', showDelay: 300 }}
-                                        />
+                                    <motion.div
+                                        className="w-full sm:w-auto"
+                                        initial={{ opacity: 0 }}
+                                        animate={{ opacity: 1 }}
+                                        transition={{ duration: 0.3 }}
+                                    >
+                                        <div className="surface-card p-3 border-round shadow-2">
+                                            <div className="flex align-items-center mb-2">
+                                                <i className="pi pi-cog pi-spin mr-2 text-primary text-xl"></i>
+                                                <span className="font-semibold text-lg">Optimizing Your Resume</span>
+                                            </div>
+                                            <div className="mb-3">
+                                                <ul className="m-0 p-0 list-none">
+                                                    <motion.li
+                                                        initial={{ opacity: 0 }}
+                                                        animate={{ opacity: 1 }}
+                                                        transition={{ delay: 0.2 }}
+                                                        className="flex align-items-center mb-2"
+                                                    >
+                                                        <i className="pi pi-check-circle text-green-500 mr-2"></i>
+                                                        <span>Formatting structure</span>
+                                                    </motion.li>
+                                                    <motion.li
+                                                        initial={{ opacity: 0 }}
+                                                        animate={{ opacity: 1 }}
+                                                        transition={{ delay: 0.4 }}
+                                                        className="flex align-items-center mb-2"
+                                                    >
+                                                        <i className="pi pi-check-circle text-green-500 mr-2"></i>
+                                                        <span>Applying ATS improvements</span>
+                                                    </motion.li>
+                                                    <motion.li
+                                                        initial={{ opacity: 0 }}
+                                                        animate={{ opacity: pollingAttempts > 2 ? 1 : 0.5 }}
+                                                        transition={{ delay: 0.6 }}
+                                                        className="flex align-items-center"
+                                                    >
+                                                        <i className={`${pollingAttempts > 2 ? "pi pi-check-circle text-green-500" : "pi pi-spin pi-spinner text-blue-500"} mr-2`}></i>
+                                                        <span>Preparing editor environment</span>
+                                                    </motion.li>
+                                                </ul>
+                                            </div>
+                                            <div className="flex justify-content-between align-items-center">
+                                                <span className="text-sm text-color-secondary">This may take a moment...</span>
+                                                <ProgressSpinner style={{ width: '20px', height: '20px' }} strokeWidth="4" />
+                                            </div>
+                                        </div>
                                     </motion.div>
                                 )}
 
@@ -829,37 +867,37 @@ const ATSCheckerPage = () => {
                                 )}
 
                                 {generatedResumeId && !isCheckingStatus && !statusError && (
-                                     <motion.div
-                                     variants={buttonHoverTap} // Keep hover/tap effects
-                                     whileHover="hover"
-                                     whileTap="tap"
-                                     // Add a subtle pulse animation
-                                     animate={{
-                                         scale: [1, 1.03, 1], // Scale up and back down
-                                         boxShadow: [ // Add a subtle glow effect
-                                             "0 0 0 0 rgba(40, 167, 69, 0.4)",
-                                             "0 0 0 6px rgba(40, 167, 69, 0)",
-                                             "0 0 0 0 rgba(40, 167, 69, 0)"
-                                         ]
-                                     }}
-                                     transition={{
-                                         duration: 1.8, // Slower, more noticeable pulse
-                                         repeat: Infinity,
-                                         ease: "easeInOut",
-                                         repeatDelay: 1 // Pause between pulses
-                                     }}
-                                     style={{ borderRadius: '6px' }} // Apply border radius for boxShadow
-                                 >
-                                     <Button
-                                         label="Go to Editor"
-                                         icon="pi pi-pencil"
-                                         // Make it the primary action button style
-                                         className="p-button-success p-button-lg w-full sm:w-auto p-button-raised shadow-md" // Larger, raised, success color
-                                         onClick={handleGoToEditor}
-                                         tooltip="Edit this resume"
-                                         tooltipOptions={{ position: 'bottom', showDelay: 300 }}
-                                     />
-                                 </motion.div>
+                                    <motion.div
+                                        variants={buttonHoverTap} // Keep hover/tap effects
+                                        whileHover="hover"
+                                        whileTap="tap"
+                                        // Add a subtle pulse animation
+                                        animate={{
+                                            scale: [1, 1.03, 1], // Scale up and back down
+                                            boxShadow: [ // Add a subtle glow effect
+                                                "0 0 0 0 rgba(40, 167, 69, 0.4)",
+                                                "0 0 0 6px rgba(40, 167, 69, 0)",
+                                                "0 0 0 0 rgba(40, 167, 69, 0)"
+                                            ]
+                                        }}
+                                        transition={{
+                                            duration: 1.8, // Slower, more noticeable pulse
+                                            repeat: Infinity,
+                                            ease: "easeInOut",
+                                            repeatDelay: 1 // Pause between pulses
+                                        }}
+                                        style={{ borderRadius: '6px' }} // Apply border radius for boxShadow
+                                    >
+                                        <Button
+                                            label="Go to Editor"
+                                            icon="pi pi-pencil"
+                                            // Make it the primary action button style
+                                            className="p-button-success p-button-lg w-full sm:w-auto p-button-raised shadow-md" // Larger, raised, success color
+                                            onClick={handleGoToEditor}
+                                            tooltip="Edit this resume"
+                                            tooltipOptions={{ position: 'bottom', showDelay: 300 }}
+                                        />
+                                    </motion.div>
                                 )}
 
                                 {status === 'authenticated' && !generateNewResume && !generationTaskId && !postAuthTaskIdToCheck && !isCheckingStatus && !statusError && (
