@@ -1,4 +1,6 @@
 import React, { useEffect, useState, useRef } from 'react';
+import axios from 'axios';
+import { useSession } from 'next-auth/react';
 import { Button } from 'primereact/button';
 import { ProgressSpinner } from 'primereact/progressspinner';
 import { Toast } from 'primereact/toast';
@@ -7,7 +9,7 @@ import { useRouter } from 'next/navigation';
 import { Divider } from 'primereact/divider'; // Import Divider
 import { Tooltip } from 'primereact/tooltip'; // Import Tooltip
 import { DataView } from 'primereact/dataview'; // Added DataView import
-import { Dialog } from 'primereact/dialog'; // Added Dialog import 
+import { Dialog } from 'primereact/dialog'; // Added Dialog import
 import { useResume } from "./ResumeContext";
 import PersonalInformation from "./components/PersonalInformation";
 import Summary from "./components/Summary";
@@ -36,7 +38,7 @@ const SECTION_ICONS = {
 
 const EditableResumeTemplate = ({
     resumeId,
-    linkedDocuments
+    linkedDocuments: initialLinkedDocuments
 }) => {
     const { data, updateData } = useResume(); // Assuming updateData is available if needed later
     const [loading, setLoading] = useState(!data);
@@ -48,6 +50,10 @@ const EditableResumeTemplate = ({
     const router = useRouter();
     const toast = useRef(null);
     const mainContentRef = useRef(null); // Ref for the main scrollable area
+    const { data: session, status } = useSession();
+    const token = session?.accessToken || null; // Get the token from session
+    // Initialize local state from props
+    const [linkedDocuments, setLinkedDocuments] = useState(initialLinkedDocuments || []);
 
     // Define section keys and non-array sections
     const ALL_SECTION_KEYS = [
@@ -139,29 +145,47 @@ const EditableResumeTemplate = ({
         return () => mediaQuery.removeEventListener('change', handleResize);
     }, [data]); // Rerun only when data initially loads
 
-    // Save resume data (example using localStorage)
+    // Save resume data with fixed toast notifications
     const saveResumeData = () => {
-        console.log("Saving data:", data);
         setLoading(true); // Show loading indicator during save
-        try {
-            const localData = localStorage.getItem('data');
-            let resumes = localData ? JSON.parse(localData) : [];
-            const existingResumeIndex = resumes.findIndex((item) => item.id === Number(resumeId));
 
-            if (existingResumeIndex !== -1) {
-                resumes[existingResumeIndex] = { ...resumes[existingResumeIndex], resume: data };
-            } else {
-                resumes.push({ id: Number(resumeId), name: `Resume ${resumeId}`, resume: data });
+        // Send data to backend using PATCH request
+        axios.patch(
+            `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/resumes/${resumeId}/`,
+            { resume: data }, // Just send the 'resume' field to update
+            {
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}` // Include auth token if using JWT
+                }
             }
+        )
+            .then(response => {
+                console.log("Save successful:", response.data);
+                setLoading(false);
+                // Show success notification using PrimeReact Toast
+                toast.current?.show({
+                    severity: 'success',
+                    summary: 'Success',
+                    detail: 'Resume saved successfully',
+                    life: 3000
+                });
 
-            localStorage.setItem('data', JSON.stringify(resumes));
-            toast.current?.show({ severity: 'success', summary: 'Success', detail: 'Resume saved successfully', life: 3000 });
-        } catch (error) {
-            console.error("Failed to save resume:", error);
-            toast.current?.show({ severity: 'error', summary: 'Error', detail: 'Failed to save resume.', life: 3000 });
-        } finally {
-            setLoading(false);
-        }
+                // Also update the local cache
+                updateResumeCache(response.data.resume || data);
+            })
+            .catch(error => {
+                console.error("Error saving resume:", error);
+                setLoading(false);
+                // Show error notification using PrimeReact Toast
+                toast.current?.show({
+                    severity: 'error',
+                    summary: 'Error',
+                    detail: `Failed to save: ${error.response?.data?.error || "Unknown error"}`,
+                    life: 3000
+                });
+            });
+
     };
 
     // Helper to format section keys for display
@@ -215,6 +239,132 @@ const EditableResumeTemplate = ({
 
     const formatDocumentType = (type) => {
         return type ? type.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase()) : 'Unknown Document';
+    };
+
+    // Add this new function to update cache after backend operations
+    const updateResumeCache = async (updatedData = null, newDocument = null) => {
+        try {
+            // If we have updated resume data, update the context
+            if (updatedData) {
+
+
+                // Also update localStorage as a fallback
+                try {
+                    const localData = localStorage.getItem('all_resumes_list_cache');
+                    let parsedData = localData ? JSON.parse(localData) : { data: [] };
+                    let resumes = parsedData.data || [];
+
+                    const existingResumeIndex = resumes.findIndex((item) => item.id === Number(resumeId));
+
+                    if (existingResumeIndex !== -1) {
+                        resumes[existingResumeIndex] = {
+                            ...resumes[existingResumeIndex],
+                            resume: updatedData
+                        };
+                    } else {
+                        resumes.push({
+                            id: Number(resumeId),
+                            name: `Resume ${resumeId}`,
+                            resume: updatedData
+                        });
+                    }
+
+                    localStorage.setItem('all_resumes_list_cache', JSON.stringify({ data: resumes }));
+                    console.log("Resume data cached in localStorage successfully");
+                } catch (storageError) {
+                    console.error("Failed to cache resume in localStorage:", storageError);
+                    // Continue execution - localStorage is just a fallback
+                }
+            }
+
+            // If we have a new document, handle document updates
+            if (newDocument && newDocument.document_uuid) {
+                try {
+                    // Fetch complete document details from the backend
+                    const response = await axios.get(
+                        `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/resumes/document_bloks/${newDocument.document_uuid}/`,
+                        {
+                            headers: {
+                                'Authorization': `Bearer ${token}`
+                            }
+                        }
+                    );
+
+                    const documentData = response.data;
+                    if (documentData) {
+                        // Update the linked documents in the component state
+                        const updatedDocuments = [...(linkedDocuments || []), documentData];
+                        setLinkedDocuments(updatedDocuments);
+
+                        // Update localStorage for all_resumes_list_cache
+                        try {
+                            const localData = localStorage.getItem('all_resumes_list_cache');
+                            if (localData) {
+                                let parsedData = JSON.parse(localData);
+                                let resumes = parsedData.data || [];
+
+                                const existingResumeIndex = resumes.findIndex(
+                                    (item) => item.id === Number(resumeId)
+                                );
+
+                                if (existingResumeIndex !== -1) {
+                                    // Initialize generated_documents_data if it doesn't exist
+                                    if (!resumes[existingResumeIndex].generated_documents_data) {
+                                        resumes[existingResumeIndex].generated_documents_data = [];
+                                    }
+
+                                    // Add the new document to the documents array if it doesn't already exist
+                                    const docExists = resumes[existingResumeIndex].generated_documents_data.some(
+                                        doc => doc.unique_id === documentData.unique_id
+                                    );
+                                    console.log("Document exists:", docExists);
+
+                                    if (!docExists) {
+                                        resumes[existingResumeIndex].generated_documents_data.push(documentData);
+
+                                        // Save back to localStorage
+                                        localStorage.setItem('all_resumes_list_cache',
+                                            JSON.stringify({ data: resumes })
+                                        );
+                                        console.log("Document data cached in localStorage successfully");
+                                    }
+                                }
+                            }
+                        } catch (storageError) {
+                            console.error("Failed to cache document in localStorage:", storageError);
+                        }
+
+                        toast.current?.show({
+                            severity: 'success',
+                            summary: 'Document Linked',
+                            detail: 'Document successfully linked to your resume',
+                            life: 3000
+                        });
+                    } else {
+                        throw new Error("Received empty document data from server");
+                    }
+                } catch (error) {
+                    console.error("Error fetching document data:", error);
+                    toast.current?.show({
+                        severity: 'error',
+                        summary: 'Error',
+                        detail: `Failed to fetch document data: ${error.response?.data?.error || error.message || "Unknown error"}`,
+                        life: 3000
+                    });
+                }
+            }
+
+            return true;
+        } catch (error) {
+            console.error("Unexpected error in updateResumeCache:", error);
+            toast.current?.show({
+                severity: 'error',
+                summary: 'Cache Update Failed',
+                detail: 'An unexpected error occurred while updating the cache',
+                life: 3000
+            });
+            return false;
+        }
     };
 
 
@@ -479,6 +629,8 @@ const EditableResumeTemplate = ({
 
                     onGenerationSuccess={(genDetails) => {
                         setShowGenerateDialog(false);
+                        // Update the cache with the new document
+                        updateResumeCache(null, genDetails); // Pass null for updatedData if not needed
 
                         toast.current?.show({
                             severity: 'success',
