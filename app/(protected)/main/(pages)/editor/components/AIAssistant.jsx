@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from "react";
+import React, { useState, useEffect, useRef } from 'react';
 import { InputText } from "primereact/inputtext";
 import { Button } from "primereact/button";
 import { Menu } from "primereact/menu";
@@ -18,19 +18,54 @@ const languages = [
     { name: 'French', code: 'fr-FR', flag: '🇫🇷' },
     { name: 'German', code: 'de-DE', flag: '🇩🇪' },
     { name: 'Turkish', code: 'tr-TR', flag: '🇹🇷' },
-    { name: 'Chinese', code: 'zh-CN', flag: '🇨🇳' },
-    { name: 'Hindi', code: 'hi-IN', flag: '🇮🇳' },
+    { name: 'Russian', code: 'ru-RU', flag: '🇷🇺' },
+    { name: 'Arabic', code: 'ar-SA', flag: '🇸🇦' },
+    { name: 'Arabic (Egypt)', code: 'ar-EG', flag: '🇪🇬' },
+    { name: 'Dutch', code: 'nl-NL', flag: '🇳🇱' },
+
 ];
 
 // Browser support information
 const BROWSER_SUPPORT_INFO = "Speech recognition is supported in Chrome, Edge, Safari, and Opera. Firefox requires enabling the 'media.webspeech.recognition.enable' flag.";
+
+const LOCAL_STORAGE_LANG_KEY = 'speech_recognition_language';
+
+// Define the getInitialLanguage function BEFORE using it in useState
+const getInitialLanguage = () => {
+    try {
+        // Try to get from localStorage first
+        const savedLangCode = localStorage.getItem(LOCAL_STORAGE_LANG_KEY);
+        if (savedLangCode) {
+            const savedLang = languages.find(lang => lang.code === savedLangCode);
+            if (savedLang) return savedLang;
+        }
+
+        // Try to match browser language
+        const browserLang = navigator.language;
+        const exactMatch = languages.find(lang => lang.code === browserLang);
+        if (exactMatch) return exactMatch;
+
+        // Try to match just the language part (e.g., 'en' from 'en-GB')
+        const langCode = browserLang.split('-')[0];
+        const partialMatch = languages.find(lang => lang.code.startsWith(langCode + '-'));
+        if (partialMatch) return partialMatch;
+
+        // Default to English US
+        return languages[0];
+    } catch (error) {
+        console.error("Error getting initial language:", error);
+        return languages[0]; // Default to English US on error
+    }
+};
 
 const AIAssistant = ({ prompt = "", setPrompt, onSubmit, isProcessing }) => {
     const [isListening, setIsListening] = useState(false);
     const [interimText, setInterimText] = useState("");
     const [finalText, setFinalText] = useState("");
     const [recognition, setRecognition] = useState(null);
-    const [selectedLanguage, setSelectedLanguage] = useState(languages.find(lang => lang.code === navigator.language) || languages[0]);
+
+    // Now using the getInitialLanguage function that was defined above
+    const [selectedLanguage, setSelectedLanguage] = useState(getInitialLanguage());
     const [isBrowserSupported, setIsBrowserSupported] = useState(!!SpeechRecognition);
     const inputRef = useRef(null);
     const [lastActivityTime, setLastActivityTime] = useState(Date.now());
@@ -186,6 +221,16 @@ const AIAssistant = ({ prompt = "", setPrompt, onSubmit, isProcessing }) => {
         }
     };
 
+    // Update localStorage when language changes
+    const updateSelectedLanguage = (lang) => {
+        setSelectedLanguage(lang);
+        try {
+            localStorage.setItem(LOCAL_STORAGE_LANG_KEY, lang.code);
+        } catch (error) {
+            console.error("Error saving language preference:", error);
+        }
+    };
+
     // Create language menu items
     const languageItems = languages.map(lang => ({
         label: (
@@ -195,7 +240,7 @@ const AIAssistant = ({ prompt = "", setPrompt, onSubmit, isProcessing }) => {
             </div>
         ),
         className: classNames({ [styles.activeLangItem]: selectedLanguage.code === lang.code }),
-        command: () => setSelectedLanguage(lang)
+        command: () => updateSelectedLanguage(lang)
     }));
 
     const showLanguageMenu = (event) => {
