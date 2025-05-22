@@ -20,7 +20,7 @@ import Skills from "./components/Skills";
 import Languages from "./components/Languages";
 import GenericSection from "./components/GenericSection";
 import GenerateDocumentDialog from "./components/GenerateDocumentDialog"; // <-- Import the new component
-
+import CreateResumeFromExistingDialog from "./components/CreateResumeFromExistingDialog"; // <-- Import the new component
 import 'primeflex/primeflex.css';
 import styles from './EditableResumeTemplate.module.css'; // Ensure CSS Modules are used
 
@@ -47,6 +47,7 @@ const EditableResumeTemplate = ({
     const [activeSection, setActiveSection] = useState(null);
     const [showGenerateDialog, setShowGenerateDialog] = useState(false); // <-- Add state for dialog
     const [showDocumentsDialog, setShowDocumentsDialog] = useState(false); // <-- Add state for documents dialog
+    const [showCreateDialog, setShowCreateDialog] = useState(false); // <-- Add state for create dialog
     const router = useRouter();
     const toast = useRef(null);
     const mainContentRef = useRef(null); // Ref for the main scrollable area
@@ -402,6 +403,20 @@ const EditableResumeTemplate = ({
                         onClick={() => router.push(`/export/${resumeId}`)}
                         disabled={loading}
                     />
+                    {/* // create new resume from this resume */}
+                    <Button
+                        icon="pi pi-copy"
+                        tooltip="Create New Resume from this one"
+                        tooltipOptions={{ position: 'bottom' }}
+                        className="p-button-outlined p-button-secondary"
+                        onClick={() => {
+
+                            setShowCreateDialog(true);
+                        }
+                        }
+                        // disabled={loading}
+                    />
+
 
                     <Button
                         icon="pi pi-folder-open"
@@ -614,9 +629,24 @@ const EditableResumeTemplate = ({
                         />
                     </div>
                 )}
+
+
             </Dialog>
 
 
+            {/* Create New Resume Dialog */}
+             <CreateResumeFromExistingDialog
+                visible={showCreateDialog}
+                onHide={() => setShowCreateDialog(false)}
+                availableResumes={[]}
+                onSuccess={
+                    (newResumeId) => {
+                        setShowCreateDialog(false);
+                        router.push(`/editor/${newResumeId}`);
+                    }
+                }
+                initialResumeId ={resumeId} // Pass the current resumeId
+            />
 
 
             {/* Render the Dialog */}

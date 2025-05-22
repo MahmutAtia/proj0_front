@@ -25,6 +25,7 @@ import { Toast } from 'primereact/toast';
 
 import { Dialog } from 'primereact/dialog'; // If not already there for other purposes
 import GenerateDocumentDialog from './(pages)/editor/components/GenerateDocumentDialog'; // Adjust path as needed
+import CreateResumeFromExistingDialog from './(pages)/editor/components/CreateResumeFromExistingDialog'; // Adjust path as neededimport
 
 // Make sure RESUMES_CACHE_KEY and CACHE_EXPIRY_DURATION are accessible here or re-defined
 // Or better, use a shared context/hook for resume data and default resume logic.
@@ -33,18 +34,6 @@ const RESUMES_CACHE_KEY_DASHBOARD = 'all_resumes_list_cache'; // Same key as Res
 const CACHE_EXPIRY_DURATION_DASHBOARD = 15 * 60 * 1000;
 
 
-// --- Child Components (Updated) ---
-
-const SidebarLogo = ({ collapsed }) => (
-    <div className={`border-bottom-1 surface-border ${collapsed ? 'justify-content-center' : ''} px-4 flex align-items-center`}>
-        <Link href="/main" className={styles.logo}>
-            <div className={styles.logoIconContainer}>
-                <IoSparkles className={styles.logoIcon} />
-            </div>
-            {!collapsed && <span className={styles.logoText}>CareerFlow</span>}
-        </Link>
-    </div>
-);
 
 
 const WelcomeBanner = ({ userName }) => (
@@ -256,6 +245,7 @@ const DashboardPage = () => {
     const [relatedDocuments, setRelatedDocuments] = useState([]);
     const [loadingResumes, setLoadingResumes] = useState(true);
     const [isGenerateDocDialogVisible, setIsGenerateDocDialogVisible] = useState(false);
+    const [showCreateDialog, setShowCreateDialog] = useState(false);
 
     // Fetch all resumes and identify default
     useEffect(() => {
@@ -398,7 +388,13 @@ const DashboardPage = () => {
             title: "New Resume",
             icon: <FiPlusSquare size={28} className={styles.actionIconForeground} />, // Changed icon for consistency
             description: "Craft a new standout resume from scratch or a template.",
-            route: '/main/editor/new', // Corrected route assuming editor/new
+            onClick: () => {
+                if (allResumes.length === 0) {
+                    toast.current?.show({ severity: 'warn', summary: 'No Resumes', detail: 'Please create a resume first before generating documents.', life: 4000 });
+                    return;
+                }
+                setShowCreateDialog(true);
+            },
             buttonLabel: "Create Resume"
         },
         {
@@ -418,6 +414,14 @@ const DashboardPage = () => {
     ];
 
     const quickActions = getQuickActions(defaultResume);
+
+    const handleCreationSuccess = (newResumeId) => {
+        console.log("New resume created with ID:", newResumeId);
+        // Optionally, navigate to the new resume or refresh data
+        // router.push(`/main/editor/${newResumeId}`);
+        setShowCreateDialog(false);
+        // Refresh resume list
+    };
 
     if (sessionStatus === "loading") {
         return (
@@ -486,6 +490,13 @@ const DashboardPage = () => {
                     }
                     router.push(`/document_editor/${genDetails.document_uuid}`);
                 }}
+            />
+            <CreateResumeFromExistingDialog
+                visible={showCreateDialog}
+                onHide={() => setShowCreateDialog(false)}
+                availableResumes={allResumes.map(r => ({ label: r.title || `Resume ID: ${r.id}`, value: r.id }))}
+                onSuccess={handleCreationSuccess}
+                // initialResumeId can be passed if a specific resume is pre-selected
             />
         </>
     );
