@@ -169,6 +169,13 @@ export default function Layout({ children }) {
         }
     }, []);
 
+    // Effect for handling unauthenticated status
+    useEffect(() => {
+        if (status === "unauthenticated") {
+            router.push('/login');
+        }
+    }, [status, router]); // Re-run this effect if status or router changes
+
     const toggleSidebar = () => {
         const newState = !sidebarCollapsed;
         setSidebarCollapsed(newState);
@@ -200,9 +207,16 @@ export default function Layout({ children }) {
         );
     }
 
+    // If unauthenticated, the useEffect will handle the redirect.
+    // We still need to prevent rendering the rest of the layout for unauthenticated users.
     if (status === "unauthenticated") {
-        router.push('/login');
-        return null; // Important to return null or a loader while redirecting
+        // Optionally, render a loading spinner or null while redirecting
+        return (
+            <div className="flex justify-content-center align-items-center min-h-screen surface-ground">
+                <ProgressSpinner style={{ width: '50px', height: '50px' }} strokeWidth="4" animationDuration=".5s" />
+            </div>
+        );
+        // Or simply: return null;
     }
 
     const handleSetDefaultResume = () => {

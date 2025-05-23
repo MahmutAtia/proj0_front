@@ -210,8 +210,7 @@ const RelatedDocumentsList = ({ documents, resumeTitle, onManageDocuments, isLoa
                                 <span className="text-sm font-medium text-color">{doc.document_type.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase())}</span>
                             </div>
                             <span className="text-xs text-color-secondary">
-                                {new Date(doc.created_at).toLocaleDateString()}
-                            </span>
+                                {new Date(doc.created_at).toISOString().split('T')[0]}                             </span>
                         </li>
                     ))}
                     {documents.length > 3 && (
@@ -496,7 +495,7 @@ const DashboardPage = () => {
                 onHide={() => setShowCreateDialog(false)}
                 availableResumes={allResumes.map(r => ({ label: r.title || `Resume ID: ${r.id}`, value: r.id }))}
                 onSuccess={handleCreationSuccess}
-                // initialResumeId can be passed if a specific resume is pre-selected
+            // initialResumeId can be passed if a specific resume is pre-selected
             />
         </>
     );
