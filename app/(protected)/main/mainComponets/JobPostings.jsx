@@ -1,118 +1,122 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { Card } from 'primereact/card';
 import { Button } from 'primereact/button';
 import { ProgressSpinner } from 'primereact/progressspinner';
 import styles from '../Dashboard.module.css';
+import useUserLocation from '../../../hooks/useUserLocation'; // Adjust path as needed
 
-const LOCAL_STORAGE_KEY = 'jobFeedData';
-const DATA_EXPIRY_MS = 120 * 60 * 1000; // 120 minutes
+const JOB_DATA_CACHE_KEY = 'jobFeedData';
+const JOB_DATA_EXPIRY_MS = 120 * 60 * 1000; // 120 minutes for job data
+
+// LOCATION_CACHE_KEY and LOCATION_CACHE_EXPIRY_MS are now in useUserLocation.js
 
 const JobPostings = ({ router }) => {
     const [jobs, setJobs] = useState([]);
-    const [loading, setLoading] = useState(true);
-    const [location, setLocation] = useState({ country: '', city: '' });
-    const [error, setError] = useState(null);
+    const [loadingJobs, setLoadingJobs] = useState(true); // Renamed to avoid conflict
+    const [jobsError, setJobsError] = useState(null); // Renamed to avoid conflict
 
-    useEffect(() => {
-        const fetchLocationAndJobs = async () => {
-            try {
-                const response = await fetch('https://ipapi.co/json/');
-                const data = await response.json();
-                const country = data.country_name;
-                const city = data.city;
-                setLocation({ country, city });
+    // Use the custom hook for location
+    const { location, loadingLocation, locationError, refetchLocation } = useUserLocation();
 
-                // Check localStorage for cached data for this location
-                const cachedData = localStorage.getItem(LOCAL_STORAGE_KEY);
-                if (cachedData) {
-                    const { jobs: cachedJobs, timestamp, location: cachedLocation } = JSON.parse(cachedData);
-                    const isCacheValid = (new Date().getTime() - timestamp) < DATA_EXPIRY_MS;
-                    const isSameLocation = cachedLocation && cachedLocation.country === country && cachedLocation.city === city;
+    // The getUserLocation function is now part of useUserLocation hook (as fetchUserLocation/refetchLocation)
 
-                    if (isCacheValid && isSameLocation && cachedJobs && cachedJobs.length > 0) {
-                        setJobs(cachedJobs);
-                        setLoading(false);
-                        setError(null);
-                        console.log("Loaded jobs from cache for:", city, country);
-                        return; // Exit if valid cache is found
-                    }
+    const fetchAndCacheJobPostings = useCallback(async (loc) => {
+        const targetCountry = loc?.country || "default";
+        const targetCity = loc?.city || "default";
+
+        setLoadingJobs(true);
+        // Preserve location-related error if jobs are being fetched as a fallback
+        // If locationError exists, we might want to show it, otherwise clear jobsError
+        if (!locationError) {
+            setJobsError(null);
+        }
+
+
+        try {
+            const cachedJobDataRaw = localStorage.getItem(JOB_DATA_CACHE_KEY);
+            if (cachedJobDataRaw) {
+                const { jobs: cachedJobs, timestamp, location: cachedJobLocation } = JSON.parse(cachedJobDataRaw);
+                const isJobCacheValid = (new Date().getTime() - timestamp) < JOB_DATA_EXPIRY_MS;
+                const isSameLocationForJobs = cachedJobLocation && cachedJobLocation.country === targetCountry && cachedJobLocation.city === targetCity;
+
+                if (isJobCacheValid && isSameLocationForJobs && cachedJobs && cachedJobs.length > 0) {
+                    setJobs(cachedJobs);
+                    console.log("Loaded jobs from job cache for:", targetCity, targetCountry);
+                    setLoadingJobs(false);
+                    return;
                 }
-                // If no valid cache, fetch new job postings
-                fetchJobPostings(country, city);
-            } catch (err) {
-                console.error("Error fetching location:", err);
-                setError("Unable to fetch location. Checking cache for default jobs or fetching new ones.");
-                // Try to load from cache with no specific location or fetch default
-                const cachedData = localStorage.getItem(LOCAL_STORAGE_KEY);
-                if (cachedData) {
-                    const { jobs: cachedJobs, timestamp, location: cachedLocation } = JSON.parse(cachedData);
-                    const isCacheValid = (new Date().getTime() - timestamp) < DATA_EXPIRY_MS;
-                     // Allow loading if cache is for 'default' or if location couldn't be fetched
-                    if (isCacheValid && (!cachedLocation || (cachedLocation.country === "default" && cachedLocation.city === "default")) && cachedJobs && cachedJobs.length > 0) {
-                        setJobs(cachedJobs);
-                        setLocation(cachedLocation || { country: 'Default', city: 'Location' });
-                        setLoading(false);
-                        setError(null);
-                        console.log("Loaded default jobs from cache due to location fetch error.");
-                        return;
-                    }
-                }
-                fetchJobPostings(); // Fallback to fetch default jobs
             }
-        };
-
-        fetchLocationAndJobs();
-    }, []);
-
-    const fetchJobPostings = (country, city) => {
-        setLoading(true);
-        setError(null);
+        } catch (e) {
+            console.warn("Failed to load jobs from job cache or parse error", e);
+        }
 
         const apiUrl = `${process.env.NEXT_PUBLIC_AI_API_URL}/scraper/scrape-jobs/`;
         const requestBody = {
             search_term: "developer",
-            location: city || "default",
-            country: country || "default",
+            location: targetCity,
+            country: targetCountry,
         };
 
-        fetch(apiUrl, {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify(requestBody),
-        })
-            .then((response) => {
-                if (!response.ok) {
-                    throw new Error(`API Error: ${response.status}`);
-                }
-                return response.json();
-            })
-            .then((data) => {
-                setJobs(data || []); // Ensure data is an array
-                try {
-                    const cacheData = {
-                        jobs: data || [],
-                        timestamp: new Date().getTime(),
-                        location: { country: country || "default", city: city || "default" } // Store location used for this cache
-                    };
-                    localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(cacheData));
-                    console.log("Saved jobs to localStorage for:", city || "default", country || "default");
-                } catch (e) {
-                    console.warn("Failed to save jobs to localStorage", e);
-                }
-                setLoading(false);
-            })
-            .catch((err) => {
-                console.error("Error fetching job postings:", err);
-                setError("Failed to fetch job postings. Please try again later.");
-                setJobs([]); // Clear jobs on error
-                setLoading(false);
+        try {
+            const response = await fetch(apiUrl, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(requestBody),
             });
-    };
+
+            if (!response.ok) {
+                const errorText = await response.text();
+                throw new Error(`API Error: ${response.status} - ${errorText}`);
+            }
+            const data = await response.json();
+            const jobsData = Array.isArray(data) ? data : (data.jobs || []);
+
+            setJobs(jobsData);
+            localStorage.setItem(JOB_DATA_CACHE_KEY, JSON.stringify({
+                jobs: jobsData,
+                timestamp: new Date().getTime(),
+                location: { country: targetCountry, city: targetCity }
+            }));
+            console.log("Fetched and saved jobs to localStorage for:", targetCity, targetCountry);
+        } catch (err) {
+            console.error("Error fetching job postings:", err);
+            setJobsError("Failed to fetch job postings. Please try again later.");
+            setJobs([]);
+        } finally {
+            setLoadingJobs(false);
+        }
+    }, [locationError]); // Depend on locationError to decide if we should clear jobsError
+
+    useEffect(() => {
+        const initializeJobsFeed = async () => {
+            // Location is fetched by the useUserLocation hook automatically on mount.
+            // We wait for the location data (or error) before fetching jobs.
+            if (!loadingLocation) { // Only proceed if location fetching is complete
+                if (location && location.country && !locationError) {
+                    await fetchAndCacheJobPostings(location);
+                } else {
+                    // If locationError exists or location is not available,
+                    // fetchAndCacheJobPostings will use default values.
+                    // The locationError state from the hook can be displayed to the user.
+                    await fetchAndCacheJobPostings(null);
+                }
+            }
+        };
+
+        initializeJobsFeed();
+    }, [loadingLocation, location, locationError, fetchAndCacheJobPostings]);
+
+
+    // Determine overall loading state and error message
+    const isLoading = loadingLocation || loadingJobs;
+    const displayError = locationError || jobsError;
 
     return (
         <Card className={`${styles.dashboardCard} h-full`}>
             <div className="flex justify-content-between align-items-center mb-3">
                 <h3 className="text-xl font-bold m-0">Latest Job Postings</h3>
+                {/* Optional: Add a button to refetch location if needed */}
+                {/* {locationError && <Button label="Retry Location" onClick={refetchLocation} className="p-button-sm p-button-warning" />} */}
                 <Button
                     label="View All"
                     icon="pi pi-arrow-right"
@@ -121,13 +125,13 @@ const JobPostings = ({ router }) => {
                     onClick={() => router.push('/main/job-feed')}
                 />
             </div>
-            {error && <p className="text-sm text-red-500 mb-3">{error}</p>}
-            {location.country && location.city && !error && (
+            {displayError && <p className="text-sm text-red-500 mb-3">{displayError}</p>}
+            {location.city && location.country && !locationError && (
                 <p className="text-sm text-color-secondary mb-3">
                     Showing top results for {location.city}, {location.country}.
                 </p>
             )}
-            {loading ? (
+            {isLoading ? (
                 <div className="flex justify-content-center align-items-center py-5">
                     <ProgressSpinner style={{ width: '30px', height: '30px' }} />
                 </div>
@@ -143,7 +147,7 @@ const JobPostings = ({ router }) => {
                     ))}
                 </ul>
             ) : (
-                <p className="text-color-secondary">{error ? "Could not load jobs." : "No new job postings found."}</p>
+                <p className="text-color-secondary">{displayError ? "Could not load jobs." : "No new job postings found."}</p>
             )}
         </Card>
     );
