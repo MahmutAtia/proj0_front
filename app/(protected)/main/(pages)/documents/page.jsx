@@ -304,8 +304,8 @@ const DocumentsPage = () => {
                 {!loading && allDocuments.length === 0 && !error && (
                      <div className="text-center p-5">
                         <FiFileText className="text-6xl text-color-secondary mb-3" />
-                        <p className="text-xl">You haven't created any documents yet.</p>
-                        <p className="text-color-secondary mb-3">Click "Generate Document" to create your first one.</p>
+                        <p className="text-xl">You haven&apos;t created any documents yet.</p>
+                        <p className="text-color-secondary mb-3">Click Generate Document&quot; to create your first one.</p>
                         <Button label="Go to Resumes" icon={<FiBriefcase />} onClick={() => router.push('/main/resumes')} className="p-button-outlined mr-2" />
                         <Button label="Generate Document" icon={<FiPlusCircle />} onClick={handleOpenGlobalGenerateDialog} className="p-button-primary" />
                     </div>
