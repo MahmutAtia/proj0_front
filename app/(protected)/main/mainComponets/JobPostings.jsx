@@ -5,7 +5,7 @@ import { ProgressSpinner } from 'primereact/progressspinner';
 import styles from '../Dashboard.module.css';
 
 const LOCAL_STORAGE_KEY = 'jobFeedData';
-const DATA_EXPIRY_MS = 15 * 60 * 1000; // 15 minutes
+const DATA_EXPIRY_MS = 120 * 60 * 1000; // 120 minutes
 
 const JobPostings = ({ router }) => {
     const [jobs, setJobs] = useState([]);
@@ -14,19 +14,54 @@ const JobPostings = ({ router }) => {
     const [error, setError] = useState(null);
 
     useEffect(() => {
-        fetch('https://ipapi.co/json/')
-            .then((response) => response.json())
-            .then((data) => {
+        const fetchLocationAndJobs = async () => {
+            try {
+                const response = await fetch('https://ipapi.co/json/');
+                const data = await response.json();
                 const country = data.country_name;
                 const city = data.city;
                 setLocation({ country, city });
+
+                // Check localStorage for cached data for this location
+                const cachedData = localStorage.getItem(LOCAL_STORAGE_KEY);
+                if (cachedData) {
+                    const { jobs: cachedJobs, timestamp, location: cachedLocation } = JSON.parse(cachedData);
+                    const isCacheValid = (new Date().getTime() - timestamp) < DATA_EXPIRY_MS;
+                    const isSameLocation = cachedLocation && cachedLocation.country === country && cachedLocation.city === city;
+
+                    if (isCacheValid && isSameLocation && cachedJobs && cachedJobs.length > 0) {
+                        setJobs(cachedJobs);
+                        setLoading(false);
+                        setError(null);
+                        console.log("Loaded jobs from cache for:", city, country);
+                        return; // Exit if valid cache is found
+                    }
+                }
+                // If no valid cache, fetch new job postings
                 fetchJobPostings(country, city);
-            })
-            .catch((err) => {
+            } catch (err) {
                 console.error("Error fetching location:", err);
-                setError("Unable to fetch location. Showing default job postings.");
-                fetchJobPostings(); // Fallback
-            });
+                setError("Unable to fetch location. Checking cache for default jobs or fetching new ones.");
+                // Try to load from cache with no specific location or fetch default
+                const cachedData = localStorage.getItem(LOCAL_STORAGE_KEY);
+                if (cachedData) {
+                    const { jobs: cachedJobs, timestamp, location: cachedLocation } = JSON.parse(cachedData);
+                    const isCacheValid = (new Date().getTime() - timestamp) < DATA_EXPIRY_MS;
+                     // Allow loading if cache is for 'default' or if location couldn't be fetched
+                    if (isCacheValid && (!cachedLocation || (cachedLocation.country === "default" && cachedLocation.city === "default")) && cachedJobs && cachedJobs.length > 0) {
+                        setJobs(cachedJobs);
+                        setLocation(cachedLocation || { country: 'Default', city: 'Location' });
+                        setLoading(false);
+                        setError(null);
+                        console.log("Loaded default jobs from cache due to location fetch error.");
+                        return;
+                    }
+                }
+                fetchJobPostings(); // Fallback to fetch default jobs
+            }
+        };
+
+        fetchLocationAndJobs();
     }, []);
 
     const fetchJobPostings = (country, city) => {
@@ -57,9 +92,10 @@ const JobPostings = ({ router }) => {
                     const cacheData = {
                         jobs: data || [],
                         timestamp: new Date().getTime(),
-                        location: { country, city } // Store location used for this cache
+                        location: { country: country || "default", city: city || "default" } // Store location used for this cache
                     };
                     localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(cacheData));
+                    console.log("Saved jobs to localStorage for:", city || "default", country || "default");
                 } catch (e) {
                     console.warn("Failed to save jobs to localStorage", e);
                 }
