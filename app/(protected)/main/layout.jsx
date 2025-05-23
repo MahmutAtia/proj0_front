@@ -25,7 +25,7 @@ import styles from './Dashboard.module.css';
 
 const SidebarLogo = ({ collapsed }) => (
     <div className={`border-bottom-1 surface-border ${collapsed ? 'justify-content-center' : ''} px-4 flex align-items-center`}>
-        <Link href="/main/dashboard" className={styles.logo}>
+        <Link href="/main" className={styles.logo}>
             <div className={styles.logoIconContainer}>
                 <IoSparkles className={styles.logoIcon} />
             </div>
@@ -185,7 +185,6 @@ export default function Layout({ children }) {
     const sidebarNavItems = [
         { label: 'Overview', icon: <FiGrid />, route: '/main' },
         { label: 'Resumes', icon: <FiFileText />, route: '/main/resumes' },
-        { label: 'Documents', icon: <FiBriefcase />, route: '/main/documents' },
         { label: 'My Website', icon: <FiGlobe />, route: defaultResume ? `/main/site-editor/${defaultResume.id}` : '/main/site-editor' },
         { label: 'ATS Checker', icon: <FiCheckSquare />, route: '/ats' },
         { label: 'Job Feed', icon: <FiBriefcase />, route: '/main/job-feed' },
