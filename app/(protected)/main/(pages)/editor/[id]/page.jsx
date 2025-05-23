@@ -11,7 +11,10 @@ import { useSession } from 'next-auth/react';
 import 'primeflex/primeflex.css';
 import { Toast } from 'primereact/toast';
 
-const ResumeEditorPage = ({ params }) => {
+const ResumeEditorPage = ({ params: paramsPromise }) => {
+    const params = React.use(paramsPromise);
+    const resumeId = params.id;
+
     const [resumeData, setResumeData] = useState(null);
     const [linkedDocuments, setLinkedDocuments] = useState([]); // New state for linked documents
     const [fetchError, setFetchError] = useState(null);
@@ -38,7 +41,7 @@ const ResumeEditorPage = ({ params }) => {
                         setResumeData(resumeItem.resume); // Core resume content
                         // Assuming generated_documents_data is a sibling to resumeItem.resume
                         setLinkedDocuments(resumeItem.generated_documents_data || []);
-                
+
                         foundInLocal = true;
                         console.log("Loaded resume and linked documents from local storage.");
                     }
@@ -55,7 +58,7 @@ const ResumeEditorPage = ({ params }) => {
                         throw new Error("Backend URL is not configured.");
                     }
                     const response = await axios.get(
-                        `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/resumes/${params.id}`,
+                        `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/resumes/${resumeId}`,
                         {
                             headers: {
                                 'Content-Type': 'application/json',
@@ -100,7 +103,7 @@ const ResumeEditorPage = ({ params }) => {
         };
 
         fetchResumeData();
-    }, [params.id, session, status, router]);
+    }, [resumeId, session, status, router]);
 
     return (
         <div>
@@ -119,7 +122,7 @@ const ResumeEditorPage = ({ params }) => {
             {resumeData && ( // Render only when core resumeData is available
                 <ResumeProvider initialData={resumeData}> {/* Pass only core resume data to context */}
                     <EditableResumeTemplate
-                        resumeId={params.id}
+                        resumeId={resumeId}
                         linkedDocuments={linkedDocuments} // Pass linkedDocuments as a prop
                     />
                 </ResumeProvider>

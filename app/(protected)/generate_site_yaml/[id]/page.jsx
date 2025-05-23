@@ -18,12 +18,13 @@ import { Message } from 'primereact/message'; // For the hint/warning
 import styles from './CreatePortfolioPage.module.css';
 
 // Importing design concept options, color styles, and add-on features
-import { designConceptOptions , colorStyleOptions, addOnFeatureOptions } from './prefrences'
+import { designConceptOptions, colorStyleOptions, addOnFeatureOptions } from './prefrences'
 
 
 
 
-export default function CreatePortfolioPage({params}) {
+export default function CreatePortfolioPage({ params: paramsPromise }) {
+    const params = React.use(paramsPromise);
     const resumeId = params.id;
     const toast = useRef(null);
     const router = useRouter(); // Ensure useRouter is initialized

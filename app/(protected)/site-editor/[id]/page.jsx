@@ -29,7 +29,8 @@ function debounce(func, wait) {
         timeout = setTimeout(later, wait);
     };
 }
-const PersonalSiteEditorPage = ({ params }) => {
+const PersonalSiteEditorPage = ({ params: paramsPromise }) => {
+    const params = React.use(paramsPromise);
     const resumeId = params.id;
     const [yamlData, setYamlData] = useState(initialYamlState);
     const [loading, setLoading] = useState(true);

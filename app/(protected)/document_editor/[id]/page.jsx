@@ -302,7 +302,9 @@ const renderMotivationFooterHtml = (footerData) => {
 
 // --- Main Editor Page Component ---
 
-const DocumentEditorPage = ({ params }) => {
+const DocumentEditorPage = ({ params: paramsPromise }) => {
+    const params = React.use(paramsPromise);
+
     const documentId = params.id;
     const toast = useRef(null);
 
