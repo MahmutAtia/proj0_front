@@ -18,6 +18,9 @@ import ReactMarkdown, { Components } from 'react-markdown';
 import { signIn, useSession } from 'next-auth/react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import styles from './ats.module.css';
+import { Suspense } from 'react';
+
+
 
 // Animation Variants
 const fadeInUp = {
@@ -39,7 +42,7 @@ const POLLING_INTERVAL = 3000; // Check status every 3 seconds
 const MAX_POLLING_ATTEMPTS = 20; // Stop polling after 60 seconds (20 * 3s)
 
 // --- Define Page Component ---
-const ATSCheckerPage = () => {
+const ATSCheckerPageContent = () => {
     // --- State ---
     const [resumeInputMethod, setResumeInputMethod] = useState<'upload' | 'paste'>('upload');
     const [resumeFile, setResumeFile] = useState<File | null>(null);
@@ -920,6 +923,20 @@ const ATSCheckerPage = () => {
                 </Card>
             </motion.div>
         </div>
+    );
+};
+
+// This is the main exported page component
+const ATSCheckerPage = () => {
+    return (
+        <Suspense fallback={
+            <div className="flex justify-content-center align-items-center min-h-screen">
+                <ProgressSpinner style={{width: '50px', height: '50px'}} strokeWidth="4" />
+                <p className="ml-2">Loading ATS Checker...</p>
+            </div>
+        }>
+            <ATSCheckerPageContent />
+        </Suspense>
     );
 };
 
