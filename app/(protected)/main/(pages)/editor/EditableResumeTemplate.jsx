@@ -1,10 +1,11 @@
+'use client';
 import React, { useEffect, useState, useRef } from 'react';
 import axios from 'axios';
 import { useSession } from 'next-auth/react';
 import { Button } from 'primereact/button';
 import { ProgressSpinner } from 'primereact/progressspinner';
 import { Toast } from 'primereact/toast';
-import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
+import { DragDropContext, Droppable, Draggable } from '@hello-pangea/dnd';
 import { useRouter } from 'next/navigation';
 import { Divider } from 'primereact/divider'; // Import Divider
 import { Tooltip } from 'primereact/tooltip'; // Import Tooltip
