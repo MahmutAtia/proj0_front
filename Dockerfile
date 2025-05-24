@@ -2,12 +2,13 @@ FROM node:22-alpine AS base
 # Declare ARGs first
 ARG NEXT_PUBLIC_BACKEND_URL
 ARG NEXT_PUBLIC_AI_API_URL
+ARG NEXT_PUBLIC_IPDATA_API_KEY
 # Add other NEXT_PUBLIC_ ARGs here if you have more
 
 # Set them as environment variables available during the build
 ENV NEXT_PUBLIC_BACKEND_URL=$NEXT_PUBLIC_BACKEND_URL
 ENV NEXT_PUBLIC_AI_API_URL=$NEXT_PUBLIC_AI_API_URL
-
+ENV NEXT_PUBLIC_IPDATA_API_KEY=$NEXT_PUBLIC_IPDATA_API_KEY
 
 # Install dependencies only when needed
 FROM base AS deps
