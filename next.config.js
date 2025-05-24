@@ -1,4 +1,12 @@
+// filepath: /home/e-kalite/Downloads/sakai-react/next.config.js
 /** @type {import('next').NextConfig} */
+const withPWA = require('next-pwa')({
+    dest: 'public',
+    register: true,
+    skipWaiting: true,
+    // disable: process.env.NODE_ENV === 'development' // Disable PWA in development
+});
+
 const nextConfig = {
     // images: {
     //     remotePatterns: [
@@ -8,12 +16,9 @@ const nextConfig = {
     //     ],
     // }
 
-    experimental: {
-        // …
-        serverComponentsExternalPackages: ['@react-pdf/renderer'],
-      },
+
 
       output: 'standalone',
-}
+};
 
-module.exports = nextConfig
+module.exports = withPWA(nextConfig);

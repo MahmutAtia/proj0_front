@@ -8,7 +8,6 @@ import 'primeicons/primeicons.css';
 import '../styles/layout/layout.scss';
 import '../styles/demo/Demos.scss';
 import AuthProvider from './providers/AuthProvider';
-import ServiceWorker from './components/ServiceWorker';
 interface RootLayoutProps {
     children: React.ReactNode;
 }
@@ -18,14 +17,16 @@ export default function RootLayout({ children }: RootLayoutProps) {
         <html lang="en" suppressHydrationWarning>
             <head>
                 <link id="theme-css" href={`/themes/lara-light-indigo/theme.css`} rel="stylesheet"></link>
+                <link rel="manifest" href="/manifest.json" />
+                <link rel="apple-touch-icon" href="/icons/icon-192x192.png"></link> {/* Adjust path if your icons are elsewhere */}
+                <meta name="theme-color" content="#000000" /> {/* You can change this color */}
             </head>
             <body>
                 <AuthProvider>
-                <PrimeReactProvider>
-                    <LayoutProvider>{children}</LayoutProvider>
-                </PrimeReactProvider>
+                    <PrimeReactProvider>
+                        <LayoutProvider>{children}</LayoutProvider>
+                    </PrimeReactProvider>
                 </AuthProvider>
-                <ServiceWorker />
             </body>
         </html>
     );
