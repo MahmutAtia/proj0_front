@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { InputText } from "primereact/inputtext";
 import { Button } from "primereact/button";
 import { Menu } from "primereact/menu";
@@ -9,7 +9,11 @@ import { Tag } from 'primereact/tag';
 // Import CSS Module
 import styles from './AIAssistant.module.css';
 
-const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+// Safe access to speech recognition
+const getSpeechRecognition = () => {
+    if (typeof window === 'undefined') return null;
+    return window.SpeechRecognition || window.webkitSpeechRecognition;
+};
 
 // Available languages for speech recognition
 const languages = [
@@ -22,7 +26,6 @@ const languages = [
     { name: 'Arabic', code: 'ar-SA', flag: '🇸🇦' },
     { name: 'Arabic (Egypt)', code: 'ar-EG', flag: '🇪🇬' },
     { name: 'Dutch', code: 'nl-NL', flag: '🇳🇱' },
-
 ];
 
 // Browser support information
@@ -33,6 +36,11 @@ const LOCAL_STORAGE_LANG_KEY = 'speech_recognition_language';
 // Define the getInitialLanguage function BEFORE using it in useState
 const getInitialLanguage = () => {
     try {
+        // Check if we're in browser environment
+        if (typeof window === 'undefined' || typeof localStorage === 'undefined') {
+            return languages[0];
+        }
+
         // Try to get from localStorage first
         const savedLangCode = localStorage.getItem(LOCAL_STORAGE_LANG_KEY);
         if (savedLangCode) {
@@ -63,36 +71,83 @@ const AIAssistant = ({ prompt = "", setPrompt, onSubmit, isProcessing }) => {
     const [interimText, setInterimText] = useState("");
     const [finalText, setFinalText] = useState("");
     const [recognition, setRecognition] = useState(null);
-
-    // Now using the getInitialLanguage function that was defined above
     const [selectedLanguage, setSelectedLanguage] = useState(getInitialLanguage());
-    const [isBrowserSupported, setIsBrowserSupported] = useState(!!SpeechRecognition);
-    const inputRef = useRef(null);
-    const [lastActivityTime, setLastActivityTime] = useState(Date.now());
-    const langMenuRef = useRef(null);
+    const [isBrowserSupported, setIsBrowserSupported] = useState(false);
+    const [permissionDenied, setPermissionDenied] = useState(false);
+    const [isInitializing, setIsInitializing] = useState(false);
+    const [dialogVisible, setDialogVisible] = useState(false);
 
-    // Initialize SpeechRecognition instance
+    const inputRef = useRef(null);
+    const lastActivityTimeRef = useRef(Date.now());
+    const langMenuRef = useRef(null);
+    const restartTimeoutRef = useRef(null);
+    const silenceTimerRef = useRef(null);
+    const recognitionRef = useRef(null);
+
+    // Check browser support on mount
     useEffect(() => {
+        const SpeechRecognition = getSpeechRecognition();
+        setIsBrowserSupported(!!SpeechRecognition);
+    }, []);
+
+    // Stable cleanup function
+    const cleanupRecognition = useCallback(() => {
+        const currentRecognition = recognitionRef.current;
+        if (currentRecognition) {
+            try {
+                currentRecognition._manualStop = true;
+                currentRecognition.stop();
+                currentRecognition.abort();
+            } catch (error) {
+                console.warn("Error during recognition cleanup:", error);
+            }
+        }
+
+        // Clear any pending timeouts
+        if (restartTimeoutRef.current) {
+            clearTimeout(restartTimeoutRef.current);
+            restartTimeoutRef.current = null;
+        }
+
+        if (silenceTimerRef.current) {
+            clearInterval(silenceTimerRef.current);
+            silenceTimerRef.current = null;
+        }
+    }, []);
+
+    // Stable stop function
+    const stopListening = useCallback(() => {
+        console.log("Stopping listening...");
+        setIsListening(false);
+        setInterimText("");
+        setIsInitializing(false);
+        setDialogVisible(false);
+        cleanupRecognition();
+    }, [cleanupRecognition]);
+
+    // Initialize SpeechRecognition instance only when needed
+    const initializeRecognition = useCallback(() => {
+        const SpeechRecognition = getSpeechRecognition();
         if (!SpeechRecognition) {
             console.warn("Speech Recognition API is not supported in this browser.");
-            setIsBrowserSupported(false);
-            return;
+            return null;
         }
 
         const sr = new SpeechRecognition();
-        sr.continuous = true; // Enable continuous listening for slow speakers
+        sr.continuous = true;
         sr.interimResults = true;
         sr.lang = selectedLanguage.code;
-
-        // Initialize the manual stop flag
         sr._manualStop = false;
+        sr._isRestarting = false;
 
         sr.onstart = () => {
-            setIsListening(true);
-            setInterimText("");
-            setFinalText("");
             console.log("Speech recognition started");
-            setLastActivityTime(Date.now());
+            setIsListening(true);
+            setIsInitializing(false);
+            setPermissionDenied(false);
+            setInterimText("");
+            setDialogVisible(true);
+            lastActivityTimeRef.current = Date.now();
         };
 
         sr.onresult = (event) => {
@@ -108,12 +163,12 @@ const AIAssistant = ({ prompt = "", setPrompt, onSubmit, isProcessing }) => {
             }
 
             setInterimText(interimTranscript);
-            setLastActivityTime(Date.now());
+            lastActivityTimeRef.current = Date.now();
 
             if (finalTranscript) {
                 setFinalText(prev => `${prev} ${finalTranscript}`.trim());
                 setPrompt(prevPrompt => (prevPrompt + " " + finalTranscript).trim());
-                if(inputRef.current) {
+                if (inputRef.current) {
                     requestAnimationFrame(() => {
                         inputRef.current.focus();
                     });
@@ -122,114 +177,170 @@ const AIAssistant = ({ prompt = "", setPrompt, onSubmit, isProcessing }) => {
         };
 
         sr.onerror = (event) => {
-            if (event.error === 'not-allowed' || event.error === 'service-not-allowed') {
-                alert("Microphone permission denied. Please allow microphone access in your browser settings.");
-                setIsListening(false);
-            } else if (event.error === 'no-speech') {
-                console.log("No speech detected, but continuing to listen...");
-                // Don't stop the recognition for no-speech errors
-                setLastActivityTime(Date.now()); // Reset the silence timer
-            } else {
-                console.error("Speech recognition error:", event.error);
-                setIsListening(false);
+            console.error("Speech recognition error:", event.error);
+
+            switch (event.error) {
+                case 'not-allowed':
+                case 'service-not-allowed':
+                    setPermissionDenied(true);
+                    setIsListening(false);
+                    setIsInitializing(false);
+                    setDialogVisible(false);
+                    alert("Microphone permission denied. Please allow microphone access and try again.");
+                    break;
+
+                case 'no-speech':
+                    console.log("No speech detected");
+                    lastActivityTimeRef.current = Date.now();
+                    // Don't stop for no-speech errors, just reset timer
+                    break;
+
+                case 'audio-capture':
+                    setIsListening(false);
+                    setIsInitializing(false);
+                    setDialogVisible(false);
+                    alert("No microphone found. Please check your microphone connection.");
+                    break;
+
+                case 'network':
+                    setIsListening(false);
+                    setIsInitializing(false);
+                    setDialogVisible(false);
+                    alert("Network error occurred. Please check your internet connection.");
+                    break;
+
+                default:
+                    console.warn("Speech recognition error:", event.error);
+                    break;
             }
         };
 
         sr.onend = () => {
             console.log("Speech recognition ended");
 
-            // Use the local sr variable instead of recognition state
             const wasManualStop = sr._manualStop;
+            const isRestarting = sr._isRestarting;
 
-            if (wasManualStop) {
+            if (wasManualStop || permissionDenied) {
                 setIsListening(false);
-            } else {
-                // Auto-restart if it ended on its own
-                console.log("Recognition ended unexpectedly. Restarting...");
-                try {
-                    // Small timeout before restart to prevent browser issues
-                    setTimeout(() => {
-                        sr.start();
-                        setLastActivityTime(Date.now());
-                    }, 300);
-                } catch (err) {
-                    console.error("Failed to restart recognition:", err);
-                    setIsListening(false); // Only set to false if restart fails
+                setIsInitializing(false);
+                setDialogVisible(false);
+                return;
+            }
+
+            // Only restart if we're still supposed to be listening and not already restarting
+            if (isListening && !isRestarting && !permissionDenied) {
+                console.log("Recognition ended unexpectedly. Attempting restart...");
+                sr._isRestarting = true;
+
+                // Clear any existing restart timeout
+                if (restartTimeoutRef.current) {
+                    clearTimeout(restartTimeoutRef.current);
                 }
+
+                restartTimeoutRef.current = setTimeout(() => {
+                    try {
+                        if (!sr._manualStop && !permissionDenied && isListening) {
+                            sr.start();
+                            lastActivityTimeRef.current = Date.now();
+                        }
+                    } catch (err) {
+                        console.error("Failed to restart recognition:", err);
+                        setIsListening(false);
+                        setIsInitializing(false);
+                        setDialogVisible(false);
+                    } finally {
+                        sr._isRestarting = false;
+                        restartTimeoutRef.current = null;
+                    }
+                }, 1000); // Increased delay to prevent rapid restarts
+            } else {
+                setIsListening(false);
+                setIsInitializing(false);
+                setDialogVisible(false);
             }
         };
 
-        setRecognition(sr);
+        return sr;
+    }, [selectedLanguage, isListening, permissionDenied]);
+
+    // Handle keyboard events for ESC key
+    useEffect(() => {
+        const handleKeyDown = (event) => {
+            if (event.key === 'Escape' && dialogVisible) {
+                stopListening();
+            }
+        };
+
+        if (dialogVisible) {
+            document.addEventListener('keydown', handleKeyDown);
+        }
 
         return () => {
-            if (sr) {
-                sr.stop();
-            }
+            document.removeEventListener('keydown', handleKeyDown);
         };
-    }, [selectedLanguage, setPrompt]);
+    }, [dialogVisible, stopListening]);
 
-    // Check for silence but don't restart recognition
+    // Cleanup on unmount
     useEffect(() => {
-        if (!isListening || !isBrowserSupported || !recognition) return;
+        return () => {
+            cleanupRecognition();
+        };
+    }, [cleanupRecognition]);
 
-        const silenceTimer = setInterval(() => {
-            const silenceThreshold = 3000; // 3 seconds of silence
-            const now = Date.now();
-
-            if (now - lastActivityTime > silenceThreshold) {
-                // Instead of stopping and starting, just update the timestamp
-                console.log("Extended silence detected. Continuing to listen...");
-                setLastActivityTime(Date.now());
-
-                // No need to restart recognition, just let it continue running
-            }
-        }, 1000);
-
-        return () => clearInterval(silenceTimer);
-    }, [isListening, lastActivityTime, recognition, isBrowserSupported]);
-
-    // Update recognition language when language changes
-    useEffect(() => {
-        if (recognition) {
-            recognition.lang = selectedLanguage.code;
-        }
-    }, [recognition, selectedLanguage]);
-
-    const toggleListening = () => {
+    const toggleListening = useCallback(() => {
         if (!isBrowserSupported) {
             alert(BROWSER_SUPPORT_INFO);
             return;
         }
 
-        if (isListening) {
-            if (recognition) {
-                // Mark this as a manual stop to prevent auto-restart
-                recognition._manualStop = true;
-                recognition.stop();
-            }
-        } else {
-            if (recognition && !isListening) {
-                try {
-                    // Reset the manual stop flag
-                    recognition._manualStop = false;
-                    recognition.start();
-                } catch (error) {
-                    console.error("Error starting speech recognition:", error);
-                    alert("Speech recognition is not ready. Please try again.");
-                }
-            }
+        if (permissionDenied) {
+            alert("Microphone permission was denied. Please refresh the page and allow microphone access.");
+            return;
         }
-    };
+
+        if (isListening || isInitializing) {
+            stopListening();
+            return;
+        }
+
+        // Initialize new recognition instance
+        const sr = initializeRecognition();
+        if (!sr) {
+            alert("Failed to initialize speech recognition.");
+            return;
+        }
+
+        recognitionRef.current = sr;
+        setRecognition(sr);
+
+        try {
+            setIsInitializing(true);
+            setPermissionDenied(false);
+            setFinalText("");
+            setInterimText("");
+            sr.start();
+        } catch (error) {
+            console.error("Error starting speech recognition:", error);
+            setIsInitializing(false);
+            alert("Failed to start speech recognition. Please try again.");
+        }
+    }, [isBrowserSupported, permissionDenied, isListening, isInitializing, stopListening, initializeRecognition]);
 
     // Update localStorage when language changes
-    const updateSelectedLanguage = (lang) => {
+    const updateSelectedLanguage = useCallback((lang) => {
+        if (isListening) {
+            alert("Please stop listening before changing the language.");
+            return;
+        }
+
         setSelectedLanguage(lang);
         try {
             localStorage.setItem(LOCAL_STORAGE_LANG_KEY, lang.code);
         } catch (error) {
             console.error("Error saving language preference:", error);
         }
-    };
+    }, [isListening]);
 
     // Create language menu items
     const languageItems = languages.map(lang => ({
@@ -244,60 +355,53 @@ const AIAssistant = ({ prompt = "", setPrompt, onSubmit, isProcessing }) => {
     }));
 
     const showLanguageMenu = (event) => {
-        if (langMenuRef.current && !isListening && !isProcessing) {
+        if (langMenuRef.current && !isListening && !isProcessing && !isInitializing) {
             langMenuRef.current.toggle(event);
         }
     };
 
-const footerContent = (
-    <div className={styles.dialogFooter}>
-        <Button
-            label="Cancel"
-            icon="pi pi-times"
-            className={styles.cancelButton}
-            onClick={() => {
-                if (recognition) {
-                    recognition._manualStop = true;
-                    recognition.stop();
-                }
-            }}
-        />
-        <Button
-            label="Done"
-            icon="pi pi-check"
-            className={styles.doneButton}
-            onClick={() => {
-                if (recognition) {
-                    recognition._manualStop = true;
-                    recognition.stop();
-                }
-            }}
-        />
-    </div>
-);
+    const footerContent = (
+        <div className={styles.dialogFooter}>
+            <Button
+                label="Cancel"
+                icon="pi pi-times"
+                className={styles.cancelButton}
+                onClick={stopListening}
+                disabled={isInitializing}
+            />
+            <Button
+                label="Done"
+                icon="pi pi-check"
+                className={styles.doneButton}
+                onClick={stopListening}
+                disabled={isInitializing}
+            />
+        </div>
+    );
+
     return (
         <>
             <div className={styles.aiAssistantContainer}>
                 {/* Input field */}
                 <div className={styles.inputWrapper}>
-                    <i className={classNames("pi", isListening ? "pi-volume-up" : "pi-comment", styles.inputIcon)} />
+                    <i className={classNames("pi", (isListening || isInitializing) ? "pi-volume-up" : "pi-comment", styles.inputIcon)} />
                     <InputText
                         ref={inputRef}
                         value={prompt}
                         onChange={(e) => setPrompt(e.target.value)}
-                        placeholder={isListening ? "Listening..." : "Ask AI to improve this section..."}
+                        placeholder={isListening ? "Listening..." : isInitializing ? "Starting..." : "Ask AI to improve this section..."}
                         className={styles.promptInput}
                         onKeyDown={(e) => e.key === "Enter" && onSubmit()}
-                        disabled={isProcessing || isListening}
+                        disabled={isProcessing || isListening || isInitializing}
                     />
                 </div>
 
-                {/* Language selector - Completely redesigned */}
+                {/* Language selector */}
                 <div className={styles.controls}>
                     <Button
                         className={styles.languageSelectorButton}
                         onClick={showLanguageMenu}
-                        disabled={isListening || isProcessing || !isBrowserSupported}
+                        disabled={isListening || isProcessing || !isBrowserSupported || isInitializing}
                         tooltip={!isBrowserSupported ? BROWSER_SUPPORT_INFO : "Select Language"}
                         tooltipOptions={{ position: 'top', showOnDisabled: true }}
                     >
@@ -316,12 +420,16 @@ const footerContent = (
 
                     {/* Voice button */}
                     <Button
-                        icon={isListening ? "pi pi-stop-circle" : "pi pi-microphone"}
+                        icon={isInitializing ? "pi pi-spin pi-spinner" : (isListening ? "pi pi-stop-circle" : "pi pi-microphone")}
                         className={classNames(styles.voiceButton, {
-                            [styles.listening]: isListening
+                            [styles.listening]: isListening,
+                            [styles.initializing]: isInitializing
                         })}
                         onClick={toggleListening}
-                        tooltip={!isBrowserSupported ? BROWSER_SUPPORT_INFO : (isListening ? "Stop Listening" : "Start Voice Input")}
+                        tooltip={!isBrowserSupported ? BROWSER_SUPPORT_INFO :
+                                permissionDenied ? "Microphone permission denied" :
+                                isInitializing ? "Starting..." :
+                                isListening ? "Stop Listening" : "Start Voice Input"}
                         tooltipOptions={{ position: 'top', showOnDisabled: true }}
                         disabled={!isBrowserSupported || isProcessing}
                     />
@@ -331,33 +439,21 @@ const footerContent = (
                         icon={isProcessing ? "pi pi-spin pi-spinner" : "pi pi-send"}
                         className={styles.submitButton}
                         onClick={onSubmit}
-                        disabled={!prompt?.trim() || isProcessing || isListening}
+                        disabled={!prompt?.trim() || isProcessing || isListening || isInitializing}
                         tooltip="Submit AI Request"
                     />
                 </div>
             </div>
 
-            {/* Voice Recognition Dialog - Professional redesign */}
+            {/* Voice Recognition Dialog */}
             <Dialog
-                visible={isListening}
+                visible={dialogVisible}
                 className={styles.voiceDialog}
-                showHeader={false} // Changed to false to use custom header
-                header={null}
+                showHeader={false}
                 dismissableMask={false}
-                closeOnEscape={true}
-                onEscape={() => {
-                    if (recognition) {
-                        recognition._manualStop = true;
-                        recognition.stop();
-                    }
-                }}
+                closable={false}
                 style={{ width: '500px', maxWidth: '95vw' }}
-                onHide={() => {
-                    if (recognition) {
-                        recognition._manualStop = true;
-                        recognition.stop();
-                    }
-                }}
+                onHide={() => {}} // Empty function to prevent unwanted hiding
                 footer={footerContent}
             >
                 <div className={styles.voiceDialogContent}>
@@ -368,12 +464,8 @@ const footerContent = (
                             <Button
                                 icon="pi pi-times"
                                 className={styles.closeButton}
-                                onClick={() => {
-                                    if (recognition) {
-                                        recognition._manualStop = true;
-                                        recognition.stop();
-                                    }
-                                }}
+                                onClick={stopListening}
+                                disabled={isInitializing}
                             />
                         </div>
                         <div className={styles.microphoneContainer}>
@@ -384,13 +476,13 @@ const footerContent = (
                         </div>
                     </div>
 
-                    {/* Language display - Keep this */}
+                    {/* Language display */}
                     <div className={styles.languageDisplay}>
                         <i className="pi pi-globe"></i>
                         <span>{selectedLanguage.flag} {selectedLanguage.name}</span>
                     </div>
 
-                    {/* Enhanced transcript area with better separations */}
+                    {/* Enhanced transcript area */}
                     <div className={styles.transcriptContainer}>
                         {finalText && (
                             <div className={styles.finalTranscriptSection}>
@@ -406,8 +498,8 @@ const footerContent = (
 
                         <div className={styles.currentListeningSection}>
                             <div className={styles.sectionHeader}>
-                                <i className="pi pi-volume-up"></i>
-                                <span>Currently Listening</span>
+                                <i className={classNames("pi", isInitializing ? "pi-spin pi-spinner" : "pi-volume-up")}></i>
+                                <span>{isInitializing ? "Starting..." : "Currently Listening"}</span>
                             </div>
 
                             <div className={styles.listeningIndicator}>
@@ -424,7 +516,7 @@ const footerContent = (
                                         <p className={styles.interimText}>{interimText}</p>
                                     ) : (
                                         <p className={styles.placeholderText}>
-                                            Speak now... I&apos;m listening and will wait for you to finish
+                                            {isInitializing ? "Requesting microphone access..." : "Speak now... I'm listening and will wait for you to finish"}
                                         </p>
                                     )}
                                 </div>
@@ -435,7 +527,7 @@ const footerContent = (
                     {/* Helpful instructions */}
                     <div className={styles.instructions}>
                         <i className="pi pi-info-circle"></i>
-                        <span>Speak clearly, pause naturally between sentences. Click &quot;Done&quot; when finished.</span>
+                        <span>Speak clearly, pause naturally between sentences. Click "Done" when finished.</span>
                     </div>
                 </div>
             </Dialog>
