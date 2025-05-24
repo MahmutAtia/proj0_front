@@ -89,7 +89,7 @@ import './styles/globals.css';
 const LandingPage = () => {
     // ... your component JSX ...
      return (
-        <div>
+        <div className="landing-page-wrapper">
             <Header />
             <main>
                 <HeroSection />
