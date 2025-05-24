@@ -36,16 +36,16 @@
 /* Sidebar Styles */
 .sidebar {
     width: 280px;
-    /* Height is 100% of the container (.editorMainArea) */
     height: 100%;
     /* --- Mobile First: Fixed Positioning --- */
     position: fixed;
-    /* Position below header (adjust value if header height changes) */
     top: 65px; /* Adjust this value precisely */
-    left: 0;
+    /* Use left for positioning instead of transform for fixed positioning */
+    left: -280px; /* Initially hidden off-screen (width of sidebar) */
     z-index: 1001;
-    transform: translateX(-100%);
-    transition: transform 0.3s ease-in-out; /* Only transition transform */
+    /* REMOVE transform from the base class, handle visibility with 'left' */
+    /* transform: translateX(-100%); */
+    transition: left 0.3s ease-in-out; /* Transition left property */
     background-color: var(--surface-overlay);
     display: flex;
     flex-direction: column;
@@ -54,7 +54,9 @@
 }
 
 .sidebarVisible {
-    transform: translateX(0);
+    /* Show sidebar by moving it into view */
+    left: 0;
+    /* REMOVE transform: translateX(0); */
 }
 
 .sidebarHeader {
@@ -81,7 +83,7 @@
     flex-direction: column;
     gap: 0.25rem;
     padding: 0.5rem;
-    /* Important for dnd: Ensure list itself doesn't have transforms */
+    /* Ensure list itself doesn't have transforms that could interfere */
     transform: none;
 }
 
@@ -93,13 +95,11 @@
     padding: 0.5rem 0.75rem;
     border-radius: var(--border-radius);
     background-color: transparent;
-    /* Remove transitions that might interfere during drag */
-    /* transition: background-color 0.15s ease, box-shadow 0.15s ease; */
     cursor: default;
     border: 1px solid transparent;
-    /* Ensure no transforms are applied by default */
+    /* Ensure no transforms are applied by default to draggable items */
     transform: none;
-    position: relative; /* Keep for potential stacking context if needed */
+    position: relative;
 }
 
 .sidebarItem:hover {
@@ -252,7 +252,7 @@
     .sidebarToggleButton { display: inline-flex !important; }
     .mainContent { margin-left: 0; }
     .overlay { display: block; }
-    /* Sidebar uses default 'fixed' positioning defined above */
+    /* Sidebar uses 'fixed' positioning and 'left' property as defined above */
 }
 
 /* Desktop (>= 1024px) */
@@ -261,15 +261,13 @@
     .sidebar {
         /* --- Desktop: Change to Sticky Positioning --- */
         position: sticky;
-        /* Stick relative to the .editorMainArea */
         top: 0; /* Stick to the top of its container */
-        /* Height remains 100% of container */
-        transform: translateX(0); /* Override mobile transform */
+        height: 100%;
+        left: 0; /* Ensure it's positioned at the start */
+        /* REMOVE transform: translateX(0); it's not needed for sticky positioning here */
         z-index: 1; /* Lower z-index than header */
         box-shadow: none; /* Remove mobile shadow */
-        /* border-right is already applied */
-        /* No transition needed for sticky positioning */
-        transition: none;
+        transition: none; /* No transition needed for sticky positioning or left property here */
     }
     .mainContent {
         margin-left: 280px; /* Push content by sidebar width */
