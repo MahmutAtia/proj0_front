@@ -8,11 +8,18 @@ import 'primeicons/primeicons.css';
 import '../styles/layout/layout.scss';
 import '../styles/demo/Demos.scss';
 import AuthProvider from './providers/AuthProvider';
+import { useEffect } from 'react';
 interface RootLayoutProps {
     children: React.ReactNode;
 }
 
 export default function RootLayout({ children }: RootLayoutProps) {
+    useEffect(() => {
+        // Direct test for a specific NEXT_PUBLIC_ variable
+        console.log('Direct test in layout - NEXT_PUBLIC_BACKEND_URL:', process.env.NEXT_PUBLIC_BACKEND_URL);
+        console.log('Direct test in layout - NEXT_PUBLIC_AI_API_URL:', process.env.NEXT_PUBLIC_AI_API_URL);
+        console.log('Direct test in layout - NEXT_PUBLIC_IPDATA_API_KEY:', process.env.NEXT_PUBLIC_IPDATA_API_KEY);
+    }, []);
     return (
         <html lang="en" suppressHydrationWarning>
             <head>
@@ -24,7 +31,9 @@ export default function RootLayout({ children }: RootLayoutProps) {
             <body>
                 <AuthProvider>
                     <PrimeReactProvider>
-                        <LayoutProvider>{children}</LayoutProvider>
+                        <LayoutProvider>
+                            {children}
+                        </LayoutProvider>
                     </PrimeReactProvider>
                 </AuthProvider>
             </body>
