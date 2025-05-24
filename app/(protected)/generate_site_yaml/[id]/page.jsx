@@ -131,7 +131,13 @@ export default function CreatePortfolioPage({ params: paramsPromise }) {
             const response = await axios.post(
                 `${backendUrl}/api/resumes/generate_website_yaml/`,
                 { resumeId: resumeId, preferences: preferences },
-                { headers: { 'Content-Type': 'application/json' } }
+                {
+                    headers: {
+                        'Content-Type': 'application/json',
+                        timeout: 600000 // 10 minutes timeout,
+
+                    }
+                }
             );
             setGenerationResult({ success: true, data: response.data });
             toast.current?.show({ severity: 'success', summary: 'Success', detail: 'Website preferences submitted! Generation started.', life: 5000 });
