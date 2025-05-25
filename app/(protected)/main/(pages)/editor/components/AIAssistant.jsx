@@ -527,7 +527,7 @@ const AIAssistant = ({ prompt = "", setPrompt, onSubmit, isProcessing }) => {
                     {/* Helpful instructions */}
                     <div className={styles.instructions}>
                         <i className="pi pi-info-circle"></i>
-                        <span>Speak clearly, pause naturally between sentences. Click "Done" when finished.</span>
+                        <span>Speak clearly, pause naturally between sentences. Click &quot;Done&quot; when finished.</span>
                     </div>
                 </div>
             </Dialog>
