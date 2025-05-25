@@ -203,7 +203,7 @@ const renderMotivationHeaderHtml = (headerData) => {
     if (!headerData) return '<div class="header-section"><p><i>Header data missing</i></p></div>';
     return `
         <div class="header-section">
-            <div class="sender-info"> {/* Reusing sender-info class */}
+            <div class="sender-info">
                 ${headerData.sender_name ? `<p class="sender-name">${escapeHtml(headerData.sender_name)}</p>` : ''}
                 ${headerData.sender_address ? `<p>${escapeHtml(headerData.sender_address)}</p>` : ''}
                 ${headerData.sender_city_postal ? `<p>${escapeHtml(headerData.sender_city_postal)}</p>` : ''}

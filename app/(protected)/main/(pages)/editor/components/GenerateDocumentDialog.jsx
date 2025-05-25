@@ -8,6 +8,7 @@ import { ProgressSpinner } from 'primereact/progressspinner';
 import { Message } from 'primereact/message'; // Added Message
 import { useRouter } from 'next/navigation';
 import axios from 'axios';
+import { useSession } from 'next-auth/react';
 
 const documentTypeOptions = [
     { label: 'Cover Letter', value: 'cover_letter' },
@@ -42,6 +43,7 @@ const GenerateDocumentDialog = ({
     const [currentExistingDocTypes, setCurrentExistingDocTypes] = useState([]);
     const toast = useRef(null);
     const router = useRouter();
+    const token = useSession()?.data?.accessToken; // Get access token from session
 
     const isResumeSelectionMode = !initialResumeId;
 
@@ -182,12 +184,17 @@ const GenerateDocumentDialog = ({
             if (!process.env.NEXT_PUBLIC_BACKEND_URL) throw new Error("Backend URL is not configured.");
             const response = await axios.post(
                 `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/resumes/generate_document/`,
-                { resumeId: selectedResumeId, documentType, language, otherInfo }
+                { resumeId: selectedResumeId, documentType, language, otherInfo },
+                {
+                    headers: {
+                        Authorization: `Bearer ${token}` // Use token from session
+                    }
+                }
             );
 
             if ((response.status === 201 || response.status === 200) && response.data?.document_uuid) {
                 const newDocId = response.data.document_uuid;
-                
+
                 if (onGenerationSuccess) { // Call parent callback
                     onGenerationSuccess({ document_uuid: newDocId, resume_id_used: selectedResumeId });
                 }
@@ -214,7 +221,7 @@ const GenerateDocumentDialog = ({
                                     className="p-button-sm p-button-secondary p-button-outlined"
                                     onClick={() => {
                                         toast.current?.clear();
-                                        onHide(); 
+                                        onHide();
                                     }}
                                 />
                             </div>

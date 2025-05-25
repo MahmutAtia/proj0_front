@@ -13,7 +13,7 @@ import { ProgressSpinner } from 'primereact/progressspinner';
 import { Toast } from 'primereact/toast';
 import { RadioButton } from 'primereact/radiobutton';
 import { Message } from 'primereact/message'; // For the hint/warning
-
+import { useSession } from 'next-auth/react';
 // CSS Modules
 import styles from './CreatePortfolioPage.module.css';
 
@@ -28,6 +28,7 @@ export default function CreatePortfolioPage({ params: paramsPromise }) {
     const resumeId = params.id;
     const toast = useRef(null);
     const router = useRouter(); // Ensure useRouter is initialized
+    const token =  useSession()?.data?.accessToken || null; // Get the access token from session
 
     const [activeIndex, setActiveIndex] = useState(0);
     const [selectedConcept, setSelectedConcept] = useState(null);
@@ -134,6 +135,7 @@ export default function CreatePortfolioPage({ params: paramsPromise }) {
                 {
                     headers: {
                         'Content-Type': 'application/json',
+                        'Authorization': token ? `Bearer ${token}` : ''
 
                     }
                 }
