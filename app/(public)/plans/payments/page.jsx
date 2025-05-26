@@ -106,7 +106,7 @@ const PaymentHistoryPage = () => {
                 ) : (
                     <div className="text-center">
                         <h3>No Payment History</h3>
-                        <p>You haven't made any payments yet.</p>
+                        <p>You haven&apos;t made any payments yet.</p>
                         <Button label="View Plans" onClick={() => window.location.href = '/plans'} />
                     </div>
                 )}

@@ -69,8 +69,8 @@ const PricingSection = () => {
                         key={plan.name}
                         className={`${styles.pricingCard} ${plan.popular ? styles.popular : ''}`}
                         variants={fadeInUp} // Use fadeInUp for entry animation
-                        // Optional: Use Framer Motion for hover scale if preferred over CSS transform
-                        // initial="rest" whileHover="hover" animate="rest" variants={cardHover}
+                    // Optional: Use Framer Motion for hover scale if preferred over CSS transform
+                    // initial="rest" whileHover="hover" animate="rest" variants={cardHover}
                     >
                         {plan.popular && <div className={styles.popularBadge}>POPULAR</div>}
                         <div className={styles.textCenter}>
@@ -89,7 +89,7 @@ const PricingSection = () => {
                         <ul className={styles.featuresList}>
                             {plan.features.map(feature => (
                                 <li key={feature} className={styles.featureItem}>
-                                    <FiCheckCircle className={styles.checkIcon}/> {feature}
+                                    <FiCheckCircle className={styles.checkIcon} /> {feature}
                                 </li>
                             ))}
                         </ul>
@@ -99,6 +99,8 @@ const PricingSection = () => {
                             variants={buttonHover}
                             whileHover="hover"
                             whileTap="tap"
+                            onClick={() => window.location.href = '/plans'} 
+
                         >
                             {plan.buttonLabel}
                         </motion.button>

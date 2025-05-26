@@ -344,7 +344,7 @@ const PlansPage = () => {
                     <i className="pi pi-exclamation-triangle text-orange-500 text-4xl mb-3"></i>
                     <h4 className="mb-2">Are you sure you want to cancel?</h4>
                     <p className="text-600">
-                        Choose how you'd like to cancel your subscription:
+                        Choose how you&apos;d like to cancel your subscription:
                     </p>
                 </div>
 
