@@ -16,7 +16,9 @@ const ResumeEditorPage = ({ params: paramsPromise }) => {
     const resumeId = params.id;
 
     const [resumeData, setResumeData] = useState(null);
-    const [linkedDocuments, setLinkedDocuments] = useState([]); // New state for linked documents
+    const [linkedDocuments, setLinkedDocuments] = useState([]);
+    const [initialSectionOrder, setInitialSectionOrder] = useState(null); // New state
+    const [initialHiddenSections, setInitialHiddenSections] = useState(null); // New state
     const [fetchError, setFetchError] = useState(null);
     const router = useRouter();
     const toast = useRef(null);
@@ -27,7 +29,9 @@ const ResumeEditorPage = ({ params: paramsPromise }) => {
             if (status === 'loading') return;
 
             setResumeData(null);
-            setLinkedDocuments([]); // Reset linked documents
+            setLinkedDocuments([]);
+            setInitialSectionOrder(null); // Reset
+            setInitialHiddenSections(null); // Reset
             setFetchError(null);
 
             const localData = localStorage.getItem('all_resumes_list_cache');
@@ -35,15 +39,14 @@ const ResumeEditorPage = ({ params: paramsPromise }) => {
             if (localData) {
                 try {
                     const resumes = JSON.parse(localData).data;
-                    // 'resumeItem' here refers to the whole object from the 'resumes' array
                     const resumeItem = resumes.find((item) => item.id === Number(params.id));
                     if (resumeItem && resumeItem.resume) {
-                        setResumeData(resumeItem.resume); // Core resume content
-                        // Assuming generated_documents_data is a sibling to resumeItem.resume
+                        setResumeData(resumeItem.resume);
                         setLinkedDocuments(resumeItem.generated_documents_data || []);
-
+                        setInitialSectionOrder(resumeItem.sections_sort || null); // Load sections_sort
+                        setInitialHiddenSections(resumeItem.hidden_sections || null); // Load hidden_sections
                         foundInLocal = true;
-                        console.log("Loaded resume and linked documents from local storage.");
+                        console.log("Loaded resume, linked documents, section order, and hidden sections from local storage.");
                     }
                 } catch (e) {
                     console.error("Error parsing local storage data:", e);
@@ -71,10 +74,11 @@ const ResumeEditorPage = ({ params: paramsPromise }) => {
                     );
                     // response.data is the parent object from the API
                     if (response.data && response.data.resume) {
-                        setResumeData(response.data.resume); // Core resume content
-                        // Assuming generated_documents_data is a sibling to response.data.resume
+                        setResumeData(response.data.resume);
                         setLinkedDocuments(response.data.generated_documents_data || []);
-                        console.log("Loaded resume and linked documents from backend:", response.data);
+                        setInitialSectionOrder(response.data.sections_sort || null); // Load sections_sort from API
+                        setInitialHiddenSections(response.data.hidden_sections || null); // Load hidden_sections from API
+                        console.log("Loaded resume, linked documents, section order, and hidden sections from backend:", response.data);
                     } else {
                          throw new Error("Invalid data format received from backend.");
                     }
@@ -119,11 +123,13 @@ const ResumeEditorPage = ({ params: paramsPromise }) => {
                 </div>
             )}
 
-            {resumeData && ( // Render only when core resumeData is available
-                <ResumeProvider initialData={resumeData}> {/* Pass only core resume data to context */}
+            {resumeData && (
+                <ResumeProvider initialData={resumeData}>
                     <EditableResumeTemplate
                         resumeId={resumeId}
-                        linkedDocuments={linkedDocuments} // Pass linkedDocuments as a prop
+                        linkedDocuments={linkedDocuments}
+                        initialSectionOrder={initialSectionOrder} // Pass new prop
+                        initialHiddenSections={initialHiddenSections} // Pass new prop
                     />
                 </ResumeProvider>
             )}

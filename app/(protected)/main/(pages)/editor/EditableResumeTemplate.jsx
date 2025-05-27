@@ -39,11 +39,14 @@ const SECTION_ICONS = {
 
 const EditableResumeTemplate = ({
     resumeId,
-    linkedDocuments: initialLinkedDocuments
+    linkedDocuments: initialLinkedDocuments,
+    initialSectionOrder, // New prop
+    initialHiddenSections // New prop
 }) => {
-    const { data, updateData } = useResume(); // Assuming updateData is available if needed later
+    const { data, updateData } = useResume();
     const [loading, setLoading] = useState(!data);
-    const [hiddenSections, setHiddenSections] = useState([]);
+    // Initialize with prop, default to empty array if prop is null/undefined
+    const [hiddenSections, setHiddenSections] = useState(initialHiddenSections || []);
     const [sidebarVisible, setSidebarVisible] = useState(true);
     const [activeSection, setActiveSection] = useState(null);
     const [showGenerateDialog, setShowGenerateDialog] = useState(false); // <-- Add state for dialog
@@ -67,7 +70,8 @@ const EditableResumeTemplate = ({
     ];
     const NON_ARRAY_SECTIONS = ['personal_information', 'summary', 'objective']; // Add 'objective' if used
 
-    const [sectionOrder, setSectionOrder] = useState(ALL_SECTION_KEYS);
+    // Initialize with prop, default to ALL_SECTION_KEYS if prop is null/undefined
+    const [sectionOrder, setSectionOrder] = useState(initialSectionOrder || ALL_SECTION_KEYS);
 
     // Check if a section is empty
     const isSectionEmpty = (key) => {
@@ -135,8 +139,15 @@ const EditableResumeTemplate = ({
     useEffect(() => {
         if (data) {
             setLoading(false);
-            // Initialize hidden sections based on emptiness only once when data loads
-            setHiddenSections(sectionOrder.filter((key) => isSectionEmpty(key)));
+            // If initialHiddenSections was not provided (null/undefined),
+            // calculate hidden sections based on emptiness using the current sectionOrder.
+            // The `useState` for `hiddenSections` already initialized it to `[]` in this case.
+            if (initialHiddenSections === null || initialHiddenSections === undefined) {
+                const calculatedHiddenSections = sectionOrder.filter((key) => isSectionEmpty(key));
+                setHiddenSections(calculatedHiddenSections);
+            }
+            // If initialHiddenSections was provided (e.g., an empty array or an array with items),
+            // the `hiddenSections` state is already correctly set by `useState`.
         }
 
         // Handle responsive sidebar visibility
@@ -145,7 +156,7 @@ const EditableResumeTemplate = ({
         handleResize(); // Initial check
         mediaQuery.addEventListener('change', handleResize);
         return () => mediaQuery.removeEventListener('change', handleResize);
-    }, [data]); // Rerun only when data initially loads
+    }, [data, initialHiddenSections, sectionOrder]); // Added initialHiddenSections and sectionOrder to dependencies
 
     // Save resume data with fixed toast notifications
     const saveResumeData = () => {
@@ -154,7 +165,11 @@ const EditableResumeTemplate = ({
         // Send data to backend using PATCH request
         axios.patch(
             `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/resumes/${resumeId}/`,
-            { resume: data }, // Just send the 'resume' field to update
+            {
+                resume: data,
+                sections_sort: sectionOrder, // Add sectionOrder to payload
+                hidden_sections: hiddenSections // Add hiddenSections to payload
+            },
             {
                 headers: {
                     'Content-Type': 'application/json',
@@ -173,8 +188,8 @@ const EditableResumeTemplate = ({
                     life: 3000
                 });
 
-                // Also update the local cache
-                updateResumeCache(response.data.resume || data);
+                // Pass the entire resume item from the backend response to updateResumeCache
+                updateResumeCache(response.data);
             })
             .catch(error => {
                 console.error("Error saving resume:", error);
@@ -244,13 +259,10 @@ const EditableResumeTemplate = ({
     };
 
     // Add this new function to update cache after backend operations
-    const updateResumeCache = async (updatedData = null, newDocument = null) => {
+    const updateResumeCache = async (updatedResumeItem = null, newDocument = null) => {
         try {
-            // If we have updated resume data, update the context
-            if (updatedData) {
-
-
-                // Also update localStorage as a fallback
+            // If we have an updated resume item (e.g., after saving)
+            if (updatedResumeItem && updatedResumeItem.resume) {
                 try {
                     const localData = localStorage.getItem('all_resumes_list_cache');
                     let parsedData = localData ? JSON.parse(localData) : { data: [] };
@@ -259,27 +271,38 @@ const EditableResumeTemplate = ({
                     const existingResumeIndex = resumes.findIndex((item) => item.id === Number(resumeId));
 
                     if (existingResumeIndex !== -1) {
+                        // Merge existing item with the updated one from backend response
                         resumes[existingResumeIndex] = {
-                            ...resumes[existingResumeIndex],
-                            resume: updatedData
+                            ...resumes[existingResumeIndex], // Preserve other potential local fields
+                            id: updatedResumeItem.id, // from backend
+                            name: updatedResumeItem.name || resumes[existingResumeIndex].name, // from backend or fallback
+                            resume: updatedResumeItem.resume, // from backend
+                            sections_sort: updatedResumeItem.sections_sort, // from backend
+                            hidden_sections: updatedResumeItem.hidden_sections, // from backend
+                            generated_documents_data: updatedResumeItem.generated_documents_data !== undefined
+                                ? updatedResumeItem.generated_documents_data
+                                : resumes[existingResumeIndex].generated_documents_data, // Preserve or update
                         };
                     } else {
+                        // Add new resume item to cache if not found (less likely for an update)
                         resumes.push({
-                            id: Number(resumeId),
-                            name: `Resume ${resumeId}`,
-                            resume: updatedData
+                            id: Number(resumeId), // or updatedResumeItem.id
+                            name: updatedResumeItem.name || `Resume ${resumeId}`,
+                            resume: updatedResumeItem.resume,
+                            sections_sort: updatedResumeItem.sections_sort,
+                            hidden_sections: updatedResumeItem.hidden_sections,
+                            generated_documents_data: updatedResumeItem.generated_documents_data || []
                         });
                     }
 
                     localStorage.setItem('all_resumes_list_cache', JSON.stringify({ data: resumes }));
-                    console.log("Resume data cached in localStorage successfully");
+                    console.log("Resume data (including sort/hidden) cached in localStorage successfully");
                 } catch (storageError) {
                     console.error("Failed to cache resume in localStorage:", storageError);
-                    // Continue execution - localStorage is just a fallback
                 }
             }
 
-            // If we have a new document, handle document updates
+            // If we have a new document, handle document updates (existing logic)
             if (newDocument && newDocument.document_uuid) {
                 try {
                     // Fetch complete document details from the backend
