@@ -33,7 +33,7 @@ const PlansPage = () => {
 
     const fetchPlans = async () => {
         try {
-            const response = await axios.get(`${process.env.NEXT_PUBLIC_BACKEND_URL}/plans/api/plans/`);
+            const response = await axios.get(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/plans/`);
             setPlans(response.data);
         } catch (error) {
             console.error('Error fetching plans:', error);
@@ -48,7 +48,7 @@ const PlansPage = () => {
         }
 
         try {
-            const response = await axios.get(`${process.env.NEXT_PUBLIC_BACKEND_URL}/plans/subscription/`, {
+            const response = await axios.get(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/plans/subscription/`, {
                 headers: { Authorization: `Bearer ${session.accessToken}` }
             });
             setCurrentSubscription(response.data);
@@ -75,7 +75,7 @@ const PlansPage = () => {
         setSubscribing(planId);
 
         try {
-            const response = await axios.post(`${process.env.NEXT_PUBLIC_BACKEND_URL}/plans/subscribe/`, {
+            const response = await axios.post(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/plans/subscribe/`, {
                 plan_id: planId,
                 variant: 'dummy'
             }, {
@@ -115,7 +115,7 @@ const PlansPage = () => {
         setCanceling(true);
 
         try {
-            const response = await axios.post(`${process.env.NEXT_PUBLIC_BACKEND_URL}/plans/cancel/`, {
+            const response = await axios.post(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/plans/cancel/`, {
                 immediate: immediate
             }, {
                 headers: { Authorization: `Bearer ${session.accessToken}` }
