@@ -26,7 +26,7 @@ const PaymentHistoryPage = () => {
 
     const fetchPaymentHistory = async () => {
         try {
-            const response = await axios.get(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/plans/payments/`, {
+            const response = await axios.get(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/payments/`, {
                 headers: { Authorization: `Bearer ${session.accessToken}` }
             });
             setPayments(response.data);

@@ -48,7 +48,7 @@ const PlansPage = () => {
         }
 
         try {
-            const response = await axios.get(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/plans/subscription/`, {
+            const response = await axios.get(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/subscription/`, {
                 headers: { Authorization: `Bearer ${session.accessToken}` }
             });
             setCurrentSubscription(response.data);
@@ -75,7 +75,7 @@ const PlansPage = () => {
         setSubscribing(planId);
 
         try {
-            const response = await axios.post(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/plans/subscribe/`, {
+            const response = await axios.post(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/subscribe/`, {
                 plan_id: planId,
                 variant: 'dummy'
             }, {
@@ -115,7 +115,7 @@ const PlansPage = () => {
         setCanceling(true);
 
         try {
-            const response = await axios.post(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/plans/cancel/`, {
+            const response = await axios.post(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/cancel/`, {
                 immediate: immediate
             }, {
                 headers: { Authorization: `Bearer ${session.accessToken}` }

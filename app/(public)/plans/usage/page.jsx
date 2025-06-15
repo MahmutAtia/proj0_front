@@ -25,7 +25,7 @@ const UsageStatsPage = () => {
 
     const fetchUsageStats = async () => {
         try {
-            const response = await axios.get(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/plans/usage/`, {
+            const response = await axios.get(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/usage/`, {
                 headers: { Authorization: `Bearer ${session.accessToken}` }
             });
             setUsageData(response.data);
