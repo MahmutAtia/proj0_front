@@ -1,25 +1,65 @@
-'use client';
 import { LayoutProvider } from '../layout/context/layoutcontext';
 import { PrimeReactProvider } from 'primereact/api';
 // import AuthProvider from './providers/AuthProvider';
+import InstallPWA from './components/InstallPWA';
 import 'primereact/resources/primereact.css';
 import 'primeflex/primeflex.css';
 import 'primeicons/primeicons.css';
 import '../styles/layout/layout.scss';
 import '../styles/demo/Demos.scss';
 import AuthProvider from './providers/AuthProvider';
-import { useEffect } from 'react';
+import type { Metadata, Viewport } from "next";
+
+const APP_NAME = "Sakai React";
+const APP_DEFAULT_TITLE = "Sakai React - PrimeFaces";
+const APP_TITLE_TEMPLATE = "%s - Sakai React";
+const APP_DESCRIPTION = "Free React Admin Template";
+
+export const metadata: Metadata = {
+  applicationName: APP_NAME,
+  title: {
+    default: APP_DEFAULT_TITLE,
+    template: APP_TITLE_TEMPLATE,
+  },
+  description: APP_DESCRIPTION,
+  manifest: "/manifest.json",
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: "default",
+    title: APP_DEFAULT_TITLE,
+  },
+  formatDetection: {
+    telephone: false,
+  },
+  openGraph: {
+    type: "website",
+    siteName: APP_NAME,
+    title: {
+      default: APP_DEFAULT_TITLE,
+      template: APP_TITLE_TEMPLATE,
+    },
+    description: APP_DESCRIPTION,
+  },
+  twitter: {
+    card: "summary",
+    title: {
+      default: APP_DEFAULT_TITLE,
+      template: APP_TITLE_TEMPLATE,
+    },
+    description: APP_DESCRIPTION,
+  },
+};
+
+export const viewport: Viewport = {
+  themeColor: "#FFFFFF",
+};
+
 interface RootLayoutProps {
     children: React.ReactNode;
 }
 
 export default function RootLayout({ children }: RootLayoutProps) {
-    useEffect(() => {
-        // Direct test for a specific NEXT_PUBLIC_ variable
-        console.log('Direct test in layout - NEXT_PUBLIC_BACKEND_URL:', process.env.NEXT_PUBLIC_BACKEND_URL);
-        console.log('Direct test in layout - NEXT_PUBLIC_AI_API_URL:', process.env.NEXT_PUBLIC_AI_API_URL);
-        console.log('Direct test in layout - NEXT_PUBLIC_IPDATA_API_KEY:', process.env.NEXT_PUBLIC_IPDATA_API_KEY);
-    }, []);
+
     return (
         <html lang="en" suppressHydrationWarning>
             <head>
@@ -33,6 +73,7 @@ export default function RootLayout({ children }: RootLayoutProps) {
                     <PrimeReactProvider>
                         <LayoutProvider>
                             {children}
+                            <InstallPWA />
                         </LayoutProvider>
                     </PrimeReactProvider>
                 </AuthProvider>
