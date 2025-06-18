@@ -4,7 +4,7 @@ import GoogleProvider from 'next-auth/providers/google';
 import axios from "axios";
 
 // These two values should be a bit less than actual token lifetimes
-const BACKEND_ACCESS_TOKEN_LIFETIME = 5 * 60;  // 5 minutes
+const BACKEND_ACCESS_TOKEN_LIFETIME = 4 * 60;  // 4 minutes (reduced from 5 for safety margin)
 const BACKEND_REFRESH_TOKEN_LIFETIME = 24 * 60 * 60;  // 24 hours
 
 const getCurrentEpochTime = () => {
@@ -101,7 +101,6 @@ export const authOptions: NextAuthOptions = {
         async signIn({ user, account, profile, email, credentials }) {
             if (!account || !SIGN_IN_PROVIDERS.includes(account.provider)) return false;
 
-            // Type assertion to ensure TypeScript knows this is a valid handler
             const handler = SIGN_IN_HANDLERS[account.provider as keyof typeof SIGN_IN_HANDLERS];
             return handler(user, account, profile, email, credentials);
         },
@@ -109,12 +108,10 @@ export const authOptions: NextAuthOptions = {
         async jwt({ user, token, account }) {
             // If `user` and `account` are set that means it is a login event
             if (user && account) {
-                // Use type assertion to ensure TypeScript knows the structure
                 const backendResponse = (account.provider === "credentials"
                     ? user
                     : account.meta) as BackendResponse;
 
-                // Now TypeScript knows that these properties exist
                 token.user = backendResponse.user;
                 token.access_token = backendResponse.access;
                 token.refresh_token = backendResponse.refresh;
@@ -122,8 +119,10 @@ export const authOptions: NextAuthOptions = {
                 return token;
             }
 
-            // Refresh the backend token if necessary
+            // Check if token exists and needs refresh
             if (token.ref && getCurrentEpochTime() > token.ref) {
+                console.log("Token expired, attempting refresh...");
+
                 try {
                     const response = await axios({
                         method: "post",
@@ -131,23 +130,65 @@ export const authOptions: NextAuthOptions = {
                         data: {
                             refresh: token.refresh_token,
                         },
+                        timeout: 10000,
                     });
+
+                    // Update tokens but KEEP user data
                     token.access_token = response.data.access;
-                    token.refresh_token = response.data.refresh;
+
+                    if (response.data.refresh) {
+                        token.refresh_token = response.data.refresh;
+                    }
+
                     token.ref = getCurrentEpochTime() + BACKEND_ACCESS_TOKEN_LIFETIME;
+
+                    console.log("Token refreshed successfully");
+
                 } catch (error) {
                     console.error("Error refreshing token:", error);
+
+                    // Clear tokens but keep user for debugging
+                    token.access_token = null;
+                    token.refresh_token = null;
+                    token.ref = null;
+                    // Don't clear user immediately for debugging
+                    console.log("User data before clearing:", token.user);
+                    token.user = null;
+
+                    throw new Error("Token refresh failed");
                 }
             }
+
             return token;
         },
 
         async session({ session, token }) {
-            // Add access token and refresh token to the session
-            session.accessToken = token.access_token;
-            session.refreshToken = token.refresh_token;
+
+            // Add tokens if they exist and are valid
+            if (token.access_token && token.refresh_token) {
+                session.accessToken = token.access_token;
+                session.refreshToken = token.refresh_token;
+            } else {
+                // Clear tokens but keep user info
+                session.accessToken = undefined;
+                session.refreshToken = undefined;
+            }
+
             return session;
         },
+    },
+
+    // **ADD EVENTS TO HANDLE TOKEN ISSUES**
+    events: {
+        async signOut(message) {
+            console.log("User signed out:", message);
+        },
+    },
+
+    // **ADD PAGES TO HANDLE ERRORS**
+    pages: {
+        signIn: '/login',
+        error: '/login', // Redirect errors to login page
     },
 };
 
@@ -156,14 +197,15 @@ declare module "next-auth" {
     interface Session {
         accessToken?: string;
         refreshToken?: string;
+        user: any;
     }
 }
 
 declare module "next-auth/jwt" {
     interface JWT {
-        access_token?: string;
-        refresh_token?: string;
-        ref?: number;
-        user?: any;
+        access_token?: string | null;
+        refresh_token?: string | null;
+        ref?: number | null;
+        user: any;
     }
 }
