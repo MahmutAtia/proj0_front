@@ -244,21 +244,21 @@ const ProfilePage = () => {
                                             icon="pi pi-cog"
                                             size="small"
                                             outlined
-                                            onClick={() => router.push('/plans')}
+                                            onClick={() => router.push('/main/plans')}
                                         />
                                         <Button
                                             label="View Usage"
                                             icon="pi pi-chart-bar"
                                             size="small"
                                             outlined
-                                            onClick={() => router.push('/plans/usage')}
+                                            onClick={() => router.push('/main/plans/usage')}
                                         />
                                         <Button
                                             label="Payments"
                                             icon="pi pi-history"
                                             size="small"
                                             outlined
-                                            onClick={() => router.push('/plans/payments')}
+                                            onClick={() => router.push('/main/plans/payments')}
                                         />
                                     </div>
                                 </div>
@@ -272,7 +272,7 @@ const ProfilePage = () => {
                                     <Button
                                         label="Explore Plans"
                                         icon="pi pi-arrow-right"
-                                        onClick={() => router.push('/plans')}
+                                        onClick={() => router.push('/main/plans')}
                                     />
                                 </div>
                             )}
@@ -435,7 +435,7 @@ const ProfilePage = () => {
                                         label="View All Payments"
                                         size="small"
                                         text
-                                        onClick={() => router.push('/plans/payments')}
+                                        onClick={() => router.push('/main/plans/payments')}
                                     />
                                 </div>
                             )}
@@ -459,7 +459,7 @@ const ProfilePage = () => {
                             icon="pi pi-shopping-cart"
                             size="small"
                             outlined
-                            onClick={() => router.push('/plans')}
+                            onClick={() => router.push('/main/plans')}
                         />
                         <Button
                             label="Usage Details"

@@ -8,10 +8,12 @@ import { Toast } from 'primereact/toast';
 import { ProgressSpinner } from 'primereact/progressspinner';
 import { Button } from 'primereact/button';
 import { useSession } from 'next-auth/react';
+import { useRouter } from 'next/navigation';
 import axios from 'axios';
 
 const PaymentHistoryPage = () => {
     const { data: session } = useSession();
+    const router = useRouter();
     const toast = useRef(null);
     const [payments, setPayments] = useState([]);
     const [loading, setLoading] = useState(true);
@@ -63,40 +65,50 @@ const PaymentHistoryPage = () => {
 
     if (loading) {
         return (
-            <div className="flex justify-content-center align-items-center min-h-screen">
-                <ProgressSpinner />
+            <div className="flex justify-content-center align-items-center" style={{ minHeight: '400px' }}>
+                <ProgressSpinner style={{ width: '50px', height: '50px' }} />
             </div>
         );
     }
 
     if (!session?.accessToken) {
         return (
-            <div className="container mx-auto p-4">
-                <Card className="text-center">
+            <div className="card">
+                <div className="text-center">
                     <h2>Login Required</h2>
                     <p>Please log in to view your payment history.</p>
-                    <Button label="Go to Login" onClick={() => window.location.href = '/login'} />
-                </Card>
+                    <Button label="Go to Login" onClick={() => router.push('/login')} />
+                </div>
             </div>
         );
     }
 
     return (
-        <div className="container mx-auto p-4">
+        <div className="card">
             <Toast ref={toast} />
 
             <div className="flex justify-content-between align-items-center mb-6">
-                <h1 className="text-3xl font-bold">Payment History</h1>
+                <div>
+                    <h1 className="text-3xl font-bold text-900 mb-2">Payment History</h1>
+                    <p className="text-600">View all your subscription payments</p>
+                </div>
                 <Button
                     label="Back to Plans"
+                    icon="pi pi-arrow-left"
                     outlined
-                    onClick={() => window.location.href = '/plans'}
+                    onClick={() => router.push('/main/plans')}
                 />
             </div>
 
             <Card>
                 {payments.length > 0 ? (
-                    <DataTable value={payments} paginator rows={10} responsiveLayout="scroll">
+                    <DataTable
+                        value={payments}
+                        paginator
+                        rows={10}
+                        responsiveLayout="scroll"
+                        stripedRows
+                    >
                         <Column field="id" header="Payment ID" />
                         <Column field="created" header="Date" body={dateBodyTemplate} />
                         <Column field="total" header="Amount" body={amountBodyTemplate} />
@@ -104,10 +116,11 @@ const PaymentHistoryPage = () => {
                         <Column field="status" header="Status" body={statusBodyTemplate} />
                     </DataTable>
                 ) : (
-                    <div className="text-center">
+                    <div className="text-center py-6">
+                        <i className="pi pi-credit-card text-6xl text-400 mb-4"></i>
                         <h3>No Payment History</h3>
-                        <p>You haven&apos;t made any payments yet.</p>
-                        <Button label="View Plans" onClick={() => window.location.href = '/plans'} />
+                        <p className="text-600 mb-4">You haven&apos;t made any payments yet.</p>
+                        <Button label="View Plans" onClick={() => router.push('/main/plans')} />
                     </div>
                 )}
             </Card>

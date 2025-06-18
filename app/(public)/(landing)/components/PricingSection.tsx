@@ -188,13 +188,7 @@ const PricingSection = () => {
                                     {plan.priceSuffix && <span className={styles.priceSuffix}>{plan.priceSuffix}</span>}
                                 </div>
                             </div>
-                            <ul className={styles.featuresList}>
-                                {plan.features.map((feature: string) => (
-                                    <li key={feature} className={styles.featureItem}>
-                                        <FiCheckCircle className={styles.checkIcon} /> {feature}
-                                    </li>
-                                ))}
-                            </ul>
+
                             <motion.button
                                 className={`button ${plan.buttonClass} ${styles.buttonFullWidth} ${styles.marginTopAuto}`}
                                 variants={buttonHover}
@@ -214,3 +208,10 @@ const PricingSection = () => {
 
 
 export default PricingSection;
+// <ul className={styles.featuresList}>
+//     {plan.features.map((feature: string) => (
+//         <li key={feature} className={styles.featureItem}>
+//             <FiCheckCircle className={styles.checkIcon} /> {feature}
+//         </li>
+//     ))}
+// </ul>
