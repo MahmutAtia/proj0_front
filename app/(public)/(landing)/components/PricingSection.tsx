@@ -90,7 +90,7 @@ const PricingSection = () => {
                     },
                     buttonClass: plan.is_popular ? 'button-primary' : 'button-secondary',
                     popular: plan.is_popular || false,
-                    actionUrl: `/plans#${plan.id}`, // Link to the plans page, potentially with an anchor
+                    actionUrl: `/main/plans#${plan.id}`, // Link to the plans page, potentially with an anchor
                 }));
                 setPlans(formattedPlans);
             } catch (err) {
