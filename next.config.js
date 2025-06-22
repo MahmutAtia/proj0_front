@@ -7,19 +7,24 @@ const {
 
 /** @type {import("next").NextConfig} */
 const nextConfig = {
+  output: 'standalone',
+  experimental: {
+    // Keep any existing experimental features you need
+  },
+  images: {
+    domains: [
+      'localhost',
+      'vbs.attiais.me'  // Add your domain here
+    ],
+    // Remove unoptimized: true to enable image optimization
+    formats: ['image/webp', 'image/avif'], // Modern formats for better performance
+    deviceSizes: [640, 750, 828, 1080, 1200, 1920, 2048, 3840],
+    imageSizes: [16, 32, 48, 64, 96, 128, 256, 384],
+  },
   reactStrictMode: true,
   poweredByHeader: false,
   compress: true,
   trailingSlash: false,
-
-  // Image optimization
-  images: {
-    domains: [
-      'localhost',
-      process.env.NEXT_PUBLIC_BACKEND_URL?.replace(/^https?:\/\//, '') || '',
-    ],
-    unoptimized: process.env.NODE_ENV === 'development',
-  },
 
   // Security headers
   async headers() {
