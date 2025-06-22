@@ -480,7 +480,7 @@ const PlansPage = () => {
                     <i className="pi pi-exclamation-triangle text-orange-500 text-6xl mb-4"></i>
                     <h4 className="text-xl mb-3">Cancel Your Subscription?</h4>
                     <p className="text-600 line-height-3">
-                        Choose how you'd like to cancel your subscription. You can always reactivate it later.
+                        Choose how you&apos;d like to cancel your subscription. You can always reactivate it later.
                     </p>
                 </div>
 
