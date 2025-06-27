@@ -19,6 +19,7 @@ import { signIn, useSession } from 'next-auth/react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import styles from './ats.module.css';
 import { Suspense } from 'react';
+import { addOrUpdateResumeInCache } from '@/app/utils/resumeCache'; // 1. Import the cache utility
 
 
 
@@ -217,19 +218,20 @@ const ATSCheckerPageContent = () => {
             }
 
             const result = await response.json();
-            const resumeIdFromResult = result.resume_id;
+            // Your backend now returns the full resume object here.
+            const newResumeData = result.resume_data;
+            const resumeIdFromResult = result.resume_id || newResumeData?.id;
 
-            if (resumeIdFromResult) {
+            if (resumeIdFromResult && newResumeData) {
                 setGeneratedResumeId(String(resumeIdFromResult));
                 toast.current?.show({ severity: 'success', summary: 'Saved', detail: 'Resume saved and editor is ready.', life: 3000 });
-                try {
-                    localStorage.removeItem('data');
-                } catch (storageError) {
-                    console.error("Failed to remove 'data' from localStorage:", storageError);
-                }
+                
+                // 2. Replace the old cache removal with a direct, efficient update.
+                addOrUpdateResumeInCache(newResumeData);
+
                 setStatusError(null);
             } else {
-                throw new Error("Resume saved, but editor ID was not provided.");
+                throw new Error("Resume saved, but editor ID or data was not provided.");
             }
 
         } catch (err: any) {
@@ -511,7 +513,7 @@ const ATSCheckerPageContent = () => {
         if (taskIdToRetry) {
             setStatusError(null);
             setPollingAttempts(0);
-            if (postAuthTaskIdToCheck) {
+            if (postAuthTaskIdToRetry) {
                 setPostAuthCheckComplete(false);
                 checkStatus(taskIdToRetry, true);
             } else {
@@ -839,7 +841,7 @@ const ATSCheckerPageContent = () => {
                                                     </motion.li>
                                                     <motion.li
                                                         initial={{ opacity: 0 }}
-                                                        animate={{ opacity: pollingAttempts > 2 ? 1 : 0.5 }}
+                                                        animate={{ opacity: 1 }}
                                                         transition={{ delay: 0.6 }}
                                                         className="flex align-items-center"
                                                     >
