@@ -17,6 +17,7 @@ const languageOptions = [
     // Add other languages as needed
 ];
 
+
 const CreateResumeFromExistingDialog = ({
     visible,
     onHide,
@@ -70,10 +71,11 @@ const CreateResumeFromExistingDialog = ({
             if (!process.env.NEXT_PUBLIC_BACKEND_URL) {
                 throw new Error("Backend URL is not configured.");
             }
-            const apiUrl = `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/resumes/create_from_existing/`;
+            const apiUrl = `${process.env.NEXT_PUBLIC_AI_API_URL}/resumes-v2/create_resume`;
+
             const payload = {
-                source_resume_id: selectedResumeId,
-                target_language: targetLanguage,
+                input_text: yamlFormatedResume,
+                language: targetLanguage,
                 job_description: jobDescription,
                 instructions: additionalInstructions,
             };
