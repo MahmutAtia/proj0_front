@@ -8,8 +8,9 @@ import { ProgressSpinner } from 'primereact/progressspinner';
 import { Message } from 'primereact/message';
 import axios from 'axios';
 import { useSession } from 'next-auth/react';
-import { useRouter } from 'next/navigation'; // If navigation is needed from the dialog
+import { useRouter } from 'next/navigation';
 import yaml from 'js-yaml';
+import { motion, AnimatePresence } from 'framer-motion';
 
 const languageOptions = [
     { label: 'English', value: 'en' },
@@ -27,17 +28,41 @@ const CreateResumeFromExistingDialog = ({
     onSuccess, // Callback function (newResumeId) => {}
 }) => {
     const [selectedResumeId, setSelectedResumeId] = useState(null);
-    // The resumeYaml state is no longer needed
     const [targetLanguage, setTargetLanguage] = useState(languageOptions[0]?.value || 'en');
     const [jobDescription, setJobDescription] = useState('');
     const [additionalInstructions, setAdditionalInstructions] = useState('');
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null);
+    const [loadingMessage, setLoadingMessage] = useState('');
     const toast = useRef(null);
     const { data: session } = useSession();
     const router = useRouter();
 
     const isSourceResumeSelectionDisabled = !!initialResumeId;
+
+    const loadingMessages = [
+        "Analyzing your source resume...",
+        "Tailoring content for the new role...",
+        "Applying language and instructions...",
+        "Building the new document structure...",
+        "Finalizing the details...",
+        "Almost ready..."
+    ];
+
+    useEffect(() => {
+        let intervalId;
+        if (loading) {
+            let messageIndex = 0;
+            setLoadingMessage(loadingMessages[0]);
+            intervalId = setInterval(() => {
+                messageIndex = (messageIndex + 1) % loadingMessages.length;
+                setLoadingMessage(loadingMessages[messageIndex]);
+            }, 2500); // Change message every 2.5 seconds
+        }
+        return () => {
+            clearInterval(intervalId);
+        };
+    }, [loading]);
 
     /**
      * Finds a resume by ID in local storage and converts it to a sorted YAML string.
@@ -121,17 +146,32 @@ const CreateResumeFromExistingDialog = ({
                 },
             });
 
-            if (response.data && response.data.resume_id) {
+            if (response.data && response.data.success && response.data.resume_id) {
+                const newResumeId = response.data.resume_id;
                 toast.current?.show({
                     severity: 'success',
-                    summary: 'Success',
-                    detail: response.data.message || 'New resume created successfully!',
+                    summary: 'Success!',
+                    detail: 'New resume created. Redirecting to the editor...',
                     life: 3000
                 });
-                if (onSuccess) {
-                    onSuccess(response.data.resume_id);
+
+                // Invalidate local cache so dashboard re-fetches
+                try {
+                    localStorage.removeItem('all_resumes_list_cache');
+                } catch (e) {
+                    console.warn("Could not clear resume cache from local storage.", e);
                 }
-                onHide(); // Close dialog on success
+
+                if (onSuccess) {
+                    onSuccess(newResumeId);
+                }
+
+                // Wait a moment for the toast to be seen before navigating
+                setTimeout(() => {
+                    router.push(`/main/editor/${newResumeId}`);
+                    onHide(); // Close dialog after navigation starts
+                }, 1500);
+
             } else {
                 throw new Error(response.data?.detail || 'Failed to create resume. Invalid response from server.');
             }
@@ -142,7 +182,8 @@ const CreateResumeFromExistingDialog = ({
             setError(errorMessage);
             toast.current?.show({ severity: 'error', summary: 'Error', detail: errorMessage, life: 5000 });
         } finally {
-            setLoading(false);
+            // Keep loading true during redirection, let the page transition handle it
+            // setLoading(false);
         }
     };
 
@@ -171,80 +212,116 @@ const CreateResumeFromExistingDialog = ({
                 onHide={onHide}
                 blockScroll
             >
-                <div className="p-fluid flex flex-column gap-4">
-                    {!isSourceResumeSelectionDisabled && (
-                        <div className="field">
-                            <label htmlFor="sourceResume" className="font-semibold block mb-2">
-                                Source Resume <span className="text-red-500">*</span>
-                            </label>
-                            <Dropdown
-                                id="sourceResume"
-                                value={selectedResumeId}
-                                options={availableResumes} // Expects { label: 'Name', value: 'id' }
-                                onChange={(e) => setSelectedResumeId(e.value)}
-                                placeholder="Select a source resume"
-                                filter
-                                className="w-full"
-                                disabled={loading}
-                            />
-                            {!selectedResumeId && <small className="p-error mt-1">Source resume is required.</small>}
-                        </div>
+                <AnimatePresence mode="wait">
+                    {loading ? (
+                        <motion.div
+                            key="loading"
+                            initial={{ opacity: 0, scale: 0.95 }}
+                            animate={{ opacity: 1, scale: 1 }}
+                            exit={{ opacity: 0, scale: 0.95 }}
+                            transition={{ duration: 0.3 }}
+                            className="flex flex-column justify-content-center align-items-center text-center p-4"
+                            style={{ minHeight: '400px', background: 'var(--surface-ground)', borderRadius: 'var(--border-radius)' }}
+                        >
+                            <ProgressSpinner style={{ width: '50px', height: '50px' }} strokeWidth="4" />
+                            <h3 className="mt-4 mb-2 text-lg font-semibold text-primary">Crafting Your New Resume</h3>
+                            <AnimatePresence mode="wait">
+                                <motion.p
+                                    key={loadingMessage}
+                                    initial={{ opacity: 0, y: 10 }}
+                                    animate={{ opacity: 1, y: 0 }}
+                                    exit={{ opacity: 0, y: -10 }}
+                                    transition={{ duration: 0.4, ease: "easeInOut" }}
+                                    className="text-color-secondary"
+                                    style={{ minHeight: '2rem' }}
+                                >
+                                    {loadingMessage}
+                                </motion.p>
+                            </AnimatePresence>
+                        </motion.div>
+                    ) : (
+                        <motion.div
+                            key="form"
+                            initial={{ opacity: 0 }}
+                            animate={{ opacity: 1 }}
+                            exit={{ opacity: 0 }}
+                            className="p-fluid flex flex-column gap-4"
+                        >
+                            {!isSourceResumeSelectionDisabled && (
+                                <div className="field">
+                                    <label htmlFor="sourceResume" className="font-semibold block mb-2">
+                                        Source Resume <span className="text-red-500">*</span>
+                                    </label>
+                                    <Dropdown
+                                        id="sourceResume"
+                                        value={selectedResumeId}
+                                        options={availableResumes} // Expects { label: 'Name', value: 'id' }
+                                        onChange={(e) => setSelectedResumeId(e.value)}
+                                        placeholder="Select a source resume"
+                                        filter
+                                        className="w-full"
+                                        disabled={loading}
+                                    />
+                                    {!selectedResumeId && <small className="p-error mt-1">Source resume is required.</small>}
+                                </div>
+                            )}
+                            {isSourceResumeSelectionDisabled && initialResumeId && (
+                                 <Message severity="info" text={`Creating new resume based on: ${availableResumes.find(r => r.value === initialResumeId)?.label || `Resume ID ${initialResumeId}` }`} className="w-full" />
+                            )}
+
+                            <div className="field">
+                                <label htmlFor="targetLanguage" className="font-semibold block mb-2">
+                                    Target Language for New Resume <span className="text-red-500">*</span>
+                                </label>
+                                <Dropdown
+                                    id="targetLanguage"
+                                    value={targetLanguage}
+                                    options={languageOptions}
+                                    onChange={(e) => setTargetLanguage(e.value)}
+                                    placeholder="Select language"
+                                    className="w-full"
+                                    disabled={loading}
+                                />
+                                 {!targetLanguage && <small className="p-error mt-1">Target language is required.</small>}
+                            </div>
+
+                            <div className="field">
+                                <label htmlFor="jobDescription" className="font-semibold block mb-2">
+                                    Job Description (Important)
+                                </label>
+                                <InputTextarea
+                                    id="jobDescription"
+                                    value={jobDescription}
+                                    onChange={(e) => setJobDescription(e.target.value)}
+                                    rows={8}
+                                    placeholder="Paste the full job description here. This greatly helps in tailoring the new resume."
+                                    autoResize
+                                    className="w-full"
+                                    disabled={loading}
+                                />
+                                <small className="text-color-secondary mt-1 block">Providing a detailed job description is highly recommended for the best results.</small>
+                            </div>
+
+                            <div className="field">
+                                <label htmlFor="additionalInstructions" className="font-semibold block mb-2">
+                                    Additional Instructions (Optional)
+                                </label>
+                                <InputTextarea
+                                    id="additionalInstructions"
+                                    value={additionalInstructions}
+                                    onChange={(e) => setAdditionalInstructions(e.target.value)}
+                                    rows={4}
+                                    placeholder="e.g., Emphasize project management skills, target a senior role, make it more concise."
+                                    autoResize
+                                    className="w-full"
+                                    disabled={loading}
+                                />
+                            </div>
+
+                            {error && <Message severity="error" text={error} className="w-full" />}
+                        </motion.div>
                     )}
-                    {isSourceResumeSelectionDisabled && initialResumeId && (
-                         <Message severity="info" text={`Creating new resume based on: ${availableResumes.find(r => r.value === initialResumeId)?.label || `Resume ID ${initialResumeId}` }`} className="w-full" />
-                    )}
-
-                    <div className="field">
-                        <label htmlFor="targetLanguage" className="font-semibold block mb-2">
-                            Target Language for New Resume <span className="text-red-500">*</span>
-                        </label>
-                        <Dropdown
-                            id="targetLanguage"
-                            value={targetLanguage}
-                            options={languageOptions}
-                            onChange={(e) => setTargetLanguage(e.value)}
-                            placeholder="Select language"
-                            className="w-full"
-                            disabled={loading}
-                        />
-                         {!targetLanguage && <small className="p-error mt-1">Target language is required.</small>}
-                    </div>
-
-                    <div className="field">
-                        <label htmlFor="jobDescription" className="font-semibold block mb-2">
-                            Job Description (Important)
-                        </label>
-                        <InputTextarea
-                            id="jobDescription"
-                            value={jobDescription}
-                            onChange={(e) => setJobDescription(e.target.value)}
-                            rows={8}
-                            placeholder="Paste the full job description here. This greatly helps in tailoring the new resume."
-                            autoResize
-                            className="w-full"
-                            disabled={loading}
-                        />
-                        <small className="text-color-secondary mt-1 block">Providing a detailed job description is highly recommended for the best results.</small>
-                    </div>
-
-                    <div className="field">
-                        <label htmlFor="additionalInstructions" className="font-semibold block mb-2">
-                            Additional Instructions (Optional)
-                        </label>
-                        <InputTextarea
-                            id="additionalInstructions"
-                            value={additionalInstructions}
-                            onChange={(e) => setAdditionalInstructions(e.target.value)}
-                            rows={4}
-                            placeholder="e.g., Emphasize project management skills, target a senior role, make it more concise."
-                            autoResize
-                            className="w-full"
-                            disabled={loading}
-                        />
-                    </div>
-
-                    {error && <Message severity="error" text={error} className="w-full" />}
-                </div>
+                </AnimatePresence>
             </Dialog>
         </>
     );
