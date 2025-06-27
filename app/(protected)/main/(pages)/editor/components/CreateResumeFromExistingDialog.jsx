@@ -9,6 +9,7 @@ import { Message } from 'primereact/message';
 import axios from 'axios';
 import { useSession } from 'next-auth/react';
 import { useRouter } from 'next/navigation'; // If navigation is needed from the dialog
+import yaml from 'js-yaml';
 
 const languageOptions = [
     { label: 'English', value: 'en' },
@@ -26,6 +27,7 @@ const CreateResumeFromExistingDialog = ({
     onSuccess, // Callback function (newResumeId) => {}
 }) => {
     const [selectedResumeId, setSelectedResumeId] = useState(null);
+    // The resumeYaml state is no longer needed
     const [targetLanguage, setTargetLanguage] = useState(languageOptions[0]?.value || 'en');
     const [jobDescription, setJobDescription] = useState('');
     const [additionalInstructions, setAdditionalInstructions] = useState('');
@@ -37,13 +39,39 @@ const CreateResumeFromExistingDialog = ({
 
     const isSourceResumeSelectionDisabled = !!initialResumeId;
 
+    /**
+     * Finds a resume by ID in local storage and converts it to a sorted YAML string.
+     * This function now returns the YAML string or throws an error.
+     * @param {string | number} resumeId The ID of the resume to process.
+     * @returns {string} The YAML string representation of the resume.
+     */
+    const generateYamlFromLocalStorage = (resumeId) => {
+        const localData = localStorage.getItem('all_resumes_list_cache');
+        if (!localData) {
+            throw new Error('Resume cache not found. Please visit the dashboard to load resumes.');
+        }
+
+        const resumes = JSON.parse(localData).data;
+        const resumeItem = resumes.find((item) => item.id == resumeId); // Loose comparison
+
+        if (!resumeItem || !resumeItem.resume) {
+            throw new Error(`Resume with ID ${resumeId} not found in local cache.`);
+        }
+
+        // Convert the resume data to a sorted YAML string and return it
+        return yaml.dump(resumeItem.resume, {
+            indent: 2,
+            lineWidth: -1,
+            noRefs: true,
+            sortKeys: true // Sorts keys alphabetically
+        });
+    };
+
     useEffect(() => {
         if (visible) {
-            if (initialResumeId) {
-                setSelectedResumeId(initialResumeId);
-            } else {
-                setSelectedResumeId(null); // Reset if no initial ID
-            }
+            // Set the initial resume ID if provided
+            setSelectedResumeId(initialResumeId || null);
+
             // Reset other fields when dialog becomes visible
             setTargetLanguage(languageOptions[0]?.value || 'en');
             setJobDescription('');
@@ -52,6 +80,8 @@ const CreateResumeFromExistingDialog = ({
             setLoading(false);
         }
     }, [visible, initialResumeId]);
+
+    // The useEffect to generate YAML on selection is no longer needed.
 
     const handleSubmit = async () => {
         if (!selectedResumeId) {
@@ -62,22 +92,24 @@ const CreateResumeFromExistingDialog = ({
             toast.current?.show({ severity: 'warn', summary: 'Validation Error', detail: 'Please select a target language.', life: 3000 });
             return;
         }
-        // Job description is optional but important, no hard validation here, but could add a soft warning or UI hint.
 
         setLoading(true);
         setError(null);
 
         try {
-            if (!process.env.NEXT_PUBLIC_BACKEND_URL) {
-                throw new Error("Backend URL is not configured.");
+            // Generate the YAML from the selected resume ID just before sending
+            const resumeYaml = generateYamlFromLocalStorage(selectedResumeId);
+
+            if (!process.env.NEXT_PUBLIC_AI_API_URL) {
+                throw new Error("AI API URL is not configured.");
             }
             const apiUrl = `${process.env.NEXT_PUBLIC_AI_API_URL}/resumes-v2/create_resume`;
 
             const payload = {
-                input_text: yamlFormatedResume,
+                input_text: resumeYaml,
                 language: targetLanguage,
                 job_description: jobDescription,
-                instructions: additionalInstructions,
+                instructions: additionalInstructions
             };
 
             const response = await axios.post(apiUrl, payload, {
@@ -89,7 +121,7 @@ const CreateResumeFromExistingDialog = ({
                 },
             });
 
-            if (response.data && response.data.new_resume_id) {
+            if (response.data && response.data.resume_id) {
                 toast.current?.show({
                     severity: 'success',
                     summary: 'Success',
@@ -97,13 +129,14 @@ const CreateResumeFromExistingDialog = ({
                     life: 3000
                 });
                 if (onSuccess) {
-                    onSuccess(response.data.new_resume_id);
+                    onSuccess(response.data.resume_id);
                 }
                 onHide(); // Close dialog on success
             } else {
                 throw new Error(response.data?.detail || 'Failed to create resume. Invalid response from server.');
             }
         } catch (err) {
+            // This will now also catch errors from generateYamlFromLocalStorage
             console.error("Error creating resume from existing:", err);
             const errorMessage = err.response?.data?.detail || err.message || 'An unexpected error occurred.';
             setError(errorMessage);
