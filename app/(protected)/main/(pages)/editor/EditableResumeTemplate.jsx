@@ -666,7 +666,6 @@ const EditableResumeTemplate = ({
                 onSuccess={
                     (newResumeId) => {
                         setShowCreateDialog(false);
-                        router.push(`/editor/${newResumeId}`);
                     }
                 }
                 initialResumeId ={resumeId} // Pass the current resumeId

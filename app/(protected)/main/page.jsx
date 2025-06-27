@@ -415,7 +415,7 @@ const DashboardPage = () => {
     const quickActions = getQuickActions(defaultResume);
 
     const handleCreationSuccess = (newResumeId) => {
-        console.log("New resume created with ID:", newResumeId);
+        // console.log("New resume created with ID:", newResumeId);
         // Optionally, navigate to the new resume or refresh data
         // router.push(`/main/editor/${newResumeId}`);
         setShowCreateDialog(false);

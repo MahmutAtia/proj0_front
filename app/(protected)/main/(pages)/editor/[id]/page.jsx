@@ -10,6 +10,7 @@ import axios from 'axios';
 import { useSession } from 'next-auth/react';
 import 'primeflex/primeflex.css';
 import { Toast } from 'primereact/toast';
+import { getResumesFromCache, addOrUpdateResumeInCache } from '@/app/utils/resumeCache';
 
 const ResumeEditorPage = ({ params: paramsPromise }) => {
     const params = React.use(paramsPromise);
@@ -34,23 +35,22 @@ const ResumeEditorPage = ({ params: paramsPromise }) => {
             setInitialHiddenSections(null); // Reset
             setFetchError(null);
 
-            const localData = localStorage.getItem('all_resumes_list_cache');
+            const localResumes = getResumesFromCache();
             let foundInLocal = false;
-            if (localData) {
+            if (localResumes) {
                 try {
-                    const resumes = JSON.parse(localData).data;
-                    const resumeItem = resumes.find((item) => item.id === Number(params.id));
+                    const resumeItem = localResumes.find((item) => item.id === Number(params.id));
                     if (resumeItem && resumeItem.resume) {
                         setResumeData(resumeItem.resume);
                         setLinkedDocuments(resumeItem.generated_documents_data || []);
                         setInitialSectionOrder(resumeItem.sections_sort || null); // Load sections_sort
                         setInitialHiddenSections(resumeItem.hidden_sections || null); // Load hidden_sections
                         foundInLocal = true;
-                        console.log("Loaded resume, linked documents, section order, and hidden sections from local storage.");
+                        console.log("Loaded resume from local cache.");
                     }
                 } catch (e) {
-                    console.error("Error parsing local storage data:", e);
-                    localStorage.removeItem('data');
+                    console.error("Error parsing local cache data:", e);
+                    invalidateResumeCache(); // Clear corrupted cache
                 }
             }
 
@@ -78,7 +78,11 @@ const ResumeEditorPage = ({ params: paramsPromise }) => {
                         setLinkedDocuments(response.data.generated_documents_data || []);
                         setInitialSectionOrder(response.data.sections_sort || null); // Load sections_sort from API
                         setInitialHiddenSections(response.data.hidden_sections || null); // Load hidden_sections from API
-                        console.log("Loaded resume, linked documents, section order, and hidden sections from backend:", response.data);
+                        
+                        // Update the cache with the newly fetched data
+                        addOrUpdateResumeInCache(response.data);
+
+                        console.log("Loaded resume from backend and updated cache:", response.data);
                     } else {
                          throw new Error("Invalid data format received from backend.");
                     }

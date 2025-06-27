@@ -11,6 +11,7 @@ import { useSession } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
 import yaml from 'js-yaml';
 import { motion, AnimatePresence } from 'framer-motion';
+import { getResumesFromCache, addOrUpdateResumeInCache } from '@/app/utils/resumeCache';
 
 const languageOptions = [
     { label: 'English', value: 'en' },
@@ -71,12 +72,12 @@ const CreateResumeFromExistingDialog = ({
      * @returns {string} The YAML string representation of the resume.
      */
     const generateYamlFromLocalStorage = (resumeId) => {
-        const localData = localStorage.getItem('all_resumes_list_cache');
-        if (!localData) {
+        // FIX: Use the centralized cache utility function to read from the correct key.
+        const resumes = getResumesFromCache(); 
+        if (!resumes) {
             throw new Error('Resume cache not found. Please visit the dashboard to load resumes.');
         }
 
-        const resumes = JSON.parse(localData).data;
         const resumeItem = resumes.find((item) => item.id == resumeId); // Loose comparison
 
         if (!resumeItem || !resumeItem.resume) {
@@ -146,34 +147,31 @@ const CreateResumeFromExistingDialog = ({
                 },
             });
 
-            if (response.data && response.data.success && response.data.resume_id) {
-                const newResumeId = response.data.resume_id;
+            // The backend now returns the full resume object in `response.data.resume`
+            if (response.data && response.data.success && response.data.resume) {
+                const newResume = response.data.resume;
                 toast.current?.show({
                     severity: 'success',
                     summary: 'Success!',
-                    detail: 'New resume created. Redirecting to the editor...',
+                    detail: 'New resume created and added to cache. Redirecting...',
                     life: 3000
                 });
 
-                // Invalidate local cache so dashboard re-fetches
-                try {
-                    localStorage.removeItem('all_resumes_list_cache');
-                } catch (e) {
-                    console.warn("Could not clear resume cache from local storage.", e);
-                }
+                // Add the new resume directly to the local cache
+                addOrUpdateResumeInCache(newResume);
 
                 if (onSuccess) {
-                    onSuccess(newResumeId);
+                    onSuccess(newResume.id);
                 }
 
-                // Wait a moment for the toast to be seen before navigating
+                // Redirect after a short delay
                 setTimeout(() => {
-                    router.push(`/main/editor/${newResumeId}`);
-                    onHide(); // Close dialog after navigation starts
+                    // Ensure the path is absolute and includes the /main segment
+                    router.push(`/main/editor/${newResume.id}`);
                 }, 1500);
 
             } else {
-                throw new Error(response.data?.detail || 'Failed to create resume. Invalid response from server.');
+                throw new Error(response.data?.detail || 'Failed to create resume. No resume data returned.');
             }
         } catch (err) {
             // This will now also catch errors from generateYamlFromLocalStorage
