@@ -17,6 +17,30 @@ import CreateResumeFromExistingDialog from '../editor/components/CreateResumeFro
 // Replace the old cache logic with the centralized utility
 import { getResumesFromCache, setResumesCache, addOrUpdateResumeInCache } from '@/app/utils/resumeCache';
 
+async function fetchAndCacheResumes(session) {
+    if (!process.env.NEXT_PUBLIC_BACKEND_URL) {
+        throw new Error("Backend URL (NEXT_PUBLIC_BACKEND_URL) is not configured.");
+    }
+    const headers = { 'Content-Type': 'application/json' };
+    if (session?.accessToken) {
+        headers['Authorization'] = `Bearer ${session.accessToken}`;
+    }
+
+    const response = await axios.get(
+        `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/resumes/`,
+        { headers, timeout: 15000 }
+    );
+
+    if (Array.isArray(response.data)) {
+        // Use the centralized cache utility
+        setResumesCache(response.data);
+        return response.data;
+    } else {
+        console.error("Invalid data format received from backend. Expected an array.", response.data);
+        throw new Error("Invalid data format received from backend.");
+    }
+}
+
 const ResumeListPage = () => {
     const [resumes, setResumes] = useState([]);
     const [loading, setLoading] = useState(true);
