@@ -12,55 +12,10 @@ import { DataView, DataViewLayoutOptions } from 'primereact/dataview';
 import { Tag } from 'primereact/tag';
 import { FiFileText, FiEdit, FiPlusSquare, FiArchive, FiAlertCircle, FiStar } from 'react-icons/fi'; // Added more icons
 import { Dialog } from 'primereact/dialog';
-import ResumeDocumentsDialog from './ResumeDocumentsDialog'; // Import the new dialog component
-
-const RESUMES_CACHE_KEY = 'all_resumes_list_cache';
-const CACHE_EXPIRY_DURATION = 15 * 60 * 1000; // 15 minutes
-
-// Helper functions getCachedResumes and fetchAndCacheResumes remain the same
-// For brevity, they are not repeated here but should be present in your file.
-
-async function getCachedResumes(session) {
-    const localData = localStorage.getItem(RESUMES_CACHE_KEY);
-    if (localData) {
-        try {
-            const parsedCache = JSON.parse(localData);
-            if (parsedCache.data && parsedCache.timestamp && (Date.now() - parsedCache.timestamp < CACHE_EXPIRY_DURATION)) {
-                return parsedCache.data;
-            } else {
-                localStorage.removeItem(RESUMES_CACHE_KEY);
-            }
-        } catch (e) {
-            console.error(`Error parsing local storage data from key ${RESUMES_CACHE_KEY}:`, e);
-            localStorage.removeItem(RESUMES_CACHE_KEY);
-        }
-    }
-    return null;
-}
-
-async function fetchAndCacheResumes(session) {
-    if (!process.env.NEXT_PUBLIC_BACKEND_URL) {
-        throw new Error("Backend URL (NEXT_PUBLIC_BACKEND_URL) is not configured.");
-    }
-    const headers = { 'Content-Type': 'application/json' };
-    if (session?.accessToken) {
-        headers['Authorization'] = `Bearer ${session.accessToken}`;
-    }
-
-    const response = await axios.get(
-        `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/resumes/`,
-        { headers, timeout: 15000 }
-    );
-
-    if (Array.isArray(response.data)) {
-        localStorage.setItem(RESUMES_CACHE_KEY, JSON.stringify({ data: response.data, timestamp: Date.now() }));
-        return response.data;
-    } else {
-        console.error("Invalid data format received from backend. Expected an array.", response.data);
-        throw new Error("Invalid data format received from backend.");
-    }
-}
-
+import ResumeDocumentsDialog from './ResumeDocumentsDialog';
+import CreateResumeFromExistingDialog from '../editor/components/CreateResumeFromExistingDialog';
+// Replace the old cache logic with the centralized utility
+import { getResumesFromCache, setResumesCache, addOrUpdateResumeInCache } from '@/app/utils/resumeCache';
 
 const ResumeListPage = () => {
     const [resumes, setResumes] = useState([]);
@@ -70,6 +25,8 @@ const ResumeListPage = () => {
     const [layout, setLayout] = useState('grid'); // Default to grid view
     const [isDocumentsDialogVisible, setIsDocumentsDialogVisible] = useState(false);
     const [selectedResumeForDocuments, setSelectedResumeForDocuments] = useState(null);
+    // Add state for the create dialog
+    const [isCreateDialogVisible, setIsCreateDialogVisible] = useState(false);
     const toast = useRef(null);
     const router = useRouter();
     const { data: session, status: sessionStatus } = useSession();
@@ -87,7 +44,7 @@ const ResumeListPage = () => {
         setError(null);
 
         try {
-            let data = forceRefresh ? null : await getCachedResumes(session);
+            let data = forceRefresh ? null : await getResumesFromCache();
             if (!data) {
                 data = await fetchAndCacheResumes(session);
             }
@@ -271,7 +228,7 @@ const ResumeListPage = () => {
                         icon={<FiPlusSquare className="mr-2"/>}
                         label="Create New Resume"
                         className="p-button-primary p-button-sm ml-3"
-                        onClick={() => router.push('/main/editor/new')}
+                        onClick={() => setIsCreateDialogVisible(true)} // Open dialog instead of navigating
                     />
                 </div>
                 <div className="flex align-items-center gap-2 mt-3 md:mt-0">
@@ -308,8 +265,9 @@ const ResumeListPage = () => {
                         icon="pi pi-refresh"
                         className="p-button-danger p-button-outlined"
                         onClick={() => {
-                            localStorage.removeItem(RESUMES_CACHE_KEY);
-                            loadResumes(true); // Call loadResumes with forceRefresh
+                            // Use the centralized cache invalidation
+                            setResumesCache([]);
+                            loadResumes(true);
                         }}
                     />
                 </div>
@@ -346,7 +304,7 @@ const ResumeListPage = () => {
                 />
             </div>
 
-            {/* Render the Dialog */}
+            {/* Render the Documents Dialog */}
             <ResumeDocumentsDialog
                 visible={isDocumentsDialogVisible}
                 onHide={onHideDocumentsDialog}
@@ -360,6 +318,21 @@ const ResumeListPage = () => {
                     handleViewEditResume(resumeToManage);
                 }}
             />
+
+            {/* Add the Create Resume Dialog */}
+            <CreateResumeFromExistingDialog
+                visible={isCreateDialogVisible}
+                onHide={() => setIsCreateDialogVisible(false)}
+                availableResumes={resumes.map(r => ({ label: r.title || `Resume ID: ${r.id}`, value: r.id }))}
+                onSuccess={(newResumeId) => {
+                    setIsCreateDialogVisible(false); // Close the dialog
+
+                    // Refresh the resumes list to include the new resume
+                    loadResumes(true); // Force refresh
+                    // Navigate to the new resume after a short delay
+                }}
+            />
+
             <style jsx global>{`
                 .line-clamp-2 {
                     display: -webkit-box;
