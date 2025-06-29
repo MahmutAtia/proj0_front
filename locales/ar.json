@@ -1,39 +1,63 @@
 {
   "common": {
-    "loading": "Loading...",
-    "error": "Error",
-    "save": "Save",
-    "cancel": "Cancel",
-    "delete": "Delete",
-    "edit": "Edit",
-    "create": "Create",
-    "search": "Search...",
-    "tryAgain": "Try Again"
+    "loading": "جاري التحميل...",
+    "error": "خطأ",
+    "save": "حفظ",
+    "cancel": "إلغاء",
+    "delete": "حذف",
+    "edit": "تعديل",
+    "create": "إنشاء",
+    "search": "بحث...",
+    "tryAgain": "حاول مرة أخرى",
+    "documents": "المستندات"
   },
   "resumes": {
-    "title": "My Resumes",
-    "createNew": "Create New Resume",
-    "searchPlaceholder": "Search Resumes...",
-    "loadingResumes": "Loading resumes...",
-    "noResumesFound": "No resumes found. Click 'Create New Resume' to start!",
-    "failedToLoad": "Failed to Load Resumes",
-    "manageResume": "Manage Resume",
-    "viewDocuments": "View Documents ({count})",
-    "addDocuments": "Add Documents",
-    "untitledResume": "Untitled Resume",
-    "noDescription": "No description available",
-    "defaultTag": "Default",
-    "updated": "Updated: {date}",
-    "documentsCount": "{count} document(s)"
+    "title": "سيرتي الذاتية",
+    "createNew": "إنشاء سيرة ذاتية جديدة",
+    "searchPlaceholder": "البحث في السير الذاتية...",
+    "loadingResumes": "جاري تحميل السير الذاتية...",
+    "noResumesFound": "لم يتم العثور على سير ذاتية. انقر على 'إنشاء سيرة ذاتية جديدة' للبدء!",
+    "failedToLoad": "فشل في تحميل السير الذاتية",
+    "manageResume": "إدارة السيرة الذاتية",
+    "viewDocuments": "عرض المستندات ({count})",
+    "addDocuments": "إضافة مستندات",
+    "untitledResume": "سيرة ذاتية بدون عنوان",
+    "noDescription": "لا يوجد وصف متاح",
+    "defaultTag": "افتراضي",
+    "updated": "تم التحديث: {date}",
+    "documentsCount": "{count} مستند"
   },
   "errors": {
-    "userNotAuthenticated": "User not authenticated.",
-    "backendUrlNotConfigured": "Backend URL (NEXT_PUBLIC_BACKEND_URL) is not configured.",
-    "requestTimeout": "The request timed out. Please check your connection or try again.",
-    "serverError": "Server Error: {status} - {message}",
-    "noResponse": "No response from server. Check network connection or backend status.",
-    "unexpectedError": "An unexpected error occurred.",
-    "invalidDataFormat": "Invalid data format received from backend.",
-    "couldNotLoadResumes": "Could not load resumes. Please try again later."
+    "userNotAuthenticated": "المستخدم غير مصدق.",
+    "backendUrlNotConfigured": "رابط الخادم الخلفي (NEXT_PUBLIC_BACKEND_URL) غير مُعدّ.",
+    "requestTimeout": "انتهت مهلة الطلب. يرجى التحقق من اتصالك أو المحاولة مرة أخرى.",
+    "serverError": "خطأ في الخادم: {status} - {message}",
+    "noResponse": "لا توجد استجابة من الخادم. تحقق من اتصال الشبكة أو حالة الخادم الخلفي.",
+    "unexpectedError": "حدث خطأ غير متوقع.",
+    "invalidDataFormat": "تم استلام تنسيق بيانات غير صالح من الخادم الخلفي.",
+    "couldNotLoadResumes": "لا يمكن تحميل السير الذاتية. يرجى المحاولة مرة أخرى لاحقاً."
+  },
+  "hero": {
+    "title": "تم رفض سيرتك الذاتية؟ مرة أخرى؟ دعنا نصلح ذلك.",
+    "subtitle": "اهرب من البحث المرهق عن وظيفة. هل تعلم أن معظم الوظائف تحتاج سيرة ذاتية {tailored} فقط لتجاوز الروبوتات؟ نحن نبنيها معك باستخدام الذكاء الاصطناعي.",
+    "tailored": "مخصصة",
+    "description": "أنت رائع وماهر ومستعد. لكن طلبك يختفي في هاوية نظام تتبع المتقدمين. المشكلة ليست فيك، بل في النظام. CareerFlow AI يصنع السير الذاتية والمحافظ التي تجعلك ملحوظاً.",
+    "startFreeResume": "ابدأ سيرتي الذاتية المجانية بالذكاء الاصطناعي",
+    "checkScore": "تحقق من نقاط ATS الخاصة بي",
+    "imageAlt": "فريق محترف يعمل"
+  },
+  "dashboard": {
+    "welcome": "مرحباً بعودتك",
+    "overview": "نظرة عامة",
+    "recentActivity": "النشاط الأخير",
+    "quickActions": "إجراءات سريعة"
+  },
+  "navigation": {
+    "home": "الرئيسية",
+    "dashboard": "لوحة التحكم",
+    "resumes": "السير الذاتية",
+    "profile": "الملف الشخصي",
+    "settings": "الإعدادات",
+    "logout": "تسجيل الخروج"
   }
 }

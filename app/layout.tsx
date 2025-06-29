@@ -5,8 +5,8 @@ import InstallPWA from './components/InstallPWA';
 import 'primereact/resources/primereact.css';
 import 'primeflex/primeflex.css';
 import 'primeicons/primeicons.css';
-import '../styles/layout/layout.scss';
-import '../styles/demo/Demos.scss';
+import './styles/layout/layout.scss';
+import './styles/demo/Demos.scss';
 import AuthProvider from './providers/AuthProvider';
 import type { Metadata, Viewport } from "next";
 

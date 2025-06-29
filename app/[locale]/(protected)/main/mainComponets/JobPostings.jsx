@@ -3,7 +3,7 @@ import { Card } from 'primereact/card';
 import { Button } from 'primereact/button';
 import { ProgressSpinner } from 'primereact/progressspinner';
 import styles from '../Dashboard.module.css';
-import useUserLocation from '../../../hooks/useUserLocation'; // Adjust path as needed
+import useUserLocation from '../../../../hooks/useUserLocation'; // Adjust path as needed
 
 const JOB_DATA_CACHE_KEY = 'jobFeedData';
 const JOB_DATA_EXPIRY_MS = 120 * 60 * 1000; // 120 minutes for job data

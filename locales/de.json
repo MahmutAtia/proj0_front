@@ -1,0 +1,40 @@
+{
+  "common": {
+    "loading": "Wird geladen...",
+    "error": "Fehler",
+    "save": "Speichern",
+    "cancel": "Abbrechen",
+    "delete": "Löschen",
+    "edit": "Bearbeiten",
+    "create": "Erstellen",
+    "search": "Suchen...",
+    "tryAgain": "Erneut versuchen",
+    "documents": "Dokumente"
+  },
+  "resumes": {
+    "title": "Meine Lebensläufe",
+    "createNew": "Neuen Lebenslauf erstellen",
+    "searchPlaceholder": "Lebensläufe durchsuchen...",
+    "loadingResumes": "Lebensläufe werden geladen...",
+    "noResumesFound": "Keine Lebensläufe gefunden. Klicken Sie auf 'Neuen Lebenslauf erstellen', um zu beginnen!",
+    "failedToLoad": "Laden der Lebensläufe fehlgeschlagen",
+    "manageResume": "Lebenslauf verwalten",
+    "viewDocuments": "Dokumente anzeigen ({count})",
+    "addDocuments": "Dokumente hinzufügen",
+    "untitledResume": "Unbenannter Lebenslauf",
+    "noDescription": "Keine Beschreibung verfügbar",
+    "defaultTag": "Standard",
+    "updated": "Aktualisiert: {date}",
+    "documentsCount": "{count} Dokument(e)"
+  },
+  "errors": {
+    "userNotAuthenticated": "Benutzer nicht authentifiziert.",
+    "backendUrlNotConfigured": "Backend-URL (NEXT_PUBLIC_BACKEND_URL) ist nicht konfiguriert.",
+    "requestTimeout": "Die Anfrage ist abgelaufen. Bitte überprüfen Sie Ihre Verbindung oder versuchen Sie es erneut.",
+    "serverError": "Server-Fehler: {status} - {message}",
+    "noResponse": "Keine Antwort vom Server. Überprüfen Sie die Netzwerkverbindung oder den Backend-Status.",
+    "unexpectedError": "Ein unerwarteter Fehler ist aufgetreten.",
+    "invalidDataFormat": "Ungültiges Datenformat vom Backend erhalten.",
+    "couldNotLoadResumes": "Lebensläufe konnten nicht geladen werden. Bitte versuchen Sie es später erneut."
+  }
+}

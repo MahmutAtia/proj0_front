@@ -1,0 +1,40 @@
+{
+  "common": {
+    "loading": "Cargando...",
+    "error": "Error",
+    "save": "Guardar",
+    "cancel": "Cancelar",
+    "delete": "Eliminar",
+    "edit": "Editar",
+    "create": "Crear",
+    "search": "Buscar...",
+    "tryAgain": "Intentar de nuevo",
+    "documents": "Documentos"
+  },
+  "resumes": {
+    "title": "Mis Currículums",
+    "createNew": "Crear Nuevo Currículum",
+    "searchPlaceholder": "Buscar Currículums...",
+    "loadingResumes": "Cargando currículums...",
+    "noResumesFound": "No se encontraron currículums. ¡Haz clic en 'Crear Nuevo Currículum' para empezar!",
+    "failedToLoad": "Error al Cargar Currículums",
+    "manageResume": "Gestionar Currículum",
+    "viewDocuments": "Ver Documentos ({count})",
+    "addDocuments": "Agregar Documentos",
+    "untitledResume": "Currículum Sin Título",
+    "noDescription": "No hay descripción disponible",
+    "defaultTag": "Predeterminado",
+    "updated": "Actualizado: {date}",
+    "documentsCount": "{count} documento(s)"
+  },
+  "errors": {
+    "userNotAuthenticated": "Usuario no autenticado.",
+    "backendUrlNotConfigured": "URL del backend (NEXT_PUBLIC_BACKEND_URL) no está configurada.",
+    "requestTimeout": "La solicitud ha expirado. Verifique su conexión o intente de nuevo.",
+    "serverError": "Error del Servidor: {status} - {message}",
+    "noResponse": "Sin respuesta del servidor. Verifique la conexión de red o el estado del backend.",
+    "unexpectedError": "Ha ocurrido un error inesperado.",
+    "invalidDataFormat": "Formato de datos inválido recibido del backend.",
+    "couldNotLoadResumes": "No se pudieron cargar los currículums. Por favor, intente de nuevo más tarde."
+  }
+}

@@ -2,7 +2,7 @@ import { NextResponse } from 'next/server'
 import type { NextRequest } from 'next/server'
 
 // Supported locales
-const locales = ['en', 'tr', 'ar'];
+const locales = ['en', 'tr', 'ar', 'de', 'es'];
 const defaultLocale = 'en';
 
 // Define public paths (without locale prefix)
@@ -64,51 +64,67 @@ export function middleware(request: NextRequest) {
   console.log('Current locale:', currentLocale);
   console.log('Path without locale:', pathWithoutLocale);
 
-  // Check if current path is public
+  // **DISABLE LOCALE DETECTION FOR EXPLICIT URLs**
+  // If user has explicitly set a locale in URL, respect it completely
+  if (currentLocale) {
+    console.log('Explicit locale detected in URL, respecting user choice:', currentLocale);
+
+    // Check if current path is public or protected
+    const isPublic = publicPaths.some(path => pathWithoutLocale.startsWith(path));
+    const isProtected = isProtectedPath(pathWithoutLocale);
+
+    // For public paths, allow access without authentication
+    if (isPublic) {
+      console.log('Public path with explicit locale, allowing access');
+      return NextResponse.next();
+    }
+
+    // For protected paths, only check authentication
+    if (isProtected) {
+      console.log('Protected path with explicit locale, checking authentication only');
+
+      // Get Next-Auth.js session token
+      const token = request.cookies.get('next-auth.session-token')?.value;
+      const devToken = request.cookies.get('__Secure-next-auth.session-token')?.value;
+      const hasValidToken = token || devToken;
+
+      console.log('Has valid token:', !!hasValidToken);
+
+      if (!hasValidToken) {
+        // Redirect to login with the SAME locale user chose
+        const loginPath = `/${currentLocale}/login`;
+        console.log('No token, redirecting to login with same locale:', loginPath);
+        return NextResponse.redirect(new URL(loginPath, request.url));
+      }
+    }
+
+    // Allow access with explicit locale
+    console.log('Allowing access with explicit locale:', pathname);
+    return NextResponse.next();
+  }
+
+  // **ONLY do automatic locale detection for paths WITHOUT explicit locale**
+  console.log('No explicit locale in URL, applying automatic detection');
+
   const isPublic = publicPaths.some(path => pathWithoutLocale.startsWith(path));
   const isProtected = isProtectedPath(pathWithoutLocale);
 
   console.log('Is public:', isPublic);
   console.log('Is protected:', isProtected);
 
-  // Handle locale redirects for all paths
-  if (!currentLocale) {
-    const preferredLocale = getPreferredLocale(request);
-    // Only redirect to locale prefix if it's not the default locale or it's not the root path
-    if (preferredLocale !== defaultLocale || pathname !== '/') {
-      const newPath = `/${preferredLocale}${pathname}`;
-      console.log('Redirecting to:', newPath);
-      return NextResponse.redirect(new URL(newPath, request.url));
-    }
-  }
+  // For paths without locale, add preferred locale
+  const preferredLocale = getPreferredLocale(request);
 
-  // For public paths, allow access without authentication
-  if (isPublic) {
-    console.log('Public path, allowing access');
+  // Only redirect to locale prefix if it's not the default locale on root path
+  if (pathname === '/' && preferredLocale === defaultLocale) {
+    console.log('Root path with default locale, no redirect needed');
     return NextResponse.next();
   }
 
-  // For protected paths, check authentication
-  if (isProtected) {
-    console.log('Protected path, checking authentication');
-
-    // Get Next-Auth.js session token
-    const token = request.cookies.get('next-auth.session-token')?.value;
-    const devToken = request.cookies.get('__Secure-next-auth.session-token')?.value;
-    const hasValidToken = token || devToken;
-
-    console.log('Has valid token:', !!hasValidToken);
-
-    if (!hasValidToken) {
-      // Redirect to login with current locale
-      const loginPath = currentLocale ? `/${currentLocale}/login` : '/login';
-      console.log('No token, redirecting to:', loginPath);
-      return NextResponse.redirect(new URL(loginPath, request.url));
-    }
-  }
-
-  console.log('Allowing access to:', pathname);
-  return NextResponse.next();
+  // Add locale to URL
+  const newPath = `/${preferredLocale}${pathname}`;
+  console.log('Adding automatic locale to URL:', newPath);
+  return NextResponse.redirect(new URL(newPath, request.url));
 }
 
 // Configure middleware to run on all routes except API and static files

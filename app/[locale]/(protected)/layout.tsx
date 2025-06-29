@@ -1,7 +1,7 @@
 import { Metadata } from 'next';
-import AppConfig from '../../layout/AppConfig';
+import AppConfig from '../../../layout/AppConfig';
 import React from 'react';
-import AppBar from '../components/AppBar';
+import AppBar from '../../components/AppBar';
 interface SimpleLayoutProps {
     children: React.ReactNode;
 }

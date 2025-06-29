@@ -3,7 +3,7 @@ import { Card } from 'primereact/card';
 import { Button } from 'primereact/button';
 import { ProgressSpinner } from 'primereact/progressspinner';
 import styles from '../Dashboard.module.css';
-import useUserLocation from '../../../hooks/useUserLocation'; // Adjust path as needed
+import useUserLocation from '../../../../hooks/useUserLocation'; // Adjust path as needed
 
 const ScholarshipList = ({ router }) => {
     const [scholarships, setScholarships] = useState([]);

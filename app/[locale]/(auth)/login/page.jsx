@@ -7,7 +7,7 @@ import { useSession, signIn } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
 import { ProgressSpinner } from 'primereact/progressspinner';
 import "./styles.css";
-import LoginForm from "../../components/auth/LoginForm";
+import LoginForm from "../../../components/auth/LoginForm";
 const LoginPage = () => {
     const toast = useRef(null);
     const router = useRouter();
