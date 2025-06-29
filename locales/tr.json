@@ -1,0 +1,39 @@
+{
+  "common": {
+    "loading": "Yükleniyor...",
+    "error": "Hata",
+    "save": "Kaydet",
+    "cancel": "İptal",
+    "delete": "Sil",
+    "edit": "Düzenle",
+    "create": "Oluştur",
+    "search": "Ara...",
+    "tryAgain": "Tekrar Dene"
+  },
+  "resumes": {
+    "title": "Özgeçmişlerim",
+    "createNew": "Yeni Özgeçmiş Oluştur",
+    "searchPlaceholder": "Özgeçmiş Ara...",
+    "loadingResumes": "Özgeçmişler yükleniyor...",
+    "noResumesFound": "Özgeçmiş bulunamadı. Başlamak için 'Yeni Özgeçmiş Oluştur'a tıklayın!",
+    "failedToLoad": "Özgeçmişler Yüklenemedi",
+    "manageResume": "Özgeçmişi Yönet",
+    "viewDocuments": "Belgeleri Görüntüle ({count})",
+    "addDocuments": "Belge Ekle",
+    "untitledResume": "Başlıksız Özgeçmiş",
+    "noDescription": "Açıklama mevcut değil",
+    "defaultTag": "Varsayılan",
+    "updated": "Güncellendi: {date}",
+    "documentsCount": "{count} belge"
+  },
+  "errors": {
+    "userNotAuthenticated": "Kullanıcı doğrulanmadı.",
+    "backendUrlNotConfigured": "Backend URL (NEXT_PUBLIC_BACKEND_URL) yapılandırılmadı.",
+    "requestTimeout": "İstek zaman aşımına uğradı. Bağlantınızı kontrol edin veya tekrar deneyin.",
+    "serverError": "Sunucu Hatası: {status} - {message}",
+    "noResponse": "Sunucudan yanıt yok. Ağ bağlantısını veya backend durumunu kontrol edin.",
+    "unexpectedError": "Beklenmeyen bir hata oluştu.",
+    "invalidDataFormat": "Backend'den geçersiz veri formatı alındı.",
+    "couldNotLoadResumes": "Özgeçmişler yüklenemedi. Lütfen daha sonra tekrar deneyin."
+  }
+}

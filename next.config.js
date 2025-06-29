@@ -8,6 +8,8 @@ const {
 /** @type {import("next").NextConfig} */
 const nextConfig = {
   output: 'standalone',
+
+//   // Add i18n configuration
   experimental: {
     // Keep any existing experimental features you need
   },
@@ -117,11 +119,9 @@ module.exports = (phase) => {
       dest: "public",
       disable: process.env.NODE_ENV === "development",
       register: true,
-
-      // Workbox options to prevent auth token caching
       workboxOptions: {
         disableDevLogs: true,
-        skipWaiting: true, // Move skipWaiting here
+        skipWaiting: true,
 
         // Runtime caching rules
         runtimeCaching: [

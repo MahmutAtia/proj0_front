@@ -1,0 +1,39 @@
+{
+  "common": {
+    "loading": "Loading...",
+    "error": "Error",
+    "save": "Save",
+    "cancel": "Cancel",
+    "delete": "Delete",
+    "edit": "Edit",
+    "create": "Create",
+    "search": "Search...",
+    "tryAgain": "Try Again"
+  },
+  "resumes": {
+    "title": "My Resumes",
+    "createNew": "Create New Resume",
+    "searchPlaceholder": "Search Resumes...",
+    "loadingResumes": "Loading resumes...",
+    "noResumesFound": "No resumes found. Click 'Create New Resume' to start!",
+    "failedToLoad": "Failed to Load Resumes",
+    "manageResume": "Manage Resume",
+    "viewDocuments": "View Documents ({count})",
+    "addDocuments": "Add Documents",
+    "untitledResume": "Untitled Resume",
+    "noDescription": "No description available",
+    "defaultTag": "Default",
+    "updated": "Updated: {date}",
+    "documentsCount": "{count} document(s)"
+  },
+  "errors": {
+    "userNotAuthenticated": "User not authenticated.",
+    "backendUrlNotConfigured": "Backend URL (NEXT_PUBLIC_BACKEND_URL) is not configured.",
+    "requestTimeout": "The request timed out. Please check your connection or try again.",
+    "serverError": "Server Error: {status} - {message}",
+    "noResponse": "No response from server. Check network connection or backend status.",
+    "unexpectedError": "An unexpected error occurred.",
+    "invalidDataFormat": "Invalid data format received from backend.",
+    "couldNotLoadResumes": "Could not load resumes. Please try again later."
+  }
+}
