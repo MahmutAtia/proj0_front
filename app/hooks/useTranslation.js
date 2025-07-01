@@ -5,11 +5,11 @@ import { useMemo, useEffect } from 'react';
 
 // Translation data
 const translations = {
-  en: require('../locales/en.json'),
-  tr: require('../locales/tr.json'),
-  ar: require('../locales/ar.json'),
-  de: require('../locales/de.json'),
-  es: require('../locales/es.json'),
+  en: require('../../locales/en.json'),
+  tr: require('../../locales/tr.json'),
+  ar: require('../../locales/ar.json'),
+  de: require('../../locales/de.json'),
+  es: require('../../locales/es.json'),
 };
 
 // RTL languages

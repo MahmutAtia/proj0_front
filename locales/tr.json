@@ -26,6 +26,30 @@
     "updated": "Güncellendi: {date}",
     "documentsCount": "{count} belge"
   },
+  "hero": {
+      "title_part1": "Özgeçmiş ",
+    "rejected": "Reddedildi",
+    "title_part2": "? Yine mi?",
+    "title_part3": "Hadi Düzeltelim.",
+    "subtitle_part1": "Ruh çöküşe uğratan iş arayışından kaç. Çoğu işin botları geçmek için sadece ",
+ "subtitle_styled": "özelleştirilmiş bir özgeçmiş",
+    "subtitle_part2": " gerektirdiğini biliyor muydun? Onları seninle birlikte, AI kullanarak inşa ediyoruz.",
+    "description": "Sen parlaksın, yeteneklisin ve hazırsın. Ama başvurun ATS uçurumunda yok oluyor. Sorun sende değil, sistemde. CareerFlow AI fark edilmeni sağlayan özgeçmişler ve portföyler yaratıyor.",
+  "startFreeResume": "Ücretsiz AI Özgeçmişimi Başlat",
+  "checkScore": "ATS Puanımı Kontrol Et",
+  "imageAlt": "Teknoloji ile kariyer başarısı yakalayan profesyoneller"
+},"header": {
+  "logo": "CareerFlow",
+  "theStruggle": "Zorluk",
+  "yourEdge": "Avantajınız",
+  "howItWorks": "Nasıl Çalışır",
+  "pricing": "Fiyatlandırma",
+  "atsCheck": "ATS Kontrolü ✨",
+  "login": "Giriş",
+  "getStarted": "Başlayın",
+  "atsTooltipTitle": "ATS Nedir? 🤔",
+  "atsTooltipText": "ATS = Robot İşveren 🤖 Özgeçmişleri tarar. Anahtar kelime kaçırırsanız? 💨 Görmezden gelinir! 👉 Sizinkini kontrol etmek için tıklayın! ✅"
+},
   "errors": {
     "userNotAuthenticated": "Kullanıcı doğrulanmadı.",
     "backendUrlNotConfigured": "Backend URL (NEXT_PUBLIC_BACKEND_URL) yapılandırılmadı.",

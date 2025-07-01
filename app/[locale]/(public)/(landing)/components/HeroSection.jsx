@@ -2,10 +2,11 @@
 import React from 'react';
 import { motion } from 'framer-motion';
 import { FiArrowRight, FiShield } from 'react-icons/fi';
-import styles from '../styles/HeroSection.module.css'; // Import CSS Module
-import { useRouter } from 'next/navigation'; // Import useRouter
+import styles from '../styles/HeroSection.module.css';
+import { useRouter } from 'next/navigation';
+import { useTranslation } from '../../../../hooks/useTranslation'; // Add translation hook
 
-// Animation Variants
+// Animation Variants (unchanged)
 const staggerContainer = (staggerChildren, delayChildren) => ({
     hidden: {},
     visible: {
@@ -18,19 +19,17 @@ const fadeInUp = {
     visible: { y: 0, opacity: 1, transition: { duration: 0.6, ease: 'easeOut' } },
 };
 
-// --- Enhanced Button Hover/Tap ---
 const buttonHoverTap = {
     hover: {
-        scale: 1.04, // Slightly larger scale
-        boxShadow: "0 5px 15px rgba(88, 28, 135, 0.3)", // Add subtle purple shadow on hover
+        scale: 1.04,
+        boxShadow: "0 5px 15px rgba(88, 28, 135, 0.3)",
         transition: { duration: 0.2 }
     },
-    tap: { scale: 0.96 }, // Slightly more pronounced tap
+    tap: { scale: 0.96 },
 };
 
-// --- New: Idle Pulse for Primary Button ---
 const primaryButtonPulse = {
-    scale: [1, 1.02, 1], // Subtle scale pulse
+    scale: [1, 1.02, 1],
     transition: {
         duration: 1.8,
         ease: "easeInOut",
@@ -39,60 +38,72 @@ const primaryButtonPulse = {
     }
 };
 
-
 const HeroSection = () => {
-    const router = useRouter(); // Initialize useRouter
+    const router = useRouter();
+    const { t, isRTL } = useTranslation();
 
     return (
         <section id="hero" className={`${styles.heroSection} section-padding`}>
-            <div className={`container ${styles.heroContainer}`}>
+            <div className={`container ${styles.heroContainer} ${isRTL ? styles.rtl : ''}`}>
                 <motion.div
-                    className={styles.heroContent}
+                    className={`${styles.heroContent} ${isRTL ? styles.rtl : ''}`}
                     variants={staggerContainer(0.15, 0.1)}
                     initial="hidden"
                     animate="visible"
                 >
-                    {/* --- Content remains the same --- */}
+                    {/* Reconstruct the title with translated parts */}
                     <motion.h1 variants={fadeInUp} className={styles.heroTitle}>
-                        Resume <span className={styles.highlightRejected}>Rejected</span>? Again? <br /> Let&apos;s Fix That.
+                        {t('hero.title_part1')}
+                        <span className={styles.highlightRejected}>{t('hero.rejected')}</span>
+                        {t('hero.title_part2')}
+                        <br />
+                        {t('hero.title_part3')}
                     </motion.h1>
+
+                    {/* This part is already correct */}
                     <motion.p variants={fadeInUp} className={styles.heroSubtitle}>
-                        Escape the soul-crushing job hunt. Did you know most jobs need a <span className="gradient-text">tailored resume</span> just to pass the bots? We build them *with* you, using AI.
+                        {t('hero.subtitle_part1')}
+                        <span className="gradient-text">{t('hero.subtitle_styled')}</span>
+                        {t('hero.subtitle_part2')}
                     </motion.p>
+
                     <motion.p variants={fadeInUp} className={styles.heroParagraph}>
-                        You&apos;re brilliant, skilled, and ready. But your application vanishes into the ATS abyss. It&apos;s not you, it&apos;s the system. CareerFlow AI crafts resumes & portfolios that get you noticed.
+                        {t('hero.description')}
                     </motion.p>
-                    <motion.div variants={fadeInUp} className={styles.heroActions}>
-                        {/* --- Apply new animations --- */}
+
+                    <motion.div variants={fadeInUp} className={`${styles.heroActions} ${isRTL ? styles.rtl : ''}`}>
                         <motion.button
                             className={`button button-primary ${styles.heroButton}`}
-                            variants={buttonHoverTap} // Use enhanced hover/tap
+                            variants={buttonHoverTap}
                             whileHover="hover"
                             whileTap="tap"
-                            animate={primaryButtonPulse} // Add idle pulse animation
+                            animate={primaryButtonPulse}
                             onClick={() => router.push('/ats')}>
-                            Start My Free AI Resume <FiArrowRight size="1.1em" />
+                            {isRTL ? <FiArrowRight size="1.1em" /> : null}
+                            {t('hero.startFreeResume')}
+                            {!isRTL ? <FiArrowRight size="1.1em" /> : null}
                         </motion.button>
                         <motion.button
                             className={`button button-secondary ${styles.heroButton}`}
-                            variants={buttonHoverTap} // Use enhanced hover/tap
+                            variants={buttonHoverTap}
                             whileHover="hover"
                             whileTap="tap"
                             onClick={() => router.push('/ats')}>
-                            Check My ATS Score <FiShield size="1.1em" />
+                            {isRTL ? <FiShield size="1.1em" /> : null}
+                            {t('hero.checkScore')}
+                            {!isRTL ? <FiShield size="1.1em" /> : null}
                         </motion.button>
                     </motion.div>
                 </motion.div>
-                {/* --- Image Container remains the same --- */}
                 <motion.div
                     className={styles.heroImageContainer}
-                    initial={{ opacity: 0, scale: 0.9, x: 50 }}
+                    initial={{ opacity: 0, scale: 0.9, x: isRTL ? -50 : 50 }}
                     animate={{ opacity: 1, scale: 1, x: 0 }}
                     transition={{ duration: 0.7, delay: 0.4, ease: 'easeOut' }}
                 >
                     <img
                         src="https://images.unsplash.com/photo-1551434678-e076c223a692?q=80&w=1740&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
-                        alt="Professionals collaborating and achieving career success with technology"
+                        alt={t('hero.imageAlt')}
                         loading="eager"
                         width="1740"
                         height="1160"
@@ -105,4 +116,3 @@ const HeroSection = () => {
 };
 
 export default HeroSection;
-

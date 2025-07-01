@@ -147,3 +147,42 @@
        align-items: center;
     }
 }
+
+/* Add these RTL styles to your HeroSection.module.css */
+
+/* RTL Support */
+.heroContent.rtl {
+    text-align: right;
+}
+
+.heroContent.rtl .heroTitle,
+.heroContent.rtl .heroSubtitle,
+.heroContent.rtl .heroParagraph {
+    text-align: right;
+}
+
+.heroContent.rtl .heroActions {
+    justify-content: flex-end;
+}
+
+/* RTL specific adjustments for desktop */
+@media (min-width: 1024px) {
+    .heroContainer.rtl {
+        grid-template-columns: 0.9fr 1fr; /* Flip the grid */
+    }
+
+    .heroContent.rtl {
+        text-align: right;
+    }
+
+    .heroContent.rtl .heroActions {
+        justify-content: flex-end;
+    }
+}
+
+/* RTL button icons */
+.rtl .heroButton svg {
+    transform: scaleX(-1); /* Flip arrow icons for RTL */
+    margin-left: 0;
+    margin-right: 0.5em;
+}

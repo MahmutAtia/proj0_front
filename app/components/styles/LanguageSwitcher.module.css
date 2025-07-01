@@ -1,0 +1,124 @@
+.languageSwitcher {
+    position: relative;
+    display: inline-block;
+}
+
+.trigger {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.5rem 0.75rem;
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 8px;
+    color: var(--text-dark);
+    font-size: 0.875rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+}
+
+.trigger:hover {
+    background: rgba(255, 255, 255, 0.15);
+    border-color: rgba(88, 28, 135, 0.3);
+}
+
+.currentFlag {
+    font-size: 1rem;
+}
+
+.currentLabel {
+    display: none;
+}
+
+.backdrop {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 999;
+}
+
+.dropdown {
+    position: absolute;
+    top: calc(100% + 8px);
+    right: 0;
+    background: var(--bg-card);
+    border: 1px solid var(--border-light);
+    border-radius: 12px;
+    box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
+    min-width: 160px;
+    z-index: 1000;
+    overflow: hidden;
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+}
+
+.option {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    width: 100%;
+    padding: 0.75rem 1rem;
+    background: none;
+    border: none;
+    color: var(--text-dark);
+    font-size: 0.875rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+    text-align: left;
+}
+
+.option:hover {
+    background-color: rgba(88, 28, 135, 0.05);
+}
+
+.option.active {
+    background-color: rgba(88, 28, 135, 0.1);
+    color: var(--primary);
+}
+
+.flag {
+    font-size: 1.1rem;
+    flex-shrink: 0;
+}
+
+.name {
+    flex: 1;
+    text-align: left;
+}
+
+.checkmark {
+    color: var(--primary);
+    font-weight: 600;
+    font-size: 0.875rem;
+}
+
+/* Desktop styles */
+@media (min-width: 768px) {
+    .currentLabel {
+        display: block;
+    }
+
+    .trigger {
+        padding: 0.6rem 1rem;
+    }
+
+    .dropdown {
+        min-width: 180px;
+    }
+}
+
+/* RTL support */
+.languageSwitcher[dir="rtl"] .dropdown {
+    right: auto;
+    left: 0;
+}
+
+.languageSwitcher[dir="rtl"] .name {
+    text-align: right;
+}

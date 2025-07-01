@@ -8,7 +8,8 @@
     "edit": "Edit",
     "create": "Create",
     "search": "Search...",
-    "tryAgain": "Try Again"
+    "tryAgain": "Try Again",
+    "documents": "Documents"
   },
   "resumes": {
     "title": "My Resumes",
@@ -35,5 +36,152 @@
     "unexpectedError": "An unexpected error occurred.",
     "invalidDataFormat": "Invalid data format received from backend.",
     "couldNotLoadResumes": "Could not load resumes. Please try again later."
+  },
+"hero": {
+  "title_part1": "Resume ",
+  "rejected": "Rejected",
+  "title_part2": "? Again?",
+  "title_part3": "Let's Fix That.",
+  "subtitle_part1": "Escape the soul-crushing job hunt. Did you know most jobs need a ",
+  "subtitle_styled": "tailored resume",
+  "subtitle_part2": " just to pass the bots? We build them *with* you, using AI.",
+  "description": "You're brilliant, skilled, and ready. But your application vanishes into the ATS abyss. It's not you, it's the system. CareerFlow AI crafts resumes & portfolios that get you noticed.",
+  "startFreeResume": "Start My Free AI Resume",
+  "checkScore": "Check My ATS Score",
+  "imageAlt": "Professionals collaborating and achieving career success with technology"
+},
+"header": {
+  "logo": "CareerFlow",
+  "theStruggle": "The Struggle",
+  "yourEdge": "Your Edge",
+  "howItWorks": "How It Works",
+  "pricing": "Pricing",
+  "atsCheck": "ATS Check ✨",
+  "login": "Login",
+  "getStarted": "Get Started",
+  "atsTooltipTitle": "What's an ATS? 🤔",
+  "atsTooltipText": "ATS = Robot Recruiter 🤖 Scans resumes. Miss keywords? 💨 Ignored! 👉 Click me to check yours! ✅"
+},
+  "struggle": {
+    "title": "Stuck in the Application {abyss}?",
+    "abyss": "Abyss?",
+    "subtitle": "You're qualified, driven, and ready. Yet, the cycle repeats: effort, rejection, doubt. Let's break free from what's holding you back.",
+    "painPoints": {
+      "blackHole": {
+        "title": "The Resume Black Hole",
+        "text": "Endless applications, deafening silence. Feel like your resume vanishes? It's a common frustration."
+      },
+      "timeSink": {
+        "title": "The Time Sink",
+        "text": "Constantly tweaking resumes, writing cover letters... Job searching shouldn't consume your entire life."
+      },
+      "visibility": {
+        "title": "The Visibility Problem",
+        "text": "Generic resume? No portfolio? Struggling to showcase your unique skills and stand out from the crowd?"
+      },
+      "atsGauntlet": {
+        "title": "The ATS Gauntlet",
+        "text": "Confused by keywords? Worried about formatting? Getting past the bots feels like a losing battle."
+      }
+    },
+    "missingOut": {
+      "title": "Don't Let Outdated Tactics Cost You",
+      "text": "A generic application isn't enough in {year}. Standout portfolios, targeted resumes, and showcasing your unique value are essential. Are your materials truly competitive?"
+    }
+  },
+  "features": {
+    "title": "Your New Edge: {aiAndBrilliance}",
+    "aiAndBrilliance": "AI + Your Brilliance",
+    "subtitle": "CareerFlow AI isn't just another tool. It's your intelligent partner, designed to amplify your strengths and navigate the complexities of the modern job market.",
+    "hyperPersonalized": {
+      "title": "Hyper-Personalized AI Drafts",
+      "text": "AI analyzes job descriptions AND your profile to craft unique, targeted resumes & letters in seconds. Say goodbye to generic!"
+    },
+    "conquerAts": {
+      "title": "Conquer the ATS",
+      "text": "Optimized formatting, keyword analysis, and a FREE instant ATS score checker ensure you pass the bots."
+    },
+    "ownCorner": {
+      "title": "Your Own Corner of the Web",
+      "text": "Generate a stunning, professional website & portfolio from your resume. Easily edit with AI, share instantly."
+    },
+    "aiEditing": {
+      "title": "AI Editing Magic Wand",
+      "text": "Need a section stronger? More concise? Just ask the AI. Edit anything in real-time with simple prompts. ✨"
+    }
+  },
+  "howItWorks": {
+    "title": "AI Is Your Co-Pilot, Not the Pilot",
+    "subtitle": "Forget robotic templates. We blend AI's speed with your unique voice. You're always in control, crafting applications that are both effective and authentically *you*.",
+    "steps": {
+      "input": {
+        "title": "Input & Context",
+        "text": "Provide your details, experiences, and the target job/scholarship description. Give the AI the fuel it needs."
+      },
+      "aiMagic": {
+        "title": "AI Magic Drafts",
+        "text": "Our AI generates tailored first drafts of resumes, letters, and website content in moments, optimized for ATS and impact."
+      },
+      "refine": {
+        "title": "Refine & Personalize",
+        "text": "Use intuitive tools and AI prompts ('Make this sound more confident') to polish, add your unique flair, and make it perfect."
+      }
+    }
+  },
+  "pricing": {
+    "title": "Simple Plans, Powerful Results",
+    "subtitle": "Choose the plan that fits your journey. Start free, upgrade anytime. No hidden fees.",
+    "popular": "POPULAR",
+    "currentPlan": "Current Plan",
+    "reactivate": "Reactivate",
+    "getStartedFree": "Get Started Free",
+    "choosePlan": "Choose Plan",
+    "loadingPlans": "Loading pricing plans...",
+    "errorTitle": "Oops! Something went wrong.",
+    "noPlansTitle": "No Plans Available",
+    "noPlansText": "Pricing plans are currently unavailable. Please check back later."
+  },
+  "atsChecker": {
+    "title": "Is Your Resume Getting {ghosted} by Robots?",
+    "ghosted": "Ghosted",
+    "subtitle": "Don't guess. Upload your resume now for a 100% FREE, instant ATS compatibility check. Get actionable insights to ensure a human actually sees your application.",
+    "scanResume": "Scan My Resume FREE",
+    "disclaimer": "No tricks, no sign-up required for the scan.",
+    "imageAlt": "Visual representation of an ATS resume scan"
+  },
+  "footer": {
+    "tagline": "Empowering job seekers and students with AI to create opportunities and build brighter futures.",
+    "product": "Product",
+    "features": "Features",
+    "pricing": "Pricing",
+    "atsChecker": "ATS Checker",
+    "templates": "Templates",
+    "resources": "Resources",
+    "blog": "Blog",
+    "guides": "Guides",
+    "faq": "FAQ",
+    "support": "Support",
+    "company": "Company",
+    "aboutUs": "About Us",
+    "careers": "Careers",
+    "contact": "Contact",
+    "legal": "Legal",
+    "privacyPolicy": "Privacy Policy",
+    "termsOfService": "Terms of Service",
+    "copyright": "© {year} CareerFlow AI. All rights reserved."
+  },
+  "dashboard": {
+    "welcome": "Welcome back",
+    "overview": "Overview",
+    "recentActivity": "Recent Activity",
+    "quickActions": "Quick Actions"
+  },
+  "navigation": {
+    "home": "Home",
+    "dashboard": "Dashboard",
+    "resumes": "Resumes",
+    "profile": "Profile",
+    "settings": "Settings",
+    "logout": "Logout"
   }
 }

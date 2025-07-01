@@ -27,6 +27,31 @@
     "updated": "Aktualisiert: {date}",
     "documentsCount": "{count} Dokument(e)"
   },
+"hero": {
+  "title_part1": "Lebenslauf ",
+  "rejected": "Abgelehnt",
+  "title_part2": "? Schon wieder?",
+  "title_part3": "Lass uns das beheben.",
+  "subtitle_part1": "Entkommen Sie der zermürbenden Jobsuche. Wussten Sie, dass die meisten Jobs nur einen ",
+  "subtitle_styled": "maßgeschneiderten Lebenslauf",
+  "subtitle_part2": " brauchen, um die Bots zu überwinden? Wir erstellen sie mit Ihnen, mit KI.",
+  "description": "Sie sind brillant, qualifiziert und bereit. Aber Ihre Bewerbung verschwindet im ATS-Abgrund. Das Problem sind nicht Sie, sondern das System. CareerFlow AI erstellt Lebensläufe und Portfolios, die Sie bemerkenswert machen.",
+  "startFreeResume": "Meinen kostenlosen KI-Lebenslauf starten",
+  "checkScore": "Meine ATS-Punktzahl prüfen",
+  "imageAlt": "Professionelles Team, das mit Technologie Karriereerfolg erreicht"
+},
+"header": {
+  "logo": "CareerFlow",
+  "theStruggle": "Die Herausforderung",
+  "yourEdge": "Ihr Vorteil",
+  "howItWorks": "Wie es funktioniert",
+  "pricing": "Preise",
+  "atsCheck": "ATS-Prüfung ✨",
+  "login": "Anmelden",
+  "getStarted": "Loslegen",
+  "atsTooltipTitle": "Was ist ein ATS? 🤔",
+  "atsTooltipText": "ATS = Roboter-Personalvermittler 🤖 Scannt Lebensläufe. Schlüsselwörter verpasst? 💨 Ignoriert! 👉 Klicken Sie hier, um Ihren zu überprüfen! ✅"
+},
   "errors": {
     "userNotAuthenticated": "Benutzer nicht authentifiziert.",
     "backendUrlNotConfigured": "Backend-URL (NEXT_PUBLIC_BACKEND_URL) ist nicht konfiguriert.",

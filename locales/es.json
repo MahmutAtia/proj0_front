@@ -27,6 +27,30 @@
     "updated": "Actualizado: {date}",
     "documentsCount": "{count} documento(s)"
   },
+"hero": {
+  "title_part1": "¿Currículum ",
+  "rejected": "Rechazado",
+  "title_part2": "? ¿Otra vez?",
+  "title_part3": "Vamos a arreglarlo.",
+  "subtitle_part1": "Escapa de la búsqueda laboral aplastante. ¿Sabías que la mayoría de trabajos solo necesitan un ",
+  "subtitle_styled": "currículum personalizado",
+  "subtitle_part2": " para superar los bots? Lo construimos contigo, usando IA.",
+  "description": "Eres brillante, hábil y estás listo. Pero tu aplicación desaparece en el abismo del ATS. El problema no eres tú, es el sistema. CareerFlow AI crea currículums y portafolios que te hacen destacar.",
+  "startFreeResume": "Comenzar mi Currículum Gratis con IA",
+  "checkScore": "Revisar mi Puntuación ATS",
+  "imageAlt": "Equipo profesional logrando éxito profesional con tecnología"
+},"header": {
+  "logo": "CareerFlow",
+  "theStruggle": "El Desafío",
+  "yourEdge": "Tu Ventaja",
+  "howItWorks": "Cómo Funciona",
+  "pricing": "Precios",
+  "atsCheck": "Verificación ATS ✨",
+  "login": "Iniciar Sesión",
+  "getStarted": "Comenzar",
+  "atsTooltipTitle": "¿Qué es un ATS? 🤔",
+  "atsTooltipText": "ATS = Reclutador Robot 🤖 Escanea currículums. ¿Pierdes palabras clave? 💨 ¡Ignorado! 👉 ¡Haz clic para verificar el tuyo! ✅"
+},
   "errors": {
     "userNotAuthenticated": "Usuario no autenticado.",
     "backendUrlNotConfigured": "URL del backend (NEXT_PUBLIC_BACKEND_URL) no está configurada.",
