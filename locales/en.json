@@ -141,14 +141,15 @@
     "noPlansTitle": "No Plans Available",
     "noPlansText": "Pricing plans are currently unavailable. Please check back later."
   },
-  "atsChecker": {
-    "title": "Is Your Resume Getting {ghosted} by Robots?",
-    "ghosted": "Ghosted",
-    "subtitle": "Don't guess. Upload your resume now for a 100% FREE, instant ATS compatibility check. Get actionable insights to ensure a human actually sees your application.",
-    "scanResume": "Scan My Resume FREE",
-    "disclaimer": "No tricks, no sign-up required for the scan.",
-    "imageAlt": "Visual representation of an ATS resume scan"
-  },
+"atsChecker": {
+  "title_part1": "Is Your Resume Getting ",
+  "ghosted": "Ghosted by Robots?",
+  "title_part2": "",
+  "subtitle": "Don't guess. Upload your resume now for a 100% FREE, instant ATS compatibility check. Get actionable insights to ensure a human actually sees your application.",
+  "scanResume": "Scan My Resume FREE",
+  "disclaimer": "No tricks, no sign-up required for the scan.",
+  "imageAlt": "Visual representation of an ATS resume scan"
+},
   "footer": {
     "tagline": "Empowering job seekers and students with AI to create opportunities and build brighter futures.",
     "product": "Product",

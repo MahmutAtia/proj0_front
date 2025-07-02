@@ -51,6 +51,14 @@
   "getStarted": "Loslegen",
   "atsTooltipTitle": "Was ist ein ATS? 🤔",
   "atsTooltipText": "ATS = Roboter-Personalvermittler 🤖 Scannt Lebensläufe. Schlüsselwörter verpasst? 💨 Ignoriert! 👉 Klicken Sie hier, um Ihren zu überprüfen! ✅"
+},"atsChecker": {
+  "title_part1": "Wird Ihr Lebenslauf von ",
+  "ghosted": "Robotern Ignoriert?",
+  "title_part2": "",
+  "subtitle": "Raten Sie nicht. Laden Sie Ihren Lebenslauf jetzt hoch für eine 100% KOSTENLOSE, sofortige ATS-Kompatibilitätsprüfung. Erhalten Sie umsetzbare Einblicke, um sicherzustellen, dass ein Mensch Ihre Bewerbung tatsächlich sieht.",
+  "scanResume": "Meinen Lebenslauf KOSTENLOS Scannen",
+  "disclaimer": "Keine Tricks, keine Anmeldung für den Scan erforderlich.",
+  "imageAlt": "Visuelle Darstellung eines ATS-Lebenslauf-Scans"
 },
   "errors": {
     "userNotAuthenticated": "Benutzer nicht authentifiziert.",

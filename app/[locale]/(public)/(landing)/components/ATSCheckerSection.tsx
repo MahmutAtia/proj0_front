@@ -2,10 +2,11 @@
 import React from 'react';
 import { motion } from 'framer-motion';
 import { FiShield, FiUploadCloud } from 'react-icons/fi';
-import styles from '../styles/ATSCheckerSection.module.css'; // Import the CSS module
-import { useRouter } from 'next/navigation'; // Import useRouter
+import styles from '../styles/ATSCheckerSection.module.css';
+import { useRouter } from 'next/navigation';
+import { useTranslation } from '../../../../hooks/useTranslation'; // Add translation hook
 
-// --- Framer Motion Variants (assuming these are defined elsewhere or pass as props) ---
+// --- Framer Motion Variants ---
 const fadeInUp = {
     initial: { opacity: 0, y: 40 },
     animate: { opacity: 1, y: 0, transition: { duration: 0.6, ease: [0.6, -0.05, 0.01, 0.99] } },
@@ -18,13 +19,14 @@ const buttonHover = {
 
 // --- ATS Checker Section ---
 const ATSCheckerSection = () => {
-        const router = useRouter(); // Initialize useRouter
+    const router = useRouter();
+    const { t, isRTL } = useTranslation(); // Add translation hook
 
     return (
         <section id="ats-checker" className={`${styles.sectionBgDark} section-padding`}>
-            <div className={`${styles.container} ${styles.atsContainer}`}>
+            <div className={`${styles.container} ${styles.atsContainer} ${isRTL ? styles.rtl : ''}`}>
                 <motion.div
-                    className={styles.atsContent}
+                    className={`${styles.atsContent} ${isRTL ? styles.rtl : ''}`}
                     variants={fadeInUp}
                     initial="initial"
                     whileInView="animate"
@@ -32,37 +34,41 @@ const ATSCheckerSection = () => {
                 >
                     <FiShield className={styles.iconShield} />
                     <h2 className={styles.heading}>
-                        Is Your Resume Getting <span className={styles.accentText}>Ghosted by Robots?</span>
+                        {t('atsChecker.title_part1')}
+                        <span className={styles.accentText}>{t('atsChecker.ghosted')}</span>
+                        {t('atsChecker.title_part2')}
                     </h2>
                     <p className={styles.subheading}>
-                    Don&apos;t guess. Upload your resume now for a 100% FREE, instant ATS compatibility check. Get actionable insights to ensure a human actually sees your application.
+                        {t('atsChecker.subtitle')}
                     </p>
 
                     <motion.button
-                        // Combine global button classes with module-specific accent class
-                        className={`button ${styles.buttonAccent}`} // Use global .button and module .buttonAccent
+                        className={`button ${styles.buttonAccent}`}
                         variants={buttonHover}
                         whileHover="hover"
                         whileTap="tap"
                         onClick={() => { router.push('/ats'); }}
                     >
-                        Scan My Resume FREE <FiUploadCloud style={{ marginLeft: '0.5rem' }}/>
+                        {t('atsChecker.scanResume')}
+                        <FiUploadCloud style={{
+                            marginLeft: isRTL ? '0' : '0.5rem',
+                            marginRight: isRTL ? '0.5rem' : '0'
+                        }}/>
                     </motion.button>
                     <p className={styles.disclaimerText}>
-                        No tricks, no sign-up required for the scan.
+                        {t('atsChecker.disclaimer')}
                     </p>
                 </motion.div>
                 <motion.div
                     className={styles.atsVisual}
-                    initial={{ opacity: 0, x: 50 }}
+                    initial={{ opacity: 0, x: isRTL ? -50 : 50 }}
                     whileInView={{ opacity: 1, x: 0 }}
                     transition={{ duration: 0.7, delay: 0.2, ease: "easeOut" }}
                     viewport={{ once: true }}
                 >
-                    {/* Replace with a relevant visual - maybe a stylized scan/report */}
                     <img
-                        src="https://images.unsplash.com/photo-1587440871875-191322ee64b0?ixlib=rb-4.0.3&q=85&fm=jpg&crop=entropy&cs=srgb&w=1600" // Abstract data/scan visual
-                        alt="Visual representation of an ATS resume scan"
+                        src="https://images.unsplash.com/photo-1587440871875-191322ee64b0?ixlib=rb-4.0.3&q=85&fm=jpg&crop=entropy&cs=srgb&w=1600"
+                        alt={t('atsChecker.imageAlt')}
                         className={styles.atsImage}
                     />
                 </motion.div>
@@ -71,4 +77,4 @@ const ATSCheckerSection = () => {
     );
 };
 
-export default ATSCheckerSection; // Make sure to export
+export default ATSCheckerSection;

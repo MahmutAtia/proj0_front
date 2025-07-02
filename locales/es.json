@@ -51,6 +51,15 @@
   "atsTooltipTitle": "¿Qué es un ATS? 🤔",
   "atsTooltipText": "ATS = Reclutador Robot 🤖 Escanea currículums. ¿Pierdes palabras clave? 💨 ¡Ignorado! 👉 ¡Haz clic para verificar el tuyo! ✅"
 },
+"atsChecker": {
+  "title_part1": "¿Los Robots están ",
+  "ghosted": "Ignorando tu Currículum?",
+  "title_part2": "",
+  "subtitle": "No adivines. Sube tu currículum ahora para una verificación de compatibilidad ATS 100% GRATUITA e instantánea. Obtén insights accionables para asegurar que un humano realmente vea tu aplicación.",
+  "scanResume": "Escanear mi Currículum GRATIS",
+  "disclaimer": "Sin trucos, no se requiere registro para el escaneo.",
+  "imageAlt": "Representación visual de un escaneo de currículum ATS"
+},
   "errors": {
     "userNotAuthenticated": "Usuario no autenticado.",
     "backendUrlNotConfigured": "URL del backend (NEXT_PUBLIC_BACKEND_URL) no está configurada.",

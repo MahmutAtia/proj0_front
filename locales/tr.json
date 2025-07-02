@@ -50,6 +50,15 @@
   "atsTooltipTitle": "ATS Nedir? 🤔",
   "atsTooltipText": "ATS = Robot İşveren 🤖 Özgeçmişleri tarar. Anahtar kelime kaçırırsanız? 💨 Görmezden gelinir! 👉 Sizinkini kontrol etmek için tıklayın! ✅"
 },
+"atsChecker": {
+  "title_part1": "Özgeçmişiniz Robotlar Tarafından ",
+  "ghosted": "Görmezden Geliniyor mu?",
+  "title_part2": "",
+  "subtitle": "Tahmin etmeyin. Özgeçmişinizi şimdi yükleyin ve %100 ÜCRETSİZ, anında ATS uyumluluk kontrolü alın. Bir insanın başvurunuzu gerçekten görmesini sağlamak için eyleme geçirilebilir içgörüler edinin.",
+  "scanResume": "Özgeçmişimi ÜCRETSİZ Tara",
+  "disclaimer": "Numara yok, tarama için kayıt gerekmez.",
+  "imageAlt": "ATS özgeçmiş taramasının görsel temsili"
+},
   "errors": {
     "userNotAuthenticated": "Kullanıcı doğrulanmadı.",
     "backendUrlNotConfigured": "Backend URL (NEXT_PUBLIC_BACKEND_URL) yapılandırılmadı.",
