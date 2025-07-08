@@ -88,6 +88,75 @@
     "text": "Una aplicación genérica no es suficiente en {year}. Portafolios destacados, currículums dirigidos y mostrar tu valor único son esenciales. ¿Son realmente competitivos tus materiales?"
   }
 },
+  "dashboard_main": {
+    "welcomeBanner": {
+      "title": "¡Bienvenido de vuelta, {userName}!",
+      "userFallback": "Usuario",
+      "subtitle": "Aquí tienes la vista general de tu panel de carrera."
+    },
+    "actionCard": {
+      "explore": "Explorar"
+    },
+    "quickActions": {
+      "createDocument": {
+        "title": "Crear Nuevo Documento",
+        "description": "Generar una carta de presentación, recomendación u otros documentos profesionales.",
+        "button": "Generar Ahora"
+      },
+      "newResume": {
+        "title": "Nuevo Currículum",
+        "description": "Crear un nuevo currículum destacado desde cero o desde una plantilla.",
+        "button": "Crear Currículum"
+      },
+      "myPortfolio": {
+        "title": "Mi Portafolio",
+        "description": "Gestionar y publicar tu sitio web personal de carrera.",
+        "button": "Editar Sitio"
+      },
+      "jobSearch": {
+        "title": "Búsqueda de Empleo",
+        "description": "Descubrir y seguir oportunidades laborales relevantes.",
+        "button": "Buscar Empleos"
+      }
+    },
+    "defaultResume": {
+      "title": "Currículum Predeterminado",
+      "loading": "Cargando Currículum Predeterminado...",
+      "lastUpdated": "Última actualización: {date}",
+      "noDefaultSelected": "No se ha seleccionado currículum predeterminado. Elige uno para personalizar tu panel.",
+      "changeDefault": "Cambiar Predeterminado",
+      "selectDefault": "Seleccionar Predeterminado",
+      "buttonChooseDefault": "Elige Tu Currículum Predeterminado",
+      "tooltipEdit": "Editar Currículum Predeterminado",
+      "tooltipViewAll": "Ver todos los currículums para seleccionar o cambiar el predeterminado"
+    },
+    "relatedDocuments": {
+      "title": "Documentos Vinculados",
+      "loading": "Cargando documentos...",
+      "selectDefaultPrompt": "Selecciona un currículum predeterminado para ver sus documentos vinculados aquí.",
+      "documentsFor": "Documentos para \"{resumeTitle}\"",
+      "manageAll": "Gestionar Todos",
+      "viewMore": "Ver {count} más...",
+      "noDocuments": "Aún no hay documentos vinculados a este currículum.",
+      "addDocument": "Agregar Documento",
+      "tooltipManageAll": "Ir a la Página de Documentos"
+    },
+    "toast": {
+      "loadError": "No se pudieron cargar los datos del currículum.",
+      "actionRequiredSummary": "Acción Requerida",
+      "actionRequiredDetail": "Por favor selecciona un currículum para establecer como predeterminado desde la página \"Todos los Currículums\".",
+      "noResumeSummary": "Sin Currículum",
+      "noResumeDetail": "No se seleccionó currículum para cambiar el estado predeterminado.",
+      "noResumeForDoc": "Por favor crea un currículum primero antes de generar documentos.",
+      "updateSuccess": "Estado del currículum maestro actualizado.",
+      "updateError": "No se pudo actualizar el estado del currículum maestro.",
+      "generationStartedSummary": "Generación de Documento Iniciada",
+      "generationStartedDetail": "Tu documento se está generando."
+    },
+    "dialog": {
+      "resumeIdLabel": "ID del Currículum: {id}"
+    }
+  },
   "dashboard_layout": {
     "logo": "CareerFlow",
     "sidebar": {

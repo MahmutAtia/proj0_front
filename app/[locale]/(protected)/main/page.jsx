@@ -26,6 +26,7 @@ import { Toast } from 'primereact/toast';
 import { Dialog } from 'primereact/dialog'; // If not already there for other purposes
 import GenerateDocumentDialog from './(pages)/editor/components/GenerateDocumentDialog'; // Adjust path as needed
 import CreateResumeFromExistingDialog from './(pages)/editor/components/CreateResumeFromExistingDialog'; // Adjust path as neededimport
+import { useTranslation } from '../../../../hooks/useTranslation'; // Import the hook
 
 // Make sure RESUMES_CACHE_KEY and CACHE_EXPIRY_DURATION are accessible here or re-defined
 // Or better, use a shared context/hook for resume data and default resume logic.
@@ -36,15 +37,19 @@ const CACHE_EXPIRY_DURATION_DASHBOARD = 15 * 60 * 1000;
 
 
 
-const WelcomeBanner = ({ userName }) => (
-    <div className="mb-6">
-        <h1 className={styles.pageHeader}>Welcome back, {userName || "User"}!</h1>
-        <p className={styles.pageSubheader}>Here&apos;s your career dashboard overview.</p>
-    </div>
-);
+const WelcomeBanner = ({ userName }) => {
+    const { t } = useTranslation();
+    return (
+        <div className="mb-6">
+            <h1 className={styles.pageHeader}>{t('dashboard_main.welcomeBanner.title', { userName: userName || t('dashboard_main.welcomeBanner.userFallback') })}</h1>
+            <p className={styles.pageSubheader}>{t('dashboard_main.welcomeBanner.subtitle')}</p>
+        </div>
+    );
+};
 
-const ActionCard = ({ title, icon, description, onClick, route, buttonLabel = "Explore" }) => {
+const ActionCard = ({ title, icon, description, onClick, route, buttonLabel }) => {
     const router = useRouter();
+    const { t } = useTranslation();
     const handleClick = () => {
         if (onClick) {
             onClick();
@@ -66,7 +71,7 @@ const ActionCard = ({ title, icon, description, onClick, route, buttonLabel = "E
                     <p className={`${styles.actionDescription} text-color-secondary mb-4 px-2`}>{description}</p>
                 </div>
                 <Button
-                    label={buttonLabel}
+                    label={buttonLabel || t('dashboard_main.actionCard.explore')}
                     icon="pi pi-arrow-right"
                     iconPos="right"
                     className="p-button-primary w-full mt-auto" // Changed to p-button-primary
@@ -88,12 +93,13 @@ const QuickActionsGrid = ({ actions }) => ( // Removed router prop as ActionCard
 );
 
 const DefaultResumeDisplay = ({ resume, onViewAll, router, isLoading }) => {
+    const { t } = useTranslation();
     if (isLoading) {
         return (
             <Card className={`${styles.dashboardCardCompact}`}>
                 <div className="flex align-items-center">
                     <ProgressSpinner style={{ width: '30px', height: '30px' }} strokeWidth="4" />
-                    <span className="ml-2 text-color-secondary">Loading Default Resume...</span>
+                    <span className="ml-2 text-color-secondary">{t('dashboard_main.defaultResume.loading')}</span>
                 </div>
             </Card>
         );
@@ -106,7 +112,7 @@ const DefaultResumeDisplay = ({ resume, onViewAll, router, isLoading }) => {
                     <div className="flex align-items-center mb-1">
                         <FiStar className={`mr-2 ${resume ? 'text-yellow-500' : 'text-gray-400'}`} style={{ fontSize: '1.3rem' }} />
                         <h3 className="text-lg font-bold m-0">
-                            Default Resume
+                            {t('dashboard_main.defaultResume.title')}
                         </h3>
                     </div>
                     {resume ? (
@@ -115,30 +121,30 @@ const DefaultResumeDisplay = ({ resume, onViewAll, router, isLoading }) => {
                                 {resume.title}
                             </p>
                             <p className="text-xs text-color-secondary mt-1">
-                                Last updated: {resume.updated_at ? new Date(resume.updated_at).toLocaleDateString() : 'N/A'}
+                                {t('dashboard_main.defaultResume.lastUpdated', { date: resume.updated_at ? new Date(resume.updated_at).toLocaleDateString() : 'N/A' })}
                             </p>
                         </>
                     ) : (
-                        <p className="text-sm text-color-secondary mt-1">No default resume selected. Choose one to personalize your dashboard.</p>
+                        <p className="text-sm text-color-secondary mt-1">{t('dashboard_main.defaultResume.noDefaultSelected')}</p>
                     )}
                 </div>
                 <div className="flex flex-wrap gap-2 align-self-start md:align-self-center mt-2 md:mt-0">
                     {resume && (
                         <Button
                             icon={<FiEdit />}
-                            label="Edit"
+                            label={t('common.edit')}
                             className="p-button-sm p-button-outlined"
                             onClick={() => router.push(`/main/editor/${resume.id}`)}
-                            tooltip="Edit Default Resume"
+                            tooltip={t('dashboard_main.defaultResume.tooltipEdit')}
                             tooltipOptions={{ position: 'top' }}
                         />
                     )}
                     <Button
-                        label={resume ? "Change Default" : "Select Default"}
+                        label={resume ? t('dashboard_main.defaultResume.changeDefault') : t('dashboard_main.defaultResume.selectDefault')}
                         icon={<FiList />}
                         className="p-button-sm p-button-secondary"
                         onClick={onViewAll} // Navigates to resumes list page
-                        tooltip="View all resumes to select or change default"
+                        tooltip={t('dashboard_main.defaultResume.tooltipViewAll')}
                         tooltipOptions={{ position: 'top' }}
                     />
                 </div>
@@ -146,7 +152,7 @@ const DefaultResumeDisplay = ({ resume, onViewAll, router, isLoading }) => {
             {!resume && !isLoading && (
                 <div className="mt-4 pt-3 border-top-1 surface-border text-center">
                     <Button
-                        label="Choose Your Default Resume"
+                        label={t('dashboard_main.defaultResume.buttonChooseDefault')}
                         className="p-button-primary"
                         onClick={onViewAll}
                     />
@@ -157,13 +163,14 @@ const DefaultResumeDisplay = ({ resume, onViewAll, router, isLoading }) => {
 };
 
 const RelatedDocumentsList = ({ documents, resumeTitle, onManageDocuments, isLoading, router }) => {
+    const { t } = useTranslation();
     if (isLoading) {
         return (
             <div className="mt-4">
-                <h4 className={`${styles.sectionTitleCompact} mb-2`}>Linked Documents</h4>
+                <h4 className={`${styles.sectionTitleCompact} mb-2`}>{t('dashboard_main.relatedDocuments.title')}</h4>
                 <div className="flex align-items-center">
                     <ProgressSpinner style={{ width: '25px', height: '25px' }} strokeWidth="4" />
-                    <span className="ml-2 text-color-secondary text-sm">Loading documents...</span>
+                    <span className="ml-2 text-color-secondary text-sm">{t('dashboard_main.relatedDocuments.loading')}</span>
                 </div>
             </div>
         );
@@ -172,10 +179,10 @@ const RelatedDocumentsList = ({ documents, resumeTitle, onManageDocuments, isLoa
         return (
             <div className={`mt-4 ${styles.relatedDocsSection} ${styles.emptyDocsSection}`}>
                 <div className="flex justify-content-between align-items-center mb-2">
-                    <h4 className={`${styles.sectionTitle} m-0`}>Linked Documents</h4>
+                    <h4 className={`${styles.sectionTitle} m-0`}>{t('dashboard_main.relatedDocuments.title')}</h4>
                 </div>
                 <p className="text-sm text-color-secondary p-3 border-round surface-50 text-center">
-                    Select a default resume to see its linked documents here.
+                    {t('dashboard_main.relatedDocuments.selectDefaultPrompt')}
                 </p>
             </div>
         );
@@ -185,14 +192,14 @@ const RelatedDocumentsList = ({ documents, resumeTitle, onManageDocuments, isLoa
         <div className={`mt-4 ${styles.relatedDocsSection}`}>
             <div className="flex justify-content-between align-items-center mb-3">
                 <h4 className={`${styles.sectionTitle} m-0`}>
-                    Documents for <span className="text-primary font-semibold">{'"' + resumeTitle + '"'}</span>
+                    {t('dashboard_main.relatedDocuments.documentsFor', { resumeTitle })}
                 </h4>
                 <Button
-                    label="Manage All"
+                    label={t('dashboard_main.relatedDocuments.manageAll')}
                     icon={<FiFolder />}
                     className="p-button-text p-button-sm p-button-secondary"
                     onClick={onManageDocuments}
-                    tooltip="Go to Documents Page"
+                    tooltip={t('dashboard_main.relatedDocuments.tooltipManageAll')}
                     tooltipOptions={{ position: 'top' }}
                 />
             </div>
@@ -215,7 +222,7 @@ const RelatedDocumentsList = ({ documents, resumeTitle, onManageDocuments, isLoa
                     ))}
                     {documents.length > 3 && (
                         <li className="text-center mt-2">
-                            <Button label={`View ${documents.length - 3} more...`} className="p-button-link p-button-sm" onClick={onManageDocuments} />
+                            <Button label={t('dashboard_main.relatedDocuments.viewMore', { count: documents.length - 3 })} className="p-button-link p-button-sm" onClick={onManageDocuments} />
                         </li>
                     )}
                 </ul>
@@ -223,9 +230,9 @@ const RelatedDocumentsList = ({ documents, resumeTitle, onManageDocuments, isLoa
                 <div className={`${styles.emptyDocsContent} text-center p-4 border-1 border-dashed surface-border border-round`}>
                     <FiArchive className="text-4xl text-color-secondary mb-2" />
                     <p className="text-sm text-color-secondary m-0">
-                        No documents linked to this resume yet.
+                        {t('dashboard_main.relatedDocuments.noDocuments')}
                     </p>
-                    <Button label="Add Document" icon={<FiPlusSquare />} className="p-button-sm p-button-text mt-2" onClick={() => router.push(`/main/editor/${defaultResume?.id}`)} />
+                    <Button label={t('dashboard_main.relatedDocuments.addDocument')} icon={<FiPlusSquare />} className="p-button-sm p-button-text mt-2" onClick={() => router.push(`/main/editor/${defaultResume?.id}`)} />
                 </div>
             )}
         </div>
@@ -238,6 +245,7 @@ const DashboardPage = () => {
     const { data: session, status: sessionStatus } = useSession();
     const router = useRouter();
     const toast = useRef(null);
+    const { t } = useTranslation(); // Main hook
 
     const [allResumes, setAllResumes] = useState([]);
     const [defaultResume, setDefaultResume] = useState(null);
@@ -284,7 +292,7 @@ const DashboardPage = () => {
 
             } catch (err) {
                 console.error("Error fetching resumes for dashboard:", err);
-                toast.current?.show({ severity: 'error', summary: 'Error', detail: 'Could not load resume data.' });
+                toast.current?.show({ severity: 'error', summary: t('common.error'), detail: t('dashboard_main.toast.loadError') });
                 setAllResumes([]);
                 setDefaultResume(null);
                 setRelatedDocuments([]);
@@ -293,7 +301,7 @@ const DashboardPage = () => {
             }
         };
         loadInitialData();
-    }, [session, sessionStatus]);
+    }, [session, sessionStatus, t]);
 
     const transformedResumesForDialog = useMemo(() => {
         return allResumes.map(resume => {
@@ -317,12 +325,12 @@ const DashboardPage = () => {
     const handleSetDefaultResume = async () => {
         if (!defaultResume && allResumes.length > 0) {
             // If no default is set, and there are resumes, prompt to select one or go to resumes page
-            toast.current?.show({ severity: 'info', summary: 'Action Required', detail: 'Please select a resume to set as default from the "All Resumes" page.' });
+            toast.current?.show({ severity: 'info', summary: t('dashboard_main.toast.actionRequiredSummary'), detail: t('dashboard_main.toast.actionRequiredDetail') });
             router.push('/main/resumes'); // Or open a dialog to select
             return;
         }
         if (!defaultResume) {
-            toast.current?.show({ severity: 'warn', summary: 'No Resume', detail: 'No resume selected to change default status.' });
+            toast.current?.show({ severity: 'warn', summary: t('dashboard_main.toast.noResumeSummary'), detail: t('dashboard_main.toast.noResumeDetail') });
             return;
         }
 
@@ -359,10 +367,10 @@ const DashboardPage = () => {
             });
             localStorage.setItem(RESUMES_CACHE_KEY_DASHBOARD, JSON.stringify({ data: updatedCacheResumes, timestamp: Date.now() }));
 
-            toast.current?.show({ severity: 'success', summary: 'Success', detail: `Master resume status updated.` });
+            toast.current?.show({ severity: 'success', summary: t('common.success'), detail: t('dashboard_main.toast.updateSuccess') });
         } catch (err) {
             console.error("Error setting default resume:", err);
-            toast.current?.show({ severity: 'error', summary: 'Error', detail: 'Could not update master resume status.' });
+            toast.current?.show({ severity: 'error', summary: t('common.error'), detail: t('dashboard_main.toast.updateError') });
             // Revert optimistic update
             setDefaultResume(oldDefaultResume);
             setAllResumes(oldAllResumes);
@@ -371,44 +379,44 @@ const DashboardPage = () => {
 
     const getQuickActions = (currentDefaultResume) => [
         {
-            title: "Create New Document",
+            title: t('dashboard_main.quickActions.createDocument.title'),
             icon: <FiFileText size={28} className={styles.actionIconForeground} />, // Enhanced icon
-            description: "Generate a cover letter, recommendation, or other professional document.",
+            description: t('dashboard_main.quickActions.createDocument.description'),
             onClick: () => {
                 if (allResumes.length === 0) {
-                    toast.current?.show({ severity: 'warn', summary: 'No Resumes', detail: 'Please create a resume first before generating documents.', life: 4000 });
+                    toast.current?.show({ severity: 'warn', summary: t('dashboard_main.toast.noResumeSummary'), detail: t('dashboard_main.toast.noResumeForDoc'), life: 4000 });
                     return;
                 }
                 setIsGenerateDocDialogVisible(true);
             },
-            buttonLabel: "Generate Now"
+            buttonLabel: t('dashboard_main.quickActions.createDocument.button')
         },
         {
-            title: "New Resume",
+            title: t('dashboard_main.quickActions.newResume.title'),
             icon: <FiPlusSquare size={28} className={styles.actionIconForeground} />, // Changed icon for consistency
-            description: "Craft a new standout resume from scratch or a template.",
+            description: t('dashboard_main.quickActions.newResume.description'),
             onClick: () => {
                 if (allResumes.length === 0) {
-                    toast.current?.show({ severity: 'warn', summary: 'No Resumes', detail: 'Please create a resume first before generating documents.', life: 4000 });
+                    toast.current?.show({ severity: 'warn', summary: t('dashboard_main.toast.noResumeSummary'), detail: t('dashboard_main.toast.noResumeForDoc'), life: 4000 });
                     return;
                 }
                 setShowCreateDialog(true);
             },
-            buttonLabel: "Create Resume"
+            buttonLabel: t('dashboard_main.quickActions.newResume.button')
         },
         {
-            title: "My Portfolio",
+            title: t('dashboard_main.quickActions.myPortfolio.title'),
             icon: <FiGlobe size={28} className={styles.actionIconForeground} />,
-            description: "Manage and publish your personal career website.",
+            description: t('dashboard_main.quickActions.myPortfolio.description'),
             route: currentDefaultResume ? `/main/site-editor/${currentDefaultResume.personal_website_uuid || currentDefaultResume.id}` : '/main/site-editor',
-            buttonLabel: "Edit Site"
+            buttonLabel: t('dashboard_main.quickActions.myPortfolio.button')
         },
         {
-            title: "Job Search",
+            title: t('dashboard_main.quickActions.jobSearch.title'),
             icon: <FiBriefcase size={28} className={styles.actionIconForeground} />,
-            description: "Discover and track relevant job opportunities.",
+            description: t('dashboard_main.quickActions.jobSearch.description'),
             route: '/main/job-feed',
-            buttonLabel: "Find Jobs"
+            buttonLabel: t('dashboard_main.quickActions.jobSearch.button')
         },
     ];
 
@@ -472,13 +480,13 @@ const DashboardPage = () => {
                 visible={isGenerateDocDialogVisible}
                 onHide={() => setIsGenerateDocDialogVisible(false)}
                 initialResumeId={null}
-                availableResumes={allResumes.map(r => ({ label: r.title || `Resume ID: ${r.id}`, value: r.id }))}
+                availableResumes={allResumes.map(r => ({ label: r.title || t('dashboard_main.dialog.resumeIdLabel', { id: r.id }), value: r.id }))}
                 allResumesListCache={transformedResumesForDialog} // Pass the transformed data
                 onGenerationSuccess={(genDetails) => {
                     toast.current?.show({
                         severity: 'success',
-                        summary: 'Document Generation Started',
-                        detail: `Your document is being generated.`,
+                        summary: t('dashboard_main.toast.generationStartedSummary'),
+                        detail: t('dashboard_main.toast.generationStartedDetail'),
                         life: 3000
                     });
                     setIsGenerateDocDialogVisible(false);
@@ -493,7 +501,7 @@ const DashboardPage = () => {
             <CreateResumeFromExistingDialog
                 visible={showCreateDialog}
                 onHide={() => setShowCreateDialog(false)}
-                availableResumes={allResumes.map(r => ({ label: r.title || `Resume ID: ${r.id}`, value: r.id }))}
+                availableResumes={allResumes.map(r => ({ label: r.title || t('dashboard_main.dialog.resumeIdLabel', { id: r.id }), value: r.id }))}
                 onSuccess={handleCreationSuccess}
             // initialResumeId can be passed if a specific resume is pre-selected
             />

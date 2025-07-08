@@ -114,6 +114,75 @@
     "settings": "الإعدادات",
     "logout": "تسجيل الخروج"
   },
+  "dashboard_main": {
+    "welcomeBanner": {
+      "title": "مرحباً بعودتك، {userName}!",
+      "userFallback": "مستخدم",
+      "subtitle": "إليك نظرة عامة على لوحة تحكم مسيرتك المهنية."
+    },
+    "actionCard": {
+      "explore": "استكشف"
+    },
+    "quickActions": {
+      "createDocument": {
+        "title": "إنشاء مستند جديد",
+        "description": "إنشاء خطاب تغطية، توصية، أو مستندات مهنية أخرى.",
+        "button": "إنشاء الآن"
+      },
+      "newResume": {
+        "title": "سيرة ذاتية جديدة",
+        "description": "صياغة سيرة ذاتية متميزة جديدة من الصفر أو قالب.",
+        "button": "إنشاء سيرة ذاتية"
+      },
+      "myPortfolio": {
+        "title": "محفظة أعمالي",
+        "description": "إدارة ونشر موقع مسيرتك المهنية الشخصي.",
+        "button": "تحرير الموقع"
+      },
+      "jobSearch": {
+        "title": "البحث عن وظيفة",
+        "description": "اكتشاف وتتبع الفرص الوظيفية ذات الصلة.",
+        "button": "البحث عن وظائف"
+      }
+    },
+    "defaultResume": {
+      "title": "السيرة الذاتية الافتراضية",
+      "loading": "جاري تحميل السيرة الذاتية الافتراضية...",
+      "lastUpdated": "آخر تحديث: {date}",
+      "noDefaultSelected": "لم يتم تحديد سيرة ذاتية افتراضية. اختر واحدة لتخصيص لوحة التحكم الخاصة بك.",
+      "changeDefault": "تغيير الافتراضي",
+      "selectDefault": "تحديد افتراضي",
+      "buttonChooseDefault": "اختر سيرتك الذاتية الافتراضية",
+      "tooltipEdit": "تحرير السيرة الذاتية الافتراضية",
+      "tooltipViewAll": "عرض جميع السير الذاتية لتحديد أو تغيير الافتراضي"
+    },
+    "relatedDocuments": {
+      "title": "المستندات المرتبطة",
+      "loading": "جاري تحميل المستندات...",
+      "selectDefaultPrompt": "حدد سيرة ذاتية افتراضية لرؤية مستنداتها المرتبطة هنا.",
+      "documentsFor": "مستندات لـ \"{resumeTitle}\"",
+      "manageAll": "إدارة الكل",
+      "viewMore": "عرض {count} أكثر...",
+      "noDocuments": "لا توجد مستندات مرتبطة بهذه السيرة الذاتية بعد.",
+      "addDocument": "إضافة مستند",
+      "tooltipManageAll": "الذهاب إلى صفحة المستندات"
+    },
+    "toast": {
+      "loadError": "لا يمكن تحميل بيانات السيرة الذاتية.",
+      "actionRequiredSummary": "إجراء مطلوب",
+      "actionRequiredDetail": "يرجى تحديد سيرة ذاتية لتعيينها كافتراضي من صفحة \"جميع السير الذاتية\".",
+      "noResumeSummary": "لا توجد سيرة ذاتية",
+      "noResumeDetail": "لم يتم تحديد سيرة ذاتية لتغيير الحالة الافتراضية.",
+      "noResumeForDoc": "يرجى إنشاء سيرة ذاتية أولاً قبل إنشاء المستندات.",
+      "updateSuccess": "تم تحديث حالة السيرة الذاتية الرئيسية.",
+      "updateError": "لا يمكن تحديث حالة السيرة الذاتية الرئيسية.",
+      "generationStartedSummary": "بدأ إنشاء المستند",
+      "generationStartedDetail": "جاري إنشاء مستندك."
+    },
+    "dialog": {
+      "resumeIdLabel": "معرف السيرة الذاتية: {id}"
+    }
+  },
   "dashboard_layout": {
     "logo": "CareerFlow",
     "sidebar": {

@@ -187,6 +187,75 @@
     "settings": "Settings",
     "logout": "Logout"
   },
+  "dashboard_main": {
+    "welcomeBanner": {
+      "title": "Welcome back, {userName}!",
+      "userFallback": "User",
+      "subtitle": "Here's your career dashboard overview."
+    },
+    "actionCard": {
+      "explore": "Explore"
+    },
+    "quickActions": {
+      "createDocument": {
+        "title": "Create New Document",
+        "description": "Generate a cover letter, recommendation, or other professional document.",
+        "button": "Generate Now"
+      },
+      "newResume": {
+        "title": "New Resume",
+        "description": "Craft a new standout resume from scratch or a template.",
+        "button": "Create Resume"
+      },
+      "myPortfolio": {
+        "title": "My Portfolio",
+        "description": "Manage and publish your personal career website.",
+        "button": "Edit Site"
+      },
+      "jobSearch": {
+        "title": "Job Search",
+        "description": "Discover and track relevant job opportunities.",
+        "button": "Find Jobs"
+      }
+    },
+    "defaultResume": {
+      "title": "Default Resume",
+      "loading": "Loading Default Resume...",
+      "lastUpdated": "Last updated: {date}",
+      "noDefaultSelected": "No default resume selected. Choose one to personalize your dashboard.",
+      "changeDefault": "Change Default",
+      "selectDefault": "Select Default",
+      "buttonChooseDefault": "Choose Your Default Resume",
+      "tooltipEdit": "Edit Default Resume",
+      "tooltipViewAll": "View all resumes to select or change default"
+    },
+    "relatedDocuments": {
+      "title": "Linked Documents",
+      "loading": "Loading documents...",
+      "selectDefaultPrompt": "Select a default resume to see its linked documents here.",
+      "documentsFor": "Documents for \"{resumeTitle}\"",
+      "manageAll": "Manage All",
+      "viewMore": "View {count} more...",
+      "noDocuments": "No documents linked to this resume yet.",
+      "addDocument": "Add Document",
+      "tooltipManageAll": "Go to Documents Page"
+    },
+    "toast": {
+      "loadError": "Could not load resume data.",
+      "actionRequiredSummary": "Action Required",
+      "actionRequiredDetail": "Please select a resume to set as default from the \"All Resumes\" page.",
+      "noResumeSummary": "No Resume",
+      "noResumeDetail": "No resume selected to change default status.",
+      "noResumeForDoc": "Please create a resume first before generating documents.",
+      "updateSuccess": "Master resume status updated.",
+      "updateError": "Could not update master resume status.",
+      "generationStartedSummary": "Document Generation Started",
+      "generationStartedDetail": "Your document is being generated."
+    },
+    "dialog": {
+      "resumeIdLabel": "Resume ID: {id}"
+    }
+  },
   "dashboard_layout": {
     "logo": "CareerFlow",
     "sidebar": {

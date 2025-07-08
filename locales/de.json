@@ -99,6 +99,75 @@
     "invalidDataFormat": "Ungültiges Datenformat vom Backend erhalten.",
     "couldNotLoadResumes": "Lebensläufe konnten nicht geladen werden. Bitte versuchen Sie es später erneut."
   },
+  "dashboard_main": {
+    "welcomeBanner": {
+      "title": "Willkommen zurück, {userName}!",
+      "userFallback": "Benutzer",
+      "subtitle": "Hier ist Ihre Karriere-Dashboard-Übersicht."
+    },
+    "actionCard": {
+      "explore": "Erkunden"
+    },
+    "quickActions": {
+      "createDocument": {
+        "title": "Neues Dokument erstellen",
+        "description": "Anschreiben, Empfehlung oder andere professionelle Dokumente erstellen.",
+        "button": "Jetzt erstellen"
+      },
+      "newResume": {
+        "title": "Neuer Lebenslauf",
+        "description": "Einen neuen herausragenden Lebenslauf von Grund auf oder aus einer Vorlage erstellen.",
+        "button": "Lebenslauf erstellen"
+      },
+      "myPortfolio": {
+        "title": "Mein Portfolio",
+        "description": "Verwalten und veröffentlichen Sie Ihre persönliche Karriere-Website.",
+        "button": "Seite bearbeiten"
+      },
+      "jobSearch": {
+        "title": "Jobsuche",
+        "description": "Entdecken und verfolgen Sie relevante Stellenangebote.",
+        "button": "Jobs finden"
+      }
+    },
+    "defaultResume": {
+      "title": "Standard-Lebenslauf",
+      "loading": "Standard-Lebenslauf wird geladen...",
+      "lastUpdated": "Zuletzt aktualisiert: {date}",
+      "noDefaultSelected": "Kein Standard-Lebenslauf ausgewählt. Wählen Sie einen aus, um Ihr Dashboard zu personalisieren.",
+      "changeDefault": "Standard ändern",
+      "selectDefault": "Standard auswählen",
+      "buttonChooseDefault": "Ihren Standard-Lebenslauf auswählen",
+      "tooltipEdit": "Standard-Lebenslauf bearbeiten",
+      "tooltipViewAll": "Alle Lebensläufe anzeigen, um Standard auszuwählen oder zu ändern"
+    },
+    "relatedDocuments": {
+      "title": "Verknüpfte Dokumente",
+      "loading": "Dokumente werden geladen...",
+      "selectDefaultPrompt": "Wählen Sie einen Standard-Lebenslauf aus, um seine verknüpften Dokumente hier zu sehen.",
+      "documentsFor": "Dokumente für \"{resumeTitle}\"",
+      "manageAll": "Alle verwalten",
+      "viewMore": "{count} weitere anzeigen...",
+      "noDocuments": "Noch keine Dokumente mit diesem Lebenslauf verknüpft.",
+      "addDocument": "Dokument hinzufügen",
+      "tooltipManageAll": "Zur Dokumentenseite gehen"
+    },
+    "toast": {
+      "loadError": "Lebenslauf-Daten konnten nicht geladen werden.",
+      "actionRequiredSummary": "Aktion erforderlich",
+      "actionRequiredDetail": "Bitte wählen Sie einen Lebenslauf von der \"Alle Lebensläufe\"-Seite aus, um ihn als Standard festzulegen.",
+      "noResumeSummary": "Kein Lebenslauf",
+      "noResumeDetail": "Kein Lebenslauf ausgewählt, um den Standard-Status zu ändern.",
+      "noResumeForDoc": "Bitte erstellen Sie zuerst einen Lebenslauf, bevor Sie Dokumente generieren.",
+      "updateSuccess": "Master-Lebenslauf-Status aktualisiert.",
+      "updateError": "Master-Lebenslauf-Status konnte nicht aktualisiert werden.",
+      "generationStartedSummary": "Dokumentenerstellung gestartet",
+      "generationStartedDetail": "Ihr Dokument wird erstellt."
+    },
+    "dialog": {
+      "resumeIdLabel": "Lebenslauf-ID: {id}"
+    }
+  },
   "dashboard_layout": {
     "logo": "CareerFlow",
     "sidebar": {

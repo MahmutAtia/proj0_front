@@ -87,6 +87,75 @@
     "text": "{year} yılında genel bir başvuru yeterli değil. Göze çarpan portföyler, hedeflenmiş özgeçmişler ve benzersiz değerinizi sergilemek esastır. Materyalleriniz gerçekten rekabetçi mi?"
   }
 },
+  "dashboard_main": {
+    "welcomeBanner": {
+      "title": "Tekrar hoş geldiniz, {userName}!",
+      "userFallback": "Kullanıcı",
+      "subtitle": "İşte kariyer kontrol panelinizin genel görünümü."
+    },
+    "actionCard": {
+      "explore": "Keşfet"
+    },
+    "quickActions": {
+      "createDocument": {
+        "title": "Yeni Belge Oluştur",
+        "description": "Ön yazı, tavsiye mektubu veya başka profesyonel belgeler oluşturun.",
+        "button": "Şimdi Oluştur"
+      },
+      "newResume": {
+        "title": "Yeni Özgeçmiş",
+        "description": "Sıfırdan veya şablondan göze çarpan yeni bir özgeçmiş hazırlayın.",
+        "button": "Özgeçmiş Oluştur"
+      },
+      "myPortfolio": {
+        "title": "Portföyüm",
+        "description": "Kişisel kariyer web sitenizi yönetin ve yayınlayın.",
+        "button": "Siteyi Düzenle"
+      },
+      "jobSearch": {
+        "title": "İş Arama",
+        "description": "İlgili iş fırsatlarını keşfedin ve takip edin.",
+        "button": "İş Bul"
+      }
+    },
+    "defaultResume": {
+      "title": "Varsayılan Özgeçmiş",
+      "loading": "Varsayılan Özgeçmiş Yükleniyor...",
+      "lastUpdated": "Son güncellenme: {date}",
+      "noDefaultSelected": "Varsayılan özgeçmiş seçilmedi. Kontrol panelinizi kişiselleştirmek için birini seçin.",
+      "changeDefault": "Varsayılanı Değiştir",
+      "selectDefault": "Varsayılan Seç",
+      "buttonChooseDefault": "Varsayılan Özgeçmişinizi Seçin",
+      "tooltipEdit": "Varsayılan Özgeçmişi Düzenle",
+      "tooltipViewAll": "Varsayılanı seçmek veya değiştirmek için tüm özgeçmişleri görüntüle"
+    },
+    "relatedDocuments": {
+      "title": "Bağlı Belgeler",
+      "loading": "Belgeler yükleniyor...",
+      "selectDefaultPrompt": "Bağlı belgelerini burada görmek için varsayılan bir özgeçmiş seçin.",
+      "documentsFor": "\"{resumeTitle}\" için Belgeler",
+      "manageAll": "Tümünü Yönet",
+      "viewMore": "{count} tane daha görüntüle...",
+      "noDocuments": "Bu özgeçmişe henüz bağlı belge yok.",
+      "addDocument": "Belge Ekle",
+      "tooltipManageAll": "Belgeler Sayfasına Git"
+    },
+    "toast": {
+      "loadError": "Özgeçmiş verileri yüklenemedi.",
+      "actionRequiredSummary": "Eylem Gerekli",
+      "actionRequiredDetail": "Lütfen \"Tüm Özgeçmişler\" sayfasından varsayılan olarak ayarlamak için bir özgeçmiş seçin.",
+      "noResumeSummary": "Özgeçmiş Yok",
+      "noResumeDetail": "Varsayılan durumunu değiştirmek için özgeçmiş seçilmedi.",
+      "noResumeForDoc": "Belge oluşturmadan önce lütfen bir özgeçmiş oluşturun.",
+      "updateSuccess": "Ana özgeçmiş durumu güncellendi.",
+      "updateError": "Ana özgeçmiş durumu güncellenemedi.",
+      "generationStartedSummary": "Belge Oluşturma Başladı",
+      "generationStartedDetail": "Belgeniz oluşturuluyor."
+    },
+    "dialog": {
+      "resumeIdLabel": "Özgeçmiş ID: {id}"
+    }
+  },
   "dashboard_layout": {
     "logo": "CareerFlow",
     "sidebar": {
