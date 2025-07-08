@@ -5,6 +5,7 @@ import { motion, useScroll, useTransform } from 'framer-motion';
 // Import different / more relevant icons
 import { FiXCircle, FiClock, FiEyeOff, FiAlertTriangle, FiTarget, FiThumbsDown } from 'react-icons/fi'; // Added FiEyeOff, FiAlertTriangle, FiTarget
 import styles from '../styles/StruggleSection.module.css'; // Import the CSS Module
+import { useTranslation } from '../../../../hooks/useTranslation'; // Add translation hook
 
 // Animation Variants (can be moved to a shared file)
 const staggerContainer = (staggerChildren) => ({
@@ -19,6 +20,7 @@ const fadeInUp = {
 };
 
 const StruggleSection = () => {
+    const { t, isRTL } = useTranslation(); // Add translation hook
     const scrollRef = useRef(null);
     // Adjust offset to trigger animations/parallax when the section is more centered
     const { scrollYProgress } = useScroll({
@@ -32,20 +34,20 @@ const StruggleSection = () => {
 
     // Define Pain Points with adjusted text/icons/colors
     const painPoints = [
-        { icon: FiThumbsDown, title: "The Resume Black Hole", text: "Endless applications, deafening silence. Feel like your resume vanishes? It's a common frustration.", colorVar: "var(--danger)" },
-        { icon: FiClock, title: "The Time Sink", text: "Constantly tweaking resumes, writing cover letters... Job searching shouldn't consume your entire life.", colorVar: "var(--warning)" },
-        { icon: FiEyeOff, title: "The Visibility Problem", text: "Generic resume? No portfolio? Struggling to showcase your unique skills and stand out from the crowd?", colorVar: "var(--primary-light)" },
-        { icon: FiAlertTriangle, title: "The ATS Gauntlet", text: "Confused by keywords? Worried about formatting? Getting past the bots feels like a losing battle.", colorVar: "var(--accent)" },
+        { icon: FiThumbsDown, title: t('struggle.painPoints.blackHole.title'), text: t('struggle.painPoints.blackHole.text'), colorVar: "var(--danger)" },
+        { icon: FiClock, title: t('struggle.painPoints.timeSink.title'), text: t('struggle.painPoints.timeSink.text'), colorVar: "var(--warning)" },
+        { icon: FiEyeOff, title: t('struggle.painPoints.visibility.title'), text: t('struggle.painPoints.visibility.text'), colorVar: "var(--primary-light)" },
+        { icon: FiAlertTriangle, title: t('struggle.painPoints.atsGauntlet.title'), text: t('struggle.painPoints.atsGauntlet.text'), colorVar: "var(--accent)" },
     ];
 
     return (
         // Assign ref for scroll tracking
-        <section id="struggle" className={styles.struggleSection} ref={scrollRef}>
+        <section id="struggle" className={`${styles.struggleSection} ${isRTL ? styles.rtl : ''}`} ref={scrollRef}>
             <div className="container"> {/* Use global container class */}
 
                 {/* Section Header */}
                 <motion.div
-                    className={styles.header}
+                    className={`${styles.header} ${isRTL ? styles.rtl : ''}`}
                     initial="hidden"
                     whileInView="visible" // Trigger when in view
                     viewport={{ once: true, amount: 0.3 }} // Trigger early
@@ -54,10 +56,12 @@ const StruggleSection = () => {
                     {/* Changed Icon & removed inline style */}
                     <FiAlertTriangle className={styles.headerIcon} />
                     <h2 className={styles.title}>
-                        Stuck in the Application <span className={styles.strikethrough}>Abyss?</span>
+                        {t('struggle.title_part1')}
+                        <span className={styles.strikethrough}>{t('struggle.abyss')}</span>
+                        {t('struggle.title_part2')}
                     </h2>
                     <p className={styles.subtitle}>
-                        You&#39;re qualified, driven, and ready. Yet, the cycle repeats: effort, rejection, doubt. Let&#39;s break free from what&#39;s holding you back.
+                        {t('struggle.subtitle')}
                     </p>
                 </motion.div>
 
@@ -90,7 +94,7 @@ const StruggleSection = () => {
 
                 {/* "Missing Out" Box */}
                 <motion.div
-                    className={styles.missingOutBox}
+                    className={`${styles.missingOutBox} ${isRTL ? styles.rtl : ''}`}
                     initial="hidden"
                     whileInView="visible"
                     viewport={{ once: true, amount: 0.4 }} // Trigger when ~half visible
@@ -100,9 +104,9 @@ const StruggleSection = () => {
                     <FiTarget className={styles.missingOutIcon} />
                     <div className={styles.missingOutContent}>
                         {/* Using h3 and p tags styled by the CSS Module */}
-                        <h3>Don&#39;t Let Outdated Tactics Cost You</h3>
+                        <h3>{t('struggle.missingOut.title')}</h3>
                         <p>
-                            A generic application isn&apos;t enough in {new Date().getFullYear()}. Standout portfolios, targeted resumes, and showcasing your unique value are essential. Are your materials truly competitive?
+                            {t('struggle.missingOut.text', { year: new Date().getFullYear() })}
                         </p>
                     </div>
                 </motion.div>

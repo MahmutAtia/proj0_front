@@ -60,6 +60,35 @@
   "disclaimer": "Keine Tricks, keine Anmeldung für den Scan erforderlich.",
   "imageAlt": "Visuelle Darstellung eines ATS-Lebenslauf-Scans"
 },
+"struggle": {
+  "title_part1": "Başvuru ",
+  "abyss": "Uçurumunda",
+  "title_part2": " Sıkıştınız mı?",
+  "subtitle": "Niteliklisiniz, kararlısınız ve hazırsınız. Yine de döngü tekrar ediyor: çaba, ret, şüphe. Sizi geri tutan şeylerden kurtulalım.",
+  "painPoints": {
+    "blackHole": {
+      "title": "Özgeçmiş Kara Deliği",
+      "text": "Sonsuz başvurular, sağır edici sessizlik. Özgeçmişinizin kaybolduğunu mu hissediyorsunuz? Bu yaygın bir hayal kırıklığı."
+    },
+    "timeSink": {
+      "title": "Zaman Batağı",
+      "text": "Sürekli özgeçmiş düzenlemek, ön yazı yazmak... İş arama tüm hayatınızı tüketmemeli."
+    },
+    "visibility": {
+      "title": "Görünürlük Sorunu",
+      "text": "Genel özgeçmiş mi? Portföy yok mu? Benzersiz yeteneklerinizi sergilemek ve kalabalıktan sıyrılmak için mücadele mi ediyorsunuz?"
+    },
+    "atsGauntlet": {
+      "title": "ATS Engelkursu",
+      "text": "Anahtar kelimeler konusunda kafanız mı karışık? Biçimlendirme konusunda endişeli misiniz? Botları geçmek kayıp bir savaş gibi geliyor?"
+    }
+  },
+  "missingOut": {
+    "title": "Eski Taktiklerin Size Mal Olmasına İzin Vermeyin",
+    "text": "{year} yılında genel bir başvuru yeterli değil. Göze çarpan portföyler, hedeflenmiş özgeçmişler ve benzersiz değerinizi sergilemek esastır. Materyalleriniz gerçekten rekabetçi mi?"
+  }
+}
+,
   "errors": {
     "userNotAuthenticated": "Benutzer nicht authentifiziert.",
     "backendUrlNotConfigured": "Backend-URL (NEXT_PUBLIC_BACKEND_URL) ist nicht konfiguriert.",

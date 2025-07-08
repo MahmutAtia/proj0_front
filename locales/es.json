@@ -60,6 +60,34 @@
   "disclaimer": "Sin trucos, no se requiere registro para el escaneo.",
   "imageAlt": "Representación visual de un escaneo de currículum ATS"
 },
+"struggle": {
+  "title_part1": "¿Atrapado en el ",
+  "abyss": "Abismo",
+  "title_part2": " de Aplicaciones?",
+  "subtitle": "Eres calificado, motivado y estás listo. Sin embargo, el ciclo se repite: esfuerzo, rechazo, duda. Liberémonos de lo que te detiene.",
+  "painPoints": {
+    "blackHole": {
+      "title": "El Agujero Negro del Currículum",
+      "text": "Aplicaciones infinitas, silencio ensordecedor. ¿Sientes que tu currículum desaparece? Es una frustración común."
+    },
+    "timeSink": {
+      "title": "El Sumidero de Tiempo",
+      "text": "Ajustando constantemente currículums, escribiendo cartas de presentación... La búsqueda de empleo no debería consumir toda tu vida."
+    },
+    "visibility": {
+      "title": "El Problema de Visibilidad",
+      "text": "¿Currículum genérico? ¿Sin portafolio? ¿Luchando para mostrar tus habilidades únicas y destacar entre la multitud?"
+    },
+    "atsGauntlet": {
+      "title": "El Desafío ATS",
+      "text": "¿Confundido por las palabras clave? ¿Preocupado por el formato? Superar los bots se siente como una batalla perdida."
+    }
+  },
+  "missingOut": {
+    "title": "No Dejes que las Tácticas Obsoletas te Cuesten",
+    "text": "Una aplicación genérica no es suficiente en {year}. Portafolios destacados, currículums dirigidos y mostrar tu valor único son esenciales. ¿Son realmente competitivos tus materiales?"
+  }
+},
   "errors": {
     "userNotAuthenticated": "Usuario no autenticado.",
     "backendUrlNotConfigured": "URL del backend (NEXT_PUBLIC_BACKEND_URL) no está configurada.",

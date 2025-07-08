@@ -62,33 +62,35 @@
   "atsTooltipTitle": "What's an ATS? 🤔",
   "atsTooltipText": "ATS = Robot Recruiter 🤖 Scans resumes. Miss keywords? 💨 Ignored! 👉 Click me to check yours! ✅"
 },
-  "struggle": {
-    "title": "Stuck in the Application {abyss}?",
-    "abyss": "Abyss?",
-    "subtitle": "You're qualified, driven, and ready. Yet, the cycle repeats: effort, rejection, doubt. Let's break free from what's holding you back.",
-    "painPoints": {
-      "blackHole": {
-        "title": "The Resume Black Hole",
-        "text": "Endless applications, deafening silence. Feel like your resume vanishes? It's a common frustration."
-      },
-      "timeSink": {
-        "title": "The Time Sink",
-        "text": "Constantly tweaking resumes, writing cover letters... Job searching shouldn't consume your entire life."
-      },
-      "visibility": {
-        "title": "The Visibility Problem",
-        "text": "Generic resume? No portfolio? Struggling to showcase your unique skills and stand out from the crowd?"
-      },
-      "atsGauntlet": {
-        "title": "The ATS Gauntlet",
-        "text": "Confused by keywords? Worried about formatting? Getting past the bots feels like a losing battle."
-      }
+
+"struggle": {
+  "title_part1": "Stuck in the Application ",
+  "abyss": "Abyss?",
+  "title_part2": "",
+  "subtitle": "You're qualified, driven, and ready. Yet, the cycle repeats: effort, rejection, doubt. Let's break free from what's holding you back.",
+  "painPoints": {
+    "blackHole": {
+      "title": "The Resume Black Hole",
+      "text": "Endless applications, deafening silence. Feel like your resume vanishes? It's a common frustration."
     },
-    "missingOut": {
-      "title": "Don't Let Outdated Tactics Cost You",
-      "text": "A generic application isn't enough in {year}. Standout portfolios, targeted resumes, and showcasing your unique value are essential. Are your materials truly competitive?"
+    "timeSink": {
+      "title": "The Time Sink",
+      "text": "Constantly tweaking resumes, writing cover letters... Job searching shouldn't consume your entire life."
+    },
+    "visibility": {
+      "title": "The Visibility Problem",
+      "text": "Generic resume? No portfolio? Struggling to showcase your unique skills and stand out from the crowd?"
+    },
+    "atsGauntlet": {
+      "title": "The ATS Gauntlet",
+      "text": "Confused by keywords? Worried about formatting? Getting past the bots feels like a losing battle."
     }
   },
+  "missingOut": {
+    "title": "Don't Let Outdated Tactics Cost You",
+    "text": "A generic application isn't enough in {year}. Standout portfolios, targeted resumes, and showcasing your unique value are essential. Are your materials truly competitive?"
+  }
+},
   "features": {
     "title": "Your New Edge: {aiAndBrilliance}",
     "aiAndBrilliance": "AI + Your Brilliance",

@@ -160,3 +160,41 @@
         margin-bottom: 0.5rem;
     }
 }
+
+
+
+/* Add these RTL styles to your StruggleSection.module.css */
+
+/* RTL Support */
+.struggleSection.rtl {
+    direction: rtl;
+}
+
+.header.rtl,
+.missingOutBox.rtl {
+    text-align: right;
+}
+
+.header.rtl .title,
+.header.rtl .subtitle {
+    text-align: right;
+}
+
+.missingOutBox.rtl .missingOutContent h3,
+.missingOutBox.rtl .missingOutContent p {
+    text-align: right;
+}
+
+/* RTL grid adjustments */
+.rtl .struggleGrid {
+    direction: rtl;
+}
+
+.rtl .painCard {
+    text-align: right;
+}
+
+.rtl .painTitle,
+.rtl .painText {
+    text-align: right;
+}
