@@ -20,19 +20,23 @@ import {
     FiList, FiFolder, FiInfo, FiMenu, FiChevronLeft, FiChevronRight
 } from 'react-icons/fi';
 import styles from './Dashboard.module.css';
+import { useTranslation } from '../../../../hooks/useTranslation'; // Import the hook
 
 // --- Child Components (defined in the same file) ---
 
-const SidebarLogo = ({ collapsed }) => (
-    <div className={`border-bottom-1 surface-border ${collapsed ? 'justify-content-center' : ''} px-4 flex align-items-center`}>
-        <Link href="/main" className={styles.logo}>
-            <div className={styles.logoIconContainer}>
-                <IoSparkles className={styles.logoIcon} />
-            </div>
-            {!collapsed && <span className={styles.logoText}>CareerFlow</span>}
-        </Link>
-    </div>
-);
+const SidebarLogo = ({ collapsed }) => {
+    const { t } = useTranslation();
+    return (
+        <div className={`border-bottom-1 surface-border ${collapsed ? 'justify-content-center' : ''} px-4 flex align-items-center`}>
+            <Link href="/main" className={styles.logo}>
+                <div className={styles.logoIconContainer}>
+                    <IoSparkles className={styles.logoIcon} />
+                </div>
+                {!collapsed && <span className={styles.logoText}>{t('dashboard_layout.logo')}</span>}
+            </Link>
+        </div>
+    );
+};
 
 const SidebarNav = ({ items, currentPath, router, collapsed }) => (
     <div>
@@ -55,82 +59,88 @@ const SidebarNav = ({ items, currentPath, router, collapsed }) => (
     </div>
 );
 
-const SidebarFooter = ({ router, collapsed }) => (
-    <div className="mt-auto">
-        <Divider className="mb-3 mx-3" />
-        <ul className="list-none p-3 m-0">
-            <li>
-                <button
-                    type="button"
-                    onClick={() => router.push('/main/settings')}
-                    className={`${styles.sidebarLink} p-ripple`}
-                    title={collapsed ? "Settings" : ''}
+const SidebarFooter = ({ router, collapsed }) => {
+    const { t } = useTranslation();
+    return (
+        <div className="mt-auto">
+            <Divider className="mb-3 mx-3" />
+            <ul className="list-none p-3 m-0">
+                <li>
+                    <button
+                        type="button"
+                        onClick={() => router.push('/main/settings')}
+                        className={`${styles.sidebarLink} p-ripple`}
+                        title={collapsed ? t('dashboard_layout.sidebar.settings') : ''}
+                    >
+                        <span className={styles.sidebarLinkIcon}><FiSettings /></span>
+                        {!collapsed && <span className={styles.sidebarLinkText}>{t('dashboard_layout.sidebar.settings')}</span>}
+                        <Ripple />
+                    </button>
+                </li>
+            </ul>
+        </div>
+    );
+};
+
+const TopBar = ({ session, userMenuRef, userMenuItems, sidebarRef, onToggleSidebar, sidebarCollapsed }) => {
+    const { t } = useTranslation();
+    return (
+        <div className={`${styles.topbar} flex justify-content-between align-items-center sticky top-0 z-5`}>
+            <div className="flex align-items-center gap-3">
+                <Button
+                    icon={<FiMenu size={20} />}
+                    className="p-button-rounded p-button-text p-button-plain mr-2 lg:hidden"
+                    onClick={() => {
+                        const sidebar = sidebarRef.current;
+                        if (sidebar) {
+                            sidebar.classList.toggle('hidden');
+                            sidebar.classList.toggle(styles.sidebarMobileOverlay);
+                        }
+                    }}
+                />
+                <Button
+                    icon={sidebarCollapsed ? <FiChevronRight size={18} /> : <FiChevronLeft size={18} />}
+                    className={`${styles.toggleButton} p-button-text hidden lg:inline-flex`}
+                    onClick={onToggleSidebar}
+                    tooltip={sidebarCollapsed ? t('dashboard_layout.topbar.expandSidebar') : t('dashboard_layout.topbar.collapseSidebar')}
+                    tooltipOptions={{ position: 'bottom' }}
+                />
+
+                <div className={`${styles.searchContainer} p-input-icon-left hidden md:block ml-3`}>
+                    <i className="pi pi-search" />
+                    <InputText
+                        className={`${styles.searchInput}`}
+                        placeholder={t('dashboard_layout.topbar.searchPlaceholder')}
+                    />
+                </div>
+            </div>
+
+            <div className="flex align-items-center gap-3">
+                <Button
+                    icon={<FiBell size={20} />}
+                    className={`${styles.iconButton} p-button-rounded p-button-text`}
+                    badge="2"
+                    badgeClassName="p-badge-danger"
+                />
+                <div
+                    className={`${styles.profileButton} flex align-items-center gap-2 cursor-pointer`}
+                    onClick={(e) => userMenuRef.current.toggle(e)}
                 >
-                    <span className={styles.sidebarLinkIcon}><FiSettings /></span>
-                    {!collapsed && <span className={styles.sidebarLinkText}>Settings</span>}
-                    <Ripple />
-                </button>
-            </li>
-        </ul>
-    </div>
-);
-
-const TopBar = ({ session, userMenuRef, userMenuItems, sidebarRef, onToggleSidebar, sidebarCollapsed }) => (
-    <div className={`${styles.topbar} flex justify-content-between align-items-center sticky top-0 z-5`}>
-        <div className="flex align-items-center gap-3">
-            <Button
-                icon={<FiMenu size={20} />}
-                className="p-button-rounded p-button-text p-button-plain mr-2 lg:hidden"
-                onClick={() => {
-                    const sidebar = sidebarRef.current;
-                    if (sidebar) {
-                        sidebar.classList.toggle('hidden');
-                        sidebar.classList.toggle(styles.sidebarMobileOverlay);
-                    }
-                }}
-            />
-            <Button
-                icon={sidebarCollapsed ? <FiChevronRight size={18} /> : <FiChevronLeft size={18} />}
-                className={`${styles.toggleButton} p-button-text hidden lg:inline-flex`}
-                onClick={onToggleSidebar}
-                tooltip={sidebarCollapsed ? "Expand Sidebar" : "Collapse Sidebar"}
-                tooltipOptions={{ position: 'bottom' }}
-            />
-
-            <div className={`${styles.searchContainer} p-input-icon-left hidden md:block ml-3`}>
-                <i className="pi pi-search" />
-                <InputText
-                    className={`${styles.searchInput}`}
-                    placeholder="Search dashboard..."
-                />
+                    <Avatar
+                        image={session?.user?.image || undefined}
+                        label={session?.user?.name ? session.user.name.charAt(0).toUpperCase() : "U"}
+                        shape="circle"
+                        className={styles.profileAvatar}
+                        style={{ width: '2.2rem', height: '2.2rem' }}
+                    />
+                    <span className="font-medium hidden md:inline">{session?.user?.name || t('dashboard_layout.topbar.userFallback')}</span>
+                    <FiChevronDown className="text-600" />
+                </div>
+                <Menu model={userMenuItems} popup ref={userMenuRef} id="user_menu" className="shadow-4" />
             </div>
         </div>
-
-        <div className="flex align-items-center gap-3">
-            <Button
-                icon={<FiBell size={20} />}
-                className={`${styles.iconButton} p-button-rounded p-button-text`}
-                badge="2"
-                badgeClassName="p-badge-danger"
-            />
-            <div
-                className={`${styles.profileButton} flex align-items-center gap-2 cursor-pointer`}
-                onClick={(e) => userMenuRef.current.toggle(e)}
-            >
-                <Avatar
-                    image={session?.user?.image || undefined}
-                    label={session?.user?.name ? session.user.name.charAt(0).toUpperCase() : "U"}
-                    shape="circle"
-                    className={styles.profileAvatar}
-                    style={{ width: '2.2rem', height: '2.2rem' }}
-                />
-                <span className="font-medium hidden md:inline">{session?.user?.name || "User"}</span>
-                <FiChevronDown className="text-600" />
-            </div>
-            <Menu model={userMenuItems} popup ref={userMenuRef} id="user_menu" className="shadow-4" />
-        </div>
-    </div>
-);
+    );
+};
 
 
 export default function Layout({ children }) {
@@ -140,6 +150,7 @@ export default function Layout({ children }) {
     const userMenuRef = useRef(null);
     const sidebarRef = useRef(null);
     const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
+    const { t } = useTranslation(); // Use translation hook
 
     // Placeholder data - replace with actual data fetching
     const [defaultResume, setDefaultResume] = useState({
@@ -183,19 +194,19 @@ export default function Layout({ children }) {
     };
 
     const userMenuItems = [
-        { label: 'Profile', icon: 'pi pi-user', command: () => router.push('/main/profile') },
-        { label: 'Settings', icon: 'pi pi-cog', command: () => router.push('/main/settings') },
+        { label: t('dashboard_layout.userMenu.profile'), icon: 'pi pi-user', command: () => router.push('/main/profile') },
+        { label: t('dashboard_layout.userMenu.settings'), icon: 'pi pi-cog', command: () => router.push('/main/settings') },
         { separator: true },
-        { label: 'Logout', icon: 'pi pi-sign-out', command: () => { router.push('/login'); } }
+        { label: t('dashboard_layout.userMenu.logout'), icon: 'pi pi-sign-out', command: () => { router.push('/login'); } }
     ];
 
     const sidebarNavItems = [
-        { label: 'Overview', icon: <FiGrid />, route: '/main' },
-        { label: 'Resumes', icon: <FiFileText />, route: '/main/resumes' },
-        { label: 'My Website', icon: <FiGlobe />, route: defaultResume ? `/main/site-editor/${defaultResume.id}` : '/main/site-editor' },
-        { label: 'ATS Checker', icon: <FiCheckSquare />, route: '/ats' },
-        { label: 'Job Feed', icon: <FiBriefcase />, route: '/main/job-feed' },
-        { label: 'Scholarships', icon: <FiAward />, route: '/main/scholarship-feed' },
+        { label: t('dashboard_layout.sidebar.overview'), icon: <FiGrid />, route: '/main' },
+        { label: t('dashboard_layout.sidebar.resumes'), icon: <FiFileText />, route: '/main/resumes' },
+        { label: t('dashboard_layout.sidebar.myWebsite'), icon: <FiGlobe />, route: defaultResume ? `/main/site-editor/${defaultResume.id}` : '/main/site-editor' },
+        { label: t('dashboard_layout.sidebar.atsChecker'), icon: <FiCheckSquare />, route: '/ats' },
+        { label: t('dashboard_layout.sidebar.jobFeed'), icon: <FiBriefcase />, route: '/main/job-feed' },
+        { label: t('dashboard_layout.sidebar.scholarships'), icon: <FiAward />, route: '/main/scholarship-feed' },
     ];
 
 
@@ -222,7 +233,11 @@ export default function Layout({ children }) {
     const handleSetDefaultResume = () => {
         // Placeholder: Implement actual logic to update backend/state
         setDefaultResume(prev => ({ ...prev, is_default: !prev.is_default }));
-        toast.current.show({ severity: 'success', summary: 'Success', detail: `Resume ${defaultResume.is_default ? 'unset as' : 'set as'} default.`, life: 3000 });
+        const summary = t('common.success');
+        const detail = defaultResume.is_default
+            ? t('dashboard_layout.toast.unsetDefault')
+            : t('dashboard_layout.toast.setDefault');
+        toast.current.show({ severity: 'success', summary, detail, life: 3000 });
     };
 
     return (

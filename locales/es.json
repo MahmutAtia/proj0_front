@@ -88,6 +88,33 @@
     "text": "Una aplicación genérica no es suficiente en {year}. Portafolios destacados, currículums dirigidos y mostrar tu valor único son esenciales. ¿Son realmente competitivos tus materiales?"
   }
 },
+  "dashboard_layout": {
+    "logo": "CareerFlow",
+    "sidebar": {
+      "settings": "Configuración",
+      "overview": "Visión General",
+      "resumes": "Currículums",
+      "myWebsite": "Mi Sitio Web",
+      "atsChecker": "Verificador ATS",
+      "jobFeed": "Ofertas de Empleo",
+      "scholarships": "Becas"
+    },
+    "topbar": {
+      "expandSidebar": "Expandir Barra Lateral",
+      "collapseSidebar": "Contraer Barra Lateral",
+      "searchPlaceholder": "Buscar en el panel...",
+      "userFallback": "Usuario"
+    },
+    "userMenu": {
+      "profile": "Perfil",
+      "settings": "Configuración",
+      "logout": "Cerrar Sesión"
+    },
+    "toast": {
+      "setDefault": "Currículum establecido como predeterminado.",
+      "unsetDefault": "Currículum ya no es el predeterminado."
+    }
+  },
   "errors": {
     "userNotAuthenticated": "Usuario no autenticado.",
     "backendUrlNotConfigured": "URL del backend (NEXT_PUBLIC_BACKEND_URL) no está configurada.",

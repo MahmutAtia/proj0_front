@@ -87,6 +87,33 @@
     "text": "{year} yılında genel bir başvuru yeterli değil. Göze çarpan portföyler, hedeflenmiş özgeçmişler ve benzersiz değerinizi sergilemek esastır. Materyalleriniz gerçekten rekabetçi mi?"
   }
 },
+  "dashboard_layout": {
+    "logo": "CareerFlow",
+    "sidebar": {
+      "settings": "Ayarlar",
+      "overview": "Genel Bakış",
+      "resumes": "Özgeçmişler",
+      "myWebsite": "Web Sitem",
+      "atsChecker": "ATS Denetleyici",
+      "jobFeed": "İş Akışı",
+      "scholarships": "Burslar"
+    },
+    "topbar": {
+      "expandSidebar": "Kenar Çubuğunu Genişlet",
+      "collapseSidebar": "Kenar Çubuğunu Daralt",
+      "searchPlaceholder": "Panoda ara...",
+      "userFallback": "Kullanıcı"
+    },
+    "userMenu": {
+      "profile": "Profil",
+      "settings": "Ayarlar",
+      "logout": "Oturumu Kapat"
+    },
+    "toast": {
+      "setDefault": "Özgeçmiş varsayılan olarak ayarlandı.",
+      "unsetDefault": "Özgeçmiş varsayılan olarak kaldırıldı."
+    }
+  },
   "errors": {
     "userNotAuthenticated": "Kullanıcı doğrulanmadı.",
     "backendUrlNotConfigured": "Backend URL (NEXT_PUBLIC_BACKEND_URL) yapılandırılmadı.",

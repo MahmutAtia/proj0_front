@@ -186,5 +186,32 @@
     "profile": "Profile",
     "settings": "Settings",
     "logout": "Logout"
+  },
+  "dashboard_layout": {
+    "logo": "CareerFlow",
+    "sidebar": {
+      "settings": "Settings",
+      "overview": "Overview",
+      "resumes": "Resumes",
+      "myWebsite": "My Website",
+      "atsChecker": "ATS Checker",
+      "jobFeed": "Job Feed",
+      "scholarships": "Scholarships"
+    },
+    "topbar": {
+      "expandSidebar": "Expand Sidebar",
+      "collapseSidebar": "Collapse Sidebar",
+      "searchPlaceholder": "Search dashboard...",
+      "userFallback": "User"
+    },
+    "userMenu": {
+      "profile": "Profile",
+      "settings": "Settings",
+      "logout": "Logout"
+    },
+    "toast": {
+      "setDefault": "Resume set as default.",
+      "unsetDefault": "Resume unset as default."
+    }
   }
 }

@@ -113,5 +113,32 @@
     "profile": "الملف الشخصي",
     "settings": "الإعدادات",
     "logout": "تسجيل الخروج"
+  },
+  "dashboard_layout": {
+    "logo": "CareerFlow",
+    "sidebar": {
+      "settings": "الإعدادات",
+      "overview": "نظرة عامة",
+      "resumes": "السير الذاتية",
+      "myWebsite": "موقعي الإلكتروني",
+      "atsChecker": "مدقق ATS",
+      "jobFeed": "آخر الوظائف",
+      "scholarships": "المنح الدراسية"
+    },
+    "topbar": {
+      "expandSidebar": "توسيع الشريط الجانبي",
+      "collapseSidebar": "طي الشريط الجانبي",
+      "searchPlaceholder": "ابحث في لوحة التحكم...",
+      "userFallback": "مستخدم"
+    },
+    "userMenu": {
+      "profile": "الملف الشخصي",
+      "settings": "الإعدادات",
+      "logout": "تسجيل الخروج"
+    },
+    "toast": {
+      "setDefault": "تم تعيين السيرة الذاتية كافتراضي.",
+      "unsetDefault": "تم إلغاء تعيين السيرة الذاتية كافتراضي."
+    }
   }
 }

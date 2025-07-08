@@ -98,5 +98,32 @@
     "unexpectedError": "Ein unerwarteter Fehler ist aufgetreten.",
     "invalidDataFormat": "Ungültiges Datenformat vom Backend erhalten.",
     "couldNotLoadResumes": "Lebensläufe konnten nicht geladen werden. Bitte versuchen Sie es später erneut."
+  },
+  "dashboard_layout": {
+    "logo": "CareerFlow",
+    "sidebar": {
+      "settings": "Einstellungen",
+      "overview": "Übersicht",
+      "resumes": "Lebensläufe",
+      "myWebsite": "Meine Webseite",
+      "atsChecker": "ATS-Prüfer",
+      "jobFeed": "Job-Feed",
+      "scholarships": "Stipendien"
+    },
+    "topbar": {
+      "expandSidebar": "Seitenleiste erweitern",
+      "collapseSidebar": "Seitenleiste einklappen",
+      "searchPlaceholder": "Dashboard durchsuchen...",
+      "userFallback": "Benutzer"
+    },
+    "userMenu": {
+      "profile": "Profil",
+      "settings": "Einstellungen",
+      "logout": "Abmelden"
+    },
+    "toast": {
+      "setDefault": "Lebenslauf als Standard festgelegt.",
+      "unsetDefault": "Lebenslauf als Standard entfernt."
+    }
   }
 }
