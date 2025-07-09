@@ -88,7 +88,7 @@ const Header = () => {
             let currentText = '';
             setTooltipText('');
 
-            words.forEach((word, index) => {
+            words.forEach((word: string, index: number) => {
                 const timeoutId = setTimeout(() => {
                     if (timeoutRef.current.includes(timeoutId)) {
                         currentText += (index > 0 ? ' ' : '') + word;

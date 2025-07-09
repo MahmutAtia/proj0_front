@@ -7,8 +7,10 @@ import { useSession, signIn } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
 import { ProgressSpinner } from 'primereact/progressspinner';
 import "./styles.css";
-import LoginForm from "../../../components/auth/LoginForm";
+import { useTranslation } from '../../../../hooks/useTranslation';
+
 const LoginPage = () => {
+    const { t } = useTranslation();
     const toast = useRef(null);
     const router = useRouter();
     const { data: session, status } = useSession();
@@ -43,8 +45,8 @@ const handleSocialLogin = async (provider) => {
     } catch (error) {
         toast.current?.show({
             severity: 'error',
-            summary: 'Error',
-            detail: `Failed to sign in with ${provider}`
+            summary: t('login.errorSummary'),
+            detail: t('login.errorDetail', { provider })
         });
     }
 };
@@ -82,7 +84,7 @@ return (
                                     className="mb-3 border-2 border-primary-50"
                                 />
                                 <div className="text-900 text-xl font-medium mb-2">
-                                    Welcome back, {lastUser.name}!
+                                    {t('login.welcomeBack', { name: lastUser.name })}
                                 </div>
                             </div>
                         )}
@@ -90,7 +92,7 @@ return (
 
                     <div className="flex flex-column gap-3 px-4">
                         <Button
-                            label="Sign in with Google"
+                            label={t('login.signInWithGoogle')}
                             icon="pi pi-google"
                             className="p-button-outlined mb-2 hover:bg-primary-50 transition-colors transition-duration-150"
                             style={{
@@ -100,7 +102,7 @@ return (
                             onClick={() => handleSocialLogin('google')}
                         />
                         <Button
-                            label="Sign in with LinkedIn"
+                            label={t('login.signInWithLinkedIn')}
                             icon="pi pi-linkedin"
                             className="p-button-outlined p-button-info hover:bg-blue-50 transition-colors transition-duration-150"
                             style={{

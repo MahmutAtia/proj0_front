@@ -194,5 +194,18 @@
       "setDefault": "Lebenslauf als Standard festgelegt.",
       "unsetDefault": "Lebenslauf als Standard entfernt."
     }
+  },
+  "login": {
+    "errorSummary": "Fehler",
+    "errorDetail": "Anmeldung mit {{provider}} fehlgeschlagen",
+    "welcomeBack": "Willkommen zurück, {{name}}!",
+    "signInWithGoogle": "Mit Google anmelden",
+    "signInWithLinkedIn": "Mit LinkedIn anmelden"
+  },
+  "accessDenied": {
+    "title": "Zugriff verweigert",
+    "message": "Sie haben nicht die erforderlichen Berechtigungen.",
+    "imageAlt": "Zugriff verweigert Bild",
+    "goToDashboard": "Zum Dashboard gehen"
   }
 }

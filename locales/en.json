@@ -282,5 +282,24 @@
       "setDefault": "Resume set as default.",
       "unsetDefault": "Resume unset as default."
     }
+  },
+  "login": {
+    "errorSummary": "Error",
+    "errorDetail": "Failed to sign in with {{provider}}",
+    "welcomeBack": "Welcome back, {{name}}!",
+    "signInWithGoogle": "Sign in with Google",
+    "signInWithLinkedIn": "Sign in with LinkedIn"
+  },
+  "accessDenied": {
+    "title": "Access Denied",
+    "message": "You do not have the necessary permissions.",
+    "imageAlt": "Access Denied Image",
+    "goToDashboard": "Go to Dashboard"
+  },
+  "errorPage": {
+    "title": "Error Occurred",
+    "message": "Something went wrong.",
+    "imageAlt": "Error Image",
+    "goToDashboard": "Go to Dashboard"
   }
 }

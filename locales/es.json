@@ -193,5 +193,18 @@
     "unexpectedError": "Ha ocurrido un error inesperado.",
     "invalidDataFormat": "Formato de datos inválido recibido del backend.",
     "couldNotLoadResumes": "No se pudieron cargar los currículums. Por favor, intente de nuevo más tarde."
+  },
+  "login": {
+    "errorSummary": "Error",
+    "errorDetail": "Error al iniciar sesión con {{provider}}",
+    "welcomeBack": "¡Bienvenido de nuevo, {{name}}!",
+    "signInWithGoogle": "Iniciar sesión con Google",
+    "signInWithLinkedIn": "Iniciar sesión con LinkedIn"
+  },
+  "accessDenied": {
+    "title": "Acceso denegado",
+    "message": "No tienes los permisos necesarios.",
+    "imageAlt": "Imagen de acceso denegado",
+    "goToDashboard": "Ir al panel de control"
   }
 }

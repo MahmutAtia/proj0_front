@@ -192,5 +192,24 @@
     "unexpectedError": "Beklenmeyen bir hata oluştu.",
     "invalidDataFormat": "Backend'den geçersiz veri formatı alındı.",
     "couldNotLoadResumes": "Özgeçmişler yüklenemedi. Lütfen daha sonra tekrar deneyin."
+  },
+  "login": {
+    "errorSummary": "Hata",
+    "errorDetail": "{{provider}} ile giriş yapılamadı",
+    "welcomeBack": "Tekrar hoş geldin, {{name}}!",
+    "signInWithGoogle": "Google ile Giriş Yap",
+    "signInWithLinkedIn": "LinkedIn ile Giriş Yap"
+  },
+  "accessDenied": {
+    "title": "Erişim Reddedildi",
+    "message": "Gerekli izinlere sahip değilsiniz.",
+    "imageAlt": "Erişim Reddedildi Resmi",
+    "goToDashboard": "Kontrol Paneline Git"
+  },
+  "errorPage": {
+    "title": "Hata Oluştu",
+    "message": "Bir şeyler yanlış gitti.",
+    "imageAlt": "Hata Resmi",
+    "goToDashboard": "Kontrol Paneline Git"
   }
 }
