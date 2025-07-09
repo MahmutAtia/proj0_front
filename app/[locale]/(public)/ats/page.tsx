@@ -225,7 +225,7 @@ const ATSCheckerPageContent = () => {
             if (resumeIdFromResult && newResumeData) {
                 setGeneratedResumeId(String(resumeIdFromResult));
                 toast.current?.show({ severity: 'success', summary: 'Saved', detail: 'Resume saved and editor is ready.', life: 3000 });
-                
+
                 // 2. Replace the old cache removal with a direct, efficient update.
                 addOrUpdateResumeInCache(newResumeData);
 
@@ -513,7 +513,7 @@ const ATSCheckerPageContent = () => {
         if (taskIdToRetry) {
             setStatusError(null);
             setPollingAttempts(0);
-            if (postAuthTaskIdToRetry) {
+            if (postAuthTaskIdToCheck) {
                 setPostAuthCheckComplete(false);
                 checkStatus(taskIdToRetry, true);
             } else {
