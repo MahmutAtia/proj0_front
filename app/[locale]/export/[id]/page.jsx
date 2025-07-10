@@ -1,7 +1,7 @@
 "use client";
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import axios from 'axios';
-import { useRouter } from 'next/navigation';
+import { useRouter, useParams } from 'next/navigation';
 import { useSession } from 'next-auth/react';
 import { ProgressSpinner } from 'primereact/progressspinner';
 import { Slider } from 'primereact/slider';
@@ -29,7 +29,8 @@ const LOADING_MESSAGES = [
     "Just a moment...",
 ];
 
-const ResumePreviewPage = ({ params }) => {
+const ResumePreviewPage = () => {
+    const params = useParams();
     const { data: session, status } = useSession();
     const resumeId = params.id;
 
