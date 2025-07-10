@@ -115,13 +115,14 @@ export function middleware(request: NextRequest) {
   // For paths without locale, add preferred locale
   const preferredLocale = getPreferredLocale(request);
 
-  // Only redirect to locale prefix if it's not the default locale on root path
-  if (pathname === '/' && preferredLocale === defaultLocale) {
-    console.log('Root path with default locale, no redirect needed');
-    return NextResponse.next();
+  // Always redirect to a locale-prefixed path from the root.
+  if (pathname === '/') {
+    const newPath = `/${preferredLocale}`;
+    console.log('Redirecting root to preferred locale:', newPath);
+    return NextResponse.redirect(new URL(newPath, request.url));
   }
 
-  // Add locale to URL
+  // Add locale to URL for other paths that are missing it.
   const newPath = `/${preferredLocale}${pathname}`;
   console.log('Adding automatic locale to URL:', newPath);
   return NextResponse.redirect(new URL(newPath, request.url));
