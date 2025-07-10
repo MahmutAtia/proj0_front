@@ -21,6 +21,7 @@ import {
 } from 'react-icons/fi';
 import styles from './Dashboard.module.css';
 import { useTranslation } from '../../../../hooks/useTranslation'; // Import the hook
+import LanguageSwitcher from '../../../components/LanguageSwitcher';
 
 // --- Child Components (defined in the same file) ---
 
@@ -116,6 +117,7 @@ const TopBar = ({ session, userMenuRef, userMenuItems, sidebarRef, onToggleSideb
             </div>
 
             <div className="flex align-items-center gap-3">
+                <LanguageSwitcher />
                 <Button
                     icon={<FiBell size={20} />}
                     className={`${styles.iconButton} p-button-rounded p-button-text`}
