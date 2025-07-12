@@ -117,6 +117,7 @@ const EditableResumeTemplate = ({
         switch (sectionKey) {
             case 'personal_information': return <PersonalInformation {...commonProps} />;
             case 'summary': return <Summary {...commonProps} />;
+            case 'objective': return <Summary {...commonProps} />; // as objective is similar to summary
             case 'experience': return <Experience {...commonProps} />;
             case 'education': return <Education {...commonProps} />;
             case 'projects': return <Projects {...commonProps} />;
