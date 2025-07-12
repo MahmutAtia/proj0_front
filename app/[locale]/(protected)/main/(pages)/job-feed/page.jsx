@@ -10,6 +10,7 @@ import { Dropdown } from 'primereact/dropdown';
 import { Checkbox } from 'primereact/checkbox';
 import { ProgressSpinner } from 'primereact/progressspinner';
 import { Toast } from 'primereact/toast';
+import api from '@/lib/axios';
 import styles from './JobFeed.module.css';
 
 const LOCAL_STORAGE_KEY = 'jobFeedData';

@@ -13,7 +13,7 @@ import { DataTable } from 'primereact/datatable';
 import { Column } from 'primereact/column';
 import { useSession } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
-import axios from 'axios';
+import api from '@/lib/axios';
 
 const ProfilePage = () => {
     const { data: session } = useSession();
@@ -35,17 +35,11 @@ const ProfilePage = () => {
     const fetchProfileData = async () => {
         try {
             const [usageResponse, subscriptionResponse, paymentsResponse] = await Promise.all([
-                axios.get(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/usage/`, {
-                    headers: { Authorization: `Bearer ${session.accessToken}` }
-                }).catch(() => ({ data: null })),
+                api.get(`/api/usage/`).catch(() => ({ data: null })),
 
-                axios.get(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/subscription/`, {
-                    headers: { Authorization: `Bearer ${session.accessToken}` }
-                }).catch(() => ({ data: null })),
+                api.get(`/api/subscription/`).catch(() => ({ data: null })),
 
-                axios.get(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/payments/`, {
-                    headers: { Authorization: `Bearer ${session.accessToken}` }
-                }).catch(() => ({ data: [] }))
+                api.get(`/api/payments/`).catch(() => ({ data: [] }))
             ]);
 
             setUsageData(usageResponse.data);

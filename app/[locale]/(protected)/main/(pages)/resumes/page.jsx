@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
-import axios from 'axios';
+import api from '@/lib/axios';
 import { useSession } from 'next-auth/react';
 import { Button } from 'primereact/button';
 import { ProgressSpinner } from 'primereact/progressspinner';
@@ -26,10 +26,7 @@ async function fetchAndCacheResumes(session) {
         headers['Authorization'] = `Bearer ${session.accessToken}`;
     }
 
-    const response = await axios.get(
-        `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/resumes/`,
-        { headers, timeout: 15000 }
-    );
+    const response = await api.get('/api/resumes/', { timeout: 15000 });
 
     if (Array.isArray(response.data)) {
         setResumesCache(response.data);
