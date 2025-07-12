@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useEffect, useRef, useCallback } from 'react';
-import axios from 'axios'; // Assuming axios is installed
+import api from '@/lib/axios'; // Use global axios instance
 import { Toast } from 'primereact/toast';
 import { Button } from 'primereact/button';
 import { ProgressSpinner } from 'primereact/progressspinner';
@@ -415,7 +415,7 @@ const DocumentEditorPage = ({ params: paramsPromise }) => {
             if (!backendUrl) {
                 throw new Error("Backend URL is not configured. Check NEXT_PUBLIC_BACKEND_URL environment variable.");
             }
-            const response = await axios.get(`${backendUrl}/api/resumes/document_bloks/${documentId}/`);
+            const response = await api.get(`/api/resumes/document_bloks/${documentId}/`);
             const { document_type, json_data } = response.data;
 
             if (!document_type || !json_data) {
@@ -559,15 +559,11 @@ const DocumentEditorPage = ({ params: paramsPromise }) => {
                 }
             };
 
-            const apiUrl = `${backendUrl}/api/resumes/document/${documentId}/update/`;
+            const apiUrl = `/api/resumes/document/${documentId}/update/`;
             console.log("Saving document to:", apiUrl);
             console.log("Data to save:", dataToSave);
 
-            await axios.put(apiUrl, dataToSave, {
-                headers: {
-                    'Content-Type': 'application/json',
-                }
-            });
+            await api.put(apiUrl, dataToSave);
 
             initialDataRef.current = JSON.stringify(documentData);
             setHasUnsavedChanges(false);
@@ -598,8 +594,8 @@ const DocumentEditorPage = ({ params: paramsPromise }) => {
         }
         setIsDownloadingPdf(true);
         try {
-            const pdfUrl = `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/resumes/document/${documentId}/`;
-            const response = await axios.get(pdfUrl, {
+            const pdfUrl = `/api/resumes/document/${documentId}/`;
+            const response = await api.get(pdfUrl, {
                 responseType: 'blob',
             });
             const blob = new Blob([response.data], { type: 'application/pdf' });
@@ -634,8 +630,8 @@ const DocumentEditorPage = ({ params: paramsPromise }) => {
         }
         setIsDownloadingWord(true);
         try {
-            const wordUrl = `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/resumes/document/${documentId}/word/`;
-            const response = await axios.get(wordUrl, {
+            const wordUrl = `/api/resumes/document/${documentId}/word/`;
+            const response = await api.get(wordUrl, {
                 responseType: 'blob',
             });
 

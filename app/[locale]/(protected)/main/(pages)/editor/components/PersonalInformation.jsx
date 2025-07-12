@@ -3,6 +3,7 @@ import React, { useRef, useState } from "react";
 import { InputText } from "primereact/inputtext";
 import { Button } from "primereact/button";
 import { Dialog } from "primereact/dialog";
+import api from '@/lib/axios';
 import { useResume } from "../ResumeContext";
 import { Toast } from "primereact/toast";
 import AIAssistant from "./AIAssistant";
@@ -80,16 +81,12 @@ const PersonalInformation = ({ sectionKey }) => {
     const handleAISubmit = async () => {
         setIsAIProcessing(true);
         try {
-            const response = await fetch("http://localhost:8000/api/resumes/edit/", {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({
-                    prompt: aiPrompt,
-                    sectionData: personalInfo,
-                    sectionTitle: "Personal Information",
-                }),
+            const response = await api.post("/api/resumes/edit/", {
+                prompt: aiPrompt,
+                sectionData: personalInfo,
+                sectionTitle: "Personal Information",
             });
-            const data = await response.json();
+            const data = response.data;
             handleAIUpdate(data);
             setAiPrompt("");
         } catch (error) {
