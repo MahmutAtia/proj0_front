@@ -1,4 +1,4 @@
-const CACHE_KEY = 'all_resumes_list';
+const CACHE_KEY = 'all_resumes_list_cache';
 
 /**
  * Retrieves the list of all resumes from localStorage.
