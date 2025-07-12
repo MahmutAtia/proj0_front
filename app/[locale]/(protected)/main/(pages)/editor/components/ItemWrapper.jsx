@@ -2,6 +2,7 @@ import { Button } from 'primereact/button';
 import { Dialog } from 'primereact/dialog';
 import { ConfirmDialog } from 'primereact/confirmdialog';
 import { useState } from 'react';
+import api from '@/lib/axios';
 import AIAssistant from './AIAssistant';
 import UndoButton from './UndoButton';
 
@@ -26,12 +27,12 @@ const ItemWrapper = ({
     const handleAISubmit = async () => {
         setIsAIProcessing(true);
         try {
-            const response = await fetch('http://localhost:8000/api/resumes/edit/', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ prompt: aiPrompt, sectionData, sectionTitle }),
+            const response = await api.post('/api/resumes/edit/', {
+                prompt: aiPrompt,
+                sectionData,
+                sectionTitle
             });
-            const data = await response.json();
+            const data = response.data;
             onAIUpdate(data);
             setAiPrompt('');
         } catch (error) {

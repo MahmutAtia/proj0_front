@@ -4,7 +4,7 @@ import { InputText } from 'primereact/inputtext';
 import { InputTextarea } from 'primereact/inputtextarea';
 import { Button } from 'primereact/button';
 import { Message } from 'primereact/message';
-import axios from 'axios';
+import api from '@/lib/axios';
 import AIAssistant from '../../../main/(pages)/editor/components/AIAssistant';
 
 /**
@@ -107,7 +107,7 @@ const ManualEditDialog = ({
                 documentType: section.documentType
             };
 
-            const response = await axios.post(`${backendUrl}/api/resumes/edit_document_blok/`, payload);
+            const response = await api.post(`/api/resumes/edit_document_blok/`, payload);
             const { feedback_message, ...updatedSectionData } = response.data;
 
             if (section.type === 'paragraph') {

@@ -4,6 +4,7 @@ import { InputTextarea } from "primereact/inputtextarea";
 import { Button } from "primereact/button";
 import { Dialog } from "primereact/dialog";
 import { Toast } from "primereact/toast";
+import api from '@/lib/axios';
 import { useResume } from "../ResumeContext";
 import AIAssistant from "./AIAssistant";
 
@@ -56,18 +57,14 @@ const Summary = ({ sectionKey }) => {
     const handleAISubmit = async () => {
         setIsAIProcessing(true);
         try {
-            const response = await fetch("http://localhost:8000/api/resumes/edit/", {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({
-                    prompt: aiPrompt,
-                    sectionData: summary,
-                    sectionTitle: sectionKey.split('_').map(word =>
-                        word.charAt(0).toUpperCase() + word.slice(1)
-                    ).join(' ')
-                }),
+            const response = await api.post("/api/resumes/edit/", {
+                prompt: aiPrompt,
+                sectionData: summary,
+                sectionTitle: sectionKey.split('_').map(word =>
+                    word.charAt(0).toUpperCase() + word.slice(1)
+                ).join(' ')
             });
-            const data = await response.json();
+            const data = response.data;
             handleAIUpdate(data);
             setAiPrompt("");
         } catch (error) {

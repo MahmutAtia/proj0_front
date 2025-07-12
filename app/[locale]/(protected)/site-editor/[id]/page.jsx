@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useEffect, useRef, useCallback } from 'react';
-import axios from 'axios';
+import api from '@/lib/axios';
 import { Dialog } from 'primereact/dialog';
 import { Button } from 'primereact/button';
 import { ProgressSpinner } from 'primereact/progressspinner';
@@ -97,7 +97,7 @@ const PersonalSiteEditorPage = ({ params: paramsPromise }) => {
             setLoading(true);
             setError(null);
             try {
-                const response = await axios.get(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/website-yaml/${resumeId}`);
+                const response = await api.get(`/api/website-yaml/${resumeId}`);
                 processFetchedData(response.data);
             } catch (err) {
                 console.error("Error fetching YAML:", err);
@@ -139,7 +139,7 @@ const PersonalSiteEditorPage = ({ params: paramsPromise }) => {
                 global: yamlData.global,
                 code_bloks: yamlData.code_bloks
             };
-            await axios.put(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/website-yaml/update/${resumeId}/`, payload); // Use PUT for overwrite
+            await api.put(`/api/website-yaml/update/${resumeId}/`, payload); // Use PUT for overwrite
 
             const localStorageKey = getLocalStorageKey();
             localStorage.removeItem(localStorageKey); // Clear backup on successful save
@@ -202,7 +202,7 @@ const PersonalSiteEditorPage = ({ params: paramsPromise }) => {
 
         try {
             const validArtifacts = artifacts.filter(art => art.key.trim() !== '');
-            const response = await axios.post(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/website-yaml/edit-block/`, {
+            const response = await api.post(`/api/website-yaml/edit-block/`, {
                 resumeId: resumeId,
                 blockName: currentBlock.name,
                 currentHtml: currentBlock.html,

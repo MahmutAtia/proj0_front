@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { FiGift, FiZap, FiUsers, FiCheckCircle, FiLoader, FiAlertTriangle, FiShoppingCart, FiBriefcase, FiStar } from 'react-icons/fi'; // Added more icons for variety
-import axios from 'axios';
+import api from '@/lib/axios'; // Adjust the import path as necessary
 import styles from '../styles/PricingSection.module.css';
 
 // --- Framer Motion Variants ---
@@ -67,8 +67,8 @@ const PricingSection = () => {
             setIsLoading(true);
             setError(null);
             try {
-                // Using the endpoint from PlansPage.jsx
-                const response = await axios.get(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/plans/`);
+                // Using the new global Axios instance
+                const response = await api.get(`/api/plans/`);
 
                 // Map backend data to the structure expected by this component
                 const formattedPlans = response.data.map((plan: any) => ({

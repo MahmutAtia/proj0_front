@@ -9,7 +9,7 @@ import { Divider } from 'primereact/divider';
 import { Dialog } from 'primereact/dialog';
 import { useSession } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
-import axios from 'axios';
+import api from '@/lib/axios';
 
 const PlansPage = () => {
     const { data: session } = useSession();
@@ -35,7 +35,7 @@ const PlansPage = () => {
 
     const fetchPlans = async () => {
         try {
-            const response = await axios.get(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/plans/`);
+            const response = await api.get(`/api/plans/`);
             setPlans(response.data);
         } catch (error) {
             console.error('Error fetching plans:', error);
@@ -50,9 +50,7 @@ const PlansPage = () => {
         }
 
         try {
-            const response = await axios.get(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/subscription/`, {
-                headers: { Authorization: `Bearer ${session.accessToken}` }
-            });
+            const response = await api.get(`/api/subscription/`);
             setCurrentSubscription(response.data);
         } catch (error) {
             console.error('Error fetching subscription:', error);
@@ -86,11 +84,9 @@ const PlansPage = () => {
         setSubscribing(planId);
 
         try {
-            const response = await axios.post(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/subscribe/`, {
+            const response = await api.post(`/api/subscribe/`, {
                 plan_id: planId,
                 variant: 'dummy'
-            }, {
-                headers: { Authorization: `Bearer ${session.accessToken}` }
             });
 
             if (response.data.success) {
@@ -126,10 +122,8 @@ const PlansPage = () => {
         setCanceling(true);
 
         try {
-            const response = await axios.post(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/cancel/`, {
+            const response = await api.post(`/api/cancel/`, {
                 immediate: immediate
-            }, {
-                headers: { Authorization: `Bearer ${session.accessToken}` }
             });
 
             if (response.data.success) {

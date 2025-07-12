@@ -1,6 +1,6 @@
 'use client';
 import React, { useEffect, useState, useRef } from 'react';
-import axios from 'axios';
+import api from '@/lib/axios';
 import { useSession } from 'next-auth/react';
 import { Button } from 'primereact/button';
 import { ProgressSpinner } from 'primereact/progressspinner';
@@ -117,6 +117,7 @@ const EditableResumeTemplate = ({
         switch (sectionKey) {
             case 'personal_information': return <PersonalInformation {...commonProps} />;
             case 'summary': return <Summary {...commonProps} />;
+            case 'objective': return <Summary {...commonProps} />; // as objective is similar to summary
             case 'experience': return <Experience {...commonProps} />;
             case 'education': return <Education {...commonProps} />;
             case 'projects': return <Projects {...commonProps} />;
@@ -163,7 +164,7 @@ const EditableResumeTemplate = ({
         setLoading(true); // Show loading indicator during save
 
         // Send data to backend using PATCH request
-        axios.patch(
+        api.patch(
             `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/resumes/${resumeId}/`,
             {
                 resume: data,
@@ -306,7 +307,7 @@ const EditableResumeTemplate = ({
             if (newDocument && newDocument.document_uuid) {
                 try {
                     // Fetch complete document details from the backend
-                    const response = await axios.get(
+                    const response = await api.get(
                         `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/resumes/document_bloks/${newDocument.document_uuid}/`,
                         {
                             headers: {

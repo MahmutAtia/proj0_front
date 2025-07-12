@@ -2,6 +2,7 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { Card } from 'primereact/card';
 import { Button } from 'primereact/button';
 import { ProgressSpinner } from 'primereact/progressspinner';
+import api from '@/lib/axios';
 import styles from '../Dashboard.module.css';
 import useUserLocation from '../../../../hooks/useUserLocation'; // Adjust path as needed
 
@@ -58,17 +59,9 @@ const JobPostings = ({ router }) => {
         };
 
         try {
-            const response = await fetch(apiUrl, {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify(requestBody),
-            });
+            const response = await api.post(apiUrl, requestBody);
 
-            if (!response.ok) {
-                const errorText = await response.text();
-                throw new Error(`API Error: ${response.status} - ${errorText}`);
-            }
-            const data = await response.json();
+            const data = response.data;
             const jobsData = Array.isArray(data) ? data : (data.jobs || []);
 
             setJobs(jobsData);
