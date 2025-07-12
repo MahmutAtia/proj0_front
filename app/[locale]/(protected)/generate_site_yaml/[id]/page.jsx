@@ -2,7 +2,7 @@
 // pages/resumes/[resumeId]/create-portfolio.js
 import React, { useState, useRef, useEffect } from 'react';
 import { useRouter, useParams } from 'next/navigation';
-import axios from 'axios';
+import api from '@/lib/axios'; // Adjust the import path as necessary
 
 // PrimeReact Components
 import { Steps } from 'primereact/steps';
@@ -13,7 +13,6 @@ import { ProgressSpinner } from 'primereact/progressspinner';
 import { Toast } from 'primereact/toast';
 import { RadioButton } from 'primereact/radiobutton';
 import { Message } from 'primereact/message'; // For the hint/warning
-import { useSession } from 'next-auth/react';
 // CSS Modules
 import styles from './CreatePortfolioPage.module.css';
 
@@ -28,7 +27,6 @@ export default function CreatePortfolioPage({ params: paramsPromise }) {
     const resumeId = params.id;
     const toast = useRef(null);
     const router = useRouter(); // Ensure useRouter is initialized
-    const token =  useSession()?.data?.accessToken || null; // Get the access token from session
 
     const [activeIndex, setActiveIndex] = useState(0);
     const [selectedConcept, setSelectedConcept] = useState(null);
@@ -128,17 +126,9 @@ export default function CreatePortfolioPage({ params: paramsPromise }) {
         const preferences = constructPreferencesPayload();
 
         try {
-            const backendUrl = process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:8000';
-            const response = await axios.post(
-                `${backendUrl}/api/resumes/generate_website_yaml/`,
-                { resumeId: resumeId, preferences: preferences },
-                {
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'Authorization': token ? `Bearer ${token}` : ''
-
-                    }
-                }
+            const response = await api.post(
+                `/api/resumes/generate_website_yaml/`,
+                { resumeId: resumeId, preferences: preferences }
             );
             setGenerationResult({ success: true, data: response.data });
             toast.current?.show({ severity: 'success', summary: 'Success', detail: 'Website preferences submitted! Generation started.', life: 5000 });
@@ -152,6 +142,8 @@ export default function CreatePortfolioPage({ params: paramsPromise }) {
             }
         } catch (error) {
             console.error("Error submitting preferences:", error);
+            // The global interceptor will handle 403 limit exceeded errors.
+            // We just need to handle other errors here.
             let detail = 'An error occurred while submitting preferences.';
             if (error.response) {
                 detail = `Error: ${error.response.status} - ${error.response.data?.detail || error.response.statusText}`;

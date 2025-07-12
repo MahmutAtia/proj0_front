@@ -20,7 +20,7 @@ import {
 import styles from './Dashboard.module.css';
 import JobPostings from './mainComponets/JobPostings';
 import ScholarshipList from './mainComponets/ScholarshipList';
-import axios from 'axios';
+import api from '@/lib/axios'; 
 import { Toast } from 'primereact/toast';
 
 import { Dialog } from 'primereact/dialog'; // If not already there for other purposes
@@ -274,9 +274,7 @@ const DashboardPage = () => {
                 }
 
                 if (!resumesData) {
-                    const headers = { 'Content-Type': 'application/json' };
-                    if (session.accessToken) headers['Authorization'] = `Bearer ${session.accessToken}`;
-                    const response = await axios.get(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/resumes/`, { headers });
+                    const response = await api.get(`/api/resumes/`);
                     resumesData = response.data;
                     localStorage.setItem(RESUMES_CACHE_KEY_DASHBOARD, JSON.stringify({ data: resumesData, timestamp: Date.now() }));
                 }
@@ -350,13 +348,10 @@ const DashboardPage = () => {
 
         try {
             // API call to update the default status
-            const headers = { 'Content-Type': 'application/json' };
-            if (session.accessToken) headers['Authorization'] = `Bearer ${session.accessToken}`;
             // This endpoint should handle setting one resume as default and unsetting others.
             // If your backend doesn't do that, you might need two calls or a more specific endpoint.
-            await axios.patch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/resumes/${defaultResume.id}/`,
-                { is_default: newDefaultState },
-                { headers }
+            await api.patch(`/api/resumes/${defaultResume.id}/`,
+                { is_default: newDefaultState }
             );
 
             // Update cache

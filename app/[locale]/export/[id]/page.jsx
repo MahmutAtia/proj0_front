@@ -1,6 +1,6 @@
 "use client";
 import React, { useState, useEffect, useRef, useCallback } from 'react';
-import axios from 'axios';
+import api from '@/lib/axios'; // Adjust the import path as necessary
 import { useRouter, useParams } from 'next/navigation';
 import { useSession } from 'next-auth/react';
 import { ProgressSpinner } from 'primereact/progressspinner';
@@ -107,18 +107,14 @@ const ResumePreviewPage = () => {
         if (currentPdfUrl) URL.revokeObjectURL(currentPdfUrl);
         setPdfUrl(null);
         try {
-            const response = await axios.post(
-                `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/resumes/generate-pdf/`,
+            const response = await api.post(
+                `/api/resumes/generate-pdf/`,
                 {
-                    resumeId: resumeId,
+                    resume_id: resumeId,
                     templateTheme: templateObject.value,
                     chosenTheme: themeValue,
                 },
                 {
-                    headers: {
-                        'Content-Type': 'application/json',
-                        ...(session?.accessToken && { 'Authorization': `Bearer ${session.accessToken}` })
-                    },
                     responseType: 'blob',
                 }
             );
@@ -132,7 +128,7 @@ const ResumePreviewPage = () => {
         } finally {
             setIsLoadingPdf(false);
         }
-    }, [resumeId, status, session?.accessToken, generateCacheKey]);
+    }, [resumeId, status, generateCacheKey]);
 
     useEffect(() => {
         if (selectedTemplate && selectedThemeValue) {
