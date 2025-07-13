@@ -10,6 +10,7 @@ import { Checkbox } from 'primereact/checkbox';
 import Cropper from 'react-easy-crop';
 import { useResume } from '../ResumeContext';
 import { useAvatar } from '../hooks/useAvatar';
+import EnhancedAvatarEditor from './EnhancedAvatarEditor';
 import AIAssistant from './AIAssistant';
 import api from '@/lib/axios';
 import './styles.css';
@@ -24,13 +25,8 @@ const PersonalInformation = ({ sectionKey }) => {
     const [aiPrompt, setAiPrompt] = useState("");
     const [isAIProcessing, setIsAIProcessing] = useState(false);
 
-    // Photo editing states
-    const [isPhotoEditing, setIsPhotoEditing] = useState(false);
-    const [imageSrc, setImageSrc] = useState(null);
-    const [crop, setCrop] = useState({ x: 0, y: 0 });
-    const [zoom, setZoom] = useState(1);
-    const [croppedAreaPixels, setCroppedAreaPixels] = useState(null);
-    const [rotation, setRotation] = useState(0);
+    // Photo editing states - now handled by EnhancedAvatarEditor
+    // Removed: isPhotoEditing, imageSrc, crop, zoom, croppedAreaPixels, rotation
 
     // Use avatar from hook instead of local data
     const currentAvatar = avatar;
@@ -92,157 +88,7 @@ const PersonalInformation = ({ sectionKey }) => {
         setCroppedAreaPixels(croppedAreaPixels);
     }, []);
 
-    const handleFileSelect = (event) => {
-        const file = event.files[0];
-        if (file) {
-            // Validate file size (limit to 5MB)
-            const maxSize = 5 * 1024 * 1024; // 5MB
-            if (file.size > maxSize) {
-                toast.current.show({
-                    severity: 'warn',
-                    summary: 'File Too Large',
-                    detail: 'Please select an image smaller than 5MB'
-                });
-                return;
-            }
-            
-            // Validate file type
-            const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp'];
-            if (!allowedTypes.includes(file.type)) {
-                toast.current.show({
-                    severity: 'warn',
-                    summary: 'Invalid File Type',
-                    detail: 'Please select a JPEG, PNG, or WebP image'
-                });
-                return;
-            }
-            
-            const reader = new FileReader();
-            reader.onload = () => {
-                setImageSrc(reader.result);
-                setIsPhotoEditing(true);
-            };
-            reader.readAsDataURL(file);
-        }
-    };
-
-    const createImage = (url) =>
-        new Promise((resolve, reject) => {
-            const image = new Image();
-            image.addEventListener('load', () => resolve(image));
-            image.addEventListener('error', (error) => reject(error));
-            image.setAttribute('crossOrigin', 'anonymous');
-            image.src = url;
-        });
-
-    const getCroppedImg = async (imageSrc, pixelCrop, rotation = 0) => {
-        const image = await createImage(imageSrc);
-        const canvas = document.createElement('canvas');
-        const ctx = canvas.getContext('2d');
-
-        const maxSize = Math.max(image.width, image.height);
-        const safeArea = 2 * ((maxSize / 2) * Math.sqrt(2));
-
-        canvas.width = safeArea;
-        canvas.height = safeArea;
-
-        ctx.translate(safeArea / 2, safeArea / 2);
-        ctx.rotate((rotation * Math.PI) / 180);
-        ctx.translate(-safeArea / 2, -safeArea / 2);
-
-        ctx.drawImage(
-            image,
-            safeArea / 2 - image.width * 0.5,
-            safeArea / 2 - image.height * 0.5
-        );
-
-        const data = ctx.getImageData(0, 0, safeArea, safeArea);
-
-        // Optimize canvas size for avatars (limit to 400x400 max)
-        const maxAvatarSize = 400;
-        const finalWidth = Math.min(pixelCrop.width, maxAvatarSize);
-        const finalHeight = Math.min(pixelCrop.height, maxAvatarSize);
-        
-        canvas.width = finalWidth;
-        canvas.height = finalHeight;
-
-        // Use higher quality anti-aliasing
-        ctx.imageSmoothingEnabled = true;
-        ctx.imageSmoothingQuality = 'high';
-
-        ctx.putImageData(
-            data,
-            Math.round(0 - safeArea / 2 + image.width * 0.5 - pixelCrop.x),
-            Math.round(0 - safeArea / 2 + image.height * 0.5 - pixelCrop.y)
-        );
-
-        // Optimize compression: use 0.85 quality for better balance
-        return canvas.toDataURL('image/jpeg', 0.85);
-    };
-
-    const handlePhotoSave = async () => {
-        try {
-            if (croppedAreaPixels && imageSrc) {
-                const croppedImage = await getCroppedImg(imageSrc, croppedAreaPixels, rotation);
-                
-                // Save to backend using hook
-                const result = await uploadAvatar(croppedImage);
-                
-                if (result.success) {
-                    toast.current.show({
-                        severity: 'success',
-                        summary: 'Photo Updated',
-                        detail: 'Profile photo has been saved'
-                    });
-                } else {
-                    throw new Error(result.error);
-                }
-            }
-            setIsPhotoEditing(false);
-        } catch (error) {
-            console.error('Error saving photo:', error);
-            toast.current.show({
-                severity: 'error',
-                summary: 'Error',
-                detail: 'Failed to save photo'
-            });
-        }
-    };
-
-    const handlePhotoRemove = async () => {
-        try {
-            // Remove from backend using hook
-            const result = await removeAvatar();
-            
-            if (result.success) {
-                setIsPhotoEditing(false);
-                setImageSrc(null);
-                
-                toast.current.show({
-                    severity: 'info',
-                    summary: 'Photo Removed',
-                    detail: 'Profile photo has been removed'
-                });
-            } else {
-                throw new Error(result.error);
-            }
-        } catch (error) {
-            console.error('Error removing photo:', error);
-            toast.current.show({
-                severity: 'error',
-                summary: 'Error',
-                detail: 'Failed to remove photo'
-            });
-        }
-    };
-
-    const handlePhotoCancel = () => {
-        setIsPhotoEditing(false);
-        setImageSrc(null);
-        setCrop({ x: 0, y: 0 });
-        setZoom(1);
-        setRotation(0);
-    };
+    // Photo editing functions are now handled by EnhancedAvatarEditor component
 
     // Existing AI handlers...
     const saveToHistory = (newData) => {
@@ -339,73 +185,31 @@ const PersonalInformation = ({ sectionKey }) => {
                     </div>
                 </div>
 
-                {/* Right side - Profile Photo */}
-                <div className="flex flex-column align-items-center gap-3">
-                    {currentAvatar ? (
-                        <div className="relative">
-                            <img 
-                                src={currentAvatar} 
-                                alt="Profile" 
-                                className="w-8rem h-8rem border-circle object-cover shadow-3"
-                                title="Profile Photo"
-                            />
-                            <Button
-                                icon="pi pi-pencil"
-                                className="p-button-rounded p-button-sm absolute"
-                                style={{ top: '0.5rem', right: '0.5rem' }}
-                                onClick={() => {
-                                    setImageSrc(currentAvatar);
-                                    setIsPhotoEditing(true);
-                                }}
-                                tooltip="Edit Photo"
-                                tooltipOptions={{ position: 'top' }}
-                            />
-                        </div>
-                    ) : (
-                        <div className="flex flex-column align-items-center gap-2">
-                            <div className="w-8rem h-8rem border-circle bg-gray-100 flex align-items-center justify-content-center">
-                                <i className="pi pi-user text-4xl text-gray-400"></i>
-                            </div>
-                            <FileUpload
-                                mode="basic"
-                                accept="image/*"
-                                maxFileSize={5000000}
-                                onSelect={handleFileSelect}
-                                chooseLabel="Add Photo"
-                                className="p-button-outlined p-button-sm"
-                                auto={false}
-                            />
-                        </div>
-                    )}
-                    
-                    {/* Avatar inclusion preference checkbox */}
-                    {currentAvatar && (
-                        <div className="flex align-items-center gap-2 mt-2">
-                            <Checkbox
-                                inputId="includeAvatarInPDF"
-                                checked={getAvatarInclusionPreference()}
-                                onChange={handleAvatarInclusionChange}
-                                tooltip="Include photo in generated PDFs and websites"
-                                tooltipOptions={{ position: 'top' }}
-                            />
-                            <label htmlFor="includeAvatarInPDF" className="text-sm">
-                                Include in PDF/Website
-                            </label>
-                        </div>
-                    )}
-                    
-                    {/* Status indicator for avatar inclusion */}
-                    {currentAvatar && (
-                        <div className="mt-2">
-                            <span className={`text-xs px-2 py-1 border-round ${
-                                getAvatarInclusionPreference()
-                                    ? 'bg-green-100 text-green-800 border-green-200' 
-                                    : 'bg-orange-100 text-orange-800 border-orange-200'
-                            }`}>
-                                {getAvatarInclusionPreference() ? '✓ Included in exports' : '✗ Excluded from exports'}
-                            </span>
-                        </div>
-                    )}
+                {/* Right side - Enhanced Profile Photo */}
+                <div className="flex flex-column align-items-center">
+                    <EnhancedAvatarEditor
+                        avatar={currentAvatar}
+                        onAvatarChange={async (avatarData) => {
+                            if (avatarData) {
+                                const result = await uploadAvatar(avatarData);
+                                if (!result.success) {
+                                    throw new Error(result.error);
+                                }
+                            } else {
+                                await removeAvatar();
+                            }
+                        }}
+                        isLoading={false} // You can pass loading state from useAvatar if available
+                        includeInPDF={getAvatarInclusionPreference()}
+                        onIncludeInPDFChange={(checked) => {
+                            const newData = { ...data };
+                            if (!newData[sectionKey]) newData[sectionKey] = {};
+                            newData[sectionKey].includeAvatarInPDF = checked;
+                            setData(newData);
+                        }}
+                        size="large"
+                        className="mb-3"
+                    />
                 </div>
             </div>
 
@@ -575,90 +379,7 @@ const PersonalInformation = ({ sectionKey }) => {
                 </div>
             </Dialog>
 
-            {/* Photo Edit Dialog */}
-            <Dialog
-                visible={isPhotoEditing}
-                onHide={handlePhotoCancel}
-                style={{ width: "min(90vw, 800px)", height: "min(90vh, 700px)" }}
-                header="Edit Profile Photo"
-                dismissableMask
-                className="photo-editor"
-            >
-                <div className="flex flex-column h-full">
-                    {/* Cropper Area */}
-                    <div className="flex-grow-1 relative" style={{ minHeight: '400px' }}>
-                        {imageSrc && (
-                            <Cropper
-                                image={imageSrc}
-                                crop={crop}
-                                zoom={zoom}
-                                rotation={rotation}
-                                aspect={1}
-                                onCropChange={setCrop}
-                                onCropComplete={onCropComplete}
-                                onZoomChange={setZoom}
-                                onRotationChange={setRotation}
-                                cropShape="round"
-                                showGrid={false}
-                            />
-                        )}
-                    </div>
-
-                    {/* Controls */}
-                    <div className="flex flex-column gap-4 p-4 border-top-1 surface-border">
-                        <div className="flex align-items-center gap-3">
-                            <label className="font-semibold min-w-max">Zoom:</label>
-                            <Slider
-                                value={zoom}
-                                onChange={(e) => setZoom(e.value)}
-                                min={1}
-                                max={3}
-                                step={0.1}
-                                className="flex-grow-1"
-                            />
-                            <span className="min-w-max text-sm">{zoom.toFixed(1)}x</span>
-                        </div>
-
-                        <div className="flex align-items-center gap-3">
-                            <label className="font-semibold min-w-max">Rotation:</label>
-                            <Slider
-                                value={rotation}
-                                onChange={(e) => setRotation(e.value)}
-                                min={-180}
-                                max={180}
-                                step={1}
-                                className="flex-grow-1"
-                            />
-                            <span className="min-w-max text-sm">{rotation}°</span>
-                        </div>
-
-                        {/* Action Buttons */}
-                        <div className="flex justify-content-between gap-2">
-                            <Button
-                                label="Remove Photo"
-                                icon="pi pi-trash"
-                                className="p-button-danger p-button-outlined"
-                                onClick={handlePhotoRemove}
-                                disabled={!currentAvatar}
-                            />
-                            <div className="flex gap-2">
-                                <Button
-                                    label="Cancel"
-                                    icon="pi pi-times"
-                                    className="p-button-text"
-                                    onClick={handlePhotoCancel}
-                                />
-                                <Button
-                                    label="Save Photo"
-                                    icon="pi pi-check"
-                                    onClick={handlePhotoSave}
-                                    disabled={!imageSrc || !croppedAreaPixels}
-                                />
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </Dialog>
+            {/* Photo editing is now handled by EnhancedAvatarEditor component */}
         </div>
     );
 };
