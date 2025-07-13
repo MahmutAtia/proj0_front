@@ -180,18 +180,24 @@ const Experience = ({ sectionKey }) => {
                             value={exp.company}
                             onChange={(e) => handleInputChange(index, 'company', e.target.value)}
                             className="w-full"
+                            tooltip="Company Name"
+                            tooltipOptions={{ position: 'top' }}
                         />
                         <InputText
                             placeholder="Title"
                             value={exp.title}
                             onChange={(e) => handleInputChange(index, 'title', e.target.value)}
                             className="w-full"
+                            tooltip="Job Title"
+                            tooltipOptions={{ position: 'top' }}
                         />
                         <InputText
                             placeholder="Location"
                             value={exp.location}
                             onChange={(e) => handleInputChange(index, 'location', e.target.value)}
                             className="w-full"
+                            tooltip="Work Location"
+                            tooltipOptions={{ position: 'top' }}
                         />
                         <div className="flex gap-2">
                             <InputText
@@ -199,38 +205,17 @@ const Experience = ({ sectionKey }) => {
                                 value={exp.start_date}
                                 onChange={(e) => handleInputChange(index, 'start_date', e.target.value)}
                                 className="flex-1"
+                                tooltip="Start Date"
+                                tooltipOptions={{ position: 'top' }}
                             />
                             <InputText
                                 placeholder="End Date (YYYY-MM-DD or Current)"
                                 value={exp.end_date}
                                 onChange={(e) => handleInputChange(index, 'end_date', e.target.value)}
                                 className="flex-1"
+                                tooltip="End Date"
+                                tooltipOptions={{ position: 'top' }}
                             />
-                        </div>
-                        <div className="flex flex-column gap-2">
-                            <label>Technologies</label>
-                            <div className="flex flex-wrap gap-2">
-                                {exp.technologies?.map((tech, techIndex) => (
-                                    <div key={techIndex} className="flex align-items-center gap-2">
-                                        <InputText
-                                            value={tech}
-                                            onChange={(e) => handleTechnologyChange(index, techIndex, e.target.value)}
-                                            className="w-8rem"
-                                        />
-                                        <Button
-                                            icon="pi pi-times"
-                                            className="p-button-rounded p-button-text p-button-danger"
-                                            onClick={() => removeTechnology(index, techIndex)}
-                                        />
-                                    </div>
-                                ))}
-                                <Button
-                                    icon="pi pi-plus"
-                                    className="p-button-rounded p-button-text"
-                                    onClick={() => addTechnology(index)}
-                                    tooltip="Add Technology"
-                                />
-                            </div>
                         </div>
                         <InputTextarea
                             placeholder="Description"
@@ -238,14 +223,16 @@ const Experience = ({ sectionKey }) => {
                             onChange={(e) => handleInputChange(index, 'description', e.target.value)}
                             rows={5}
                             className="w-full"
+                            tooltip="Job Description"
+                            tooltipOptions={{ position: 'top' }}
                         />
                     </div>
                 }
                 viewContent={
                     <div className="flex flex-column gap-2">
                         <div className="flex justify-content-between align-items-start">
-                            <span className="font-semibold">{exp.company}</span>
-                            <span className="text-500 text-right flex-shrink-0 ml-2">
+                            <span className="font-semibold" title="Company Name">{exp.company}</span>
+                            <span className="text-500 text-right flex-shrink-0 ml-2" title="Employment Period">
                                 {exp.start_date && exp.start_date !== '' ? (
                                     new Date(exp.start_date).toLocaleDateString()
                                 ) : ''} - {exp.end_date && exp.end_date !== '' ? (
@@ -255,25 +242,14 @@ const Experience = ({ sectionKey }) => {
                                 ) : 'Current'}
                             </span>
                         </div>
-                        <span className="text-primary font-medium">{exp.title}</span>
+                        <span className="text-primary font-medium" title="Job Title">{exp.title}</span>
                         {exp.location && (
-                            <span className="text-600 text-sm">{exp.location}</span>
-                        )}
-                        {exp.technologies && exp.technologies.length > 0 && (
-                            <div className="flex flex-wrap gap-1 mt-1">
-                                {exp.technologies.map((tech, techIndex) => (
-                                    <span key={techIndex} className="bg-primary-50 text-primary-700 px-2 py-1 border-round text-xs">
-                                        {tech}
-                                    </span>
-                                ))}
-                            </div>
+                            <span className="text-600 text-sm" title="Work Location">{exp.location}</span>
                         )}
                         <div 
-                            style={{ 
-                                whiteSpace: 'pre-line',
-                                wordBreak: 'break-word'
-                            }} 
+                            style={{ whiteSpace: 'pre-line', wordBreak: 'break-word' }} 
                             className="text-700 line-height-4 mt-2"
+                            title="Job Description"
                         >
                             {exp.description}
                         </div>

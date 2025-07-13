@@ -129,7 +129,7 @@ const Languages = ({ sectionKey }) => {
                             <div className="flex align-items-center justify-content-center w-2rem h-2rem bg-primary-50 border-circle">
                                 <i className="pi pi-globe text-primary text-sm"></i>
                             </div>
-                            <span className="font-semibold text-900 text-lg">{lang.language}</span>
+                            <span className="font-semibold text-900 text-lg" title="Language Name">{lang.language}</span>
                         </div>
                         <span 
                             className={`px-3 py-2 border-round-lg text-sm font-semibold shadow-1 ${
@@ -143,6 +143,7 @@ const Languages = ({ sectionKey }) => {
                                     ? 'bg-yellow-500 text-white'
                                     : 'bg-gray-400 text-white'
                             }`}
+                            title="Proficiency Level"
                         >
                             {lang.proficiency}
                         </span>
@@ -179,6 +180,8 @@ const Languages = ({ sectionKey }) => {
                                     value={lang.language}
                                     onChange={(e) => handleLanguageChange(index, 'language', e)}
                                     className="flex-1"
+                                    tooltip="Language Name"
+                                    tooltipOptions={{ position: 'top' }}
                                 />
                                 <Dropdown
                                     placeholder="Proficiency"
@@ -186,11 +189,15 @@ const Languages = ({ sectionKey }) => {
                                     options={fluencyOptions}
                                     onChange={(e) => handleLanguageChange(index, 'proficiency', e.value)}
                                     className="w-10rem"
+                                    tooltip="Proficiency Level"
+                                    tooltipOptions={{ position: 'top' }}
                                 />
                                 <Button
                                     icon="pi pi-times"
                                     className="p-button-rounded p-button-text p-button-danger"
                                     onClick={() => removeLanguage(index)}
+                                    tooltip="Remove Language"
+                                    tooltipOptions={{ position: 'top' }}
                                 />
                             </div>
                         ))}

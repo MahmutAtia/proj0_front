@@ -143,6 +143,8 @@ const Projects = ({ sectionKey }) => {
                                 value={project.name}
                                 onChange={(e) => handleInputChange(index, 'name', e)}
                                 className="w-full"
+                                tooltip="Project Name"
+                                tooltipOptions={{ position: 'top' }}
                             />
                             <InputTextarea
                                 placeholder="Description"
@@ -150,25 +152,35 @@ const Projects = ({ sectionKey }) => {
                                 onChange={(e) => handleInputChange(index, 'description', e)}
                                 rows={4}
                                 className="w-full"
+                                tooltip="Project Description"
+                                tooltipOptions={{ position: 'top' }}
                             />
                             <InputText
                                 placeholder="Project Link/URL"
                                 value={project.link}
                                 onChange={(e) => handleInputChange(index, 'link', e)}
                                 className="w-full"
+                                tooltip="Project Link/URL"
+                                tooltipOptions={{ position: 'top' }}
                             />
                         </div>
                     }
                     viewContent={
                         <div className="flex flex-column gap-2">
                             <div className="flex justify-content-between align-items-start">
-                                <span className="font-semibold text-900">{project.name}</span>
+                                <span 
+                                    className="font-semibold text-900"
+                                    title="Project Name"
+                                >
+                                    {project.name}
+                                </span>
                                 {project.link && project.link !== '' && (
                                     <a 
                                         href={project.link} 
                                         target="_blank" 
                                         rel="noopener noreferrer"
                                         className="text-primary"
+                                        title="Project Link"
                                     >
                                         <i className="pi pi-external-link"></i>
                                     </a>
@@ -180,6 +192,7 @@ const Projects = ({ sectionKey }) => {
                                     wordBreak: 'break-word'
                                 }} 
                                 className="text-700 line-height-3"
+                                title="Project Description"
                             >
                                 {project.description}
                             </div>
