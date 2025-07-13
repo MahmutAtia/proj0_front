@@ -136,3 +136,15 @@
     background: var(--primary-color);
     color: var(--surface-0);
 }
+
+.photo-editor .reactEasyCrop_Container {
+    background: var(--surface-ground);
+}
+
+.photo-editor .reactEasyCrop_CropArea {
+    border: 2px solid var(--primary-color);
+}
+
+.photo-editor .reactEasyCrop_CropAreaRound {
+    border: 2px solid var(--primary-color);
+}
