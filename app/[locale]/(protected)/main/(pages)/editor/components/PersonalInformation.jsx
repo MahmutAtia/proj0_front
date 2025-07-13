@@ -118,19 +118,17 @@ const PersonalInformation = ({ sectionKey }) => {
             </div>
 
             <div className="flex flex-column gap-2 p-4">
-                <p className="m-0">{personalInfo.email}</p>
+                <p className="m-0" title="Email Address">{personalInfo.email}</p>
 
                 {personalInfo.phone && (
-                    <p className="m-0">
-                        {personalInfo.phone}
-                    </p>
+                    <p className="m-0" title="Phone Number">{personalInfo.phone}</p>
                 )}
 
                 {personalInfo.location?.address && (
-                    <p className="m-0">{personalInfo.location.address}</p>
+                    <p className="m-0" title="Address">{personalInfo.location.address}</p>
                 )}
                 {personalInfo.location?.city && (
-                    <p className="m-0">
+                    <p className="m-0" title="Location">
                         {personalInfo.location.city}, {personalInfo.location.state}{" "}
                         {personalInfo.location.postal_code}
                     </p>
@@ -138,7 +136,7 @@ const PersonalInformation = ({ sectionKey }) => {
                 {Object.entries(personalInfo.profiles).map(
                     ([key, value]) =>
                         value && (
-                            <p key={key} className="m-0">
+                            <p key={key} className="m-0" title={`${key.charAt(0).toUpperCase() + key.slice(1)} Profile`}>
                                 <a href={value} target="_blank" rel="noopener noreferrer">
                                     {key}: {value}
                                 </a>
@@ -165,6 +163,8 @@ const PersonalInformation = ({ sectionKey }) => {
                                 value={personalInfo.name}
                                 onChange={(e) => handleInputChange("name", e)}
                                 className="w-full"
+                                tooltip="Full Name"
+                                tooltipOptions={{ position: 'top' }}
                             />
                         </div>
 
@@ -174,6 +174,8 @@ const PersonalInformation = ({ sectionKey }) => {
                                 value={personalInfo.email}
                                 onChange={(e) => handleInputChange("email", e)}
                                 className="w-full"
+                                tooltip="Email Address"
+                                tooltipOptions={{ position: 'top' }}
                             />
                         </div>
 
@@ -183,9 +185,9 @@ const PersonalInformation = ({ sectionKey }) => {
                                 value={personalInfo.phone || ""}
                                 onChange={(e) => handlePhoneChange(0, e)}
                                 className="w-full"
+                                tooltip="Phone Number"
+                                tooltipOptions={{ position: 'top' }}
                             />
-
-
                         </div>
 
                         <div className="field">
@@ -194,6 +196,8 @@ const PersonalInformation = ({ sectionKey }) => {
                                 value={personalInfo.location?.address || ""}
                                 onChange={(e) => handleLocationChange("address", e)}
                                 className="w-full"
+                                tooltip="Street Address"
+                                tooltipOptions={{ position: 'top' }}
                             />
                         </div>
 
@@ -204,6 +208,8 @@ const PersonalInformation = ({ sectionKey }) => {
                                     value={personalInfo.location?.city || ""}
                                     onChange={(e) => handleLocationChange("city", e)}
                                     className="w-full"
+                                    tooltip="City"
+                                    tooltipOptions={{ position: 'top' }}
                                 />
                             </div>
                             <div className="col-4">
@@ -212,6 +218,8 @@ const PersonalInformation = ({ sectionKey }) => {
                                     value={personalInfo.location?.state || ""}
                                     onChange={(e) => handleLocationChange("state", e)}
                                     className="w-full"
+                                    tooltip="State/Province"
+                                    tooltipOptions={{ position: 'top' }}
                                 />
                             </div>
                             <div className="col-4">
@@ -220,6 +228,8 @@ const PersonalInformation = ({ sectionKey }) => {
                                     value={personalInfo.location?.postal_code || ""}
                                     onChange={(e) => handleLocationChange("postal_code", e)}
                                     className="w-full"
+                                    tooltip="Postal/ZIP Code"
+                                    tooltipOptions={{ position: 'top' }}
                                 />
                             </div>
                         </div>
@@ -232,24 +242,32 @@ const PersonalInformation = ({ sectionKey }) => {
                                     value={personalInfo.profiles.linkedin || ""}
                                     onChange={(e) => handleProfileChange("linkedin", e)}
                                     className="w-full"
+                                    tooltip="LinkedIn Profile URL"
+                                    tooltipOptions={{ position: 'top' }}
                                 />
                                 <InputText
                                     placeholder="GitHub URL"
                                     value={personalInfo.profiles.github || ""}
                                     onChange={(e) => handleProfileChange("github", e)}
                                     className="w-full"
+                                    tooltip="GitHub Profile URL"
+                                    tooltipOptions={{ position: 'top' }}
                                 />
                                 <InputText
                                     placeholder="Personal Website"
                                     value={personalInfo.profiles.website || ""}
                                     onChange={(e) => handleProfileChange("website", e)}
                                     className="w-full"
+                                    tooltip="Personal Website URL"
+                                    tooltipOptions={{ position: 'top' }}
                                 />
                                 <InputText
                                     placeholder="Portfolio URL"
                                     value={personalInfo.profiles.portfolio || ""}
                                     onChange={(e) => handleProfileChange("portfolio", e)}
                                     className="w-full"
+                                    tooltip="Portfolio Website URL"
+                                    tooltipOptions={{ position: 'top' }}
                                 />
                             </div>
                         </div>

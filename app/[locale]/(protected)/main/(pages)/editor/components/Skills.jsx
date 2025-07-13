@@ -169,13 +169,17 @@ const Skills = ({ sectionKey }) => {
                                 value={skill.name}
                                 onChange={(e) => handleInputChange(index, 'name', e.target.value)}
                                 className="w-full"
+                                tooltip="Skill Name"
+                                tooltipOptions={{ position: 'top' }}
                             />
                             <Dropdown
-                                placeholder="proficiency"
+                                placeholder="Proficiency Level"
                                 value={skill.level}
                                 options={levelOptions}
-                                onChange={(e) => handleInputChange(index, 'proficiency', e.value)}
+                                onChange={(e) => handleInputChange(index, 'level', e.value)}
                                 className="w-full"
+                                tooltip="Skill Proficiency Level"
+                                tooltipOptions={{ position: 'top' }}
                             />
                             <div className="flex flex-column gap-2">
                                 <label>Keywords</label>
@@ -186,11 +190,14 @@ const Skills = ({ sectionKey }) => {
                                                 value={keyword}
                                                 onChange={(e) => handleKeywordChange(index, keywordIndex, e.target.value)}
                                                 className="w-8rem"
+                                                // No tooltip for array items
                                             />
                                             <Button
                                                 icon="pi pi-times"
                                                 className="p-button-rounded p-button-text p-button-danger"
                                                 onClick={() => removeKeyword(index, keywordIndex)}
+                                                tooltip="Remove Keyword"
+                                                tooltipOptions={{ position: 'top' }}
                                             />
                                         </div>
                                     ))}
@@ -199,6 +206,7 @@ const Skills = ({ sectionKey }) => {
                                         className="p-button-rounded p-button-text"
                                         onClick={() => addKeyword(index)}
                                         tooltip="Add Keyword"
+                                        tooltipOptions={{ position: 'top' }}
                                     />
                                 </div>
                             </div>
@@ -207,8 +215,8 @@ const Skills = ({ sectionKey }) => {
                     viewContent={
                         <div className="flex flex-column gap-2">
                             <div className="flex justify-content-between">
-                                <span className="font-semibold">{skill.name}</span>
-                                <span className="text-500">{skill.level}</span>
+                                <span className="font-semibold" title="Skill Name">{skill.name}</span>
+                                <span className="text-500" title="Proficiency Level">{skill.level}</span>
                             </div>
                             <div className="flex flex-wrap gap-2">
                                 {skill.keywords?.map((keyword, keywordIndex) => (

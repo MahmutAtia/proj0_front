@@ -223,6 +223,34 @@ const Education = ({ sectionKey }) => {
                                 tooltip="Grade Point Average"
                                 tooltipOptions={{ position: 'top' }}
                             />
+                            <div className="flex flex-column gap-2">
+                                <label>Relevant Courses</label>
+                                <div className="flex flex-wrap gap-2">
+                                    {edu.relevant_courses?.map((course, courseIndex) => (
+                                        <div key={courseIndex} className="flex align-items-center gap-2">
+                                            <InputText
+                                                value={course}
+                                                onChange={(e) => handleCourseChange(index, courseIndex, e.target.value)}
+                                                className="w-10rem"
+                                            />
+                                            <Button
+                                                icon="pi pi-times"
+                                                className="p-button-rounded p-button-text p-button-danger"
+                                                onClick={() => removeCourse(index, courseIndex)}
+                                                tooltip="Remove Course"
+                                                tooltipOptions={{ position: 'top' }}
+                                            />
+                                        </div>
+                                    ))}
+                                    <Button
+                                        icon="pi pi-plus"
+                                        className="p-button-rounded p-button-text"
+                                        onClick={() => addCourse(index)}
+                                        tooltip="Add Course"
+                                        tooltipOptions={{ position: 'top' }}
+                                    />
+                                </div>
+                            </div>
                         </div>
                     }
                     viewContent={
@@ -234,14 +262,23 @@ const Education = ({ sectionKey }) => {
                                 </span>
                             </div>
                             <span className="text-primary font-medium" title="Degree/Program">{edu.degree}</span>
-                            {edu.major && (
+                            {edu.major && edu.major !== '' && (
                                 <span className="text-600" title="Major Field of Study">Major: {edu.major}</span>
                             )}
-                            {edu.minor && (
+                            {edu.minor && edu.minor !== '' && (
                                 <span className="text-600" title="Minor Field of Study">Minor: {edu.minor}</span>
                             )}
-                            {edu.gpa && (
+                            {edu.gpa && edu.gpa !== '' && (
                                 <span className="text-700" title="Grade Point Average">GPA: {edu.gpa}</span>
+                            )}
+                            {edu.relevant_courses && edu.relevant_courses.length > 0 && (
+                                <div className="flex flex-wrap gap-1 mt-1">
+                                    {edu.relevant_courses.map((course, courseIndex) => (
+                                        <span key={courseIndex} className="bg-blue-50 text-blue-700 px-2 py-1 border-round text-xs">
+                                            {course}
+                                        </span>
+                                    ))}
+                                </div>
                             )}
                         </div>
                     }
