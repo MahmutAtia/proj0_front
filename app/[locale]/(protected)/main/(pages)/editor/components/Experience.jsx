@@ -3,6 +3,7 @@ import React, { useRef, useState } from 'react';
 import { InputText } from 'primereact/inputtext';
 import { InputTextarea } from 'primereact/inputtextarea';
 import { Calendar } from 'primereact/calendar';
+import { Button } from 'primereact/button';
 import { useResume } from '../ResumeContext';
 import SectionWrapper from './SectionWrapper';
 import ItemWrapper from './ItemWrapper';
@@ -36,20 +37,19 @@ const Experience = ({ sectionKey }) => {
         const newIndex = experiences.length;
         const newExperience = {
             company: '',
-            position: '',
-            startDate: '',
-            endDate: '',
-            description: ''
+            title: '',
+            start_date: '',
+            end_date: '',
+            location: '',
+            description: '',
+            technologies: []
         };
         const newData = { ...data };
         newData[sectionKey] = [...experiences, newExperience];
         setData(newData);
-        // Automatically enable editing for new item
-        setNewItemIndex(newIndex); // Set index to trigger animation
-        toggleItemEditMode(experiences.length); // Enable editing
+        setNewItemIndex(newIndex);
+        toggleItemEditMode(experiences.length);
 
-
-        //  scroll
         setTimeout(() => {
             lastItemRef.current?.scrollIntoView({
                 behavior: 'smooth',
@@ -129,6 +129,24 @@ const Experience = ({ sectionKey }) => {
         });
     };
 
+    const addTechnology = (index) => {
+        const newData = { ...data };
+        newData[sectionKey][index].technologies = [...(newData[sectionKey][index].technologies || []), ''];
+        setData(newData);
+    };
+
+    const handleTechnologyChange = (expIndex, techIndex, value) => {
+        const newData = { ...data };
+        newData[sectionKey][expIndex].technologies[techIndex] = value;
+        setData(newData);
+    };
+
+    const removeTechnology = (expIndex, techIndex) => {
+        const newData = { ...data };
+        newData[sectionKey][expIndex].technologies.splice(techIndex, 1);
+        setData(newData);
+    };
+
     return (<SectionWrapper
         title="Experience" onAdd={addExperience} toast={toast}
         className="scroll-mt-[120px] pt-4"
@@ -164,30 +182,55 @@ const Experience = ({ sectionKey }) => {
                             className="w-full"
                         />
                         <InputText
-                            placeholder="Position"
-                            value={exp.position}
-                            onChange={(e) => handleInputChange(index, 'position', e.target.value)}
+                            placeholder="Title"
+                            value={exp.title}
+                            onChange={(e) => handleInputChange(index, 'title', e.target.value)}
+                            className="w-full"
+                        />
+                        <InputText
+                            placeholder="Location"
+                            value={exp.location}
+                            onChange={(e) => handleInputChange(index, 'location', e.target.value)}
                             className="w-full"
                         />
                         <div className="flex gap-2">
-                            <Calendar
-                                placeholder="Start Date"
-                                value={exp.startDate}
-                                onChange={(e) => handleInputChange(index, 'startDate', e.value)}
+                            <InputText
+                                placeholder="Start Date (YYYY-MM-DD)"
+                                value={exp.start_date}
+                                onChange={(e) => handleInputChange(index, 'start_date', e.target.value)}
                                 className="flex-1"
-                                monthNavigator
-                                yearNavigator
-                                yearRange="2000:2030"
                             />
-                            <Calendar
-                                placeholder="End Date"
-                                value={exp.endDate}
-                                onChange={(e) => handleInputChange(index, 'endDate', e.value)}
+                            <InputText
+                                placeholder="End Date (YYYY-MM-DD or Current)"
+                                value={exp.end_date}
+                                onChange={(e) => handleInputChange(index, 'end_date', e.target.value)}
                                 className="flex-1"
-                                monthNavigator
-                                yearNavigator
-                                yearRange="2000:2030"
                             />
+                        </div>
+                        <div className="flex flex-column gap-2">
+                            <label>Technologies</label>
+                            <div className="flex flex-wrap gap-2">
+                                {exp.technologies?.map((tech, techIndex) => (
+                                    <div key={techIndex} className="flex align-items-center gap-2">
+                                        <InputText
+                                            value={tech}
+                                            onChange={(e) => handleTechnologyChange(index, techIndex, e.target.value)}
+                                            className="w-8rem"
+                                        />
+                                        <Button
+                                            icon="pi pi-times"
+                                            className="p-button-rounded p-button-text p-button-danger"
+                                            onClick={() => removeTechnology(index, techIndex)}
+                                        />
+                                    </div>
+                                ))}
+                                <Button
+                                    icon="pi pi-plus"
+                                    className="p-button-rounded p-button-text"
+                                    onClick={() => addTechnology(index)}
+                                    tooltip="Add Technology"
+                                />
+                            </div>
                         </div>
                         <InputTextarea
                             placeholder="Description"
@@ -200,15 +243,40 @@ const Experience = ({ sectionKey }) => {
                 }
                 viewContent={
                     <div className="flex flex-column gap-2">
-                        <div className="flex justify-content-between">
+                        <div className="flex justify-content-between align-items-start">
                             <span className="font-semibold">{exp.company}</span>
-                            <span className="text-500">
-                                {exp.startDate ? new Date(exp.startDate).toLocaleDateString() : ''} -
-                                {exp.endDate ? new Date(exp.endDate).toLocaleDateString() : ''}
+                            <span className="text-500 text-right flex-shrink-0 ml-2">
+                                {exp.start_date && exp.start_date !== '' ? (
+                                    new Date(exp.start_date).toLocaleDateString()
+                                ) : ''} - {exp.end_date && exp.end_date !== '' ? (
+                                    exp.end_date === 'Current' || exp.end_date === 'current' 
+                                        ? 'Current'
+                                        : new Date(exp.end_date).toLocaleDateString()
+                                ) : 'Current'}
                             </span>
                         </div>
-                        <span className="text-primary">{exp.position}</span>
-                        <div style={{ whiteSpace: 'pre-line' }} className="text-700 line-height-4">{exp.description}</div>
+                        <span className="text-primary font-medium">{exp.title}</span>
+                        {exp.location && (
+                            <span className="text-600 text-sm">{exp.location}</span>
+                        )}
+                        {exp.technologies && exp.technologies.length > 0 && (
+                            <div className="flex flex-wrap gap-1 mt-1">
+                                {exp.technologies.map((tech, techIndex) => (
+                                    <span key={techIndex} className="bg-primary-50 text-primary-700 px-2 py-1 border-round text-xs">
+                                        {tech}
+                                    </span>
+                                ))}
+                            </div>
+                        )}
+                        <div 
+                            style={{ 
+                                whiteSpace: 'pre-line',
+                                wordBreak: 'break-word'
+                            }} 
+                            className="text-700 line-height-4 mt-2"
+                        >
+                            {exp.description}
+                        </div>
                     </div>
                 }
             />
