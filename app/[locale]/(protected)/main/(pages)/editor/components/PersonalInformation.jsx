@@ -1,13 +1,15 @@
 "use client";
-import React, { useRef, useState, useCallback } from 'react';
+import React, { useRef, useState, useCallback, useEffect } from 'react';
 import { InputText } from 'primereact/inputtext';
 import { Button } from 'primereact/button';
 import { Dialog } from 'primereact/dialog';
 import { Toast } from 'primereact/toast';
 import { Slider } from 'primereact/slider';
 import { FileUpload } from 'primereact/fileupload';
+import { Checkbox } from 'primereact/checkbox';
 import Cropper from 'react-easy-crop';
 import { useResume } from '../ResumeContext';
+import { useAvatar } from '../hooks/useAvatar';
 import AIAssistant from './AIAssistant';
 import api from '@/lib/axios';
 import './styles.css';
@@ -15,6 +17,7 @@ import './styles.css';
 const PersonalInformation = ({ sectionKey }) => {
     const toast = useRef(null);
     const { data, setData, toggleEditMode, editMode } = useResume();
+    const { avatar, uploadAvatar, removeAvatar } = useAvatar();
     const personalInfo = data[sectionKey];
     const isEditing = editMode[sectionKey]?.all;
     const historyRef = useRef([]);
@@ -29,12 +32,28 @@ const PersonalInformation = ({ sectionKey }) => {
     const [croppedAreaPixels, setCroppedAreaPixels] = useState(null);
     const [rotation, setRotation] = useState(0);
 
+    // Use avatar from hook instead of local data
+    const currentAvatar = avatar;
+
     // Existing personal info handlers...
     const handleInputChange = (field, e) => {
         const value = e.target?.value ?? e;
         const newData = { ...data };
         newData[sectionKey][field] = value;
         setData(newData);
+    };
+
+    // Handle avatar inclusion preference toggle
+    const handleAvatarInclusionChange = (e) => {
+        const newData = { ...data };
+        if (!newData[sectionKey]) newData[sectionKey] = {};
+        newData[sectionKey].includeAvatarInPDF = e.checked;
+        setData(newData);
+    };
+
+    // Get avatar inclusion preference with default fallback
+    const getAvatarInclusionPreference = () => {
+        return personalInfo.includeAvatarInPDF !== undefined ? personalInfo.includeAvatarInPDF : false;
     };
 
     const handlePhoneChange = (index, e) => {
@@ -76,6 +95,28 @@ const PersonalInformation = ({ sectionKey }) => {
     const handleFileSelect = (event) => {
         const file = event.files[0];
         if (file) {
+            // Validate file size (limit to 5MB)
+            const maxSize = 5 * 1024 * 1024; // 5MB
+            if (file.size > maxSize) {
+                toast.current.show({
+                    severity: 'warn',
+                    summary: 'File Too Large',
+                    detail: 'Please select an image smaller than 5MB'
+                });
+                return;
+            }
+            
+            // Validate file type
+            const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp'];
+            if (!allowedTypes.includes(file.type)) {
+                toast.current.show({
+                    severity: 'warn',
+                    summary: 'Invalid File Type',
+                    detail: 'Please select a JPEG, PNG, or WebP image'
+                });
+                return;
+            }
+            
             const reader = new FileReader();
             reader.onload = () => {
                 setImageSrc(reader.result);
@@ -117,8 +158,17 @@ const PersonalInformation = ({ sectionKey }) => {
 
         const data = ctx.getImageData(0, 0, safeArea, safeArea);
 
-        canvas.width = pixelCrop.width;
-        canvas.height = pixelCrop.height;
+        // Optimize canvas size for avatars (limit to 400x400 max)
+        const maxAvatarSize = 400;
+        const finalWidth = Math.min(pixelCrop.width, maxAvatarSize);
+        const finalHeight = Math.min(pixelCrop.height, maxAvatarSize);
+        
+        canvas.width = finalWidth;
+        canvas.height = finalHeight;
+
+        // Use higher quality anti-aliasing
+        ctx.imageSmoothingEnabled = true;
+        ctx.imageSmoothingQuality = 'high';
 
         ctx.putImageData(
             data,
@@ -126,7 +176,8 @@ const PersonalInformation = ({ sectionKey }) => {
             Math.round(0 - safeArea / 2 + image.height * 0.5 - pixelCrop.y)
         );
 
-        return canvas.toDataURL('image/jpeg', 0.8);
+        // Optimize compression: use 0.85 quality for better balance
+        return canvas.toDataURL('image/jpeg', 0.85);
     };
 
     const handlePhotoSave = async () => {
@@ -134,15 +185,18 @@ const PersonalInformation = ({ sectionKey }) => {
             if (croppedAreaPixels && imageSrc) {
                 const croppedImage = await getCroppedImg(imageSrc, croppedAreaPixels, rotation);
                 
-                const newData = { ...data };
-                newData[sectionKey].profilePhoto = croppedImage;
-                setData(newData);
-
-                toast.current.show({
-                    severity: 'success',
-                    summary: 'Photo Updated',
-                    detail: 'Profile photo has been saved'
-                });
+                // Save to backend using hook
+                const result = await uploadAvatar(croppedImage);
+                
+                if (result.success) {
+                    toast.current.show({
+                        severity: 'success',
+                        summary: 'Photo Updated',
+                        detail: 'Profile photo has been saved'
+                    });
+                } else {
+                    throw new Error(result.error);
+                }
             }
             setIsPhotoEditing(false);
         } catch (error) {
@@ -155,18 +209,31 @@ const PersonalInformation = ({ sectionKey }) => {
         }
     };
 
-    const handlePhotoRemove = () => {
-        const newData = { ...data };
-        delete newData[sectionKey].profilePhoto;
-        setData(newData);
-        setIsPhotoEditing(false);
-        setImageSrc(null);
-        
-        toast.current.show({
-            severity: 'info',
-            summary: 'Photo Removed',
-            detail: 'Profile photo has been removed'
-        });
+    const handlePhotoRemove = async () => {
+        try {
+            // Remove from backend using hook
+            const result = await removeAvatar();
+            
+            if (result.success) {
+                setIsPhotoEditing(false);
+                setImageSrc(null);
+                
+                toast.current.show({
+                    severity: 'info',
+                    summary: 'Photo Removed',
+                    detail: 'Profile photo has been removed'
+                });
+            } else {
+                throw new Error(result.error);
+            }
+        } catch (error) {
+            console.error('Error removing photo:', error);
+            toast.current.show({
+                severity: 'error',
+                summary: 'Error',
+                detail: 'Failed to remove photo'
+            });
+        }
     };
 
     const handlePhotoCancel = () => {
@@ -274,10 +341,10 @@ const PersonalInformation = ({ sectionKey }) => {
 
                 {/* Right side - Profile Photo */}
                 <div className="flex flex-column align-items-center gap-3">
-                    {personalInfo.profilePhoto ? (
+                    {currentAvatar ? (
                         <div className="relative">
                             <img 
-                                src={personalInfo.profilePhoto} 
+                                src={currentAvatar} 
                                 alt="Profile" 
                                 className="w-8rem h-8rem border-circle object-cover shadow-3"
                                 title="Profile Photo"
@@ -287,7 +354,7 @@ const PersonalInformation = ({ sectionKey }) => {
                                 className="p-button-rounded p-button-sm absolute"
                                 style={{ top: '0.5rem', right: '0.5rem' }}
                                 onClick={() => {
-                                    setImageSrc(personalInfo.profilePhoto);
+                                    setImageSrc(currentAvatar);
                                     setIsPhotoEditing(true);
                                 }}
                                 tooltip="Edit Photo"
@@ -308,6 +375,35 @@ const PersonalInformation = ({ sectionKey }) => {
                                 className="p-button-outlined p-button-sm"
                                 auto={false}
                             />
+                        </div>
+                    )}
+                    
+                    {/* Avatar inclusion preference checkbox */}
+                    {currentAvatar && (
+                        <div className="flex align-items-center gap-2 mt-2">
+                            <Checkbox
+                                inputId="includeAvatarInPDF"
+                                checked={getAvatarInclusionPreference()}
+                                onChange={handleAvatarInclusionChange}
+                                tooltip="Include photo in generated PDFs and websites"
+                                tooltipOptions={{ position: 'top' }}
+                            />
+                            <label htmlFor="includeAvatarInPDF" className="text-sm">
+                                Include in PDF/Website
+                            </label>
+                        </div>
+                    )}
+                    
+                    {/* Status indicator for avatar inclusion */}
+                    {currentAvatar && (
+                        <div className="mt-2">
+                            <span className={`text-xs px-2 py-1 border-round ${
+                                getAvatarInclusionPreference()
+                                    ? 'bg-green-100 text-green-800 border-green-200' 
+                                    : 'bg-orange-100 text-orange-800 border-orange-200'
+                            }`}>
+                                {getAvatarInclusionPreference() ? '✓ Included in exports' : '✗ Excluded from exports'}
+                            </span>
                         </div>
                     )}
                 </div>
@@ -436,6 +532,25 @@ const PersonalInformation = ({ sectionKey }) => {
                             />
                         </div>
                     </div>
+
+                    {/* Avatar Inclusion Preference */}
+                    {currentAvatar && (
+                        <div className="field">
+                            <div className="flex align-items-center gap-2">
+                                <Checkbox
+                                    inputId="includeAvatarInPDFDialog"
+                                    checked={getAvatarInclusionPreference()}
+                                    onChange={handleAvatarInclusionChange}
+                                />
+                                <label htmlFor="includeAvatarInPDFDialog" className="text-sm font-medium">
+                                    Include avatar in generated PDFs and websites
+                                </label>
+                            </div>
+                            <small className="text-gray-500">
+                                Uncheck this if you prefer to exclude your photo from professional documents
+                            </small>
+                        </div>
+                    )}
                 </div>
 
                 {/* Sticky AI Assistant and Undo Button at the Bottom */}
@@ -524,7 +639,7 @@ const PersonalInformation = ({ sectionKey }) => {
                                 icon="pi pi-trash"
                                 className="p-button-danger p-button-outlined"
                                 onClick={handlePhotoRemove}
-                                disabled={!personalInfo.profilePhoto}
+                                disabled={!currentAvatar}
                             />
                             <div className="flex gap-2">
                                 <Button
