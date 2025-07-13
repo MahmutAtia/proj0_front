@@ -8,12 +8,12 @@ import { Toast } from 'primereact/toast';
 import { useResume } from '../ResumeContext';
 import AIAssistant from './AIAssistant';
 import api from '@/lib/axios';
+import './styles.css';
 
 const Languages = ({ sectionKey }) => {
     const toast = useRef(null);
     const { data, setData, toggleEditMode, editMode } = useResume();
     const languages = data[sectionKey] || [];
-    const isEditing = editMode[sectionKey]?.all;
     const historyRef = useRef([]);
     const [aiPrompt, setAiPrompt] = useState("");
     const [isAIProcessing, setIsAIProcessing] = useState(false);
@@ -30,6 +30,8 @@ const Languages = ({ sectionKey }) => {
         { label: 'Intermediate', value: 'Intermediate' },
         { label: 'Basic', value: 'Basic' }
     ];
+
+    const isEditing = editMode[sectionKey]?.all;
 
     const handleLanguageChange = (index, field, value) => {
         const newData = { ...data };
@@ -53,34 +55,57 @@ const Languages = ({ sectionKey }) => {
         setData(newData);
     };
 
-    const saveToHistory = (newData) => {
-        historyRef.current.push(JSON.stringify(languages));
-        setData(newData);
-    };
+    const handleAIUpdate = async (updatedData) => {
+        try {
+            const prevState = [...languages];
+            historyRef.current.push(JSON.stringify(prevState));
 
-    const handleUndo = () => {
-        if (historyRef.current.length > 0) {
-            const previousState = JSON.parse(historyRef.current.pop());
             const newData = { ...data };
-            newData[sectionKey] = previousState;
+            newData[sectionKey] = updatedData.languages || updatedData;
             setData(newData);
+
             toast.current.show({
-                severity: "info",
-                summary: "Undo",
-                detail: "Previous state restored",
+                severity: 'success',
+                summary: 'AI Updated',
+                detail: 'Languages have been updated'
+            });
+        } catch (error) {
+            console.error('AI Update Error:', error);
+            toast.current.show({
+                severity: 'error',
+                summary: 'Update Failed',
+                detail: 'Failed to update languages'
             });
         }
     };
 
-    const handleAIUpdate = (updatedData) => {
-        saveToHistory({
-            ...data,
-            [sectionKey]: updatedData.languages || updatedData,
-        });
+    const handleUndo = () => {
+        if (historyRef.current.length > 0) {
+            const prevState = JSON.parse(historyRef.current.pop());
+            const newData = { ...data };
+            newData[sectionKey] = prevState;
+            setData(newData);
+
+            toast.current.show({
+                severity: 'info',
+                summary: 'Undo',
+                detail: 'Previous state restored'
+            });
+        }
+    };
+
+    const handleDelete = () => {
+        if (isEditing) {
+            toggleEditMode(sectionKey, 'all');
+        }
+        const newData = { ...data };
+        newData[sectionKey] = [];
+        setData(newData);
+
         toast.current.show({
-            severity: "success",
-            summary: "AI Updated",
-            detail: "Languages have been updated",
+            severity: 'success',
+            summary: 'Deleted',
+            detail: 'All languages have been removed'
         });
     };
 
@@ -101,12 +126,6 @@ const Languages = ({ sectionKey }) => {
         setIsAIProcessing(false);
     };
 
-    const dialogHeader = (
-        <div className="flex align-items-center justify-content-between p-3 border-bottom-1 surface-border">
-            <h2 className="text-xl font-semibold m-0">Edit Languages</h2>
-        </div>
-    );
-
     return (
         <div className="surface-card p-4 border-round-xl shadow-2">
             <Toast ref={toast} />
@@ -119,44 +138,46 @@ const Languages = ({ sectionKey }) => {
                     className="p-button-rounded p-button-text"
                     onClick={() => toggleEditMode(sectionKey, 'all')}
                     tooltip="Edit Languages"
+                    tooltipOptions={{ position: 'top' }}
                 />
             </div>
 
-            <div className="flex flex-column gap-3 p-4">
-                {languages.map((lang, index) => (
-                    <div key={index} className="flex justify-content-between align-items-center p-3 border-1 border-200 border-round hover:surface-100 transition-colors transition-duration-150">
-                        <div className="flex align-items-center gap-3">
-                            <div className="flex align-items-center justify-content-center w-2rem h-2rem bg-primary-50 border-circle">
-                                <i className="pi pi-globe text-primary text-sm"></i>
+            {/* View Content */}
+            <div className="p-4">
+                <div style={{ 
+                    display: 'grid', 
+                    gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))', 
+                    gap: '12px' 
+                }}>
+                    {languages.map((lang, index) => (
+                        <div key={index}>
+                            <div className="flex justify-content-between align-items-center p-3 border-1 border-200 border-round hover:surface-100 transition-colors transition-duration-150 h-full">
+                                <div className="flex align-items-center gap-2">
+                                    <i className="pi pi-globe text-primary"></i>
+                                    <span className="font-semibold text-900" title="Language Name">{lang.language}</span>
+                                </div>
+                                <span 
+                                    className={`px-3 py-1 border-round text-sm font-medium ${
+                                        lang.proficiency === 'Native' || lang.proficiency === 'C2' 
+                                            ? 'bg-green-100 text-green-800' 
+                                            : lang.proficiency === 'C1' || lang.proficiency === 'Fluent'
+                                            ? 'bg-blue-100 text-blue-800'
+                                            : lang.proficiency === 'B2' || lang.proficiency === 'Intermediate'
+                                            ? 'bg-orange-100 text-orange-800'
+                                            : 'bg-gray-100 text-gray-800'
+                                    }`}
+                                    title="Proficiency Level"
+                                >
+                                    {lang.proficiency}
+                                </span>
                             </div>
-                            <span className="font-semibold text-900 text-lg" title="Language Name">{lang.language}</span>
                         </div>
-                        <span 
-                            className={`px-3 py-2 border-round-lg text-sm font-semibold shadow-1 ${
-                                lang.proficiency === 'Native' || lang.proficiency === 'C2' 
-                                    ? 'bg-green-500 text-white' 
-                                    : lang.proficiency === 'C1' || lang.proficiency === 'Fluent'
-                                    ? 'bg-blue-500 text-white'
-                                    : lang.proficiency === 'B2' || lang.proficiency === 'Intermediate'
-                                    ? 'bg-orange-500 text-white'
-                                    : lang.proficiency === 'B1'
-                                    ? 'bg-yellow-500 text-white'
-                                    : 'bg-gray-400 text-white'
-                            }`}
-                            title="Proficiency Level"
-                        >
-                            {lang.proficiency}
-                        </span>
-                    </div>
-                ))}
-                
+                    ))}
+                </div>
                 {languages.length === 0 && (
-                    <div className="text-center py-6 text-500">
-                        <div className="flex align-items-center justify-content-center w-4rem h-4rem bg-gray-100 border-circle mx-auto mb-3">
-                            <i className="pi pi-globe text-gray-400 text-2xl"></i>
-                        </div>
-                        <h3 className="text-xl font-medium text-600 mb-2">No languages added yet</h3>
-                        <p className="text-sm text-500">Click edit to add your language skills</p>
+                    <div className="text-center py-4 text-500">
+                        <i className="pi pi-globe text-3xl mb-2 block"></i>
+                        <p>No languages added yet</p>
                     </div>
                 )}
             </div>
@@ -166,7 +187,11 @@ const Languages = ({ sectionKey }) => {
                 visible={isEditing}
                 onHide={() => toggleEditMode(sectionKey, 'all')}
                 style={{ width: "min(90vw, 700px)" }}
-                header={dialogHeader}
+                header={
+                    <div className="flex align-items-center justify-content-between p-3 border-bottom-1 surface-border">
+                        <h2 className="text-xl font-semibold m-0">Edit Languages</h2>
+                    </div>
+                }
                 dismissableMask
                 className="languages-editor"
             >
@@ -227,6 +252,7 @@ const Languages = ({ sectionKey }) => {
                                 onClick={handleUndo}
                                 disabled={!historyRef.current.length}
                                 tooltip="Undo"
+                                tooltipOptions={{ position: 'top' }}
                             />
                         </div>
                     </div>
