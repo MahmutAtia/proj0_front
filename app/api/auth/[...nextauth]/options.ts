@@ -4,7 +4,7 @@ import GoogleProvider from 'next-auth/providers/google';
 import axios from "axios";
 
 // These two values should be a bit less than actual token lifetimes
-const BACKEND_ACCESS_TOKEN_LIFETIME = 4 * 60;  // 4 minutes (reduced from 5 for safety margin)
+const BACKEND_ACCESS_TOKEN_LIFETIME = 15 * 60;  // 15 minutes (increased from 4 for stability)
 const BACKEND_REFRESH_TOKEN_LIFETIME = 24 * 60 * 60;  // 24 hours
 
 const getCurrentEpochTime = () => {
@@ -116,6 +116,7 @@ export const authOptions: NextAuthOptions = {
                 token.access_token = backendResponse.access;
                 token.refresh_token = backendResponse.refresh;
                 token.ref = getCurrentEpochTime() + BACKEND_ACCESS_TOKEN_LIFETIME;
+                token.failedRefreshAttempts = 0; // Reset failed attempts on successful login
                 return token;
             }
 
@@ -130,32 +131,60 @@ export const authOptions: NextAuthOptions = {
                         data: {
                             refresh: token.refresh_token,
                         },
-                        timeout: 10000,
+                        timeout: 15000, // Increased timeout
+                        validateStatus: function (status) {
+                            return status < 500; // Don't throw for 4xx errors, handle them gracefully
+                        }
                     });
 
-                    // Update tokens but KEEP user data
-                    token.access_token = response.data.access;
+                    // Check if refresh was successful
+                    if (response.status === 200 && response.data.access) {
+                        // Update tokens but KEEP user data
+                        token.access_token = response.data.access;
 
-                    if (response.data.refresh) {
-                        token.refresh_token = response.data.refresh;
+                        if (response.data.refresh) {
+                            token.refresh_token = response.data.refresh;
+                        }
+
+                        token.ref = getCurrentEpochTime() + BACKEND_ACCESS_TOKEN_LIFETIME;
+                        token.failedRefreshAttempts = 0; // Reset failed attempts on successful refresh
+                        console.log("Token refreshed successfully");
+                        return token;
+                    } else {
+                        // Refresh failed with 4xx error
+                        console.log("Token refresh failed with status:", response.status);
+                        throw new Error(`Refresh failed: ${response.status}`);
                     }
 
-                    token.ref = getCurrentEpochTime() + BACKEND_ACCESS_TOKEN_LIFETIME;
-
-                    console.log("Token refreshed successfully");
-
-                } catch (error) {
+                } catch (error: any) {
                     console.error("Error refreshing token:", error);
 
-                    // Clear tokens but keep user for debugging
-                    token.access_token = null;
-                    token.refresh_token = null;
-                    token.ref = null;
-                    // Don't clear user immediately for debugging
-                    console.log("User data before clearing:", token.user);
-                    token.user = null;
-
-                    throw new Error("Token refresh failed");
+                    // Only clear session if refresh token is actually invalid (not just network issues)
+                    if (error.response?.status === 401 || error.message?.includes('Refresh failed: 401')) {
+                        console.log("Refresh token invalid, clearing session");
+                        // Clear tokens but PRESERVE user data for a better UX
+                        token.access_token = null;
+                        token.refresh_token = null;
+                        token.ref = null;
+                        // Only clear user after multiple failed attempts
+                        if (!token.failedRefreshAttempts) {
+                            token.failedRefreshAttempts = 1;
+                        } else {
+                            token.failedRefreshAttempts++;
+                        }
+                        
+                        // Only clear user after 3 failed refresh attempts
+                        if (token.failedRefreshAttempts >= 3) {
+                            token.user = null;
+                        }
+                        return token; // Return cleared token instead of throwing
+                    } else {
+                        // For network errors, keep trying with existing token
+                        console.log("Network error during refresh, keeping existing session");
+                        // Extend the refresh time slightly to avoid immediate retry
+                        token.ref = getCurrentEpochTime() + 60; // Retry in 1 minute
+                        return token;
+                    }
                 }
             }
 
@@ -163,15 +192,32 @@ export const authOptions: NextAuthOptions = {
         },
 
         async session({ session, token }) {
+            // Always ensure user data is available if token has user
+            if (token.user) {
+                session.user = {
+                    ...session.user,
+                    ...token.user,
+                    // Ensure these core fields are always available
+                    name: token.user.first_name && token.user.last_name 
+                        ? `${token.user.first_name} ${token.user.last_name}`.trim()
+                        : token.user.username || token.user.email,
+                    email: token.user.email,
+                    image: token.user.image || null,
+                };
+            }
 
             // Add tokens if they exist and are valid
             if (token.access_token && token.refresh_token) {
                 session.accessToken = token.access_token;
                 session.refreshToken = token.refresh_token;
             } else {
-                // Clear tokens but keep user info
+                // Clear tokens but keep user info to prevent logout
                 session.accessToken = undefined;
                 session.refreshToken = undefined;
+                // Only clear user if token is completely invalid AND we've failed multiple times
+                if (!token.user || (token.failedRefreshAttempts && token.failedRefreshAttempts >= 3)) {
+                    session.user = undefined;
+                }
             }
 
             return session;
@@ -207,5 +253,6 @@ declare module "next-auth/jwt" {
         refresh_token?: string | null;
         ref?: number | null;
         user: any;
+        failedRefreshAttempts?: number;
     }
 }
