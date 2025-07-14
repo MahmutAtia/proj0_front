@@ -301,25 +301,24 @@ const DashboardPage = () => {
         loadInitialData();
     }, [session, sessionStatus, t]);
 
-    const transformedResumesForDialog = useMemo(() => {
-        return allResumes.map(resume => {
-            const docTypesObject = {};
-            if (resume.generated_documents_data && Array.isArray(resume.generated_documents_data)) {
-                resume.generated_documents_data.forEach(doc => {
-                    if (doc.document_type) {
-                        // The dialog only needs to know *that* a document type exists.
-                        // Storing 'true' or a minimal object is sufficient.
-                        docTypesObject[doc.document_type] = true;
-                    }
-                });
-            }
-            return {
-                id: resume.id, // Ensure 'id' is used consistently
-                // title: resume.title, // Not strictly needed by the dialog's cache logic but good for debugging
-                json_content: docTypesObject // This structure is expected by GenerateDocumentDialog
-            };
-        });
-    }, [allResumes]);
+const transformedResumesForDialog = useMemo(() => {
+    return allResumes.map(resume => {
+        const docTypesObject = {};
+        if (resume.generated_documents_data && Array.isArray(resume.generated_documents_data)) {
+            resume.generated_documents_data.forEach(doc => {
+                if (doc.document_type) {
+                    docTypesObject[doc.document_type] = true;
+                }
+            });
+        }
+        return {
+            id: resume.id,
+            json_content: docTypesObject,
+            resume: resume.resume,         // <-- Add this line
+            about: resume.about || "",     // <-- And this line
+        };
+    });
+}, [allResumes]);
     const handleSetDefaultResume = async () => {
         if (!defaultResume && allResumes.length > 0) {
             // If no default is set, and there are resumes, prompt to select one or go to resumes page
