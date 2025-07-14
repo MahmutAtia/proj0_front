@@ -2,9 +2,8 @@ import { Button } from 'primereact/button';
 import { Dialog } from 'primereact/dialog';
 import { ConfirmDialog } from 'primereact/confirmdialog';
 import { useState } from 'react';
-import api from '@/lib/axios';
+import { aiApi } from '@/lib/axios';
 import AIAssistant from './AIAssistant';
-import UndoButton from './UndoButton';
 
 const ItemWrapper = ({
     sectionTitle,
@@ -27,10 +26,10 @@ const ItemWrapper = ({
     const handleAISubmit = async () => {
         setIsAIProcessing(true);
         try {
-            const response = await api.post('/api/resumes/edit/', {
+            const response = await aiApi.post("/resumes-v2/edit_section", {
                 prompt: aiPrompt,
-                sectionData,
-                sectionTitle
+                sectionData: sectionData,
+                sectionTitle: sectionTitle
             });
             const data = response.data;
             onAIUpdate(data);

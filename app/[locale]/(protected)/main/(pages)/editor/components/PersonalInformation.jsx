@@ -3,7 +3,7 @@ import React, { useRef, useState } from "react";
 import { InputText } from "primereact/inputtext";
 import { Button } from "primereact/button";
 import { Dialog } from "primereact/dialog";
-import api from '@/lib/axios';
+import { aiApi } from "@/lib/axios";
 import { useResume } from "../ResumeContext";
 import { Toast } from "primereact/toast";
 import AIAssistant from "./AIAssistant";
@@ -81,7 +81,8 @@ const PersonalInformation = ({ sectionKey }) => {
     const handleAISubmit = async () => {
         setIsAIProcessing(true);
         try {
-            const response = await api.post("/api/resumes/edit/", {
+
+            const response = await aiApi.post("/resumes-v2/edit_section", {
                 prompt: aiPrompt,
                 sectionData: personalInfo,
                 sectionTitle: "Personal Information",
