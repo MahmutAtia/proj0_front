@@ -17,6 +17,7 @@ import { InputText } from 'primereact/inputtext';
 import { Toolbar } from 'primereact/toolbar';
 
 import GenerateDocumentDialog from '../editor/components/GenerateDocumentDialog'; // Adjust path
+import { getResumesFromCache } from '@/app/utils/resumeCache'; // Import cache utility
 
 const RESUMES_CACHE_KEY_DOCS = 'all_resumes_list_cache';
 const CACHE_EXPIRY_DURATION_DOCS = 15 * 60 * 1000; // 15 minutes
@@ -313,6 +314,7 @@ const DocumentsPage = () => {
                 onHide={() => setIsGenerateDialogVisible(false)}
                 resumeId={selectedResumeForDialog} // This will be null for global add
                 availableResumes={allResumes.map(r => ({ label: r.title || "Untitled Resume", value: r.id }))} // Pass all resumes
+                allResumesListCache={getResumesFromCache() || []} // Pass the cache data
                 onGenerationSuccess={onDocumentGeneratedOrUpdated} // Callback to refresh list
             />
         </div>
