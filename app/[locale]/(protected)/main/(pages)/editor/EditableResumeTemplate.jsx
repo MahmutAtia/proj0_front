@@ -22,6 +22,7 @@ import Languages from "./components/Languages";
 import GenericSection from "./components/GenericSection";
 import GenerateDocumentDialog from "./components/GenerateDocumentDialog"; // <-- Import the new component
 import CreateResumeFromExistingDialog from "./components/CreateResumeFromExistingDialog"; // <-- Import the new component
+import { getResumesFromCache } from '@/app/utils/resumeCache'; // Import cache utility
 import 'primeflex/primeflex.css';
 import styles from './EditableResumeTemplate.module.css'; // Ensure CSS Modules are used
 
@@ -59,7 +60,10 @@ const EditableResumeTemplate = ({
     const token = session?.accessToken || null; // Get the token from session
     // Initialize local state from props
     const [linkedDocuments, setLinkedDocuments] = useState(initialLinkedDocuments || []);
-
+    
+    // Get resumes cache for GenerateDocumentDialog
+    const allResumesListCache = getResumesFromCache() || [];
+ 
     // Define section keys and non-array sections
     const ALL_SECTION_KEYS = [
         "personal_information", "summary", "experience", "education", "projects",
@@ -679,6 +683,7 @@ const EditableResumeTemplate = ({
                     visible={showGenerateDialog}
                     onHide={() => setShowGenerateDialog(false)}
                     initialResumeId={resumeId} // Pass the current resumeId
+                    allResumesListCache={allResumesListCache} // Pass the cache data
                     existingDocTypes={linkedDocuments.map(doc => doc.document_type)} // Pass existing document types
 
                     onGenerationSuccess={(genDetails) => {

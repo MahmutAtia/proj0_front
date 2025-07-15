@@ -4,7 +4,7 @@ import { InputTextarea } from "primereact/inputtextarea";
 import { Button } from "primereact/button";
 import { Dialog } from "primereact/dialog";
 import { Toast } from "primereact/toast";
-import api from '@/lib/axios';
+import { aiApi } from "@/lib/axios";
 import { useResume } from "../ResumeContext";
 import AIAssistant from "./AIAssistant";
 
@@ -45,7 +45,7 @@ const Summary = ({ sectionKey }) => {
     const handleAIUpdate = (updatedData) => {
         saveToHistory();
         const newData = { ...data };
-        newData[sectionKey] = updatedData.summary; // Extract the summary value
+        newData[sectionKey] = updatedData[sectionKey];
         setData(newData);
         toast.current.show({
             severity: "success",
@@ -57,9 +57,9 @@ const Summary = ({ sectionKey }) => {
     const handleAISubmit = async () => {
         setIsAIProcessing(true);
         try {
-            const response = await api.post("/api/resumes/edit/", {
+            const response = await aiApi.post("/resumes-v2/edit_section", {
                 prompt: aiPrompt,
-                sectionData: summary,
+                sectionData: { [sectionKey]: summary }, // dict: key is sectionKey, value is summary
                 sectionTitle: sectionKey.split('_').map(word =>
                     word.charAt(0).toUpperCase() + word.slice(1)
                 ).join(' ')

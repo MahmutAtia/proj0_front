@@ -7,8 +7,8 @@ import { Toast } from 'primereact/toast';
 import { ProgressSpinner } from 'primereact/progressspinner';
 import { Message } from 'primereact/message'; // Added Message
 import { useRouter } from 'next/navigation';
-import axios from 'axios';
 import { useSession } from 'next-auth/react';
+import api, { aiApi } from '@/lib/axios'; // Import the axios instance
 
 const documentTypeOptions = [
     { label: 'Cover Letter', value: 'cover_letter' },
@@ -43,7 +43,6 @@ const GenerateDocumentDialog = ({
     const [currentExistingDocTypes, setCurrentExistingDocTypes] = useState([]);
     const toast = useRef(null);
     const router = useRouter();
-    const token = useSession()?.data?.accessToken; // Get access token from session
 
     const isResumeSelectionMode = !initialResumeId;
 
@@ -76,7 +75,7 @@ const GenerateDocumentDialog = ({
             // If cache is available, try to get existing types from there for the initialResumeId
             if (allResumesListCache && allResumesListCache.length > 0) {
                 const selectedResumeData = allResumesListCache.find(
-                    (resume) => resume.id === initialResumeId
+                    (resume) => resume.id == initialResumeId // Use loose equality
                 );
                 if (selectedResumeData && selectedResumeData.json_content) {
                     typesForInitialResume = Object.keys(selectedResumeData.json_content);
@@ -124,7 +123,7 @@ const GenerateDocumentDialog = ({
         if (newResumeId && allResumesListCache) { // Use the prop allResumesListCache
             setLoadingDocTypes(true);
             const selectedResumeData = allResumesListCache.find(
-                (resume) => resume.id === newResumeId // Use .id for lookup
+                (resume) => resume.id == newResumeId // Use loose equality to handle string/number differences
             );
 
             if (selectedResumeData && selectedResumeData.json_content) {
@@ -181,64 +180,133 @@ const GenerateDocumentDialog = ({
 
         setLoading(true);
         try {
-            if (!process.env.NEXT_PUBLIC_BACKEND_URL) throw new Error("Backend URL is not configured.");
-            const response = await axios.post(
-                `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/resumes/generate_document/`,
-                { resumeId: selectedResumeId, documentType, language, otherInfo },
-                {
-                    headers: {
-                        Authorization: `Bearer ${token}` // Use token from session
+                     
+            // Get resume data from cache
+            const selectedResumeData = allResumesListCache?.find(
+                (resume) => resume.id == selectedResumeId  // Use loose equality to handle string/number differences
+            );
+
+
+            if (!selectedResumeData) {
+                // Additional debugging to see what IDs are available
+                const availableIds = allResumesListCache?.map(r => ({ id: r.id, type: typeof r.id }));
+                throw new Error("Selected resume not found in cache. Please refresh and try again.");
+            }
+
+            // Extract personal_info and about from cache
+            const personal_info = selectedResumeData.resume?.personal_information || {};
+            const about_candidate = selectedResumeData.about || "";
+
+            // Debug the extracted data
+            console.log("Debug - personal_info:", personal_info);
+            console.log("Debug - about_candidate:", about_candidate);
+            console.log("Debug - selectedResumeData structure keys:", Object.keys(selectedResumeData));
+            if (selectedResumeData.resume) {
+                console.log("Debug - resume structure keys:", Object.keys(selectedResumeData.resume));
+            }
+
+            // Call the new FastAPI documents endpoint
+            console.log("Debug - About to call API with:", {
+                endpoint: `/documents/generate`,
+                baseURL: process.env.NEXT_PUBLIC_AI_API_URL,
+                payload: {
+                    resume_id: selectedResumeId,
+                    document_type: documentType, 
+                    language: language, 
+                    other_info: {
+                        personal_info: personal_info,
+                        about_candidate: about_candidate,
+                        additional_context: otherInfo
+                    }
+                }
+            });
+            
+            const response = await aiApi.post(
+                `/documents/generate`,
+                { 
+                    resume_id: selectedResumeId,
+                    document_type: documentType, 
+                    language: language, 
+                    other_info: {
+                        personal_info: personal_info,
+                        about_candidate: about_candidate,
+                        additional_context: otherInfo
                     }
                 }
             );
 
-            if ((response.status === 201 || response.status === 200) && response.data?.document_uuid) {
-                const newDocId = response.data.document_uuid;
+            console.log("Debug - Full response:", response);
+            console.log("Debug - Response status:", response.status);
+            console.log("Debug - Response data:", response.data);
 
-                if (onGenerationSuccess) { // Call parent callback
-                    onGenerationSuccess({ document_uuid: newDocId, resume_id_used: selectedResumeId });
-                }
-                // The toast with navigation options can be handled by the parent (DashboardPage)
-                // or kept here if preferred. For now, let parent handle it via onGenerationSuccess.
-                // onHide(); // Close dialog on success, parent will show toast and navigate.
-                // For now, let's keep the sticky toast here as per original complex dialog.
-                 toast.current?.show({
-                    severity: 'success',
-                    summary: 'Generation Started',
-                    detail: (
-                        <div className="flex flex-column align-items-start" style={{ flex: '1' }}>
-                            <span>{`${documentTypeOptions.find(o => o.value === documentType)?.label || 'Document'} generation initiated.`}</span>
-                            <div className="flex align-items-center gap-2 mt-3">
-                                <Button
-                                    label="Go to Editor"
-                                    icon="pi pi-arrow-right"
-                                    className="p-button-sm p-button-success"
-                                    onClick={() => handleNavigateToEditor(newDocId)}
-                                />
-                                <Button
-                                    label="Stay Here"
-                                    icon="pi pi-times"
-                                    className="p-button-sm p-button-secondary p-button-outlined"
-                                    onClick={() => {
-                                        toast.current?.clear();
-                                        onHide();
-                                    }}
-                                />
+            if (response.status === 200 || response.status === 201) {
+                // Handle successful response
+                const responseData = response.data;
+                
+                if (responseData?.success && responseData?.document_id) {
+                    const newDocId = responseData.document_id;
+
+                    if (onGenerationSuccess) {
+                        onGenerationSuccess({ document_uuid: newDocId, resume_id_used: selectedResumeId });
+                    }
+                    
+                    toast.current?.show({
+                        severity: 'success',
+                        summary: 'Generation Completed',
+                        detail: (
+                            <div className="flex flex-column align-items-start" style={{ flex: '1' }}>
+                                <span>{`${documentTypeOptions.find(o => o.value === documentType)?.label || 'Document'} generated successfully.`}</span>
+                                <div className="flex align-items-center gap-2 mt-3">
+                                    <Button
+                                        label="Go to Editor"
+                                        icon="pi pi-arrow-right"
+                                        className="p-button-sm p-button-success"
+                                        onClick={() => handleNavigateToEditor(newDocId)}
+                                    />
+                                    <Button
+                                        label="Stay Here"
+                                        icon="pi pi-times"
+                                        className="p-button-sm p-button-secondary p-button-outlined"
+                                        onClick={() => {
+                                            toast.current?.clear();
+                                            onHide();
+                                        }}
+                                    />
+                                </div>
                             </div>
-                        </div>
-                    ),
-                    sticky: true
-                });
-                // Dialog is NOT hidden here by default if using sticky toast with options.
+                        ),
+                        sticky: true
+                    });
+                } else {
+                    throw new Error(responseData?.detail || responseData?.error || "Unexpected response format from server");
+                }
             } else {
-                throw new Error(response.data?.detail || response.data?.error || "Failed to start document generation.");
+                throw new Error(response.data?.detail || response.data?.error || "Failed to generate document.");
             }
         } catch (error) {
             console.error("Error generating document:", error);
-            const errorMessage = error.response?.data?.detail || error.response?.data?.error || error.message || 'An unexpected error occurred.';
+            console.error("Error response:", error.response);
+            console.error("Error response data:", error.response?.data);
+            console.error("Error message:", error.message);
+            console.error("Error code:", error.code);
+            console.error("Error config:", error.config);
+            
+            let errorMessage = 'An unexpected error occurred.';
+            
+            if (error.response) {
+                // Server responded with error status
+                errorMessage = error.response.data?.detail || error.response.data?.error || `Server error: ${error.response.status}`;
+            } else if (error.request) {
+                // Network error or no response
+                errorMessage = 'Network error: Unable to reach the server. Please check if the API server is running.';
+            } else {
+                // Other error
+                errorMessage = error.message || 'An unexpected error occurred.';
+            }
+            
             toast.current?.show({ severity: 'error', summary: 'Generation Failed', detail: errorMessage, life: 5000 });
         } finally {
-            setLoading(false); // Set loading to false in all cases, success toast handles dialog state
+            setLoading(false);
         }
     };
 

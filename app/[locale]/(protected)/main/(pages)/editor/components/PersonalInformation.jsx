@@ -1,4 +1,5 @@
 "use client";
+
 import React, { useRef, useState, useCallback, useEffect } from 'react';
 import { InputText } from 'primereact/inputtext';
 import { Button } from 'primereact/button';
@@ -12,7 +13,7 @@ import { useResume } from '../ResumeContext';
 import { useAvatar } from '../hooks/useAvatar';
 import EnhancedAvatarEditor from './EnhancedAvatarEditor';
 import AIAssistant from './AIAssistant';
-import api from '@/lib/axios';
+import { aiApi } from "@/lib/axios";
 import './styles.css';
 
 const PersonalInformation = ({ sectionKey }) => {
@@ -112,7 +113,8 @@ const PersonalInformation = ({ sectionKey }) => {
     const handleAISubmit = async () => {
         setIsAIProcessing(true);
         try {
-            const response = await api.post("/api/resumes/edit/", {
+
+            const response = await aiApi.post("/resumes-v2/edit_section", {
                 prompt: aiPrompt,
                 sectionData: personalInfo,
                 sectionTitle: "Personal Information",
