@@ -122,3 +122,11 @@
 .languageSwitcher[dir="rtl"] .name {
     text-align: right;
 }
+
+
+/*  i added this to support emoji flags  as fallback if it caauses any issues you can remove it */
+.flag, .currentFlag, .langFlag {
+  font-family: "Apple Color Emoji", "Segoe UI Emoji", "Noto Color Emoji", "EmojiOne Color", "Twemoji Mozilla", sans-serif;
+  font-size: 1.2em;
+  vertical-align: middle;
+}
