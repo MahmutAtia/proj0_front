@@ -4,8 +4,8 @@ import GoogleProvider from 'next-auth/providers/google';
 import axios from "axios";
 
 // These two values should be a bit less than actual token lifetimes
-const BACKEND_ACCESS_TOKEN_LIFETIME = 15 * 60;  // 15 minutes (increased from 4 for stability)
-const BACKEND_REFRESH_TOKEN_LIFETIME = 24 * 60 * 60;  // 24 hours
+const BACKEND_ACCESS_TOKEN_LIFETIME = 19 * 60; // 19 minutes
+const BACKEND_REFRESH_TOKEN_LIFETIME = 2 * 24 * 60 * 60; // 2 days
 
 const getCurrentEpochTime = () => {
     return Math.floor(new Date().getTime() / 1000);
@@ -106,8 +106,29 @@ export const authOptions: NextAuthOptions = {
         },
 
         async jwt({ user, token, account }) {
+            console.log('🔑 JWT Callback - Entry:', {
+                hasUser: !!user,
+                hasAccount: !!account,
+                accountProvider: account?.provider,
+                currentTokenHasAccess: !!token.access_token,
+                tokenExpiry: token.ref ? new Date(token.ref * 1000).toISOString() : 'none',
+                currentTime: new Date().toISOString(),
+                fullTokenKeys: Object.keys(token || {}),
+                userKeys: user ? Object.keys(user) : []
+            });
+            
+            // CRITICAL DEBUG: Log the full token object structure
+            console.log('🔍 Full Token Object:', JSON.stringify(token, null, 2));
+            if (user) {
+                console.log('🔍 Full User Object:', JSON.stringify(user, null, 2));
+            }
+            if (account) {
+                console.log('🔍 Full Account Object:', JSON.stringify(account, null, 2));
+            }
+
             // If `user` and `account` are set that means it is a login event
             if (user && account) {
+                console.log('🚪 Login event detected');
                 const backendResponse = (account.provider === "credentials"
                     ? user
                     : account.meta) as BackendResponse;
@@ -117,6 +138,14 @@ export const authOptions: NextAuthOptions = {
                 token.refresh_token = backendResponse.refresh;
                 token.ref = getCurrentEpochTime() + BACKEND_ACCESS_TOKEN_LIFETIME;
                 token.failedRefreshAttempts = 0; // Reset failed attempts on successful login
+                
+                console.log('✅ Login tokens set:', {
+                    hasAccess: !!token.access_token,
+                    hasRefresh: !!token.refresh_token,
+                    accessLength: token.access_token?.length || 0,
+                    expiresAt: new Date(token.ref * 1000).toISOString()
+                });
+                
                 return token;
             }
 
@@ -192,6 +221,15 @@ export const authOptions: NextAuthOptions = {
         },
 
         async session({ session, token }) {
+            console.log('🎫 Session Callback - Token Debug:', {
+                hasUser: !!token.user,
+                hasAccessToken: !!token.access_token,
+                hasRefreshToken: !!token.refresh_token,
+                accessTokenLength: token.access_token?.length || 0,
+                failedAttempts: token.failedRefreshAttempts || 0,
+                tokenExpiry: token.ref ? new Date(token.ref * 1000).toISOString() : 'none'
+            });
+
             // Always ensure user data is available if token has user
             if (token.user) {
                 session.user = {
@@ -206,19 +244,32 @@ export const authOptions: NextAuthOptions = {
                 };
             }
 
-            // Add tokens if they exist and are valid
-            if (token.access_token && token.refresh_token) {
+            // CRITICAL FIX: Always pass accessToken if it exists, even if refresh token is missing
+            if (token.access_token) {
                 session.accessToken = token.access_token;
+                console.log('✅ AccessToken added to session');
+            } else {
+                console.log('❌ No accessToken in token object');
+                session.accessToken = undefined;
+            }
+
+            if (token.refresh_token) {
                 session.refreshToken = token.refresh_token;
             } else {
-                // Clear tokens but keep user info to prevent logout
-                session.accessToken = undefined;
                 session.refreshToken = undefined;
-                // Only clear user if token is completely invalid AND we've failed multiple times
-                if (!token.user || (token.failedRefreshAttempts && token.failedRefreshAttempts >= 3)) {
-                    session.user = undefined;
-                }
             }
+
+            // Only clear user if we've completely failed authentication
+            if (!token.user || (token.failedRefreshAttempts && token.failedRefreshAttempts >= 3)) {
+                console.log('🚫 Clearing user session due to repeated failures');
+                session.user = undefined;
+            }
+
+            console.log('🎫 Final Session:', {
+                hasUser: !!session.user,
+                hasAccessToken: !!session.accessToken,
+                userEmail: session.user?.email || 'none'
+            });
 
             return session;
         },
