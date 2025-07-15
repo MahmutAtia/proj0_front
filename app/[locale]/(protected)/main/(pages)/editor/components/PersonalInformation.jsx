@@ -83,11 +83,6 @@ const PersonalInformation = ({ sectionKey }) => {
         setData(newData);
     };
 
-    // Photo handlers
-    const onCropComplete = useCallback((croppedArea, croppedAreaPixels) => {
-        setCroppedAreaPixels(croppedAreaPixels);
-    }, []);
-
     // Photo editing functions are now handled by EnhancedAvatarEditor component
 
     // Existing AI handlers...

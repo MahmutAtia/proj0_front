@@ -13,7 +13,7 @@ import Cropper from 'react-easy-crop';
 import { 
     FiCamera, FiEdit3, FiTrash2, FiRotateCcw, FiRotateCw, 
     FiZoomIn, FiZoomOut, FiUpload, FiCheck, FiX, FiRefreshCw,
-    FiMove, FiMaximize2, FiSave
+    FiMove, FiMaximize2, FiSave, FiImage
 } from 'react-icons/fi';
 
 const EnhancedAvatarEditor = ({ 
@@ -34,11 +34,35 @@ const EnhancedAvatarEditor = ({
     const [isProcessing, setIsProcessing] = useState(false);
     const [isDragOver, setIsDragOver] = useState(false);
     const [uploadProgress, setUploadProgress] = useState(0);
-    const [previewMode, setPreviewMode] = useState(false);
+    const [previewMode, setPreviewMode] = useState(true); // Show preview by default
+    const [previewImage, setPreviewImage] = useState(null);
     
     const fileInputRef = useRef(null);
     const toast = useRef(null);
     const dropRef = useRef(null);
+
+    // Generate preview image when crop changes (debounced)
+    useEffect(() => {
+        const generatePreview = async () => {
+            if (croppedAreaPixels && imageSrc) {
+                try {
+                    // Always use the same exact cropping function for both preview and final image
+                    // to ensure they match perfectly
+                    const croppedImage = await getCroppedImg(imageSrc, croppedAreaPixels, rotation);
+                    setPreviewImage(croppedImage);
+                } catch (error) {
+                    console.error('Error generating preview:', error);
+                    setPreviewImage(null);
+                }
+            } else {
+                setPreviewImage(null);
+            }
+        };
+
+        // Use a shorter debounce time for more responsive preview
+        const timeoutId = setTimeout(generatePreview, 150);
+        return () => clearTimeout(timeoutId);
+    }, [croppedAreaPixels, imageSrc, rotation]);
 
     // Size configurations
     const sizeConfig = {
@@ -104,7 +128,7 @@ const EnhancedAvatarEditor = ({
             toast.current?.show({
                 severity: 'error',
                 summary: 'Invalid File',
-                detail: 'Please select an image file'
+                detail: 'Please select an image file (JPEG, PNG, WebP, or GIF)'
             });
             return;
         }
@@ -123,6 +147,15 @@ const EnhancedAvatarEditor = ({
             setImageSrc(reader.result);
             setIsEditing(true);
             resetControls();
+            // Clear previous preview
+            setPreviewImage(null);
+        };
+        reader.onerror = () => {
+            toast.current?.show({
+                severity: 'error',
+                summary: 'File Error',
+                detail: 'Failed to read the selected file'
+            });
         };
         reader.readAsDataURL(file);
     }, []);
@@ -131,59 +164,101 @@ const EnhancedAvatarEditor = ({
         setCrop({ x: 0, y: 0 });
         setZoom(1);
         setRotation(0);
+        setCroppedAreaPixels(null);
+        setPreviewImage(null);
     };
 
     const onCropComplete = useCallback((croppedArea, croppedAreaPixels) => {
         setCroppedAreaPixels(croppedAreaPixels);
     }, []);
 
+    /**
+     * Creates a cropped image from the source image using the crop area pixels
+     * @param {string} imageSrc - Base64 or URL of the source image
+     * @param {Object} pixelCrop - Crop area pixels from react-easy-crop
+     * @param {number} rotation - Rotation angle in degrees
+     * @returns {Promise<string>} - Base64 string of the cropped image
+     */
     const getCroppedImg = async (imageSrc, pixelCrop, rotation = 0) => {
-        const image = new Image();
-        image.crossOrigin = 'anonymous';
-        
-        return new Promise((resolve) => {
-            image.onload = () => {
-                const canvas = document.createElement('canvas');
-                const ctx = canvas.getContext('2d');
+        const image = await createImage(imageSrc);
+        const canvas = document.createElement('canvas');
+        const ctx = canvas.getContext('2d');
 
-                const maxSize = Math.max(image.width, image.height);
-                const safeArea = 2 * ((maxSize / 2) * Math.sqrt(2));
+        if (!ctx) {
+            throw new Error('No 2d context');
+        }
 
-                canvas.width = safeArea;
-                canvas.height = safeArea;
+        const rotRad = getRadianAngle(rotation);
 
-                ctx.imageSmoothingEnabled = true;
-                ctx.imageSmoothingQuality = 'high';
-                ctx.translate(safeArea / 2, safeArea / 2);
-                ctx.rotate((rotation * Math.PI) / 180);
-                ctx.translate(-safeArea / 2, -safeArea / 2);
+        // calculate bounding box of the rotated image
+        const { width: bBoxWidth, height: bBoxHeight } = rotateSize(
+            image.width,
+            image.height,
+            rotation
+        );
 
-                ctx.drawImage(
-                    image,
-                    safeArea / 2 - image.width * 0.5,
-                    safeArea / 2 - image.height * 0.5
-                );
+        // set canvas size to match the bounding box
+        canvas.width = bBoxWidth;
+        canvas.height = bBoxHeight;
 
-                const data = ctx.getImageData(0, 0, safeArea, safeArea);
+        // translate canvas context to a central location to allow rotating and flipping around the center
+        ctx.translate(bBoxWidth / 2, bBoxHeight / 2);
+        ctx.rotate(rotRad);
+        ctx.translate(-image.width / 2, -image.height / 2);
 
-                const finalSize = Math.min(pixelCrop.width, 512); // Optimize size
-                canvas.width = finalSize;
-                canvas.height = finalSize;
+        // draw rotated image
+        ctx.drawImage(image, 0, 0);
 
-                ctx.imageSmoothingEnabled = true;
-                ctx.imageSmoothingQuality = 'high';
+        const croppedCanvas = document.createElement('canvas');
+        const croppedCtx = croppedCanvas.getContext('2d');
 
-                ctx.putImageData(
-                    data,
-                    Math.round(0 - safeArea / 2 + image.width * 0.5 - pixelCrop.x),
-                    Math.round(0 - safeArea / 2 + image.height * 0.5 - pixelCrop.y)
-                );
+        if (!croppedCtx) {
+            throw new Error('No 2d context');
+        }
 
-                resolve(canvas.toDataURL('image/jpeg', 0.9));
-            };
-            image.src = imageSrc;
-        });
+        // Set the size of the cropped canvas
+        croppedCanvas.width = pixelCrop.width;
+        croppedCanvas.height = pixelCrop.height;
+
+        // Draw the cropped image onto the new canvas
+        croppedCtx.drawImage(
+            canvas,
+            pixelCrop.x,
+            pixelCrop.y,
+            pixelCrop.width,
+            pixelCrop.height,
+            0,
+            0,
+            pixelCrop.width,
+            pixelCrop.height
+        );
+
+        return croppedCanvas.toDataURL('image/jpeg', 0.95);
     };
+
+    const createImage = (url) =>
+        new Promise((resolve, reject) => {
+            const image = new Image();
+            image.addEventListener('load', () => resolve(image));
+            image.addEventListener('error', (error) => reject(error));
+            image.setAttribute('crossOrigin', 'anonymous');
+            image.src = url;
+        });
+
+    const getRadianAngle = (degreeValue) => {
+        return (degreeValue * Math.PI) / 180;
+    };
+
+    const rotateSize = (width, height, rotation) => {
+        const rotRad = (rotation * Math.PI) / 180;
+        return {
+            width:
+                Math.abs(Math.cos(rotRad) * width) + Math.abs(Math.sin(rotRad) * height),
+            height:
+                Math.abs(Math.sin(rotRad) * width) + Math.abs(Math.cos(rotRad) * height),
+        };
+    };
+
 
     const handleSave = async () => {
         if (!croppedAreaPixels || !imageSrc) return;
@@ -194,15 +269,21 @@ const EnhancedAvatarEditor = ({
         try {
             // Simulate progress for better UX
             const progressInterval = setInterval(() => {
-                setUploadProgress(prev => Math.min(prev + 10, 90));
-            }, 100);
+                setUploadProgress(prev => Math.min(prev + 8, 85));
+            }, 150);
 
+            // Wait a bit to show progress
+            await new Promise(resolve => setTimeout(resolve, 500));
+            
+            // Always generate a fresh image on save to ensure accuracy
             const croppedImage = await getCroppedImg(imageSrc, croppedAreaPixels, rotation);
             
             clearInterval(progressInterval);
-            setUploadProgress(100);
+            setUploadProgress(95);
 
             await onAvatarChange(croppedImage);
+            
+            setUploadProgress(100);
             
             toast.current?.show({
                 severity: 'success',
@@ -211,19 +292,26 @@ const EnhancedAvatarEditor = ({
                 life: 3000
             });
 
-            setIsEditing(false);
-            setImageSrc(null);
+            // Small delay to show completion
+            setTimeout(() => {
+                setIsEditing(false);
+                setImageSrc(null);
+                setPreviewImage(null); // Clear preview
+                resetControls();
+            }, 300);
             
         } catch (error) {
             console.error('Error saving avatar:', error);
             toast.current?.show({
                 severity: 'error',
                 summary: 'Upload Failed',
-                detail: error.message || 'Failed to update avatar'
+                detail: error.message || 'Failed to update avatar. Please try again.'
             });
         } finally {
-            setIsProcessing(false);
-            setUploadProgress(0);
+            setTimeout(() => {
+                setIsProcessing(false);
+                setUploadProgress(0);
+            }, 300);
         }
     };
 
@@ -247,6 +335,7 @@ const EnhancedAvatarEditor = ({
     const handleCancel = () => {
         setIsEditing(false);
         setImageSrc(null);
+        setPreviewImage(null); // Clear preview
         resetControls();
     };
 
@@ -320,11 +409,11 @@ const EnhancedAvatarEditor = ({
                         </div>
                     ) : (
                         <div className={`
-                            w-full h-full border-circle border-2 border-dashed border-300 
+                            w-full h-full border-circle border-dashed
                             bg-gray-50 hover:bg-gray-100 transition-all duration-300
                             flex flex-column align-items-center justify-content-center gap-2
-                            ${isDragOver ? 'border-primary bg-primary-50' : ''}
-                        `}>
+                            ${isDragOver ? 'border-primary bg-primary-50' : 'border-300'}
+                        `} style={{ borderWidth: '2px' }}>
                             <FiCamera className={`text-gray-400 text-${config.iconSize}`} />
                             <span className="text-xs text-gray-500 text-center px-2">
                                 Click or drag to upload
@@ -421,16 +510,28 @@ const EnhancedAvatarEditor = ({
                                     crop={crop}
                                     zoom={zoom}
                                     rotation={rotation}
-                                    aspect={1}
+                                    aspect={1} // Perfect square aspect ratio
                                     onCropChange={setCrop}
                                     onCropComplete={onCropComplete}
                                     onZoomChange={setZoom}
                                     onRotationChange={setRotation}
                                     cropShape="round"
                                     showGrid={false}
+                                    zoomSpeed={0.1}
+                                    wheelZoomDisabled={false}
+                                    restrictPosition={true} // Keep crop area within image bounds
                                     style={{
                                         containerStyle: {
-                                            background: 'transparent'
+                                            background: 'transparent',
+                                            borderRadius: '0.75rem'
+                                        },
+                                        cropAreaStyle: {
+                                            border: '3px solid var(--primary-color)',
+                                            borderRadius: '50%',
+                                            boxShadow: '0 0 0 9999em rgba(0, 0, 0, 0.7)'
+                                        },
+                                        mediaStyle: {
+                                            borderRadius: '0.75rem'
                                         }
                                     }}
                                 />
@@ -471,6 +572,39 @@ const EnhancedAvatarEditor = ({
                     {/* Enhanced Controls */}
                     <div className="controls-panel bg-gray-50 border-round p-4">
                         <div className="grid gap-3">
+                            {/* Preview Section */}
+                            <div className="col-12 mb-3">
+                                <div className="flex align-items-center justify-content-between mb-3">
+                                    <h4 className="m-0 text-lg font-semibold">Preview</h4>
+                                    <Button
+                                        icon={<FiMaximize2 />}
+                                        className="p-button-text p-button-sm"
+                                        onClick={() => setPreviewMode(!previewMode)}
+                                        tooltip={previewMode ? "Hide Preview" : "Show Preview"}
+                                    />
+                                </div>
+                                {(previewMode && croppedAreaPixels && previewImage) && (
+                                    <div className="preview-main flex flex-column align-items-center gap-3 p-4 bg-white border-round shadow-1">
+                                        <div className="preview-avatar-container">
+                                            <div className="w-8rem h-8rem border-circle border-3 border-primary bg-white shadow-3 overflow-hidden mx-auto position-relative">
+                                                <img 
+                                                    src={previewImage} 
+                                                    alt="Avatar preview" 
+                                                    className="w-full h-full object-cover"
+                                                    style={{ objectFit: 'cover' }}
+                                                />
+                                            </div>
+                                        </div>
+                                        <div className="preview-info text-center">
+                                            <div className="text-sm font-semibold text-gray-700 mb-1">Final Avatar</div>
+                                            <div className="text-xs text-gray-500">
+                                                This preview matches exactly what will be saved
+                                            </div>
+                                        </div>
+                                    </div>
+                                )}
+                            </div>
+
                             {/* Zoom Control */}
                             <div className="col-12 md:col-6">
                                 <div className="flex align-items-center gap-3">
@@ -481,11 +615,11 @@ const EnhancedAvatarEditor = ({
                                         onChange={(e) => setZoom(e.value)}
                                         min={1}
                                         max={3}
-                                        step={0.05}
+                                        step={0.02}
                                         className="flex-grow-1"
                                     />
                                     <span className="min-w-max text-sm font-mono bg-white px-2 py-1 border-round">
-                                        {zoom.toFixed(1)}x
+                                        {zoom.toFixed(2)}x
                                     </span>
                                 </div>
                             </div>
@@ -543,7 +677,7 @@ const EnhancedAvatarEditor = ({
                                     className="p-button-primary"
                                     onClick={handleSave}
                                     loading={isProcessing}
-                                    disabled={!croppedAreaPixels}
+                                    disabled={!croppedAreaPixels || !previewImage}
                                 />
                             </div>
                         </div>
