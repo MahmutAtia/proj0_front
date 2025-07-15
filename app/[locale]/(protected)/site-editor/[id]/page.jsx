@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState, useEffect, useRef, useCallback } from 'react';
+import {aiApi} from '@/lib/axios';
 import api from '@/lib/axios';
 import { Dialog } from 'primereact/dialog';
 import { Button } from 'primereact/button';
@@ -202,12 +203,11 @@ const PersonalSiteEditorPage = ({ params: paramsPromise }) => {
 
         try {
             const validArtifacts = artifacts.filter(art => art.key.trim() !== '');
-            const response = await api.post(`/api/website-yaml/edit-block/`, {
-                resumeId: resumeId,
-                blockName: currentBlock.name,
-                currentHtml: currentBlock.html,
-                currentCss: currentBlock.css,
-                currentJs: currentBlock.js,
+            const response = await aiApi.post(`/websites/edit_section/`, {
+                block_name: currentBlock.name,
+                current_html: currentBlock.html,
+                current_css: currentBlock.css,
+                current_js: currentBlock.js,
                 prompt: aiPrompt,
                 artifacts: validArtifacts,
             });
