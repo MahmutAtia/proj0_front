@@ -11,7 +11,7 @@ import { InputText } from 'primereact/inputtext';
 import { Tooltip } from 'primereact/tooltip';
 import { Toast } from 'primereact/toast';
 import { Divider } from 'primereact/divider';
-import AIAssistant from '../../main/(pages)/editor/components/AIAssistant';
+import AIAssistant from '../../editor/components/AIAssistant';
 
 const initialYamlState = {
     global: { name: "global", js: "", css: "", html: "", feedback: "Global styles and settings." },

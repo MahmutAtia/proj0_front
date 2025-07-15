@@ -199,7 +199,7 @@ const DocumentsPage = () => {
                         </div>
                         <div className="text-sm text-color-secondary mb-2 md:mb-0 md:ml-4 flex align-items-center">
                             <FiLink2 className="mr-1" />
-                            Related to: <strong className="ml-1 hover:underline cursor-pointer" onClick={() => router.push(`/main/editor/${doc.resumeId}`)}>{doc.resumeTitle}</strong>
+                            Related to: <strong className="ml-1 hover:underline cursor-pointer" onClick={() => router.push(`/editor/${doc.resumeId}`)}>{doc.resumeTitle}</strong>
                             {doc.resumeIsDefault && <Tag severity="info" value="Master" className="ml-2 text-xs"></Tag>}
                         </div>
                         <div className="flex gap-2 justify-content-start md:justify-content-end">

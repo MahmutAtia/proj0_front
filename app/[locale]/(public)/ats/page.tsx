@@ -502,7 +502,7 @@ const ATSCheckerPageContent = () => {
 
     const handleGoToEditor = () => {
         if (generatedResumeId) {
-            router.push(`/main/editor/${generatedResumeId}`);
+            router.push(`/editor/${generatedResumeId}`);
         } else {
             toast.current?.show({ severity: 'warn', summary: 'Not Ready', detail: 'Editor is not ready yet or status check failed.' });
         }

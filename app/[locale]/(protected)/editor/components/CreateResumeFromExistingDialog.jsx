@@ -167,7 +167,7 @@ const CreateResumeFromExistingDialog = ({
                 // Redirect after a short delay
                 setTimeout(() => {
                     // Ensure the path is absolute and includes the /main segment
-                    router.push(`/main/editor/${newResume.id}`);
+                    router.push(`/editor/${newResume.id}`);
                 }, 1500);
 
             } else {

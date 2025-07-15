@@ -106,7 +106,7 @@ const ResumeListPage = () => {
     }, [loadResumes]);
 
     const handleViewEditResume = (resume) => {
-        router.push(`/main/editor/${resume.id}`);
+        router.push(`/editor/${resume.id}`);
     };
 
     const handleEditDocument = (docId, e) => {
