@@ -24,8 +24,8 @@ import api from '@/lib/axios';
 import { Toast } from 'primereact/toast';
 
 import { Dialog } from 'primereact/dialog'; // If not already there for other purposes
-import GenerateDocumentDialog from './(pages)/editor/components/GenerateDocumentDialog'; // Adjust path as needed
-import CreateResumeFromExistingDialog from './(pages)/editor/components/CreateResumeFromExistingDialog'; // Adjust path as neededimport
+import GenerateDocumentDialog from '../editor/components/GenerateDocumentDialog'; // Adjust path as needed
+import CreateResumeFromExistingDialog from '../editor/components/CreateResumeFromExistingDialog'; // Adjust path as neededimport
 import { useTranslation } from '../../../../hooks/useTranslation'; // Import the hook
 
 // Make sure RESUMES_CACHE_KEY and CACHE_EXPIRY_DURATION are accessible here or re-defined

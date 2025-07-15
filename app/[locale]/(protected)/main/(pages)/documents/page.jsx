@@ -16,7 +16,7 @@ import { Dropdown } from 'primereact/dropdown';
 import { InputText } from 'primereact/inputtext';
 import { Toolbar } from 'primereact/toolbar';
 
-import GenerateDocumentDialog from '../editor/components/GenerateDocumentDialog'; // Adjust path
+import GenerateDocumentDialog from '../../../editor/components/GenerateDocumentDialog'; // Adjust path
 import { getResumesFromCache } from '@/app/utils/resumeCache'; // Import cache utility
 
 const RESUMES_CACHE_KEY_DOCS = 'all_resumes_list_cache';

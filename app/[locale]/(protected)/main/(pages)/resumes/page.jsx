@@ -13,7 +13,7 @@ import { Tag } from 'primereact/tag';
 import { FiFileText, FiEdit, FiPlusSquare, FiArchive, FiAlertCircle, FiStar } from 'react-icons/fi';
 import { Dialog } from 'primereact/dialog';
 import ResumeDocumentsDialog from './ResumeDocumentsDialog';
-import CreateResumeFromExistingDialog from '../editor/components/CreateResumeFromExistingDialog';
+import CreateResumeFromExistingDialog from '../../../editor/components/CreateResumeFromExistingDialog';
 import { getResumesFromCache, setResumesCache, addOrUpdateResumeInCache } from '@/app/utils/resumeCache';
 import { useTranslation } from '@/hooks/useTranslation';
 
