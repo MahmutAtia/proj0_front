@@ -131,10 +131,10 @@ const GenericSection = ({ sectionKey }) => {
 
 
     const renderEditField = (item, index, field) => {
-
         const label = field.split('_').map(word =>
             word.charAt(0).toUpperCase() + word.slice(1)
         ).join(' ')
+        
         if (isArrayField(field)) {
             return (
                 <div className="flex flex-column gap-2">
@@ -146,11 +146,14 @@ const GenericSection = ({ sectionKey }) => {
                                     value={value}
                                     onChange={(e) => handleArrayFieldChange(index, field, valueIndex, e.target.value)}
                                     className="w-8rem"
+                                    // No tooltip for array items
                                 />
                                 <Button
                                     icon="pi pi-times"
                                     className="p-button-rounded p-button-text p-button-danger"
                                     onClick={() => removeArrayItem(index, field, valueIndex)}
+                                    tooltip={`Remove ${label}`}
+                                    tooltipOptions={{ position: 'top' }}
                                 />
                             </div>
                         ))}
@@ -158,7 +161,8 @@ const GenericSection = ({ sectionKey }) => {
                             icon="pi pi-plus"
                             className="p-button-rounded p-button-text"
                             onClick={() => addArrayItem(index, field)}
-                            tooltip={`Add ${field.replace('_', ' ')}`}
+                            tooltip={`Add ${label}`}
+                            tooltipOptions={{ position: 'top' }}
                         />
                     </div>
                 </div>
@@ -175,6 +179,8 @@ const GenericSection = ({ sectionKey }) => {
                     monthNavigator
                     yearNavigator
                     yearRange="1900:2030"
+                    tooltip={label}
+                    tooltipOptions={{ position: 'top' }}
                 />
             );
         }
@@ -187,6 +193,8 @@ const GenericSection = ({ sectionKey }) => {
                     onChange={(e) => handleInputChange(index, field, e.target.value)}
                     rows={3}
                     className="w-full"
+                    tooltip={label}
+                    tooltipOptions={{ position: 'top' }}
                 />
             );
         }
@@ -197,6 +205,8 @@ const GenericSection = ({ sectionKey }) => {
                 value={item[field]}
                 onChange={(e) => handleInputChange(index, field, e.target.value)}
                 className="w-full"
+                tooltip={label}
+                tooltipOptions={{ position: 'top' }}
             />
         );
     };
@@ -205,17 +215,21 @@ const GenericSection = ({ sectionKey }) => {
         // Guard against null/undefined
         if (!item[field]) return null;
 
+        const label = field.split('_').map(word =>
+            word.charAt(0).toUpperCase() + word.slice(1)
+        ).join(' ');
+
         // Handle complex objects
         const value = item[field];
         if (typeof value === 'object' && !Array.isArray(value)) {
-            console.log('value', value);
             // If object has name property, use it
-            if (value.name) return <span>{value.name}</span>;
+            if (value.name) return <span title={label}>{value.name}</span>;
             // If object has text/description property, use it
-            if (value.text || value.description) return <span>{value.text || value.description}</span>;
+            if (value.text || value.description) return <span title={label}>{value.text || value.description}</span>;
             // Fallback to stringify
-            return <span>{JSON.stringify(value)}</span>;
+            return <span title={label}>{JSON.stringify(value)}</span>;
         }
+        
         if (isArrayField(field) && Array.isArray(item[field])) {
             return (
                 <div className="flex flex-wrap gap-2">
@@ -229,19 +243,19 @@ const GenericSection = ({ sectionKey }) => {
         }
 
         if (isDateField(field) && item[field]) {
-            return <span className="text-500">{new Date(item[field]).toLocaleDateString()}</span>;
+            return <span className="text-500" title={label}>{new Date(item[field]).toLocaleDateString()}</span>;
         }
 
         if (isMultilineField(field)) {
-            return <div style={{ whiteSpace: 'pre-line' }} className="text-700 line-height-4">{item[field]}</div>;
+            return <div style={{ whiteSpace: 'pre-line' }} className="text-700 line-height-4" title={label}>{item[field]}</div>;
         }
 
         // Make first field bold
         if (field === Object.keys(item)[0]) {
-            return <span className="font-semibold">{item[field]}</span>;
+            return <span className="font-semibold" title={label}>{item[field]}</span>;
         }
 
-        return <span className="text-primary">{item[field]}</span>;
+        return <span className="text-primary" title={label}>{item[field]}</span>;
     };
 
 

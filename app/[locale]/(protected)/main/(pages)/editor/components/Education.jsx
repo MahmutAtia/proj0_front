@@ -2,6 +2,7 @@
 import React, { useRef, useState } from 'react';
 import { InputText } from 'primereact/inputtext';
 import { Calendar } from 'primereact/calendar';
+import { Button } from 'primereact/button';
 import { useResume } from '../ResumeContext';
 import SectionWrapper from './SectionWrapper';
 import ItemWrapper from './ItemWrapper';
@@ -28,11 +29,12 @@ const Education = ({ sectionKey }) => {
         const newIndex = education.length;
         const newEducation = {
             institution: '',
-            area: '',
-            studyType: '',
-            startDate: '',
-            endDate: '',
-            gpa: ''
+            degree: '',
+            major: '',
+            minor: '',
+            graduation_date: '',
+            gpa: '',
+            relevant_courses: []
         };
         const newData = { ...data };
         newData[sectionKey] = [...education, newEducation];
@@ -46,6 +48,24 @@ const Education = ({ sectionKey }) => {
                 block: 'center'
             });
         }, 100);
+    };
+
+    const addCourse = (index) => {
+        const newData = { ...data };
+        newData[sectionKey][index].relevant_courses = [...(newData[sectionKey][index].relevant_courses || []), ''];
+        setData(newData);
+    };
+
+    const handleCourseChange = (eduIndex, courseIndex, value) => {
+        const newData = { ...data };
+        newData[sectionKey][eduIndex].relevant_courses[courseIndex] = value;
+        setData(newData);
+    };
+
+    const removeCourse = (eduIndex, courseIndex) => {
+        const newData = { ...data };
+        newData[sectionKey][eduIndex].relevant_courses.splice(courseIndex, 1);
+        setData(newData);
     };
 
     const handleAIUpdate = async (index, updatedData) => {
@@ -112,6 +132,20 @@ const Education = ({ sectionKey }) => {
         });
     };
 
+    const formatGraduationDate = (dateString) => {
+        if (!dateString) return '';
+        try {
+            // For YYYY-MM format, add day to make it a valid date
+            const date = new Date(dateString + '-01');
+            return date.toLocaleDateString('en-US', { 
+                year: 'numeric', 
+                month: 'short' 
+            });
+        } catch (error) {
+            return dateString; // Return original if parsing fails
+        }
+    };
+
     return (
         <SectionWrapper
             title="Education"
@@ -146,58 +180,106 @@ const Education = ({ sectionKey }) => {
                                 value={edu.institution}
                                 onChange={(e) => handleInputChange(index, 'institution', e.target.value)}
                                 className="w-full"
+                                tooltip="Institution Name"
+                                tooltipOptions={{ position: 'top' }}
                             />
                             <InputText
-                                placeholder="Area of Study"
-                                value={edu.area}
-                                onChange={(e) => handleInputChange(index, 'area', e.target.value)}
+                                placeholder="Degree"
+                                value={edu.degree}
+                                onChange={(e) => handleInputChange(index, 'degree', e.target.value)}
                                 className="w-full"
+                                tooltip="Degree/Program"
+                                tooltipOptions={{ position: 'top' }}
                             />
                             <InputText
-                                placeholder="Degree Type"
-                                value={edu.studyType}
-                                onChange={(e) => handleInputChange(index, 'studyType', e.target.value)}
+                                placeholder="Major"
+                                value={edu.major}
+                                onChange={(e) => handleInputChange(index, 'major', e.target.value)}
                                 className="w-full"
+                                tooltip="Major Field of Study"
+                                tooltipOptions={{ position: 'top' }}
                             />
-                            <div className="flex gap-2">
-                                <Calendar
-                                    placeholder="Start Date"
-                                    value={edu.startDate}
-                                    onChange={(e) => handleInputChange(index, 'startDate', e.value)}
-                                    className="flex-1"
-                                    monthNavigator
-                                    yearNavigator
-                                    yearRange="2000:2030"
-                                />
-                                <Calendar
-                                    placeholder="End Date"
-                                    value={edu.endDate}
-                                    onChange={(e) => handleInputChange(index, 'endDate', e.value)}
-                                    className="flex-1"
-                                    monthNavigator
-                                    yearNavigator
-                                    yearRange="2000:2030"
-                                />
-                            </div>
+                            <InputText
+                                placeholder="Minor"
+                                value={edu.minor}
+                                onChange={(e) => handleInputChange(index, 'minor', e.target.value)}
+                                className="w-full"
+                                tooltip="Minor Field of Study"
+                                tooltipOptions={{ position: 'top' }}
+                            />
+                            <InputText
+                                placeholder="Graduation Date (YYYY-MM)"
+                                value={edu.graduation_date}
+                                onChange={(e) => handleInputChange(index, 'graduation_date', e.target.value)}
+                                className="w-full"
+                                tooltip="Graduation Date"
+                                tooltipOptions={{ position: 'top' }}
+                            />
                             <InputText
                                 placeholder="GPA"
                                 value={edu.gpa}
                                 onChange={(e) => handleInputChange(index, 'gpa', e.target.value)}
                                 className="w-full"
+                                tooltip="Grade Point Average"
+                                tooltipOptions={{ position: 'top' }}
                             />
+                            <div className="flex flex-column gap-2">
+                                <label>Relevant Courses</label>
+                                <div className="flex flex-wrap gap-2">
+                                    {edu.relevant_courses?.map((course, courseIndex) => (
+                                        <div key={courseIndex} className="flex align-items-center gap-2">
+                                            <InputText
+                                                value={course}
+                                                onChange={(e) => handleCourseChange(index, courseIndex, e.target.value)}
+                                                className="w-10rem"
+                                            />
+                                            <Button
+                                                icon="pi pi-times"
+                                                className="p-button-rounded p-button-text p-button-danger"
+                                                onClick={() => removeCourse(index, courseIndex)}
+                                                tooltip="Remove Course"
+                                                tooltipOptions={{ position: 'top' }}
+                                            />
+                                        </div>
+                                    ))}
+                                    <Button
+                                        icon="pi pi-plus"
+                                        className="p-button-rounded p-button-text"
+                                        onClick={() => addCourse(index)}
+                                        tooltip="Add Course"
+                                        tooltipOptions={{ position: 'top' }}
+                                    />
+                                </div>
+                            </div>
                         </div>
                     }
                     viewContent={
                         <div className="flex flex-column gap-2">
-                            <div className="flex justify-content-between">
-                                <span className="font-semibold">{edu.institution}</span>
-                                <span className="text-500">
-                                    {edu.startDate ? new Date(edu.startDate).toLocaleDateString() : ''} -
-                                    {edu.endDate ? new Date(edu.endDate).toLocaleDateString() : ''}
+                            <div className="flex justify-content-between align-items-start">
+                                <span className="font-semibold" title="Institution Name">{edu.institution}</span>
+                                <span className="text-500 text-right flex-shrink-0 ml-2" title="Graduation Date">
+                                    {formatGraduationDate(edu.graduation_date)}
                                 </span>
                             </div>
-                            <span className="text-primary">{edu.studyType} in {edu.area}</span>
-                            {edu.gpa && <span className="text-700">GPA: {edu.gpa}</span>}
+                            <span className="text-primary font-medium" title="Degree/Program">{edu.degree}</span>
+                            {edu.major && edu.major !== '' && (
+                                <span className="text-600" title="Major Field of Study">Major: {edu.major}</span>
+                            )}
+                            {edu.minor && edu.minor !== '' && (
+                                <span className="text-600" title="Minor Field of Study">Minor: {edu.minor}</span>
+                            )}
+                            {edu.gpa && edu.gpa !== '' && (
+                                <span className="text-700" title="Grade Point Average">GPA: {edu.gpa}</span>
+                            )}
+                            {edu.relevant_courses && edu.relevant_courses.length > 0 && (
+                                <div className="flex flex-wrap gap-1 mt-1">
+                                    {edu.relevant_courses.map((course, courseIndex) => (
+                                        <span key={courseIndex} className="bg-blue-50 text-blue-700 px-2 py-1 border-round text-xs">
+                                            {course}
+                                        </span>
+                                    ))}
+                                </div>
+                            )}
                         </div>
                     }
                 />

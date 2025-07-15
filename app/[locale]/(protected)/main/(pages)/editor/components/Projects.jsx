@@ -29,9 +29,7 @@ const Projects = ({ sectionKey }) => {
         const newProject = {
             name: '',
             description: '',
-            url: '',
-            github: '',
-            keywords: []
+            link: ''
         };
         const newData = { ...data };
         newData[sectionKey] = [...projects, newProject];
@@ -145,62 +143,58 @@ const Projects = ({ sectionKey }) => {
                                 value={project.name}
                                 onChange={(e) => handleInputChange(index, 'name', e)}
                                 className="w-full"
+                                tooltip="Project Name"
+                                tooltipOptions={{ position: 'top' }}
                             />
                             <InputTextarea
                                 placeholder="Description"
                                 value={project.description}
                                 onChange={(e) => handleInputChange(index, 'description', e)}
-                                rows={3}
+                                rows={4}
                                 className="w-full"
+                                tooltip="Project Description"
+                                tooltipOptions={{ position: 'top' }}
                             />
-                            <div className="flex gap-2">
-                                <InputText
-                                    placeholder="Project URL"
-                                    value={project.url}
-                                    onChange={(e) => handleInputChange(index, 'url', e)}
-                                    className="flex-1"
-                                />
-                                <InputText
-                                    placeholder="GitHub URL"
-                                    value={project.github}
-                                    onChange={(e) => handleInputChange(index, 'github', e)}
-                                    className="flex-1"
-                                />
-                            </div>
                             <InputText
-                                placeholder="Technologies (comma-separated)"
-                                value={project.keywords?.join(', ')}
-                                onChange={(e) => handleInputChange(index, 'keywords', {
-                                    target: { value: e.target.value.split(',').map(k => k.trim()) }
-                                })}
+                                placeholder="Project Link/URL"
+                                value={project.link}
+                                onChange={(e) => handleInputChange(index, 'link', e)}
                                 className="w-full"
+                                tooltip="Project Link/URL"
+                                tooltipOptions={{ position: 'top' }}
                             />
                         </div>
                     }
                     viewContent={
                         <div className="flex flex-column gap-2">
-                            <div className="flex justify-content-between">
-                                <span className="font-semibold">{project.name}</span>
-                                <div className="flex gap-2">
-                                    {project.url && (
-                                        <a href={project.url} target="_blank" rel="noopener noreferrer">
-                                            <i className="pi pi-link"></i>
-                                        </a>
-                                    )}
-                                    {project.github && (
-                                        <a href={project.github} target="_blank" rel="noopener noreferrer">
-                                            <i className="pi pi-github"></i>
-                                        </a>
-                                    )}
-                                </div>
+                            <div className="flex justify-content-between align-items-start">
+                                <span 
+                                    className="font-semibold text-900"
+                                    title="Project Name"
+                                >
+                                    {project.name}
+                                </span>
+                                {project.link && project.link !== '' && (
+                                    <a 
+                                        href={project.link} 
+                                        target="_blank" 
+                                        rel="noopener noreferrer"
+                                        className="text-primary"
+                                        title="Project Link"
+                                    >
+                                        <i className="pi pi-external-link"></i>
+                                    </a>
+                                )}
                             </div>
-                            <div style={{ whiteSpace: 'pre-line' }} className="text-700">{project.description}</div>
-                            <div className="flex flex-wrap gap-2">
-                                {project.keywords?.map((tech, i) => (
-                                    <span key={i} className="surface-200 text-700 border-round px-2 py-1">
-                                        {tech}
-                                    </span>
-                                ))}
+                            <div 
+                                style={{ 
+                                    whiteSpace: 'pre-line',
+                                    wordBreak: 'break-word'
+                                }} 
+                                className="text-700 line-height-3"
+                                title="Project Description"
+                            >
+                                {project.description}
                             </div>
                         </div>
                     }
