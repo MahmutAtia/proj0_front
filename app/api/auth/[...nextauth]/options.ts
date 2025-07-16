@@ -41,6 +41,8 @@ const SIGN_IN_HANDLERS: Record<string, SignInHandlerFn> = {
                     access_token: account["access_token"],
                 },
             });
+            console.log("Google response:", response.data); // Add this
+
             account["meta"] = response.data;
             return true;
         } catch (error) {
@@ -88,6 +90,8 @@ export const authOptions: NextAuthOptions = {
                         }
                     );
                     const data = await response.json();
+                    console.log("Login response:", data); // Add this
+
                     if (data) return data;
                 } catch (error) {
                     console.error(error);
@@ -105,102 +109,59 @@ export const authOptions: NextAuthOptions = {
             return handler(user, account, profile, email, credentials);
         },
 
-  async jwt({ user, token, account }) {
-        // --- 1. INITIAL SIGN-IN ---
-        // This block runs only when a user successfully signs in.
-        if (user && account) {
-            console.log("✅ Initial sign-in: Populating token from backend response.");
-            const backendResponse = (account.provider === "credentials" ? user : account.meta) as {
-                user: any;
-                access: string;
-                refresh: string;
-            };
+        async jwt({ user, token, account }) {
+            // --- 1. INITIAL SIGN-IN ---
+            if (user && account) {
+                console.log("✅ Initial sign-in: Populating token from backend response.");
+                const backendResponse = (account.provider === "credentials" ? user : account.meta) as BackendResponse;
+                token.user = backendResponse.user;
+                token.access_token = backendResponse.access;
+                token.refresh_token = backendResponse.refresh;
+                token.ref = getCurrentEpochTime() + BACKEND_ACCESS_TOKEN_LIFETIME;
+                return token;
+            }
 
-            // Persist the data from your backend to the token
-            token.user = backendResponse.user;
-            token.access_token = backendResponse.access;
-            token.refresh_token = backendResponse.refresh;
-            token.ref = getCurrentEpochTime() + BACKEND_ACCESS_TOKEN_LIFETIME;
-            
-            return token;
-        }
+            // --- 2. SUBSEQUENT REQUESTS (TOKEN IS VALID) ---
+            if (token.ref && getCurrentEpochTime() < token.ref) {
+                return token;
+            }
 
-        // --- 2. SUBSEQUENT REQUESTS (TOKEN IS VALID) ---
-        // On subsequent requests, if the access token is still valid, return it.
-        if (token.ref && getCurrentEpochTime() < token.ref) {
-            return token;
-        }
+            // --- 3. TOKEN REFRESH ---
+            console.log("⏳ Access token expired, attempting refresh...");
+            if (!token.refresh_token) {
+                console.error("❌ No refresh token found. Invalidating session completely.");
+                return { ...token, access_token: null, refresh_token: null, ref: null, user: null };
+            }
 
-        // --- 3. SUBSEQUENT REQUESTS (TOKEN IS EXPIRED) ---
-        // If the access token has expired, we need to refresh it.
-        console.log("⏳ Access token expired, attempting refresh...");
-
-        // If we don't have a refresh token, we can't do anything. The session is invalid.
-        if (!token.refresh_token) {
-            console.error("❌ No refresh token found. Invalidating session.");
-            token.user = null; // Invalidate the session
-            return token;
-        }
-
-        try {
-            const response = await fetch(
-                process.env.NEXTAUTH_BACKEND_URL + "/accounts/token/refresh/",
-                {
+            try {
+                const response = await fetch(process.env.NEXTAUTH_BACKEND_URL + "/accounts/token/refresh/", {
                     method: "POST",
                     headers: { "Content-Type": "application/json" },
                     body: JSON.stringify({ refresh: token.refresh_token }),
-                }
-            );
+                });
 
-            const refreshedTokens = await response.json();
+                const refreshedTokens = await response.json();
+                if (!response.ok) throw refreshedTokens;
 
-            if (!response.ok) {
-                // The refresh token was rejected (e.g., expired, revoked)
-                throw new Error("Refresh token failed with status: " + response.status);
+                console.log("✨ Token refreshed successfully.");
+                return {
+                    ...token,
+                    access_token: refreshedTokens.access,
+                    refresh_token: refreshedTokens.refresh ?? token.refresh_token,
+                    ref: getCurrentEpochTime() + BACKEND_ACCESS_TOKEN_LIFETIME,
+                };
+            } catch (error) {
+                console.error("🚨 Error refreshing access token:", error);
+                return { ...token, access_token: null, refresh_token: null, ref: null, user: null, error: "RefreshAccessTokenError" };
             }
-            
-            console.log("✨ Token refreshed successfully.");
-            
-            // Update the token with the new values
-            token.access_token = refreshedTokens.access;
-            // Your backend might or might not return a new refresh token
-            token.refresh_token = refreshedTokens.refresh ?? token.refresh_token;
-            token.ref = getCurrentEpochTime() + BACKEND_ACCESS_TOKEN_LIFETIME;
-
-            return token;
-
-        } catch (error) {
-            console.error("🚨 Error refreshing token:", error);
-            
-            // THE CRITICAL FIX: The refresh failed, so we invalidate the entire session
-            // by setting all key properties to null.
-            token.access_token = null;
-            token.refresh_token = null;
-            token.ref = null;
-            token.user = null; // This effectively logs the user out.
-
-            return token;
-        }
-    },
-    
+        },
 
         async session({ session, token }) {
-            console.log('🎫 Session Callback - Token Debug:', {
-                hasUser: !!token.user,
-                hasAccessToken: !!token.access_token,
-                hasRefreshToken: !!token.refresh_token,
-                accessTokenLength: token.access_token?.length || 0,
-                failedAttempts: token.failedRefreshAttempts || 0,
-                tokenExpiry: token.ref ? new Date(token.ref * 1000).toISOString() : 'none'
-            });
-
-            // Always ensure user data is available if token has user
             if (token.user) {
                 session.user = {
                     ...session.user,
                     ...token.user,
-                    // Ensure these core fields are always available
-                    name: token.user.first_name && token.user.last_name 
+                    name: token.user.first_name && token.user.last_name
                         ? `${token.user.first_name} ${token.user.last_name}`.trim()
                         : token.user.username || token.user.email,
                     email: token.user.email,
@@ -208,31 +169,15 @@ export const authOptions: NextAuthOptions = {
                 };
             }
 
-            // CRITICAL FIX: Always pass accessToken if it exists, even if refresh token is missing
-            if (token.access_token) {
-                session.accessToken = token.access_token;
-                console.log('✅ AccessToken set in session:', session.accessToken.slice(0, 10) + '...');
-            } else {
-                console.log('❌ No accessToken in token object');
-                session.accessToken = undefined;
-            }
-
-            if (token.refresh_token) {
-                session.refreshToken = token.refresh_token;
-                console.log('✅ RefreshToken set in session:', session.refreshToken.slice(0, 10) + '...');
-            } else {
-                session.refreshToken = undefined;
-            }
-
-            // Only clear user if we've completely failed authentication
-            if (!token.user || (token.failedRefreshAttempts && token.failedRefreshAttempts >= 3)) {
-                console.log('🚫 Clearing user session due to repeated failures');
-                session.user = undefined;
-            }
-
+            session.accessToken = token.access_token;
+            session.refreshToken = token.refresh_token;
+            session.error = token.error;
+            
+            // Log final session state for debugging
             console.log('🎫 Final Session:', {
                 hasUser: !!session.user,
                 hasAccessToken: !!session.accessToken,
+                error: session.error,
                 userEmail: session.user?.email || 'none'
             });
 
@@ -257,9 +202,10 @@ export const authOptions: NextAuthOptions = {
 // Add type definitions to prevent TypeScript errors
 declare module "next-auth" {
     interface Session {
-        accessToken?: string;
-        refreshToken?: string;
+        accessToken?: string | null;
+        refreshToken?: string | null;
         user: any;
+        error?: "RefreshAccessTokenError";
     }
 }
 
@@ -269,6 +215,6 @@ declare module "next-auth/jwt" {
         refresh_token?: string | null;
         ref?: number | null;
         user: any;
-        failedRefreshAttempts?: number;
+        error?: "RefreshAccessTokenError";
     }
 }

@@ -1,6 +1,6 @@
 "use client";
 import React, { useState, useRef, useEffect } from 'react';
-import { useSession } from 'next-auth/react';
+import { useSession, signOut } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { Button } from 'primereact/button';
@@ -182,12 +182,15 @@ export default function Layout({ children }) {
         }
     }, []);
 
-    // Effect for handling unauthenticated status
+    // Effect for handling unauthenticated status and session errors
     useEffect(() => {
         if (status === "unauthenticated") {
             router.push('/login');
         }
-    }, [status, router]); // Re-run this effect if status or router changes
+        if (session?.error === "RefreshAccessTokenError") {
+            signOut({ callbackUrl: '/login' });
+        }
+    }, [status, session, router]);
 
     const toggleSidebar = () => {
         const newState = !sidebarCollapsed;
@@ -199,7 +202,7 @@ export default function Layout({ children }) {
         { label: t('dashboard_layout.userMenu.profile'), icon: 'pi pi-user', command: () => router.push('/main/profile') },
         { label: t('dashboard_layout.userMenu.settings'), icon: 'pi pi-cog', command: () => router.push('/main/settings') },
         { separator: true },
-        { label: t('dashboard_layout.userMenu.logout'), icon: 'pi pi-sign-out', command: () => { router.push('/login'); } }
+        { label: t('dashboard_layout.userMenu.logout'), icon: 'pi pi-sign-out', command: () => signOut({ callbackUrl: '/login' }) }
     ];
 
     const sidebarNavItems = [
