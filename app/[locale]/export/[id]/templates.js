@@ -71,5 +71,16 @@ export const MOCK_TEMPLATES_WITH_THEMES = [
       { name: 'Mono', value: 'theme-mono', color: '#333333' },
     ],
   },
-  
+  {
+    id: 't6',
+    name: 'Professional',
+    value: 'template6',
+    previewUrl: 'https://s3.resume.io/uploads/examples/resume/resume_pages/222/persistent-resource/student-resume-examples.jpg',
+    themes: [
+      { name: 'Default', value: 'theme-professional', color: '#005f73' },
+      { name: 'Blue', value: 'theme-blue', color: '#0a9396' },
+      { name: 'Green', value: 'theme-green', color: '#94d2bd' },
+      { name: 'Grey', value: 'theme-grey', color: '#6c757d' },
+    ],
+  },
 ]
