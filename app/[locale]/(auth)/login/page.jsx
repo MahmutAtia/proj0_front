@@ -14,30 +14,37 @@ const LoginPage = () => {
     const toast = useRef(null);
     const router = useRouter();
     const { data: session, status } = useSession();
-    const [lastUser, setLastUser] = useState(null);
+    const [lastUser, setLastUser] = useState(() => {
+        if (typeof window !== 'undefined') { // Ensure localStorage is available
+            const stored = localStorage.getItem('lastUser');
+            return stored ? JSON.parse(stored) : null;
+        }
+        return null;
+    });
 
+    // Effect to save authenticated user to localStorage and update state
     useEffect(() => {
-        const stored = localStorage.getItem('lastUser');
-        if (stored) setLastUser(JSON.parse(stored));
+        if (status === 'authenticated' && session?.user) {
+            const userData = {
+                name: session.user.name,
+                image: session.user.image
+            };
+            console.log("Saving authenticated user to localStorage:", userData);
+            localStorage.setItem('lastUser', JSON.stringify(userData));
+            setLastUser(userData); // Update state immediately
+        }
+    }, [status, session]); // Depend on status and session
 
+    // Effect for redirection after authentication
+    useEffect(() => {
         if (status === 'authenticated') {
-            localStorage.setItem('lastUser', JSON.stringify({
-                name: session?.user?.name,
-                image: session?.user?.image
-            }));
-            // it should redirect to the previous page if there is one else to the dashboard
-            // go to past page if there is one
             if (document.referrer) {
-                // go to past page if there is one
                 router.back();
             } else {
-                // else go to dashboard
                 router.push('/main');
             }
-
-
-}
-    }, [status, router, session]);
+        }
+    }, [status, router]); // Depend on status and router
 
 const handleSocialLogin = async (provider) => {
     try {
