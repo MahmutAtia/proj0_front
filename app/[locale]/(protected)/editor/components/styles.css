@@ -148,3 +148,22 @@
 .photo-editor .reactEasyCrop_CropAreaRound {
     border: 2px solid var(--primary-color);
 }
+
+@media (max-width: 700px) {
+    .personal-info-main-row {
+        flex-direction: column !important;
+        gap: 1.5rem;
+        align-items: stretch !important;
+        padding: 1rem 0.25rem;
+    }
+    .personal-info-avatar {
+        margin: 0 auto 1rem auto !important;
+        max-width: 100%;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+    .personal-info-details {
+        width: 100%;
+    }
+}
