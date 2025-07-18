@@ -107,7 +107,7 @@ const ManualEditDialog = ({
                 document_type: section.documentType
             };
 
-            const response = await aiApi.post(`/documents/edit_section/`, payload);
+            const response = await aiApi.post(`/documents/edit_section`, payload);
             const { feedback_message, ...updatedSectionData } = response.data;
 
             if (section.type === 'paragraph') {
