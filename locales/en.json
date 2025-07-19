@@ -9,8 +9,18 @@
     "create": "Create",
     "search": "Search...",
     "tryAgain": "Try Again",
-    "documents": "Documents"
+    "documents": "Documents",
+    "remote": "Remote",
+    "source": "Source",
+    "day": "day",
+    "hour": "hour",
+    "ago": "ago",
+    "justNow": "Just now",
+    "sortBy": "Sort By",
+    "refresh": "Refresh",
+    "viewAll": "View All"
   },
+
   "resumes": {
     "title": "My Resumes",
     "createNew": "Create New Resume",
@@ -188,6 +198,13 @@
     "logout": "Logout"
   },
   "dashboard_main": {
+          "jobPostings": {
+      "title": "Latest Job Postings",
+      "subtitle": "Showing {count} jobs ({status})",
+      "noJobs": "No jobs found yet. The system will automatically search for jobs based on your default resume's keywords.",
+      "startScraping": "Start Job Search",
+      "viewMore": "View {count} more jobs"
+    },
     "welcomeBanner": {
       "title": "Welcome back, {userName}!",
       "userFallback": "User",
@@ -301,5 +318,47 @@
     "message": "Something went wrong.",
     "imageAlt": "Error Image",
     "goToDashboard": "Go to Dashboard"
-  }
+  },
+
+
+"jobFeed": {
+    "title": "Job Feed",
+    "subtitle": "Showing {filtered} of {count} jobs found",
+    "loading": "Loading job opportunities...",
+    "loadingInitial": "Loading job feed...",
+    "fetching": "Fetching jobs...",
+    "searchStarted": "Search Started",
+    "searchStartedDetail": "Refreshing jobs based on your criteria...",
+    "autoUpdate": {
+        "status": "Auto-Update Status",
+        "active": "Active",
+        "inactive": "Inactive",
+        "description": "Jobs are automatically updated every 5 minutes based on your default resume keywords",
+        "inactiveDescription": "Automatic job updates are not running"
+    },
+    "filters": {
+        "search": "Job title, keyword...",
+        "location": "City or Country",
+        "remoteOnly": "Remote Only"
+    },
+    "sorting": {
+        "relevance": "Relevance",
+        "recent": "Most Recent",
+        "company": "Company A-Z",
+        "title": "Title A-Z"
+    },
+    "job": {
+        "locationNotSpecified": "Not specified",
+        "addedAgo": "Added",
+        "viewOn": "View on",
+        "applyNow": "Apply Now"
+    },
+    "empty": {
+        "title": "No jobs found",
+        "description": "No job postings found matching your criteria. Try broadening your search!"
+    }
+}
+
+
+
 }

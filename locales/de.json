@@ -9,7 +9,16 @@
     "create": "Erstellen",
     "search": "Suchen...",
     "tryAgain": "Erneut versuchen",
-    "documents": "Dokumente"
+    "documents": "Dokumente",
+    "remote": "Remote",
+    "source": "Quelle",
+    "day": "Tag",
+    "hour": "Stunde",
+    "ago": "vor",
+    "justNow": "Gerade jetzt",
+    "sortBy": "Sortieren nach",
+    "refresh": "Aktualisieren",
+    "viewAll": "Alle anzeigen"
   },
   "resumes": {
     "title": "Meine Lebensläufe",
@@ -100,6 +109,13 @@
     "couldNotLoadResumes": "Lebensläufe konnten nicht geladen werden. Bitte versuchen Sie es später erneut."
   },
   "dashboard_main": {
+    "jobPostings": {
+      "title": "Neueste Stellenausschreibungen",
+      "subtitle": "Zeige {count} Jobs ({status})",
+      "noJobs": "Noch keine Jobs gefunden. Das System wird automatisch nach Jobs basierend auf den Schlüsselwörtern Ihres Standard-Lebenslaufs suchen.",
+      "startScraping": "Jobsuche starten",
+      "viewMore": "{count} weitere Jobs anzeigen"
+    },
     "welcomeBanner": {
       "title": "Willkommen zurück, {userName}!",
       "userFallback": "Benutzer",
@@ -111,22 +127,22 @@
     "quickActions": {
       "createDocument": {
         "title": "Neues Dokument erstellen",
-        "description": "Anschreiben, Empfehlung oder andere professionelle Dokumente erstellen.",
-        "button": "Jetzt erstellen"
+        "description": "Erstellen Sie ein Anschreiben, eine Empfehlung oder ein anderes professionelles Dokument.",
+        "button": "Jetzt generieren"
       },
       "newResume": {
         "title": "Neuer Lebenslauf",
-        "description": "Einen neuen herausragenden Lebenslauf von Grund auf oder aus einer Vorlage erstellen.",
+        "description": "Erstellen Sie einen neuen herausragenden Lebenslauf von Grund auf oder mit einer Vorlage.",
         "button": "Lebenslauf erstellen"
       },
       "myPortfolio": {
         "title": "Mein Portfolio",
         "description": "Verwalten und veröffentlichen Sie Ihre persönliche Karriere-Website.",
-        "button": "Seite bearbeiten"
+        "button": "Website bearbeiten"
       },
       "jobSearch": {
         "title": "Jobsuche",
-        "description": "Entdecken und verfolgen Sie relevante Stellenangebote.",
+        "description": "Entdecken und verfolgen Sie relevante Stellenmöglichkeiten.",
         "button": "Jobs finden"
       }
     },
@@ -137,14 +153,14 @@
       "noDefaultSelected": "Kein Standard-Lebenslauf ausgewählt. Wählen Sie einen aus, um Ihr Dashboard zu personalisieren.",
       "changeDefault": "Standard ändern",
       "selectDefault": "Standard auswählen",
-      "buttonChooseDefault": "Ihren Standard-Lebenslauf auswählen",
+      "buttonChooseDefault": "Wählen Sie Ihren Standard-Lebenslauf",
       "tooltipEdit": "Standard-Lebenslauf bearbeiten",
       "tooltipViewAll": "Alle Lebensläufe anzeigen, um Standard auszuwählen oder zu ändern"
     },
     "relatedDocuments": {
       "title": "Verknüpfte Dokumente",
       "loading": "Dokumente werden geladen...",
-      "selectDefaultPrompt": "Wählen Sie einen Standard-Lebenslauf aus, um seine verknüpften Dokumente hier zu sehen.",
+      "selectDefaultPrompt": "Wählen Sie einen Standard-Lebenslauf aus, um die verknüpften Dokumente hier zu sehen.",
       "documentsFor": "Dokumente für \"{resumeTitle}\"",
       "manageAll": "Alle verwalten",
       "viewMore": "{count} weitere anzeigen...",
@@ -155,13 +171,13 @@
     "toast": {
       "loadError": "Lebenslauf-Daten konnten nicht geladen werden.",
       "actionRequiredSummary": "Aktion erforderlich",
-      "actionRequiredDetail": "Bitte wählen Sie einen Lebenslauf von der \"Alle Lebensläufe\"-Seite aus, um ihn als Standard festzulegen.",
+      "actionRequiredDetail": "Bitte wählen Sie einen Lebenslauf aus, um ihn als Standard auf der Seite \"Alle Lebensläufe\" festzulegen.",
       "noResumeSummary": "Kein Lebenslauf",
       "noResumeDetail": "Kein Lebenslauf ausgewählt, um den Standard-Status zu ändern.",
       "noResumeForDoc": "Bitte erstellen Sie zuerst einen Lebenslauf, bevor Sie Dokumente generieren.",
       "updateSuccess": "Master-Lebenslauf-Status aktualisiert.",
       "updateError": "Master-Lebenslauf-Status konnte nicht aktualisiert werden.",
-      "generationStartedSummary": "Dokumentenerstellung gestartet",
+      "generationStartedSummary": "Dokumentgenerierung gestartet",
       "generationStartedDetail": "Ihr Dokument wird erstellt."
     },
     "dialog": {

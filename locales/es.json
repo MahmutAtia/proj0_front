@@ -9,7 +9,16 @@
     "create": "Crear",
     "search": "Buscar...",
     "tryAgain": "Intentar de nuevo",
-    "documents": "Documentos"
+    "documents": "Documentos",
+    "remote": "Remoto",
+    "source": "Fuente",
+    "day": "día",
+    "hour": "hora",
+    "ago": "hace",
+    "justNow": "Ahora mismo",
+    "sortBy": "Ordenar por",
+    "refresh": "Actualizar",
+    "viewAll": "Ver todo"
   },
   "resumes": {
     "title": "Mis Currículums",
@@ -89,10 +98,17 @@
   }
 },
   "dashboard_main": {
+    "jobPostings": {
+      "title": "Últimas Ofertas de Trabajo",
+      "subtitle": "Mostrando {count} trabajos ({status})",
+      "noJobs": "No se encontraron trabajos aún. El sistema buscará automáticamente trabajos basándose en las palabras clave de tu currículum predeterminado.",
+      "startScraping": "Comenzar Búsqueda de Trabajo",
+      "viewMore": "Ver {count} trabajos más"
+    },
     "welcomeBanner": {
       "title": "¡Bienvenido de vuelta, {userName}!",
       "userFallback": "Usuario",
-      "subtitle": "Aquí tienes la vista general de tu panel de carrera."
+      "subtitle": "Aquí tienes una vista general de tu panel de carrera."
     },
     "actionCard": {
       "explore": "Explorar"
@@ -100,30 +116,30 @@
     "quickActions": {
       "createDocument": {
         "title": "Crear Nuevo Documento",
-        "description": "Generar una carta de presentación, recomendación u otros documentos profesionales.",
+        "description": "Generar una carta de presentación, recomendación u otro documento profesional.",
         "button": "Generar Ahora"
       },
       "newResume": {
         "title": "Nuevo Currículum",
-        "description": "Crear un nuevo currículum destacado desde cero o desde una plantilla.",
+        "description": "Crear un nuevo currículum destacado desde cero o una plantilla.",
         "button": "Crear Currículum"
       },
       "myPortfolio": {
         "title": "Mi Portafolio",
-        "description": "Gestionar y publicar tu sitio web personal de carrera.",
+        "description": "Gestionar y publicar tu sitio web de carrera personal.",
         "button": "Editar Sitio"
       },
       "jobSearch": {
-        "title": "Búsqueda de Empleo",
+        "title": "Búsqueda de Trabajo",
         "description": "Descubrir y seguir oportunidades laborales relevantes.",
-        "button": "Buscar Empleos"
+        "button": "Buscar Trabajos"
       }
     },
     "defaultResume": {
       "title": "Currículum Predeterminado",
       "loading": "Cargando Currículum Predeterminado...",
       "lastUpdated": "Última actualización: {date}",
-      "noDefaultSelected": "No se ha seleccionado currículum predeterminado. Elige uno para personalizar tu panel.",
+      "noDefaultSelected": "No hay currículum predeterminado seleccionado. Elige uno para personalizar tu panel.",
       "changeDefault": "Cambiar Predeterminado",
       "selectDefault": "Seleccionar Predeterminado",
       "buttonChooseDefault": "Elige Tu Currículum Predeterminado",
@@ -137,7 +153,7 @@
       "documentsFor": "Documentos para \"{resumeTitle}\"",
       "manageAll": "Gestionar Todos",
       "viewMore": "Ver {count} más...",
-      "noDocuments": "Aún no hay documentos vinculados a este currículum.",
+      "noDocuments": "No hay documentos vinculados a este currículum aún.",
       "addDocument": "Agregar Documento",
       "tooltipManageAll": "Ir a la Página de Documentos"
     },
@@ -146,12 +162,12 @@
       "actionRequiredSummary": "Acción Requerida",
       "actionRequiredDetail": "Por favor selecciona un currículum para establecer como predeterminado desde la página \"Todos los Currículums\".",
       "noResumeSummary": "Sin Currículum",
-      "noResumeDetail": "No se seleccionó currículum para cambiar el estado predeterminado.",
+      "noResumeDetail": "No hay currículum seleccionado para cambiar el estado predeterminado.",
       "noResumeForDoc": "Por favor crea un currículum primero antes de generar documentos.",
       "updateSuccess": "Estado del currículum maestro actualizado.",
       "updateError": "No se pudo actualizar el estado del currículum maestro.",
       "generationStartedSummary": "Generación de Documento Iniciada",
-      "generationStartedDetail": "Tu documento se está generando."
+      "generationStartedDetail": "Se está generando tu documento."
     },
     "dialog": {
       "resumeIdLabel": "ID del Currículum: {id}"

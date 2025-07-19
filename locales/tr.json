@@ -8,7 +8,17 @@
     "edit": "Düzenle",
     "create": "Oluştur",
     "search": "Ara...",
-    "tryAgain": "Tekrar Dene"
+    "tryAgain": "Tekrar Dene",
+    "documents": "Belgeler",
+    "remote": "Uzaktan",
+    "source": "Kaynak",
+    "day": "gün",
+    "hour": "saat",
+    "ago": "önce",
+    "justNow": "Şimdi",
+    "sortBy": "Şuna göre sırala",
+    "refresh": "Yenile",
+    "viewAll": "Tümünü görüntüle"
   },
   "resumes": {
     "title": "Özgeçmişlerim",
@@ -88,8 +98,15 @@
   }
 },
   "dashboard_main": {
+    "jobPostings": {
+      "title": "Son İş İlanları",
+      "subtitle": "{count} iş gösteriliyor ({status})",
+      "noJobs": "Henüz iş bulunamadı. Sistem otomatik olarak varsayılan özgeçmişinizin anahtar kelimelerine göre iş arayacak.",
+      "startScraping": "İş Aramayı Başlat",
+      "viewMore": "{count} iş daha görüntüle"
+    },
     "welcomeBanner": {
-      "title": "Tekrar hoş geldiniz, {userName}!",
+      "title": "Tekrar hoş geldin, {userName}!",
       "userFallback": "Kullanıcı",
       "subtitle": "İşte kariyer kontrol panelinizin genel görünümü."
     },
@@ -99,12 +116,12 @@
     "quickActions": {
       "createDocument": {
         "title": "Yeni Belge Oluştur",
-        "description": "Ön yazı, tavsiye mektubu veya başka profesyonel belgeler oluşturun.",
+        "description": "Bir kapak mektubu, tavsiye veya diğer profesyonel belgeleri oluşturun.",
         "button": "Şimdi Oluştur"
       },
       "newResume": {
         "title": "Yeni Özgeçmiş",
-        "description": "Sıfırdan veya şablondan göze çarpan yeni bir özgeçmiş hazırlayın.",
+        "description": "Sıfırdan veya şablondan yeni bir öne çıkan özgeçmiş oluşturun.",
         "button": "Özgeçmiş Oluştur"
       },
       "myPortfolio": {
@@ -121,19 +138,19 @@
     "defaultResume": {
       "title": "Varsayılan Özgeçmiş",
       "loading": "Varsayılan Özgeçmiş Yükleniyor...",
-      "lastUpdated": "Son güncellenme: {date}",
-      "noDefaultSelected": "Varsayılan özgeçmiş seçilmedi. Kontrol panelinizi kişiselleştirmek için birini seçin.",
+      "lastUpdated": "Son güncelleme: {date}",
+      "noDefaultSelected": "Varsayılan özgeçmiş seçilmedi. Kontrol panelinizi kişiselleştirmek için bir tane seçin.",
       "changeDefault": "Varsayılanı Değiştir",
       "selectDefault": "Varsayılan Seç",
       "buttonChooseDefault": "Varsayılan Özgeçmişinizi Seçin",
       "tooltipEdit": "Varsayılan Özgeçmişi Düzenle",
-      "tooltipViewAll": "Varsayılanı seçmek veya değiştirmek için tüm özgeçmişleri görüntüle"
+      "tooltipViewAll": "Varsayılan seçmek veya değiştirmek için tüm özgeçmişleri görüntüle"
     },
     "relatedDocuments": {
       "title": "Bağlı Belgeler",
       "loading": "Belgeler yükleniyor...",
-      "selectDefaultPrompt": "Bağlı belgelerini burada görmek için varsayılan bir özgeçmiş seçin.",
-      "documentsFor": "\"{resumeTitle}\" için Belgeler",
+      "selectDefaultPrompt": "Bağlı belgeleri burada görmek için varsayılan özgeçmiş seçin.",
+      "documentsFor": "\"{resumeTitle}\" için belgeler",
       "manageAll": "Tümünü Yönet",
       "viewMore": "{count} tane daha görüntüle...",
       "noDocuments": "Bu özgeçmişe henüz bağlı belge yok.",
@@ -145,8 +162,8 @@
       "actionRequiredSummary": "Eylem Gerekli",
       "actionRequiredDetail": "Lütfen \"Tüm Özgeçmişler\" sayfasından varsayılan olarak ayarlamak için bir özgeçmiş seçin.",
       "noResumeSummary": "Özgeçmiş Yok",
-      "noResumeDetail": "Varsayılan durumunu değiştirmek için özgeçmiş seçilmedi.",
-      "noResumeForDoc": "Belge oluşturmadan önce lütfen bir özgeçmiş oluşturun.",
+      "noResumeDetail": "Varsayılan durumu değiştirmek için seçili özgeçmiş yok.",
+      "noResumeForDoc": "Belge oluşturmadan önce lütfen önce bir özgeçmiş oluşturun.",
       "updateSuccess": "Ana özgeçmiş durumu güncellendi.",
       "updateError": "Ana özgeçmiş durumu güncellenemedi.",
       "generationStartedSummary": "Belge Oluşturma Başladı",
@@ -156,60 +173,41 @@
       "resumeIdLabel": "Özgeçmiş ID: {id}"
     }
   },
-  "dashboard_layout": {
-    "logo": "CareerFlow",
-    "sidebar": {
-      "settings": "Ayarlar",
-      "overview": "Genel Bakış",
-      "resumes": "Özgeçmişler",
-      "myWebsite": "Web Sitem",
-      "atsChecker": "ATS Denetleyici",
-      "jobFeed": "İş Akışı",
-      "scholarships": "Burslar"
+  "jobFeed": {
+    "title": "İş Akışı",
+    "subtitle": "{count} işten {filtered} tanesi gösteriliyor",
+    "loading": "İş fırsatları yükleniyor...",
+    "loadingInitial": "İş akışı yükleniyor...",
+    "fetching": "İşler aranıyor...",
+    "searchStarted": "Arama Başladı",
+    "searchStartedDetail": "İşler kriterlerinize göre güncelleniyor...",
+    "autoUpdate": {
+      "status": "Otomatik Güncelleme Durumu",
+      "active": "Aktif",
+      "inactive": "Aktif Değil",
+      "description": "İşler varsayılan özgeçmişinizin anahtar kelimelerine göre her 5 dakikada otomatik olarak güncellenir",
+      "inactiveDescription": "Otomatik iş güncellemeleri çalışmıyor"
     },
-    "topbar": {
-      "expandSidebar": "Kenar Çubuğunu Genişlet",
-      "collapseSidebar": "Kenar Çubuğunu Daralt",
-      "searchPlaceholder": "Panoda ara...",
-      "userFallback": "Kullanıcı"
+    "filters": {
+      "search": "İş başlığı, anahtar kelime...",
+      "location": "Şehir veya Ülke",
+      "remoteOnly": "Sadece Uzaktan"
     },
-    "userMenu": {
-      "profile": "Profil",
-      "settings": "Ayarlar",
-      "logout": "Oturumu Kapat"
+    "sorting": {
+      "relevance": "İlgililik",
+      "recent": "En Son",
+      "company": "Şirket A-Z",
+      "title": "Başlık A-Z"
     },
-    "toast": {
-      "setDefault": "Özgeçmiş varsayılan olarak ayarlandı.",
-      "unsetDefault": "Özgeçmiş varsayılan olarak kaldırıldı."
+    "job": {
+      "locationNotSpecified": "Belirtilmedi",
+      "addedAgo": "Eklendi",
+      "viewOn": "Şurada görüntüle",
+      "applyNow": "Şimdi Başvur"
+    },
+    "empty": {
+      "title": "İş bulunamadı",
+      "description": "Kriterlerinizle eşleşen iş ilanı bulunamadı. Aramanızı genişletmeyi deneyin!"
     }
-  },
-  "errors": {
-    "userNotAuthenticated": "Kullanıcı doğrulanmadı.",
-    "backendUrlNotConfigured": "Backend URL (NEXT_PUBLIC_BACKEND_URL) yapılandırılmadı.",
-    "requestTimeout": "İstek zaman aşımına uğradı. Bağlantınızı kontrol edin veya tekrar deneyin.",
-    "serverError": "Sunucu Hatası: {status} - {message}",
-    "noResponse": "Sunucudan yanıt yok. Ağ bağlantısını veya backend durumunu kontrol edin.",
-    "unexpectedError": "Beklenmeyen bir hata oluştu.",
-    "invalidDataFormat": "Backend'den geçersiz veri formatı alındı.",
-    "couldNotLoadResumes": "Özgeçmişler yüklenemedi. Lütfen daha sonra tekrar deneyin."
-  },
-  "login": {
-    "errorSummary": "Hata",
-    "errorDetail": "{{provider}} ile giriş yapılamadı",
-    "welcomeBack": "Tekrar hoş geldin, {{name}}!",
-    "signInWithGoogle": "Google ile Giriş Yap",
-    "signInWithLinkedIn": "LinkedIn ile Giriş Yap"
-  },
-  "accessDenied": {
-    "title": "Erişim Reddedildi",
-    "message": "Gerekli izinlere sahip değilsiniz.",
-    "imageAlt": "Erişim Reddedildi Resmi",
-    "goToDashboard": "Kontrol Paneline Git"
-  },
-  "errorPage": {
-    "title": "Hata Oluştu",
-    "message": "Bir şeyler yanlış gitti.",
-    "imageAlt": "Hata Resmi",
-    "goToDashboard": "Kontrol Paneline Git"
   }
 }
