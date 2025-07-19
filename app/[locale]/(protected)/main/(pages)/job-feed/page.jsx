@@ -10,148 +10,77 @@ import { Dropdown } from 'primereact/dropdown';
 import { Checkbox } from 'primereact/checkbox';
 import { ProgressSpinner } from 'primereact/progressspinner';
 import { Toast } from 'primereact/toast';
-import api from '@/lib/axios';
+import { Badge } from 'primereact/badge';
+import { useJobService } from '@/hooks/useJobService';
+import { useTranslation } from '@/hooks/useTranslation';
 import styles from './JobFeed.module.css';
-
-const LOCAL_STORAGE_KEY = 'jobFeedData';
-const DATA_EXPIRY_MS = 15 * 60 * 1000; // 15 minutes
 
 const JobFeedPage = () => {
     const router = useRouter();
     const toast = useRef(null);
-
-    const [allJobs, setAllJobs] = useState([]); // Holds all fetched/cached jobs
-    const [filteredJobs, setFilteredJobs] = useState([]); // Jobs after client-side filtering
-    const [loading, setLoading] = useState(true);
-    const [error, setError] = useState(null);
-    const [userLocation, setUserLocation] = useState({ country: '', city: '' }); // User's detected IP location
-    const [searchLocation, setSearchLocation] = useState({ country: '', city: '' }); // Location used for the current search
-
+    const { t } = useTranslation();
+    
+    // Use the centralized job service
+    const { jobs: allJobs, loading, getFilteredJobs, refresh, isServiceRunning } = useJobService();
+    
+    const [filteredJobs, setFilteredJobs] = useState([]);
     const [searchTerm, setSearchTerm] = useState('');
-    const [locationFilterInput, setLocationFilterInput] = useState(''); // Input field for location
+    const [locationFilterInput, setLocationFilterInput] = useState('');
     const [isRemote, setIsRemote] = useState(false);
+    const [mounted, setMounted] = useState(false);
 
     const sortOptions = [
-        { label: 'Relevance', value: 'relevance' },
-        // Add date sort if your API provides a reliable date field
-        // { label: 'Date Posted (Newest)', value: 'date_newest' },
+        { label: t('jobFeed.sorting.relevance') || 'Relevance', value: 'relevance' },
+        { label: t('jobFeed.sorting.recent') || 'Most Recent', value: 'recent' },
+        { label: t('jobFeed.sorting.company') || 'Company A-Z', value: 'company_asc' },
+        { label: t('jobFeed.sorting.title') || 'Title A-Z', value: 'title_asc' }
     ];
     const [sortKey, setSortKey] = useState(sortOptions[0].value);
     const [layout, setLayout] = useState('grid');
 
+    // Track mounted state for hydration safety
     useEffect(() => {
-        // Attempt to load from localStorage first
-        try {
-            const cachedDataString = localStorage.getItem(LOCAL_STORAGE_KEY);
-            if (cachedDataString) {
-                const cachedData = JSON.parse(cachedDataString);
-                const now = new Date().getTime();
-                if (cachedData.jobs && (now - cachedData.timestamp < DATA_EXPIRY_MS)) {
-                    setAllJobs(cachedData.jobs);
-                    setUserLocation(cachedData.location || { country: '', city: '' });
-                    setSearchLocation(cachedData.location || { country: '', city: '' });
-                    setLocationFilterInput(cachedData.location?.city || '');
-                    setLoading(false);
-                    toast.current?.show({ severity: 'info', summary: 'Loaded Cached Data', detail: 'Displaying recently fetched jobs.', life: 3000 });
-                    return; // Exit if valid cache is found
-                } else {
-                    localStorage.removeItem(LOCAL_STORAGE_KEY); // Clear expired cache
-                }
-            }
-        } catch (e) {
-            console.warn("Failed to read from localStorage", e);
-        }
-
-        // If no valid cache, fetch user's IP location then jobs
-        fetch('https://ipapi.co/json/')
-            .then((response) => response.json())
-            .then((data) => {
-                const country = data.country_name;
-                const city = data.city;
-                setUserLocation({ country, city });
-                setSearchLocation({ country, city }); // Set initial search location
-                setLocationFilterInput(city || ''); // Pre-fill location input
-                fetchJobsAPI(country, city, "developer jobs", city || "default");
-            })
-            .catch((err) => {
-                console.error("Error fetching user location:", err);
-                setError("Could not fetch your location. Please enter one manually or jobs will be fetched for a default location.");
-                toast.current?.show({ severity: 'warn', summary: 'Location Error', detail: 'Could not fetch your location. Using defaults.' });
-                fetchJobsAPI(null, null, "developer jobs", "default"); // Fetch with default
-            });
+        setMounted(true);
     }, []);
 
-    const fetchJobsAPI = async (country, city, currentSearchTerm, currentGoogleSearchLocation) => {
-        setLoading(true);
-        setError(null);
-
-        const apiUrl = `${process.env.NEXT_PUBLIC_AI_API_URL}/scraper/scrape-jobs/`;
-        const requestBody = {
-            search_term: currentSearchTerm || "jobs",
-            location: currentGoogleSearchLocation || "default", // API uses this for its own location logic
-            country: country || "default",
-        };
-
-        try {
-            const response = await fetch(apiUrl, {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify(requestBody),
-            });
-            if (!response.ok) {
-                const errorData = await response.json().catch(() => ({ message: "Unknown API error" }));
-                throw new Error(`API Error: ${response.status} - ${errorData.detail || errorData.message || "Failed to fetch jobs"}`);
-            }
-            const data = await response.json();
-            setAllJobs(data || []);
-            setSearchLocation({ country: country || '', city: city || '' }); // Update search location state
-
-            // Save to localStorage
-            try {
-                const cacheData = {
-                    jobs: data || [],
-                    timestamp: new Date().getTime(),
-                    location: { country, city }
-                };
-                localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(cacheData));
-            } catch (e) {
-                console.warn("Failed to save jobs to localStorage", e);
-            }
-
-        } catch (err) {
-            console.error("Error fetching job postings:", err);
-            setError(err.message || "Failed to fetch job postings. Please try again later.");
-            toast.current?.show({ severity: 'error', summary: 'Fetch Error', detail: err.message || "Failed to fetch jobs." });
-            setAllJobs([]);
-        } finally {
-            setLoading(false);
-        }
-    };
-
+    // Apply filters whenever inputs change
     useEffect(() => {
-        // Client-side filtering logic
-        let currentJobs = [...allJobs];
+        if (!mounted || !getFilteredJobs) return;
 
-        // Filter by remote
-        if (isRemote) {
-            currentJobs = currentJobs.filter(job => job.is_remote);
+        let filtered = getFilteredJobs({
+            searchTerm: searchTerm.trim(),
+            location: locationFilterInput.trim(),
+            isRemote: isRemote
+        });
+
+        // Apply sorting
+        switch (sortKey) {
+            case 'recent':
+                filtered.sort((a, b) => (b.addedAt || 0) - (a.addedAt || 0));
+                break;
+            case 'company_asc':
+                filtered.sort((a, b) => (a.company || '').localeCompare(b.company || ''));
+                break;
+            case 'title_asc':
+                filtered.sort((a, b) => (a.title || '').localeCompare(b.title || ''));
+                break;
+            case 'relevance':
+            default:
+                break;
         }
 
-        // Add sorting logic here if API doesn't sort or if more complex client-side sort is needed
-        // For 'date_newest', you'd need a reliable date field from the API.
-        // Example: if (sortKey === 'date_newest') { currentJobs.sort((a, b) => new Date(b.posted_date) - new Date(a.posted_date)); }
-
-        setFilteredJobs(currentJobs);
-    }, [allJobs, isRemote, sortKey]); // Re-filter when these change
+        setFilteredJobs(filtered);
+    }, [allJobs, searchTerm, locationFilterInput, isRemote, sortKey, getFilteredJobs, mounted]);
 
     const handleSearch = () => {
-        // Use locationFilterInput for the city in the search, fallback to userLocation.city if empty
-        const cityToSearch = locationFilterInput || userLocation.city;
-        // For country, prioritize userLocation.country if locationFilterInput is just a city,
-        // or allow for a country to be part of locationFilterInput (more complex parsing needed for that)
-        const countryToSearch = userLocation.country; // Simplified: assumes locationFilterInput is city-level
-
-        fetchJobsAPI(countryToSearch, cityToSearch, searchTerm, cityToSearch);
+        // Trigger a manual refresh of the job service
+        refresh();
+        toast.current?.show({ 
+            severity: 'info', 
+            summary: t('jobFeed.searchStarted') || 'Search Started', 
+            detail: t('jobFeed.searchStartedDetail') || 'Refreshing jobs based on your criteria...', 
+            life: 3000 
+        });
     };
 
     const jobItemTemplate = (job, currentLayout) => {
@@ -165,17 +94,21 @@ const JobFeedPage = () => {
                                     <div className="text-2xl font-bold text-900">{job.title}</div>
                                     <div className="text-lg text-600">{job.company}</div>
                                     <div className="flex align-items-center gap-3">
-                                        <span><i className="pi pi-map-marker mr-1"></i>{job.location || 'Not specified'}</span>
-                                        {job.is_remote && (<span className="p-tag p-tag-success">Remote</span>)}
+                                        <span><i className="pi pi-map-marker mr-1"></i>{job.location || t('jobFeed.job.locationNotSpecified') || 'Not specified'}</span>
+                                        {job.is_remote && (<span className="p-tag p-tag-success">{t('common.remote') || 'Remote'}</span>)}
                                     </div>
+                                    {job.addedAt && (
+                                        <div className="text-sm text-color-secondary">
+                                            {t('jobFeed.job.addedAgo') || 'Added'} {formatTimeAgo(job.addedAt)}
+                                        </div>
+                                    )}
                                     <a href={job.job_url} target="_blank" rel="noopener noreferrer" className="p-button p-button-sm p-button-text mt-2">
-                                        View on {job.site || 'Source'} <i className="pi pi-external-link ml-1"></i>
+                                        {t('jobFeed.job.viewOn') || 'View on'} {job.site || t('common.source') || 'Source'} <i className="pi pi-external-link ml-1"></i>
                                     </a>
                                 </div>
                                 <div className="flex sm:flex-column align-items-center sm:align-items-end gap-3 sm:gap-2">
-                                    {/* Placeholder for date or other info */}
-                                    {/* <span className="text-sm text-500">{job.posted_date}</span> */}
-                                    <Button label="Apply Now" icon="pi pi-send" className="p-button-raised p-button-sm" onClick={() => window.open(job.job_url, '_blank')} />
+                                    {job.site && <Badge value={job.site.toUpperCase()} severity="secondary" />}
+                                    <Button label={t('jobFeed.job.applyNow') || 'Apply Now'} icon="pi pi-send" className="p-button-raised p-button-sm" onClick={() => window.open(job.job_url, '_blank')} />
                                 </div>
                             </div>
                         </div>
@@ -191,14 +124,24 @@ const JobFeedPage = () => {
                         <div className="text-lg font-bold text-center mb-2">{job.title}</div>
                         <div className="text-md text-600 text-center mb-3">{job.company}</div>
                         <div className="text-sm text-500 mb-3">
-                            <i className="pi pi-map-marker mr-1"></i>{job.location || 'Not specified'}
-                            {job.is_remote && <span className="p-tag p-tag-info ml-2">Remote</span>}
+                            <i className="pi pi-map-marker mr-1"></i>{job.location || t('jobFeed.job.locationNotSpecified') || 'Not specified'}
+                            {job.is_remote && <span className="p-tag p-tag-info ml-2">{t('common.remote') || 'Remote'}</span>}
                         </div>
+                        {job.addedAt && (
+                            <div className="text-xs text-color-secondary mb-3 text-center">
+                                {t('jobFeed.job.addedAgo') || 'Added'} {formatTimeAgo(job.addedAt)}
+                            </div>
+                        )}
+                        {job.site && (
+                            <div className="text-center mb-3">
+                                <Badge value={job.site.toUpperCase()} severity="secondary" />
+                            </div>
+                        )}
                         <div className="mt-auto flex flex-column gap-2">
-                             <a href={job.job_url} target="_blank" rel="noopener noreferrer" className="p-button p-button-sm p-button-outlined w-full">
-                                View on {job.site || 'Source'}
+                            <a href={job.job_url} target="_blank" rel="noopener noreferrer" className="p-button p-button-sm p-button-outlined w-full">
+                                {t('jobFeed.job.viewOn') || 'View on'} {job.site || t('common.source') || 'Source'}
                             </a>
-                            <Button label="Apply Now" icon="pi pi-send" className="p-button-sm p-button-raised w-full" onClick={() => window.open(job.job_url, '_blank')} />
+                            <Button label={t('jobFeed.job.applyNow') || 'Apply Now'} icon="pi pi-send" className="p-button-sm p-button-raised w-full" onClick={() => window.open(job.job_url, '_blank')} />
                         </div>
                     </div>
                 </Card>
@@ -206,42 +149,114 @@ const JobFeedPage = () => {
         );
     };
 
+    // Client-safe time formatting
+    const formatTimeAgo = (timestamp) => {
+        if (!timestamp || !mounted) return '';
+        
+        const now = Date.now();
+        const diff = now - timestamp;
+        const hours = Math.floor(diff / (1000 * 60 * 60));
+        const days = Math.floor(hours / 24);
+        
+        if (days > 0) {
+            return `${days} ${t('common.day')}${days > 1 ? 's' : ''} ${t('common.ago')}`;
+        } else if (hours > 0) {
+            return `${hours} ${t('common.hour')}${hours > 1 ? 's' : ''} ${t('common.ago')}`;
+        } else {
+            return t('common.justNow') || 'Just now';
+        }
+    };
 
     const dataviewHeader = (
         <div className={`flex flex-column md:flex-row md:justify-content-between gap-3 p-4 ${styles.header}`}>
-            <div className="p-inputgroup flex-1 md:flex-initial" style={{ maxWidth: '600px' }}>
-                <InputText placeholder="Job title, keyword..." value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} onKeyPress={(e) => e.key === 'Enter' && handleSearch()} />
-                <InputText placeholder="City or Country" value={locationFilterInput} onChange={(e) => setLocationFilterInput(e.target.value)} onKeyPress={(e) => e.key === 'Enter' && handleSearch()} />
-                <Button icon="pi pi-search" onClick={handleSearch} tooltip="Search" tooltipOptions={{position: 'bottom'}}/>
+            <div className="flex justify-content-between align-items-center mb-3 md:mb-0">
+                <div className="flex align-items-center gap-2">
+                    <h2 className="text-2xl font-bold m-0">{t('jobFeed.title') || 'Job Feed'}</h2>
+                    {isServiceRunning && (
+                        <Badge 
+                            value="LIVE" 
+                            severity="success" 
+                            tooltip={t('jobFeed.autoUpdate.description') || 'Jobs are automatically updated every 5 minutes based on your default resume keywords'}
+                        />
+                    )}
+                </div>
+                <p className="text-color-secondary m-0">
+                    {t('jobFeed.subtitle', { 
+                        filtered: filteredJobs.length, 
+                        count: allJobs.length 
+                    }) || `Showing ${filteredJobs.length} of ${allJobs.length} jobs found`}
+                </p>
             </div>
+            
+            <div className="p-inputgroup flex-1 md:flex-initial" style={{ maxWidth: '600px' }}>
+                <InputText 
+                    placeholder={t('jobFeed.filters.search') || 'Job title, keyword...'} 
+                    value={searchTerm} 
+                    onChange={(e) => setSearchTerm(e.target.value)} 
+                    onKeyPress={(e) => e.key === 'Enter' && handleSearch()} 
+                />
+                <InputText 
+                    placeholder={t('jobFeed.filters.location') || 'City or Country'} 
+                    value={locationFilterInput} 
+                    onChange={(e) => setLocationFilterInput(e.target.value)} 
+                    onKeyPress={(e) => e.key === 'Enter' && handleSearch()} 
+                />
+                <Button 
+                    icon="pi pi-search" 
+                    onClick={handleSearch} 
+                    loading={loading}
+                    tooltip={t('common.search') || 'Search'} 
+                    tooltipOptions={{position: 'bottom'}}
+                />
+            </div>
+            
             <div className="flex align-items-center justify-content-center md:justify-content-end gap-3 mt-3 md:mt-0">
                 <div className="flex align-items-center">
-                    <Checkbox inputId="remote" onChange={e => setIsRemote(e.checked ?? false)} checked={isRemote}></Checkbox>
-                    <label htmlFor="remote" className="ml-2">Remote Only</label>
+                    <Checkbox 
+                        inputId="remote" 
+                        onChange={e => setIsRemote(e.checked ?? false)} 
+                        checked={isRemote}
+                    />
+                    <label htmlFor="remote" className="ml-2">{t('jobFeed.filters.remoteOnly') || 'Remote Only'}</label>
                 </div>
-                {/* <Dropdown options={sortOptions} value={sortKey} optionLabel="label" placeholder="Sort By" onChange={(e) => setSortKey(e.value)} className="w-full sm:w-auto" /> */}
+                
+                <Dropdown 
+                    options={sortOptions} 
+                    value={sortKey} 
+                    optionLabel="label" 
+                    placeholder={t('common.sortBy') || 'Sort By'} 
+                    onChange={(e) => setSortKey(e.value)} 
+                    className="w-full sm:w-auto" 
+                />
+                
+                <Button
+                    icon="pi pi-refresh"
+                    className="p-button-outlined p-button-sm"
+                    onClick={refresh}
+                    loading={loading}
+                    tooltip={t('common.refresh') || 'Refresh'}
+                />
+                
                 <DataViewLayoutOptions layout={layout} onChange={(e) => setLayout(e.value)} />
             </div>
         </div>
     );
 
-    // ... (keep your loading and error states rendering)
-    if (loading && filteredJobs.length === 0) { // Show spinner only if no jobs are displayed yet
+    // Show loading during initial mount to prevent hydration issues
+    if (!mounted) {
         return (
             <div className="flex justify-content-center align-items-center min-h-screen">
                 <ProgressSpinner />
-                <p className="ml-2">Loading job opportunities...</p>
+                <p className="ml-2">{t('jobFeed.loadingInitial') || 'Loading job feed...'}</p>
             </div>
         );
     }
-     if (error && filteredJobs.length === 0) { // Show full page error if no jobs and error
+
+    if (loading && filteredJobs.length === 0) {
         return (
-            <div className="flex flex-column justify-content-center align-items-center min-h-screen text-center p-5">
-                <i className="pi pi-exclamation-triangle text-6xl text-orange-500 mb-3"></i>
-                <h2 className="text-2xl mb-2">Oops! Something went wrong.</h2>
-                <p className="text-lg text-600 mb-3">{error}</p>
-                <p className="text-md text-500 mb-4">Please try adjusting your search terms or try again later.</p>
-                <Button label="Retry Search" icon="pi pi-refresh" onClick={handleSearch} />
+            <div className="flex justify-content-center align-items-center min-h-screen">
+                <ProgressSpinner />
+                <p className="ml-2">{t('jobFeed.loading') || 'Loading job opportunities...'}</p>
             </div>
         );
     }
@@ -249,17 +264,19 @@ const JobFeedPage = () => {
     return (
         <div className={styles.jobFeedContainer}>
             <Toast ref={toast} />
+            
+            
             <Card className={styles.pageCard}>
                 <DataView
                     value={filteredJobs}
                     itemTemplate={(job) => jobItemTemplate(job, layout)}
                     layout={layout}
                     header={dataviewHeader}
-                    paginator={filteredJobs.length > 12} // Show paginator if more than 12 jobs
+                    paginator={filteredJobs.length > 12}
                     rows={12}
                     alwaysShowPaginator={false}
-                    emptyMessage={loading ? "Fetching jobs..." : "No job postings found matching your criteria. Try broadening your search!"}
-                    loading={loading && filteredJobs.length > 0} // Show inline loader if jobs are already displayed but fetching new ones
+                    emptyMessage={loading ? (t('jobFeed.fetching') || 'Fetching jobs...') : (t('jobFeed.empty.description') || 'No job postings found matching your criteria. Try broadening your search!')}
+                    loading={loading && filteredJobs.length > 0}
                     pt={{ header: { className: 'surface-ground' } }}
                 />
             </Card>
