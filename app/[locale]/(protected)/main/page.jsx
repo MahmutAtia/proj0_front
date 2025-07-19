@@ -117,7 +117,7 @@ const DefaultResumeDisplay = ({ resume, onViewAll, router, isLoading }) => {
                     </div>
                     {resume ? (
                         <>
-                            <p className={`${styles.defaultResumeTitle} text-primary mt-1 mb-0 cursor-pointer hover:underline`} onClick={() => router.push(`/main/editor/${resume.id}`)}>
+                            <p className={`${styles.defaultResumeTitle} text-primary mt-1 mb-0 cursor-pointer hover:underline`} onClick={() => router.push(`/editor/${resume.id}`)}>
                                 {resume.title}
                             </p>
                             <p className="text-xs text-color-secondary mt-1">
@@ -134,7 +134,7 @@ const DefaultResumeDisplay = ({ resume, onViewAll, router, isLoading }) => {
                             icon={<FiEdit />}
                             label={t('common.edit')}
                             className="p-button-sm p-button-outlined"
-                            onClick={() => router.push(`/main/editor/${resume.id}`)}
+                            onClick={() => router.push(`/editor/${resume.id}`)}
                             tooltip={t('dashboard_main.defaultResume.tooltipEdit')}
                             tooltipOptions={{ position: 'top' }}
                         />
@@ -232,7 +232,7 @@ const RelatedDocumentsList = ({ documents, resumeTitle, onManageDocuments, isLoa
                     <p className="text-sm text-color-secondary m-0">
                         {t('dashboard_main.relatedDocuments.noDocuments')}
                     </p>
-                    <Button label={t('dashboard_main.relatedDocuments.addDocument')} icon={<FiPlusSquare />} className="p-button-sm p-button-text mt-2" onClick={() => router.push(`/main/editor/${defaultResume?.id}`)} />
+                    <Button label={t('dashboard_main.relatedDocuments.addDocument')} icon={<FiPlusSquare />} className="p-button-sm p-button-text mt-2" onClick={() => router.push(`/editor/${defaultResume?.id}`)} />
                 </div>
             )}
         </div>
@@ -419,7 +419,7 @@ const transformedResumesForDialog = useMemo(() => {
     const handleCreationSuccess = (newResumeId) => {
         // console.log("New resume created with ID:", newResumeId);
         // Optionally, navigate to the new resume or refresh data
-        // router.push(`/main/editor/${newResumeId}`);
+        // router.push(`/editor/${newResumeId}`);
         setShowCreateDialog(false);
         // Refresh resume list
     };
