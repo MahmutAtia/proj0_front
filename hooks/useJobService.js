@@ -1,21 +1,28 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { useSession } from 'next-auth/react';
 import { aiApi } from '@/lib/axios';
+import api from '@/lib/axios'; // Import the main api for resume fetching
 
 const JOB_SERVICE_CACHE_KEY = 'globalJobService';
 const JOB_SERVICE_EXPIRY_MS = 24 * 60 * 60 * 1000; // 24 hours
-const SCRAPE_INTERVAL_MS = 5 * 60 * 1000; // 5 minutes
-const DEFAULT_RESUME_CACHE_KEY = 'defaultResumeData';
+const KEYWORD_INTERVAL_MS = 5 * 60 * 1000; // 5 minutes between keywords
+const RESUMES_CACHE_KEY = 'all_resumes_list_cache'; // Same key as dashboard
+const CACHE_EXPIRY_DURATION = 15 * 60 * 1000; // Same as dashboard (15 minutes)
 
 class JobService {
     constructor() {
         this.jobs = [];
         this.isRunning = false;
-        this.intervalId = null;
+        this.keywordTimeoutId = null;
         this.subscribers = new Set();
-        this.lastScrapeTime = 0;
+        this.lastFullCycleTime = 0;
+        this.currentKeywordIndex = 0;
+        this.keywords = [];
         this.defaultResume = null;
         this.userLocation = null;
+        this.isProcessingKeyword = false;
+        this.cycleStartTime = 0;
+        this.hasStartedCycle = false;
         this.loadFromCache();
     }
 
@@ -24,18 +31,25 @@ class JobService {
         try {
             const cachedData = localStorage.getItem(JOB_SERVICE_CACHE_KEY);
             if (cachedData) {
-                const { jobs, timestamp, lastScrapeTime, location } = JSON.parse(cachedData);
-                const now = Date.now();
+                const { 
+                    jobs, 
+                    timestamp, 
+                    lastFullCycleTime, 
+                    currentKeywordIndex, 
+                    keywords,
+                    cycleStartTime,
+                    hasStartedCycle 
+                } = JSON.parse(cachedData);
                 
-                // Only load if cache is less than 24 hours old
-                if (now - timestamp < JOB_SERVICE_EXPIRY_MS) {
-                    this.jobs = jobs || [];
-                    this.lastScrapeTime = lastScrapeTime || 0;
-                    this.userLocation = location;
-                    console.log('JobService: Loaded from cache', this.jobs.length, 'jobs');
-                } else {
-                    localStorage.removeItem(JOB_SERVICE_CACHE_KEY);
-                }
+                this.jobs = jobs || [];
+                this.lastFullCycleTime = lastFullCycleTime || 0;
+                this.currentKeywordIndex = currentKeywordIndex || 0;
+                this.keywords = keywords || [];
+                this.cycleStartTime = cycleStartTime || 0;
+                this.hasStartedCycle = hasStartedCycle || false;
+                
+                console.log(`JobService: Loaded from cache - ${this.jobs.length} jobs, keyword ${this.currentKeywordIndex}/${this.keywords.length}`);
+                console.log(`JobService: Last cycle: ${new Date(this.lastFullCycleTime).toLocaleString()}`);
             }
         } catch (error) {
             console.error('JobService: Failed to load from cache', error);
@@ -48,8 +62,12 @@ class JobService {
             const cacheData = {
                 jobs: this.jobs,
                 timestamp: Date.now(),
-                lastScrapeTime: this.lastScrapeTime,
-                location: this.userLocation
+                lastFullCycleTime: this.lastFullCycleTime,
+                currentKeywordIndex: this.currentKeywordIndex,
+                keywords: this.keywords,
+                location: this.userLocation,
+                cycleStartTime: this.cycleStartTime,
+                hasStartedCycle: this.hasStartedCycle
             };
             localStorage.setItem(JOB_SERVICE_CACHE_KEY, JSON.stringify(cacheData));
         } catch (error) {
@@ -68,32 +86,69 @@ class JobService {
         this.subscribers.forEach(callback => callback(this.jobs));
     }
 
-    // Get default resume with search keywords
+    // Check if 24-hour cycle has expired
+    is24HourCycleExpired() {
+        const now = Date.now();
+        const timeSinceLastCycle = now - this.lastFullCycleTime;
+        return timeSinceLastCycle >= JOB_SERVICE_EXPIRY_MS;
+    }
+
+    // Check if currently in middle of a cycle
+    isInActiveCycle() {
+        if (!this.hasStartedCycle) return false;
+        if (this.currentKeywordIndex >= this.keywords.length) return false; // Completed cycle
+        
+        const now = Date.now();
+        const timeSinceCycleStart = now - this.cycleStartTime;
+        
+        // If cycle started but it's been more than expected time, consider it stalled
+        const expectedCycleTime = this.keywords.length * KEYWORD_INTERVAL_MS;
+        if (timeSinceCycleStart > expectedCycleTime + (60 * 60 * 1000)) { // Add 1 hour buffer
+            console.log('JobService: Cycle appears stalled, will restart');
+            return false;
+        }
+        
+        return true;
+    }
+
+    // Get default resume using the same caching strategy as dashboard
     async getDefaultResume() {
         try {
-            // Check cache first
-            const cachedResume = localStorage.getItem(DEFAULT_RESUME_CACHE_KEY);
-            if (cachedResume) {
-                const { resume, timestamp } = JSON.parse(cachedResume);
-                // Use cached resume if less than 1 hour old
-                if (Date.now() - timestamp < 60 * 60 * 1000) {
-                    this.defaultResume = resume;
-                    return resume;
+            // Use the same cache key as dashboard
+            const localData = localStorage.getItem(RESUMES_CACHE_KEY);
+            let resumesData = null;
+            
+            if (localData) {
+                const parsedCache = JSON.parse(localData);
+                if (parsedCache.data && parsedCache.timestamp && (Date.now() - parsedCache.timestamp < CACHE_EXPIRY_DURATION)) {
+                    resumesData = parsedCache.data;
+                    console.log('JobService: Using cached resumes data');
+                } else {
+                    console.log('JobService: Cached resumes expired, will fetch fresh');
+                    localStorage.removeItem(RESUMES_CACHE_KEY);
                 }
             }
 
-            // Fetch fresh data
-            const response = await api.get('/api/resumes/');
-            const resumes = response.data;
-            const defaultResume = resumes.find(r => r.is_default) || resumes[0];
+            if (!resumesData) {
+                console.log('JobService: Fetching fresh resumes data');
+                const response = await api.get('/api/resumes/');
+                resumesData = response.data;
+                
+                // Cache the resumes data using the same key as dashboard
+                localStorage.setItem(RESUMES_CACHE_KEY, JSON.stringify({ 
+                    data: resumesData, 
+                    timestamp: Date.now() 
+                }));
+            }
+
+            // Find the default resume
+            const defaultResume = resumesData.find(r => r.is_default) || resumesData[0];
             
             if (defaultResume) {
-                // Cache the resume
-                localStorage.setItem(DEFAULT_RESUME_CACHE_KEY, JSON.stringify({
-                    resume: defaultResume,
-                    timestamp: Date.now()
-                }));
                 this.defaultResume = defaultResume;
+                console.log('JobService: Found default resume:', defaultResume.title);
+            } else {
+                console.log('JobService: No default resume found');
             }
             
             return defaultResume;
@@ -122,83 +177,126 @@ class JobService {
         }
     }
 
-    // Scrape jobs based on default resume
-    async scrapeJobs() {
+    // Initialize keywords from resume
+    async initializeKeywords() {
+        const defaultResume = await this.getDefaultResume();
+        if (!defaultResume) {
+            console.warn('JobService: No default resume found for keyword initialization');
+            return false;
+        }
+
+        const searchTerms = this.extractSearchTerms(defaultResume);
+        if (!searchTerms || searchTerms.length === 0) {
+            console.warn('JobService: No search keywords found in resume');
+            return false;
+        }
+
+        // Only update keywords if they've changed
+        const keywordsChanged = JSON.stringify(this.keywords) !== JSON.stringify(searchTerms);
+        if (keywordsChanged) {
+            this.keywords = searchTerms;
+            // Don't reset currentKeywordIndex here unless starting a new cycle
+            console.log(`JobService: Keywords updated. Total: ${this.keywords.length}`, this.keywords);
+        }
+
+        return true;
+    }
+
+    // Process single keyword
+    async processSingleKeyword() {
+        if (this.isProcessingKeyword) {
+            console.log('JobService: Already processing a keyword, skipping...');
+            return;
+        }
+
+        if (this.currentKeywordIndex >= this.keywords.length) {
+            console.log('JobService: All keywords processed for this cycle');
+            return;
+        }
+
+        this.isProcessingKeyword = true;
+
         try {
-            console.log('JobService: Starting job scrape...');
-            
-            const [defaultResume, location] = await Promise.all([
-                this.getDefaultResume(),
-                this.getUserLocation()
-            ]);
-
-            if (!defaultResume) {
-                console.warn('JobService: No default resume found, skipping scrape');
+            // Get location
+            const location = await this.getUserLocation();
+            if (!location) {
+                console.warn('JobService: Cannot process keyword - no location available');
                 return;
             }
 
-            // Extract search terms from resume
-            const searchTerms = this.extractSearchTerms(defaultResume);
-            
-            if (!searchTerms || searchTerms.length === 0) {
-                console.warn('JobService: No search keywords found in resume');
-                return;
-            }
+            // Get current keyword
+            const currentKeyword = this.keywords[this.currentKeywordIndex];
+            console.log(`JobService: Processing keyword ${this.currentKeywordIndex + 1}/${this.keywords.length}: "${currentKeyword}"`);
 
-            console.log(`JobService: Scraping jobs for ${searchTerms.length} keywords:`, searchTerms);
+            // Make API request
+            const requestBody = {
+                search_term: currentKeyword,
+                location: location.city,
+                country: location.country,
+            };
 
-            const scrapePromises = searchTerms.map(term => {
-                const requestBody = {
-                    search_term: term,
-                    location: location.city,
-                    country: location.country,
-                };
-                return aiApi.post('/scraper/scrape-jobs/', requestBody);
-            });
+            const response = await aiApi.post('/scraper/scrape-jobs/', requestBody);
+            const newJobs = Array.isArray(response.data) ? response.data : (response.data.jobs || []);
 
-            const results = await Promise.allSettled(scrapePromises);
-            
-            const allNewJobs = [];
-            results.forEach((result, index) => {
-                if (result.status === 'fulfilled') {
-                    const newJobs = Array.isArray(result.value.data) ? result.value.data : (result.value.data.jobs || []);
-                    if (newJobs.length > 0) {
-                        console.log(`JobService: Found ${newJobs.length} jobs for keyword "${searchTerms[index]}"`);
-                        allNewJobs.push(...newJobs);
-                    }
-                } else {
-                    console.error(`JobService: Failed to scrape for keyword "${searchTerms[index]}"`, result.reason);
-                }
-            });
-
-            if (allNewJobs.length > 0) {
-                // Deduplicate jobs from the current scrape before adding to the main list
-                const uniqueNewJobs = [];
-                const seenJobs = new Set();
-
-                allNewJobs.forEach(job => {
-                    const identifier = (job.job_url || `${job.title}-${job.company}`).toLowerCase();
-                    if (!seenJobs.has(identifier)) {
-                        seenJobs.add(identifier);
-                        uniqueNewJobs.push(job);
-                    }
-                });
+            if (newJobs.length > 0) {
+                console.log(`JobService: Found ${newJobs.length} jobs for keyword "${currentKeyword}"`);
                 
-                const addedCount = this.addUniqueJobs(uniqueNewJobs);
+                // Add unique jobs to cache
+                const addedCount = this.addUniqueJobs(newJobs);
+                console.log(`JobService: Added ${addedCount} unique jobs. Total jobs: ${this.jobs.length}`);
+                
                 if (addedCount > 0) {
-                    this.lastScrapeTime = Date.now();
                     this.saveToCache();
                     this.notifySubscribers();
-                    console.log(`JobService: Added ${addedCount} new unique jobs. Total: ${this.jobs.length}`);
-                } else {
-                    console.log('JobService: No new unique jobs found to add.');
                 }
             } else {
-                console.log('JobService: No new jobs found from any keyword.');
+                console.log(`JobService: No jobs found for keyword "${currentKeyword}"`);
+            }
+
+            // Move to next keyword
+            this.currentKeywordIndex++;
+
+            // Check if we completed full cycle
+            if (this.currentKeywordIndex >= this.keywords.length) {
+                console.log('JobService: ✅ Completed full keyword cycle!');
+                this.currentKeywordIndex = 0; // Reset for next cycle
+                this.lastFullCycleTime = Date.now();
+                this.hasStartedCycle = false;
+                this.cycleStartTime = 0;
+                
+                // Clean old jobs (keep jobs from last 7 days)
+                this.cleanOldJobs();
+                
+                this.saveToCache();
+                console.log(`JobService: Next cycle will start in 24 hours (${new Date(this.lastFullCycleTime + JOB_SERVICE_EXPIRY_MS).toLocaleString()})`);
+            } else {
+                // Save progress
+                this.saveToCache();
             }
 
         } catch (error) {
-            console.error('JobService: An error occurred during the scrape process', error);
+            console.error(`JobService: Error processing keyword "${this.keywords[this.currentKeywordIndex]}"`, error);
+            // Still move to next keyword to avoid getting stuck
+            this.currentKeywordIndex++;
+            this.saveToCache();
+        } finally {
+            this.isProcessingKeyword = false;
+        }
+    }
+
+    // Clean old jobs (keep jobs from last 7 days)
+    cleanOldJobs() {
+        const sevenDaysAgo = Date.now() - (7 * 24 * 60 * 60 * 1000);
+        const initialCount = this.jobs.length;
+        
+        this.jobs = this.jobs.filter(job => {
+            // Keep job if it has addedAt timestamp and is within 7 days, or if no timestamp (keep as fallback)
+            return !job.addedAt || job.addedAt > sevenDaysAgo;
+        });
+
+        const removedCount = initialCount - this.jobs.length;
+        if (removedCount > 0) {
+            console.log(`JobService: Cleaned ${removedCount} old jobs. Remaining: ${this.jobs.length}`);
         }
     }
 
@@ -211,7 +309,6 @@ class JobService {
             const keywords = resume.job_search_keywords.split(',').map(k => k.trim());
             keywords.forEach(k => k && terms.add(k));
         }
-
 
         console.log('JobService: Extracted search terms:', Array.from(terms));
         return Array.from(terms).filter(term => term.length > 2); // Filter out short terms
@@ -228,6 +325,8 @@ class JobService {
             );
 
             if (!exists) {
+                // Add timestamp for tracking
+                newJob.addedAt = Date.now();
                 this.jobs.unshift(newJob); // Add new jobs to the beginning
                 addedCount++;
             }
@@ -235,22 +334,96 @@ class JobService {
         return addedCount;
     }
 
-    // Start the background scraping service
-    start() {
-        if (this.isRunning) return;
-        
-        this.isRunning = true;
-        console.log('JobService: Starting background job scraping...');
-
-        // Initial scrape if we haven't scraped in the last hour
-        if (Date.now() - this.lastScrapeTime > 60 * 60 * 1000) {
-            this.scrapeJobs();
+    // Schedule next keyword processing
+    scheduleNextKeyword() {
+        if (this.keywordTimeoutId) {
+            clearTimeout(this.keywordTimeoutId);
         }
 
-        // Set up interval for every 5 minutes
-        this.intervalId = setInterval(() => {
-            this.scrapeJobs();
-        }, SCRAPE_INTERVAL_MS);
+        // Don't schedule if cycle is complete
+        if (this.currentKeywordIndex >= this.keywords.length) {
+            console.log('JobService: Cycle complete, no more keywords to schedule');
+            return;
+        }
+
+        this.keywordTimeoutId = setTimeout(() => {
+            this.processSingleKeyword().then(() => {
+                // Schedule next keyword if still running and not complete
+                if (this.isRunning && this.currentKeywordIndex < this.keywords.length) {
+                    this.scheduleNextKeyword();
+                }
+            });
+        }, KEYWORD_INTERVAL_MS);
+        
+        const nextKeyword = this.keywords[this.currentKeywordIndex];
+        console.log(`JobService: Scheduled next keyword "${nextKeyword}" in ${KEYWORD_INTERVAL_MS / 1000 / 60} minutes`);
+    }
+
+    // Start the background scraping service
+    async start() {
+        if (this.isRunning) {
+            console.log('JobService: Already running');
+            return;
+        }
+        
+        console.log('JobService: Starting background job scraping...');
+
+        // Initialize keywords
+        const hasKeywords = await this.initializeKeywords();
+        if (!hasKeywords) {
+            console.warn('JobService: Cannot start - no keywords available');
+            return;
+        }
+
+        // Check if 24-hour cycle has expired
+        const cycleExpired = this.is24HourCycleExpired();
+        const inActiveCycle = this.isInActiveCycle();
+
+        console.log(`JobService: Cycle expired: ${cycleExpired}, In active cycle: ${inActiveCycle}`);
+        console.log(`JobService: Current keyword index: ${this.currentKeywordIndex}/${this.keywords.length}`);
+
+        if (cycleExpired && !inActiveCycle) {
+            // Start new 24-hour cycle
+            console.log('JobService: 🚀 Starting NEW 24-hour cycle');
+            this.currentKeywordIndex = 0;
+            this.hasStartedCycle = true;
+            this.cycleStartTime = Date.now();
+            this.isRunning = true;
+            
+            // Process first keyword immediately
+            this.processSingleKeyword().then(() => {
+                if (this.isRunning && this.currentKeywordIndex < this.keywords.length) {
+                    this.scheduleNextKeyword();
+                }
+            });
+        } else if (inActiveCycle) {
+            // Continue existing cycle
+            console.log(`JobService: 📋 Continuing existing cycle from keyword ${this.currentKeywordIndex + 1}/${this.keywords.length}`);
+            this.isRunning = true;
+            
+            // Continue with next keyword
+            if (this.currentKeywordIndex < this.keywords.length) {
+                this.processSingleKeyword().then(() => {
+                    if (this.isRunning && this.currentKeywordIndex < this.keywords.length) {
+                        this.scheduleNextKeyword();
+                    }
+                });
+            }
+        } else {
+            // Waiting for next 24-hour cycle
+            const timeUntilNextCycle = (this.lastFullCycleTime + JOB_SERVICE_EXPIRY_MS) - Date.now();
+            const hoursLeft = Math.ceil(timeUntilNextCycle / (1000 * 60 * 60));
+            console.log(`JobService: ⏰ Waiting for next cycle. ${hoursLeft} hours remaining until ${new Date(this.lastFullCycleTime + JOB_SERVICE_EXPIRY_MS).toLocaleString()}`);
+            this.isRunning = true;
+            
+            // Schedule to start next cycle when time comes
+            setTimeout(() => {
+                if (this.isRunning) {
+                    console.log('JobService: 24 hours elapsed, starting new cycle...');
+                    this.start(); // Recursively start new cycle
+                }
+            }, timeUntilNextCycle);
+        }
     }
 
     // Stop the background scraping service
@@ -258,9 +431,9 @@ class JobService {
         if (!this.isRunning) return;
         
         this.isRunning = false;
-        if (this.intervalId) {
-            clearInterval(this.intervalId);
-            this.intervalId = null;
+        if (this.keywordTimeoutId) {
+            clearTimeout(this.keywordTimeoutId);
+            this.keywordTimeoutId = null;
         }
         console.log('JobService: Stopped background job scraping');
     }
@@ -300,9 +473,41 @@ class JobService {
         return filteredJobs.slice(0, filters.limit || filteredJobs.length);
     }
 
-    // Manual refresh
+    // Manual refresh - process next keyword immediately (only if in active cycle)
     async refresh() {
-        await this.scrapeJobs();
+        console.log('JobService: Manual refresh triggered');
+        
+        if (this.isInActiveCycle() && this.currentKeywordIndex < this.keywords.length) {
+            await this.processSingleKeyword();
+        } else if (this.is24HourCycleExpired()) {
+            // Start new cycle if expired
+            console.log('JobService: Starting new cycle due to manual refresh');
+            await this.start();
+        } else {
+            console.log('JobService: Cannot refresh - either cycle complete or time not elapsed');
+        }
+    }
+
+    // Get service status
+    getStatus() {
+        const cycleExpired = this.is24HourCycleExpired();
+        const inActiveCycle = this.isInActiveCycle();
+        const timeUntilNextCycle = Math.max(0, (this.lastFullCycleTime + JOB_SERVICE_EXPIRY_MS) - Date.now());
+        
+        return {
+            isRunning: this.isRunning,
+            currentKeywordIndex: this.currentKeywordIndex,
+            totalKeywords: this.keywords.length,
+            currentKeyword: this.keywords[this.currentKeywordIndex] || null,
+            lastFullCycleTime: this.lastFullCycleTime,
+            isProcessingKeyword: this.isProcessingKeyword,
+            jobsCount: this.jobs.length,
+            cycleExpired,
+            inActiveCycle,
+            timeUntilNextCycle,
+            hasStartedCycle: this.hasStartedCycle,
+            cycleStartTime: this.cycleStartTime
+        };
     }
 }
 
@@ -333,7 +538,7 @@ export const useJobService = () => {
             setJobs(jobServiceInstance.getJobs());
             setLoading(false);
 
-            // Start the service
+            // Start the service (it will check if it should actually start based on 24-hour cycle)
             jobServiceInstance.start();
 
             return () => {
@@ -363,12 +568,17 @@ export const useJobService = () => {
         }
     }, []);
 
+    const getStatus = useCallback(() => {
+        return jobServiceInstance ? jobServiceInstance.getStatus() : null;
+    }, []);
+
     return {
         jobs,
         loading,
         error,
         getFilteredJobs,
         refresh,
+        getStatus,
         isServiceRunning: jobServiceInstance?.isRunning || false
     };
 };
