@@ -1,174 +1,156 @@
 "use client";
-import React, { useState, useEffect, useRef, useCallback } from 'react';
-import api from '@/lib/axios'; // Adjust the import path as necessary
-import { useRouter, useParams } from 'next/navigation';
+
+import React, { useState, useEffect, useCallback, useRef } from 'react';
+import { useParams } from 'next/navigation';
 import { useSession } from 'next-auth/react';
-import { ProgressSpinner } from 'primereact/progressspinner';
-import { Slider } from 'primereact/slider';
-import { Skeleton } from 'primereact/skeleton';
-import { Message } from 'primereact/message';
 import { Button } from 'primereact/button';
 import { Card } from 'primereact/card';
+import { Slider } from 'primereact/slider';
+import { ProgressSpinner } from 'primereact/progressspinner';
+import { Message } from 'primereact/message';
+import { Skeleton } from 'primereact/skeleton';
+import { Dialog } from 'primereact/dialog';
 import { Tooltip } from 'primereact/tooltip';
-import { Dialog } from 'primereact/dialog'; // Import Dialog
+import { Toast } from 'primereact/toast';
+import { AnimatePresence, motion } from 'framer-motion'; // Import AnimatePresence
+import { useDebouncedCallback } from 'use-debounce';
+import api from '@/lib/axios'; // Ensure this points to your configured axios instance
 import styles from './export.module.css';
-import { MOCK_TEMPLATES_WITH_THEMES } from './templates.js';
-import { motion, AnimatePresence } from 'framer-motion'; // Import AnimatePresence
+import { MOCK_TEMPLATES_WITH_THEMES } from './templates.js'; // Import mock templates
 
 // --- Constants ---
-const PDF_ASPECT_RATIO = 1.414;
-const BASE_PREVIEW_WIDTH = 800;
-const HEADER_HEIGHT = 60; // Approx height of your main app header (adjust if needed)
-const TOOLBAR_HEIGHT = 53; // Approx height of the new preview toolbar
+const PDF_ASPECT_RATIO = 297 / 210; // A4 aspect ratio
+const BASE_PREVIEW_WIDTH = 800; // Base width in pixels for 100% scale
+const HEADER_HEIGHT = 60;
+const TOOLBAR_HEIGHT = 53;
 const LOADING_MESSAGES = [
     "Generating Preview...",
     "Applying styles...",
     "Rendering layout...",
     "Fetching fonts...",
     "Almost ready...",
-    "Just a moment...",
 ];
 
 const ResumePreviewPage = () => {
     const params = useParams();
     const { data: session, status } = useSession();
-    const resumeId = params.id;
+    const id = params.id; // Resume ID from URL
 
-    // --- State ---
+    // --- Refs ---
+    const toast = useRef(null);
+    const previewContentRef = useRef(null);
+    const loadingIntervalRef = useRef(null);
+
+    // --- Options State ---
     const [templatesData, setTemplatesData] = useState([]);
+    const [isLoadingOptions, setIsLoadingOptions] = useState(true);
+    const [errorOptions, setErrorOptions] = useState(null);
+    const [resumeData, setResumeData] = useState(null); // Store resume data for download filename
+
+    // --- Selection State ---
     const [selectedTemplate, setSelectedTemplate] = useState(null);
     const [selectedThemeValue, setSelectedThemeValue] = useState(null);
+
+    // --- Preview State ---
+    const [previewUrl, setPreviewUrl] = useState(null);
+    const [isLoadingPreview, setIsLoadingPreview] = useState(false);
+    const [errorPreview, setErrorPreview] = useState(null);
+    const [loadingMessageIndex, setLoadingMessageIndex] = useState(0);
+
+    // --- UI State ---
     const [scale, setScale] = useState(100);
-    const [pdfUrl, setPdfUrl] = useState(null);
-    const [isLoadingOptions, setIsLoadingOptions] = useState(true);
-    const [isLoadingPdf, setIsLoadingPdf] = useState(false);
-    const [loadingMessageIndex, setLoadingMessageIndex] = useState(0); // New state for message index
-    const [errorOptions, setErrorOptions] = useState(null);
-    const [errorPdf, setErrorPdf] = useState(null);
-    const [isPreviewVisible, setIsPreviewVisible] = useState(false); // State for modal visibility
-    const [previewImageUrl, setPreviewImageUrl] = useState(''); // State for image URL in modal
+    const [isDownloading, setIsDownloading] = useState(false);
+    const [isPreviewVisible, setIsPreviewVisible] = useState(false);
+    const [previewImageUrl, setPreviewImageUrl] = useState('');
 
     // --- Calculated Dimensions ---
     const iframeScaleFactor = scale / 100;
     const iframeWidth = BASE_PREVIEW_WIDTH * iframeScaleFactor;
     const iframeHeight = iframeWidth * PDF_ASPECT_RATIO;
 
-    // --- Refs ---
-    const pdfBlobCache = useRef({});
-    const previewContentRef = useRef(null);
-    const loadingIntervalRef = useRef(null); // Ref to store interval ID
-
-    // --- Logic (fetchTemplates, generateCacheKey, fetchPdf, useEffects) ---
+    // --- Data Fetching ---
     useEffect(() => {
-        const fetchTemplates = async () => {
+        const fetchOptions = () => {
+            if (status !== 'authenticated' || !id) return;
+            
             setIsLoadingOptions(true);
             setErrorOptions(null);
-            setSelectedTemplate(null);
-            setSelectedThemeValue(null);
+            
             try {
-                await new Promise(resolve => setTimeout(resolve, 600));
+                // Use mock templates directly - no API fetching needed
                 setTemplatesData(MOCK_TEMPLATES_WITH_THEMES);
-            } catch (error) {
-                console.error("Error fetching templates:", error);
-                setErrorOptions("Failed to load templates. Please try again.");
+                
+                // Set initial selection to the first template
+                if (MOCK_TEMPLATES_WITH_THEMES.length > 0) {
+                    const initialTemplate = MOCK_TEMPLATES_WITH_THEMES[0];
+                    setSelectedTemplate(initialTemplate);
+                    
+                    // Set initial theme to the first theme of the first template
+                    if (initialTemplate.themes && initialTemplate.themes.length > 0) {
+                        setSelectedThemeValue(initialTemplate.themes[0].value);
+                    }
+                }
+                
+            } catch (err) {
+                console.error("Failed to load templates:", err);
+                setErrorOptions("Could not load templates. Please refresh the page.");
             } finally {
                 setIsLoadingOptions(false);
             }
         };
-        if (status === 'authenticated') fetchTemplates();
-        else if (status === 'unauthenticated') {
-            setErrorOptions("Please log in to view this page.");
-            setIsLoadingOptions(false);
-        }
-    }, [resumeId, status, session?.accessToken]);
 
-    const generateCacheKey = useCallback((templateId, themeValue) => {
-        if (!resumeId || !templateId || !themeValue) return null;
-        return `${resumeId}-${templateId}-${themeValue}`;
-    }, [resumeId]);
+        // Add a small timeout to ensure session is properly loaded
+        const timeoutId = setTimeout(fetchOptions, 100);
+        return () => clearTimeout(timeoutId);
+    }, [id, status]);
 
-    const fetchPdf = useCallback(async (templateObject, themeValue) => {
-        if (status !== 'authenticated') {
-            setErrorPdf("Authentication required.");
-            return;
-        }
-        if (!templateObject || !themeValue) return;
-        const cacheKey = generateCacheKey(templateObject.id, themeValue);
-        const currentPdfUrl = pdfUrl; // Capture current URL before potential state change
-        if (pdfBlobCache.current[cacheKey]) {
-            if (currentPdfUrl) URL.revokeObjectURL(currentPdfUrl);
-            setPdfUrl(URL.createObjectURL(pdfBlobCache.current[cacheKey]));
-            setIsLoadingPdf(false);
-            setErrorPdf(null);
-            return;
-        }
-        setIsLoadingPdf(true);
-        setErrorPdf(null);
-        if (currentPdfUrl) URL.revokeObjectURL(currentPdfUrl);
-        setPdfUrl(null);
-        try {
-            const response = await api.post(
-                `/api/resumes/generate-pdf/`,
-                {
-                    resume_id: resumeId,
-                    templateTheme: templateObject.value,
-                    chosenTheme: themeValue,
-                },
-                {
-                    responseType: 'blob',
-                }
-            );
-            const pdfBlob = response.data;
-            const pdfObjectURL = URL.createObjectURL(pdfBlob);
-            setPdfUrl(pdfObjectURL);
-            pdfBlobCache.current[cacheKey] = pdfBlob;
-        } catch (error) {
-            console.error("Error generating PDF:", error);
-            setErrorPdf(error.response?.data?.message || error.message || "Failed to generate PDF.");
-        } finally {
-            setIsLoadingPdf(false);
-        }
-    }, [resumeId, status, generateCacheKey]);
+    // --- Preview Generation ---
+    const debouncedSetPreviewUrl = useDebouncedCallback(() => {
+        if (!selectedTemplate || !id) return;
+
+        console.log('Setting preview URL for:', { 
+            template: selectedTemplate.value, 
+            theme: selectedThemeValue, 
+            resumeId: id 
+        });
+
+        setIsLoadingPreview(true);
+        setErrorPreview(null);
+
+        const themeQueryParam = selectedThemeValue ? `&theme=${selectedThemeValue}` : '';
+        // env.NEXT_PUBLIC_BACKEND_URL is assumed to be set in your environment variables
+        // Adjust the URL as per your backend API structure
+
+        const url =  `${process.env.NEXT_PUBLIC_BACKEND_URL || ''}/api/resumes/${id}/preview/?template=${selectedTemplate.value}${themeQueryParam}`;
+        console.log('Generated preview URL:', url);
+        setPreviewUrl(url);
+    }, 300);
 
     useEffect(() => {
-        if (selectedTemplate && selectedThemeValue) {
-            fetchPdf(selectedTemplate, selectedThemeValue);
-        }
-    }, [selectedTemplate, selectedThemeValue, fetchPdf]);
+        debouncedSetPreviewUrl();
+    }, [selectedTemplate, selectedThemeValue, id, debouncedSetPreviewUrl]);
 
+    // --- Loading Message Cycling ---
     useEffect(() => {
-        return () => {
-            if (pdfUrl) URL.revokeObjectURL(pdfUrl);
-        };
-    }, [pdfUrl]);
-
-    // Effect to cycle through loading messages
-    useEffect(() => {
-        if (isLoadingPdf) {
-            setLoadingMessageIndex(0); // Reset to first message on new load
+        if (isLoadingPreview) {
             loadingIntervalRef.current = setInterval(() => {
-                setLoadingMessageIndex(prevIndex =>
-                    (prevIndex + 1) % LOADING_MESSAGES.length
-                );
-            }, 1000); // Change message every 2 seconds
+                setLoadingMessageIndex(prevIndex => (prevIndex + 1) % LOADING_MESSAGES.length);
+            }, 2000);
         } else {
-            clearInterval(loadingIntervalRef.current); // Clear interval when not loading
+            clearInterval(loadingIntervalRef.current);
+            setLoadingMessageIndex(0);
         }
-
-        // Cleanup interval on component unmount
         return () => clearInterval(loadingIntervalRef.current);
-    }, [isLoadingPdf]);
+    }, [isLoadingPreview]);
 
     // --- Handlers ---
     const handleTemplateSelect = (template) => {
-        if (isLoadingPdf || template.id === selectedTemplate?.id) return;
         setSelectedTemplate(template);
-        const firstThemeValue = template.themes?.[0]?.value || null;
-        setSelectedThemeValue(firstThemeValue);
+        // Reset theme to the default for the new template
+        setSelectedThemeValue(template.themes?.[0]?.value || null);
     };
 
     const handleThemeSelect = (themeValue) => {
-        if (isLoadingPdf || themeValue === selectedThemeValue) return;
         setSelectedThemeValue(themeValue);
     };
 
@@ -176,118 +158,133 @@ const ResumePreviewPage = () => {
         setScale(e.value);
     };
 
-    const handleDownload = () => {
-        if (!pdfUrl || isLoadingPdf || errorPdf) return;
-        const cacheKey = generateCacheKey(selectedTemplate?.id, selectedThemeValue);
-        const blob = pdfBlobCache.current[cacheKey];
-        if (blob) {
+    const handleIframeLoad = () => {
+        console.log('Iframe loaded successfully');
+        setIsLoadingPreview(false);
+    };
+
+    const handleIframeError = () => {
+        console.error('Iframe failed to load');
+        setIsLoadingPreview(false);
+        setErrorPreview('Failed to load preview. Please try again.');
+    };
+
+    const handleDownload = async () => {
+        if (!selectedTemplate || !id) {
+            toast.current.show({ severity: 'warn', summary: 'Cannot Download', detail: 'Please select a template first.', life: 3000 });
+            return;
+        }
+        setIsDownloading(true);
+        try {
+            const response = await api.post('/api/resumes/generate-pdf/', {
+                resume_id: id,
+                templateTheme: selectedTemplate.value, // Use template.value instead of template.id
+                chosenTheme: selectedThemeValue,
+            }, {
+                responseType: 'blob',
+            });
+
+            const blob = new Blob([response.data], { type: 'application/pdf' });
+            const url = window.URL.createObjectURL(blob);
             const link = document.createElement('a');
-            link.href = URL.createObjectURL(blob);
-            const templateName = selectedTemplate?.name.replace(/\s+/g, '-') || 'Resume';
-            const themeName = selectedTemplate?.themes.find(t => t.value === selectedThemeValue)?.name.replace(/\s+/g, '-') || 'DefaultTheme';
-            link.download = `${templateName}-${themeName}.pdf`;
+            link.href = url;
+            const fileName = `Resume_${resumeData?.basics?.name?.replace(/\s+/g, '_') || id}.pdf`;
+            link.setAttribute('download', fileName);
             document.body.appendChild(link);
             link.click();
-            document.body.removeChild(link);
-            URL.revokeObjectURL(link.href);
-        } else {
-            console.error("Download failed: Blob not found in cache.");
+            link.parentNode.removeChild(link);
+            window.URL.revokeObjectURL(url);
+
+            toast.current.show({ severity: 'success', summary: 'Download Started', detail: 'Your PDF resume is downloading.', life: 3000 });
+        } catch (err) {
+            console.error('PDF download failed:', err);
+            toast.current.show({ severity: 'error', summary: 'Download Failed', detail: 'Could not generate the PDF. Please try again.', life: 4000 });
+        } finally {
+            setIsDownloading(false);
         }
     };
 
     const handlePreviewOpen = (imageUrl, event) => {
-        event.stopPropagation(); // Prevent card selection when clicking preview
-        setPreviewImageUrl(imageUrl || '/images/previews/default.png');
+        event.stopPropagation();
+        setPreviewImageUrl(imageUrl);
         setIsPreviewVisible(true);
     };
 
     // --- Render Skeletons ---
     const renderTemplateSkeletons = () => (
-        Array.from({ length: 4 }).map((_, i) => (
-            <div key={`skel-tpl-${i}`} className="col-6">
+        Array.from({ length: 6 }).map((_, i) => ( // Changed to 6 to match mock templates count
+            <div key={`skel-tpl-${i}`} className="col-6 p-1">
                 <Skeleton height="150px" className="mb-2 border-round" />
                 <Skeleton height="1rem" width="70%" className="mx-auto border-round" />
             </div>
         ))
     );
 
-    // --- Current Themes ---
     const currentThemes = selectedTemplate?.themes || [];
 
-    // --- Render Component ---
+    if (status === 'loading') {
+        return <div className="flex justify-content-center align-items-center min-h-screen"><ProgressSpinner /></div>;
+    }
+
     return (
         <div className="min-h-screen flex flex-column bg-surface-100">
-            {/* Main Grid - Adjust height calculation */}
+            <Toast ref={toast} />
+
             <div className="flex-grow-1 grid grid-nogutter" style={{ height: `calc(100vh - ${HEADER_HEIGHT}px)` }}>
 
-                {/* Control Panel (Templates Only) */}
+                {/* Sidebar Column */}
                 <div className="col-12 md:col-4 lg:col-3 flex flex-column h-full border-right-1 surface-border bg-surface-0">
-                    {/* Panel Header */}
                     <div className="p-4 border-bottom-1 surface-border flex-shrink-0">
                         <h1 className="text-lg font-semibold m-0">Select Template</h1>
                     </div>
 
-                    {/* Scrollable Content Area (Templates) */}
                     <div className="p-4 flex-grow-1 overflow-y-auto">
                         {isLoadingOptions ? (
-                            <> {/* Skeleton Loading */}
-                                <div className="mb-5">
-                                    <div className="grid"> {renderTemplateSkeletons()} </div>
-                                </div>
-                            </>
+                            <div className="grid grid-nogutter -m-1">{renderTemplateSkeletons()}</div>
                         ) : errorOptions ? (
                             <Message severity="error" text={errorOptions} className="w-full" />
                         ) : (
-                            <> {/* Loaded Content */}
-                                {/* Templates Section */}
-                                <div className="mb-5">
-                                    {templatesData.length > 0 ? (
-                                        <div className="grid grid-nogutter -m-1">
-                                            {templatesData.map((template) => (
-                                                <div key={template.id} className="col-6 p-1">
-                                                    <Card
-                                                        className={`cursor-pointer border-2 hover:shadow-md ${styles.templateCard} ${selectedTemplate?.id === template.id ? 'border-primary shadow-2' : 'border-transparent'} relative`} // Added relative positioning
-                                                        onClick={() => handleTemplateSelect(template)}
-                                                        pt={{ header: { className: 'p-0' }, body: { className: 'p-0' }, content: { className: 'p-2 text-center' } }}
-                                                    >
-                                                        {/* --- Preview Button Overlay --- */}
-                                                        <Button
-                                                            icon="pi pi-eye"
-                                                            rounded
-                                                            text
-                                                            severity="secondary"
-                                                            aria-label={`Preview ${template.name}`}
-                                                            tooltip="Preview Template"
-                                                            tooltipOptions={{ position: 'top', showDelay: 300 }}
-                                                            className={`absolute top-0 right-0 mt-1 mr-1 z-1 ${styles.previewButton}`} // Position top-right
-                                                            onClick={(e) => handlePreviewOpen(template.previewUrl, e)}
-                                                        />
-                                                        {/* --- End Preview Button --- */}
-
-                                                        <img src={template.previewUrl || '/images/previews/default.png'} alt={`${template.name} Preview`} className={`w-full block border-round-top ${styles.templatePreviewImage}`} />
-                                                        <div className="text-sm font-medium text-color-secondary mt-1">{template.name}</div>
-                                                    </Card>
-                                                </div>
-                                            ))}
-                                        </div>
-                                    ) : (<p className="text-sm text-color-secondary">No templates available.</p>)}
-                                </div>
-                            </>
+                            <div className="grid grid-nogutter -m-1">
+                                {templatesData.map((template) => (
+                                    <div key={template.id} className="col-6 p-1">
+                                        <Card
+                                            className={`cursor-pointer border-2 hover:shadow-md ${styles.templateCard} ${selectedTemplate?.id === template.id ? 'border-primary shadow-2' : 'border-transparent'} relative`}
+                                            onClick={() => handleTemplateSelect(template)}
+                                            pt={{ header: { className: 'p-0' }, body: { className: 'p-0' }, content: { className: 'p-2 text-center' } }}
+                                        >
+                                            <Button
+                                                icon="pi pi-eye"
+                                                rounded text severity="secondary"
+                                                aria-label={`Preview ${template.name}`}
+                                                tooltip="Preview Template"
+                                                tooltipOptions={{ position: 'top', showDelay: 300 }}
+                                                className={`absolute top-0 right-0 mt-1 mr-1 z-1 ${styles.previewButton}`}
+                                                onClick={(e) => handlePreviewOpen(template.previewUrl, e)}
+                                            />
+                                            <img src={template.previewUrl || '/images/previews/default.png'} alt={`${template.name} Preview`} className={`w-full block border-round-top ${styles.templatePreviewImage}`} />
+                                            <div className="text-sm font-medium text-color-secondary mt-1">{template.name}</div>
+                                        </Card>
+                                    </div>
+                                ))}
+                            </div>
                         )}
                     </div>
 
-                    {/* Download Button Area */}
                     <div className="p-4 border-top-1 surface-border mt-auto flex-shrink-0">
-                        <Button label="Download PDF" icon="pi pi-download" className="w-full" onClick={handleDownload} disabled={!pdfUrl || isLoadingPdf || errorPdf || isLoadingOptions} />
+                        <Button
+                            label="Download PDF"
+                            icon="pi pi-download"
+                            className="w-full"
+                            onClick={handleDownload}
+                            loading={isDownloading}
+                            disabled={!selectedTemplate || isLoadingPreview || isLoadingOptions}
+                        />
                     </div>
                 </div>
 
-                {/* Right Side (Toolbar + Preview) */}
+                {/* Preview Column */}
                 <div className="col-12 md:col-8 lg:col-9 h-full flex flex-column">
-
-                    {/* Preview Toolbar - NEW */}
-                    <div className={`p-2 border-bottom-1 surface-border bg-surface-0 flex align-items-center justify-content-between flex-shrink-0 ${styles.previewToolbar}`} style={{ height: `${TOOLBAR_HEIGHT}px` }}>
-                        {/* Theme Selector (Conditional) */}
+                    <div className={`p-2 border-bottom-1 surface-border bg-surface-0 flex align-items-center justify-content-between flex-shrink-0`} style={{ height: `${TOOLBAR_HEIGHT}px` }}>
                         <div className="flex align-items-center gap-2">
                             {selectedTemplate && currentThemes.length > 0 && (
                                 <>
@@ -304,69 +301,67 @@ const ResumePreviewPage = () => {
                                     ))}
                                 </>
                             )}
-                            {selectedTemplate && currentThemes.length === 0 && (
-                                <span className="text-xs text-color-secondary">No themes for this template.</span>
-                            )}
                         </div>
 
-                        {/* Zoom Control */}
                         <div className="flex align-items-center gap-2" style={{ minWidth: '200px' }}>
                             <i className="pi pi-search-minus text-color-secondary"></i>
-                            <Slider value={scale} onChange={handleScaleChange} min={25} max={150} step={5} className="flex-grow-1 mx-1" disabled={isLoadingOptions || isLoadingPdf} />
+                            <Slider value={scale} onChange={handleScaleChange} min={25} max={150} step={5} className="flex-grow-1 mx-1" disabled={isLoadingOptions || isLoadingPreview} />
                             <i className="pi pi-search-plus text-color-secondary"></i>
                             <span className="text-sm font-medium text-color-secondary w-3rem text-right">{scale}%</span>
                         </div>
                     </div>
 
-
-
-                    {/* Preview Area - Adjust height calculation */}
                     <div
                         ref={previewContentRef}
                         className="flex-grow-1 overflow-auto bg-surface-100 p-4 lg:p-6 flex justify-content-center"
                         style={{ height: `calc(100% - ${TOOLBAR_HEIGHT}px)` }}
                     >
-                        {/* PDF Container - Size set dynamically */}
                         <div
                             className={`${styles.pdfContainer} relative`}
                             style={{ width: `${iframeWidth}px`, height: `${iframeHeight}px` }}
                         >
-                            {/* Overlays and Iframe */}
-                            <AnimatePresence> {/* Wrap conditional rendering with AnimatePresence */}
-                                {isLoadingPdf && (
-                                    <motion.div // Use motion.div for animation
-                                        key="pdf-loading-overlay" // Add a unique key for AnimatePresence
+                            <AnimatePresence>
+                                {isLoadingPreview && (
+                                    <motion.div
+                                        key="preview-loading-overlay"
                                         className={`absolute top-0 left-0 w-full h-full flex flex-column align-items-center justify-content-center z-2 bg-white-alpha-80 ${styles.overlayBase}`}
-                                        initial={{ opacity: 0 }} // Start invisible
-                                        animate={{ opacity: 1 }} // Fade in
-                                        exit={{ opacity: 0 }}    // Fade out
-                                        transition={{ duration: 0.3 }} // Control animation speed
+                                        initial={{ opacity: 0 }} 
+                                        animate={{ opacity: 1 }} 
+                                        exit={{ opacity: 0 }}
+                                        transition={{ duration: 0.3 }}
                                     >
                                         <ProgressSpinner style={{ width: '40px', height: '40px' }} strokeWidth="3" />
-                                        {/* Display cycling loading message */}
                                         <p className="mt-3 text-color-secondary">{LOADING_MESSAGES[loadingMessageIndex]}</p>
                                     </motion.div>
                                 )}
                             </AnimatePresence>
-                            {/* Error Overlay (Can also be animated similarly if desired) */}
-                            {!isLoadingPdf && errorPdf && (
+
+                            {!isLoadingPreview && errorPreview && (
                                 <div className={`absolute top-0 left-0 w-full h-full flex flex-column align-items-center justify-content-center z-2 bg-red-100 text-red-700 p-4 border-round ${styles.overlayBase}`}>
                                     <i className="pi pi-exclamation-circle text-3xl mb-2"></i>
-                                    <p className="text-center">{errorPdf}</p>
+                                    <p className="text-center">{errorPreview}</p>
                                 </div>
                             )}
-                            {/* PDF Iframe */}
-                            {!isLoadingPdf && pdfUrl && !errorPdf && (
-                            <iframe
-                                key={pdfUrl} // Key helps React replace the iframe correctly
-                                src={`${pdfUrl}#view=Fit&toolbar=0&navpanes=0&scrollbar=0`} // Changed FitH to Fit
-                                title={`Resume Preview - ${selectedTemplate?.name || ''}`}
-                                className={styles.pdfIframe}
-                                style={{ width: '100%', height: '100%' }}
-                            />
-                        )}
+
+                            {/* HTML Preview Iframe */}
+                            {previewUrl && !errorPreview && (
+                                <iframe
+                                    key={previewUrl}
+                                    src={previewUrl}
+                                    title={`Resume Preview - ${selectedTemplate?.name || ''}`}
+                                    className={styles.pdfIframe}
+                                    style={{ 
+                                        width: '100%', 
+                                        height: '100%',
+                                        visibility: isLoadingPreview ? 'hidden' : 'visible' 
+                                    }}
+                                    onLoad={handleIframeLoad}
+                                    onError={handleIframeError}
+                                />
+                            )}
+
                             {/* Placeholder */}
-                            {!isLoadingPdf && !pdfUrl && !errorPdf && (
+                            {!previewUrl && !errorPreview && !isLoadingPreview && (
                                 <div className={`absolute top-0 left-0 w-full h-full flex flex-column align-items-center justify-content-center z-1 bg-surface-50 text-color-secondary ${styles.overlayBase}`}>
                                     <i className="pi pi-file-edit text-4xl mb-3 text-surface-400"></i>
                                     <p>{isLoadingOptions ? 'Loading options...' : 'Select a template to begin.'}</p>
@@ -376,21 +371,18 @@ const ResumePreviewPage = () => {
                     </div>
                 </div>
             </div>
-            {/* --- Template Preview Modal --- */}
+
+            {/* Template Preview Dialog */}
             <Dialog
                 header="Template Preview"
                 visible={isPreviewVisible}
-                style={{ width: '90vw', maxWidth: '600px' }} // Responsive width
+                style={{ width: '90vw', maxWidth: '600px' }}
                 modal
                 onHide={() => setIsPreviewVisible(false)}
-                pt={{
-                    content: { className: 'p-0' } // Remove padding from content area
-                }}
+                pt={{ content: { className: 'p-0' } }}
             >
                 <img src={previewImageUrl} alt="Template Preview" style={{ width: '100%', display: 'block' }} />
             </Dialog>
-            {/* --- End Modal --- */}
-
         </div>
     );
 };

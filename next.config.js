@@ -32,7 +32,7 @@ const nextConfig = {
   async headers() {
     return [
       {
-        source: '/(.*)',
+        source: '/((?!api/resumes/.*/preview).*)', // Exclude preview routes
         headers: [
           {
             key: 'X-Frame-Options',
@@ -45,6 +45,15 @@ const nextConfig = {
           {
             key: 'Referrer-Policy',
             value: 'origin-when-cross-origin',
+          },
+        ],
+      },
+      {
+        source: '/api/resumes/:path*/preview',
+        headers: [
+          {
+            key: 'X-Frame-Options',
+            value: 'SAMEORIGIN',
           },
         ],
       },

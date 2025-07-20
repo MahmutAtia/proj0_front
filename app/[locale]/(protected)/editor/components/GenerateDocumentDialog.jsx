@@ -198,9 +198,6 @@ const GenerateDocumentDialog = ({
             const about_candidate = selectedResumeData.about || "";
 
             // Debug the extracted data
-            console.log("Debug - personal_info:", personal_info);
-            console.log("Debug - about_candidate:", about_candidate);
-            console.log("Debug - selectedResumeData structure keys:", Object.keys(selectedResumeData));
             if (selectedResumeData.resume) {
                 console.log("Debug - resume structure keys:", Object.keys(selectedResumeData.resume));
             }
