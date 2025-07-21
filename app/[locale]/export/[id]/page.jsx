@@ -14,7 +14,8 @@ import { Dialog } from 'primereact/dialog'; // Import Dialog
 import styles from './export.module.css';
 import { MOCK_TEMPLATES_WITH_THEMES } from './templates.js';
 import { motion, AnimatePresence } from 'framer-motion'; // Import AnimatePresence
-
+import { SelectButton } from 'primereact/selectbutton';
+import { ToggleButton } from 'primereact/togglebutton';
 // --- Constants ---
 const PDF_ASPECT_RATIO = 1.414;
 const BASE_PREVIEW_WIDTH = 800;
@@ -39,14 +40,17 @@ const ResumePreviewPage = () => {
     const [selectedTemplate, setSelectedTemplate] = useState(null);
     const [selectedThemeValue, setSelectedThemeValue] = useState(null);
     const [scale, setScale] = useState(100);
+    const [fontScale, setFontScale] = useState('medium');
+    const [showIcons, setShowIcons] = useState(false);
+    const [showAvatar, setShowAvatar] = useState(false); // New state for avatar
     const [pdfUrl, setPdfUrl] = useState(null);
     const [isLoadingOptions, setIsLoadingOptions] = useState(true);
     const [isLoadingPdf, setIsLoadingPdf] = useState(false);
-    const [loadingMessageIndex, setLoadingMessageIndex] = useState(0); // New state for message index
+    const [loadingMessageIndex, setLoadingMessageIndex] = useState(0);
     const [errorOptions, setErrorOptions] = useState(null);
     const [errorPdf, setErrorPdf] = useState(null);
-    const [isPreviewVisible, setIsPreviewVisible] = useState(false); // State for modal visibility
-    const [previewImageUrl, setPreviewImageUrl] = useState(''); // State for image URL in modal
+    const [isPreviewVisible, setIsPreviewVisible] = useState(false);
+    const [previewImageUrl, setPreviewImageUrl] = useState('');
 
     // --- Calculated Dimensions ---
     const iframeScaleFactor = scale / 100;
@@ -56,7 +60,7 @@ const ResumePreviewPage = () => {
     // --- Refs ---
     const pdfBlobCache = useRef({});
     const previewContentRef = useRef(null);
-    const loadingIntervalRef = useRef(null); // Ref to store interval ID
+    const loadingIntervalRef = useRef(null);
 
     // --- Logic (fetchTemplates, generateCacheKey, fetchPdf, useEffects) ---
     useEffect(() => {
@@ -82,9 +86,9 @@ const ResumePreviewPage = () => {
         }
     }, [resumeId, status, session?.accessToken]);
 
-    const generateCacheKey = useCallback((templateId, themeValue) => {
+    const generateCacheKey = useCallback((templateId, themeValue, fontScale, showIcons, showAvatar) => {
         if (!resumeId || !templateId || !themeValue) return null;
-        return `${resumeId}-${templateId}-${themeValue}`;
+        return `${resumeId}-${templateId}-${themeValue}-${fontScale}-${showIcons}-${showAvatar}`;
     }, [resumeId]);
 
     const fetchPdf = useCallback(async (templateObject, themeValue) => {
@@ -93,8 +97,8 @@ const ResumePreviewPage = () => {
             return;
         }
         if (!templateObject || !themeValue) return;
-        const cacheKey = generateCacheKey(templateObject.id, themeValue);
-        const currentPdfUrl = pdfUrl; // Capture current URL before potential state change
+        const cacheKey = generateCacheKey(templateObject.id, themeValue, fontScale, showIcons, showAvatar);
+        const currentPdfUrl = pdfUrl;
         if (pdfBlobCache.current[cacheKey]) {
             if (currentPdfUrl) URL.revokeObjectURL(currentPdfUrl);
             setPdfUrl(URL.createObjectURL(pdfBlobCache.current[cacheKey]));
@@ -113,6 +117,9 @@ const ResumePreviewPage = () => {
                     resume_id: resumeId,
                     templateTheme: templateObject.value,
                     chosenTheme: themeValue,
+                    scale: fontScale,
+                    showIcons: showIcons,
+                    showAvatar: showAvatar, // Add this parameter
                 },
                 {
                     responseType: 'blob',
@@ -128,13 +135,13 @@ const ResumePreviewPage = () => {
         } finally {
             setIsLoadingPdf(false);
         }
-    }, [resumeId, status, generateCacheKey]);
+    }, [resumeId, status, generateCacheKey, fontScale, showIcons, showAvatar]);
 
     useEffect(() => {
         if (selectedTemplate && selectedThemeValue) {
             fetchPdf(selectedTemplate, selectedThemeValue);
         }
-    }, [selectedTemplate, selectedThemeValue, fetchPdf]);
+    }, [selectedTemplate, selectedThemeValue, fetchPdf, fontScale, showIcons, showAvatar]);
 
     useEffect(() => {
         return () => {
@@ -178,8 +185,10 @@ const ResumePreviewPage = () => {
 
     const handleDownload = () => {
         if (!pdfUrl || isLoadingPdf || errorPdf) return;
-        const cacheKey = generateCacheKey(selectedTemplate?.id, selectedThemeValue);
+        
+        const cacheKey = generateCacheKey(selectedTemplate?.id, selectedThemeValue, fontScale, showIcons, showAvatar);
         const blob = pdfBlobCache.current[cacheKey];
+        
         if (blob) {
             const link = document.createElement('a');
             link.href = URL.createObjectURL(blob);
@@ -192,6 +201,8 @@ const ResumePreviewPage = () => {
             URL.revokeObjectURL(link.href);
         } else {
             console.error("Download failed: Blob not found in cache.");
+            console.log("Available cache keys:", Object.keys(pdfBlobCache.current));
+            console.log("Looking for cache key:", cacheKey);
         }
     };
 
@@ -276,9 +287,38 @@ const ResumePreviewPage = () => {
                         )}
                     </div>
 
-                    {/* Download Button Area */}
+                    {/* Enhanced Controls Section */}
+                    <div className="p-4 border-top-1 surface-border">
+                        <h3 className="text-lg font-semibold mb-3 text-color">Preview Settings</h3>
+                        
+
+
+                        {/* Scale Control */}
+                        <div className="mb-3">
+                            <div className="flex align-items-center justify-content-between mb-2">
+                                <label className="text-sm font-medium text-color-secondary">Preview Scale</label>
+                                <span className="text-sm font-medium text-color-secondary w-3rem text-right">{scale}%</span>
+                            </div>
+                            <Slider
+                                value={scale}
+                                onChange={handleScaleChange}
+                                min={50}
+                                max={150}
+                                step={5}
+                                className="w-full"
+                            />
+                        </div>
+                    </div>
+
+                    {/* Download Button */}
                     <div className="p-4 border-top-1 surface-border mt-auto flex-shrink-0">
-                        <Button label="Download PDF" icon="pi pi-download" className="w-full" onClick={handleDownload} disabled={!pdfUrl || isLoadingPdf || errorPdf || isLoadingOptions} />
+                        <Button 
+                            label="Download PDF" 
+                            icon="pi pi-download" 
+                            className="w-full" 
+                            onClick={handleDownload} 
+                            disabled={!pdfUrl || isLoadingPdf || errorPdf || isLoadingOptions} 
+                        />
                     </div>
                 </div>
 
@@ -287,8 +327,8 @@ const ResumePreviewPage = () => {
 
                     {/* Preview Toolbar - NEW */}
                     <div className={`p-2 border-bottom-1 surface-border bg-surface-0 flex align-items-center justify-content-between flex-shrink-0 ${styles.previewToolbar}`} style={{ height: `${TOOLBAR_HEIGHT}px` }}>
-                        {/* Theme Selector (Conditional) */}
-                        <div className="flex align-items-center gap-2">
+                        {/* Left side - Theme and customization controls */}
+                        <div className="flex align-items-center gap-3">
                             {selectedTemplate && currentThemes.length > 0 && (
                                 <>
                                     <span className="text-xs uppercase font-semibold text-color-secondary mr-1">Theme:</span>
@@ -304,17 +344,47 @@ const ResumePreviewPage = () => {
                                     ))}
                                 </>
                             )}
-                            {selectedTemplate && currentThemes.length === 0 && (
-                                <span className="text-xs text-color-secondary">No themes for this template.</span>
-                            )}
+
+                            {/* Font Size Selector */}
+                            <div className="flex align-items-center gap-2 ml-3">
+                                <span className="text-xs uppercase font-semibold text-color-secondary">Size:</span>
+                                <SelectButton 
+                                    value={fontScale} 
+                                    onChange={(e) => setFontScale(e.value)} 
+                                    options={[
+                                        { label: 'S', value: 'small' },
+                                        { label: 'M', value: 'medium' },
+                                        { label: 'L', value: 'large' }
+                                    ]}
+                                    size="small"
+                                    disabled={isLoadingOptions || isLoadingPdf}
+                                />
+                            </div>
                         </div>
 
-                        {/* Zoom Control */}
-                        <div className="flex align-items-center gap-2" style={{ minWidth: '200px' }}>
-                            <i className="pi pi-search-minus text-color-secondary"></i>
-                            <Slider value={scale} onChange={handleScaleChange} min={25} max={150} step={5} className="flex-grow-1 mx-1" disabled={isLoadingOptions || isLoadingPdf} />
-                            <i className="pi pi-search-plus text-color-secondary"></i>
-                            <span className="text-sm font-medium text-color-secondary w-3rem text-right">{scale}%</span>
+                        {/* Right side - Icons and Avatar toggles */}
+                        <div className="flex align-items-center gap-3">
+                            {/* Icons Toggle */}
+                            <div className="flex align-items-center gap-2">
+                                <span className="text-xs uppercase font-semibold text-color-secondary">Icons:</span>
+                                <ToggleButton
+                                    checked={showIcons}
+                                    onChange={(e) => setShowIcons(e.value)}
+                                    className={`w-3rem h-2rem ${styles.centeredToggle}`}
+                                    disabled={isLoadingOptions || isLoadingPdf}
+                                />
+                            </div>
+
+                            {/* Avatar Toggle */}
+                            <div className="flex align-items-center gap-2">
+                                <span className="text-xs uppercase font-semibold text-color-secondary">Avatar:</span>
+                                <ToggleButton
+                                    checked={showAvatar}
+                                    onChange={(e) => setShowAvatar(e.value)}
+                                    className={`w-3rem h-2rem ${styles.centeredToggle}`}
+                                    disabled={isLoadingOptions || isLoadingPdf}
+                                />
+                            </div>
                         </div>
                     </div>
 

@@ -78,3 +78,23 @@
 .previewButton:hover {
     background-color: rgba(255, 255, 255, 0.9);
 }
+/* Center text in toggle buttons */
+.centeredToggle :global(.p-button-label) {
+    display: flex !important;
+    justify-content: center !important;
+    align-items: center !important;
+    width: 100% !important;
+    text-align: center !important;
+    font-size: 0.75rem !important;
+    font-weight: 500 !important;
+}
+
+.centeredToggle :global(.p-togglebutton) {
+    display: flex !important;
+    justify-content: center !important;
+    align-items: center !important;
+}
+
+.centeredToggle {
+    text-align: center !important;
+}
