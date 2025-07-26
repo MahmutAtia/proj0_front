@@ -54,6 +54,9 @@ const SIGN_IN_HANDLERS: Record<string, SignInHandlerFn> = {
 
 const SIGN_IN_PROVIDERS = Object.keys(SIGN_IN_HANDLERS);
 
+// --- SOLUTION: Add a lock to prevent token refresh race conditions ---
+let tokenRefreshPromise: Promise<any> | null = null;
+
 export const authOptions: NextAuthOptions = {
     secret: process.env.NEXTAUTH_SECRET,
     session: {
@@ -127,37 +130,51 @@ export const authOptions: NextAuthOptions = {
             }
 
             // --- 3. TOKEN REFRESH ---
-            console.log("⏳ Access token expired, attempting refresh...");
             if (!token.refresh_token) {
                 console.error("❌ No refresh token found. Invalidating session completely.");
-                return { ...token, access_token: null, refresh_token: null, ref: null, user: null };
+                return { ...token, error: "RefreshAccessTokenError" };
             }
 
-            try {
-                const response = await fetch(process.env.NEXTAUTH_BACKEND_URL + "/accounts/token/refresh/", {
-                    method: "POST",
-                    headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify({ refresh: token.refresh_token }),
-                });
-
-                const refreshedTokens = await response.json();
-                if (!response.ok) throw refreshedTokens;
-
-                console.log("✨ Token refreshed successfully.");
-                return {
-                    ...token,
-                    access_token: refreshedTokens.access,
-                    refresh_token: refreshedTokens.refresh ?? token.refresh_token,
-                    ref: getCurrentEpochTime() + BACKEND_ACCESS_TOKEN_LIFETIME,
-                };
-            } catch (error) {
-                console.error("🚨 Error refreshing access token:", error);
-                return { ...token, access_token: null, refresh_token: null, ref: null, user: null, error: "RefreshAccessTokenError" };
+            // --- Use the lock ---
+            if (tokenRefreshPromise) {
+                console.log("🔄 Another refresh is in progress, waiting for it to complete...");
+                return await tokenRefreshPromise;
             }
+
+            tokenRefreshPromise = (async () => {
+                console.log("⏳ Access token expired, attempting refresh...");
+                try {
+                    const response = await fetch(process.env.NEXTAUTH_BACKEND_URL + "/accounts/token/refresh/", {
+                        method: "POST",
+                        headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify({ refresh: token.refresh_token }),
+                    });
+
+                    const refreshedTokens = await response.json();
+                    if (!response.ok) throw refreshedTokens;
+
+                    console.log("✨ Token refreshed successfully.");
+                    return {
+                        ...token,
+                        access_token: refreshedTokens.access,
+                        refresh_token: refreshedTokens.refresh ?? token.refresh_token,
+                        ref: getCurrentEpochTime() + BACKEND_ACCESS_TOKEN_LIFETIME,
+                    };
+                } catch (error) {
+                    console.error("🚨 Error refreshing access token:", error);
+                    // On failure, invalidate the session to force re-login
+                    return { ...token, access_token: null, refresh_token: null, ref: null, user: null, error: "RefreshAccessTokenError" };
+                } finally {
+                    // --- Release the lock ---
+                    tokenRefreshPromise = null;
+                }
+            })();
+
+            return await tokenRefreshPromise;
         },
 
         async session({ session, token }) {
-            if (token.user) {
+            if (token) {
                 session.user = {
                     ...session.user,
                     ...token.user,

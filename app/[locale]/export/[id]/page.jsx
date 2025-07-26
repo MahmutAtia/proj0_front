@@ -11,11 +11,13 @@ import { Button } from 'primereact/button';
 import { Card } from 'primereact/card';
 import { Tooltip } from 'primereact/tooltip';
 import { Dialog } from 'primereact/dialog'; // Import Dialog
+import { Dropdown } from 'primereact/dropdown'; // Import Dropdown for font selector
 import styles from './export.module.css';
 import { MOCK_TEMPLATES_WITH_THEMES } from './templates.js';
 import { motion, AnimatePresence } from 'framer-motion'; // Import AnimatePresence
 import { SelectButton } from 'primereact/selectbutton';
 import { ToggleButton } from 'primereact/togglebutton';
+
 // --- Constants ---
 const PDF_ASPECT_RATIO = 1.414;
 const BASE_PREVIEW_WIDTH = 800;
@@ -30,6 +32,45 @@ const LOADING_MESSAGES = [
     "Just a moment...",
 ];
 
+// --- Font icon mapping for different font styles ---
+const FONT_ICONS = {
+    // Clean/Modern fonts
+    'roboto-opensans': 'pi pi-font',
+    'inter-sourcesans': 'pi pi-align-left',
+    'inter-poppins': 'pi pi-pencil',
+    'montserrat-sourcesans': 'pi pi-bold',
+    'nunitosans-opensans': 'pi pi-italic',
+    'nunitosans-sourceserif': 'pi pi-underline',
+    'system-georgia': 'pi pi-desktop',
+    'ibmplexsans-ibmplexserif': 'pi pi-code',
+    
+    // Elegant/Classic fonts
+    'lato-merriweather': 'pi pi-star',
+    'nunito-crimson': 'pi pi-heart',
+    'crimson-lato': 'pi pi-crown',
+    'playfair-sourcesans': 'pi pi-bookmark',
+    'cormorant-lato': 'pi pi-book',
+    'librebaskerville-opensans': 'pi pi-graduation-cap',
+    
+    // Creative/Modern fonts
+    'poppins-merriweather': 'pi pi-palette',
+    'comfortaa-opensans': 'pi pi-sun',
+    'raleway-lora': 'pi pi-moon',
+    'quicksand-crimson': 'pi pi-sparkles',
+    'inter-charter': 'pi pi-file-edit',
+    'karla-spectral': 'pi pi-image',
+    
+    // Professional/Corporate fonts
+    'sourcesans-sourceserif': 'pi pi-briefcase',
+    'roboto-robotoslab': 'pi pi-building',
+    'calibri-times': 'pi pi-verified',
+    'arial-georgia': 'pi pi-shield',
+    'worksans-lora': 'pi pi-cog',
+    
+    // Default fallback
+    'default': 'pi pi-font'
+};
+
 const ResumePreviewPage = () => {
     const params = useParams();
     const { data: session, status } = useSession();
@@ -43,6 +84,7 @@ const ResumePreviewPage = () => {
     const [fontScale, setFontScale] = useState('medium');
     const [showIcons, setShowIcons] = useState(false);
     const [showAvatar, setShowAvatar] = useState(false); // New state for avatar
+    const [selectedFont, setSelectedFont] = useState(null); // New state for font
     const [pdfUrl, setPdfUrl] = useState(null);
     const [isLoadingOptions, setIsLoadingOptions] = useState(true);
     const [isLoadingPdf, setIsLoadingPdf] = useState(false);
@@ -86,9 +128,9 @@ const ResumePreviewPage = () => {
         }
     }, [resumeId, status, session?.accessToken]);
 
-    const generateCacheKey = useCallback((templateId, themeValue, fontScale, showIcons, showAvatar) => {
+    const generateCacheKey = useCallback((templateId, themeValue, fontScale, showIcons, showAvatar, selectedFont) => {
         if (!resumeId || !templateId || !themeValue) return null;
-        return `${resumeId}-${templateId}-${themeValue}-${fontScale}-${showIcons}-${showAvatar}`;
+        return `${resumeId}-${templateId}-${themeValue}-${fontScale}-${showIcons}-${showAvatar}-${selectedFont || 'default'}`;
     }, [resumeId]);
 
     const fetchPdf = useCallback(async (templateObject, themeValue) => {
@@ -97,7 +139,8 @@ const ResumePreviewPage = () => {
             return;
         }
         if (!templateObject || !themeValue) return;
-        const cacheKey = generateCacheKey(templateObject.id, themeValue, fontScale, showIcons, showAvatar);
+        
+        const cacheKey = generateCacheKey(templateObject.id, themeValue, fontScale, showIcons, showAvatar, selectedFont);
         const currentPdfUrl = pdfUrl;
         if (pdfBlobCache.current[cacheKey]) {
             if (currentPdfUrl) URL.revokeObjectURL(currentPdfUrl);
@@ -119,7 +162,8 @@ const ResumePreviewPage = () => {
                     chosenTheme: themeValue,
                     scale: fontScale,
                     showIcons: showIcons,
-                    showAvatar: showAvatar, // Add this parameter
+                    showAvatar: showAvatar,
+                    fontFamily: selectedFont, // Add font family parameter
                 },
                 {
                     responseType: 'blob',
@@ -135,13 +179,13 @@ const ResumePreviewPage = () => {
         } finally {
             setIsLoadingPdf(false);
         }
-    }, [resumeId, status, generateCacheKey, fontScale, showIcons, showAvatar]);
+    }, [resumeId, status, generateCacheKey, fontScale, showIcons, showAvatar, selectedFont]);
 
     useEffect(() => {
         if (selectedTemplate && selectedThemeValue) {
             fetchPdf(selectedTemplate, selectedThemeValue);
         }
-    }, [selectedTemplate, selectedThemeValue, fetchPdf, fontScale, showIcons, showAvatar]);
+    }, [selectedTemplate, selectedThemeValue, fetchPdf, fontScale, showIcons, showAvatar, selectedFont]);
 
     useEffect(() => {
         return () => {
@@ -172,6 +216,8 @@ const ResumePreviewPage = () => {
         setSelectedTemplate(template);
         const firstThemeValue = template.themes?.[0]?.value || null;
         setSelectedThemeValue(firstThemeValue);
+        // Reset font selection when template changes to template's default
+        setSelectedFont(template.defaultFont || template.fonts?.[0]?.value || null);
     };
 
     const handleThemeSelect = (themeValue) => {
@@ -183,10 +229,15 @@ const ResumePreviewPage = () => {
         setScale(e.value);
     };
 
+    const handleFontChange = (fontValue) => {
+        if (isLoadingPdf || fontValue === selectedFont) return;
+        setSelectedFont(fontValue);
+    };
+
     const handleDownload = () => {
         if (!pdfUrl || isLoadingPdf || errorPdf) return;
         
-        const cacheKey = generateCacheKey(selectedTemplate?.id, selectedThemeValue, fontScale, showIcons, showAvatar);
+        const cacheKey = generateCacheKey(selectedTemplate?.id, selectedThemeValue, fontScale, showIcons, showAvatar, selectedFont);
         const blob = pdfBlobCache.current[cacheKey];
         
         if (blob) {
@@ -222,8 +273,28 @@ const ResumePreviewPage = () => {
         ))
     );
 
-    // --- Current Themes ---
+    // --- Current Themes and Fonts ---
     const currentThemes = selectedTemplate?.themes || [];
+    const currentFonts = selectedTemplate?.fonts || [];
+
+    // --- Options for the Font SelectButton ---
+    const fontSelectButtonOptions = currentFonts.map(font => ({
+        value: font.value,
+        icon: FONT_ICONS[font.value] || FONT_ICONS.default,
+        tooltip: `${font.name} - ${font.description}`
+    }));
+
+    // --- Custom template for each font button ---
+    const fontOptionTemplate = (option) => {
+        // Add a tooltip for each button
+        return (
+            <>
+                <Tooltip target={`.font-option-${option.value}`} content={option.tooltip} position="top" showDelay={300} />
+                <i className={`pi ${option.icon} font-option-${option.value}`} />
+            </>
+        );
+    };
+
 
     // --- Render Component ---
     return (
@@ -257,7 +328,7 @@ const ResumePreviewPage = () => {
                                             {templatesData.map((template) => (
                                                 <div key={template.id} className="col-6 p-1">
                                                     <Card
-                                                        className={`cursor-pointer border-2 hover:shadow-md ${styles.templateCard} ${selectedTemplate?.id === template.id ? 'border-primary shadow-2' : 'border-transparent'} relative`} // Added relative positioning
+                                                        className={`cursor-pointer border-2 hover:shadow-md ${styles.templateCard} ${selectedTemplate?.id === template.id ? 'border-primary shadow-2' : 'border-transparent'} relative`}
                                                         onClick={() => handleTemplateSelect(template)}
                                                         pt={{ header: { className: 'p-0' }, body: { className: 'p-0' }, content: { className: 'p-2 text-center' } }}
                                                     >
@@ -270,10 +341,9 @@ const ResumePreviewPage = () => {
                                                             aria-label={`Preview ${template.name}`}
                                                             tooltip="Preview Template"
                                                             tooltipOptions={{ position: 'top', showDelay: 300 }}
-                                                            className={`absolute top-0 right-0 mt-1 mr-1 z-1 ${styles.previewButton}`} // Position top-right
+                                                            className={`absolute top-0 right-0 mt-1 mr-1 z-1 ${styles.previewButton}`}
                                                             onClick={(e) => handlePreviewOpen(template.previewUrl, e)}
                                                         />
-                                                        {/* --- End Preview Button --- */}
 
                                                         <img src={template.previewUrl || '/images/previews/default.png'} alt={`${template.name} Preview`} className={`w-full block border-round-top ${styles.templatePreviewImage}`} />
                                                         <div className="text-sm font-medium text-color-secondary mt-1">{template.name}</div>
@@ -290,8 +360,28 @@ const ResumePreviewPage = () => {
                     {/* Enhanced Controls Section */}
                     <div className="p-4 border-top-1 surface-border">
                         <h3 className="text-lg font-semibold mb-3 text-color">Preview Settings</h3>
-                        
 
+                        {/* Font Selector with Icons - UPDATED */}
+                        {selectedTemplate && currentFonts.length > 0 && (
+                            <div className="mb-4">
+                                <div className="flex align-items-center justify-content-between mb-2">
+                                    <label className="text-sm font-medium text-color-secondary">Font Style</label>
+                                </div>
+                                <SelectButton 
+                                    value={selectedFont} 
+                                    onChange={(e) => handleFontChange(e.value)} 
+                                    options={fontSelectButtonOptions} 
+                                    itemTemplate={fontOptionTemplate}
+                                    className="w-full"
+                                    disabled={isLoadingOptions || isLoadingPdf}
+                                    pt={{
+                                        button: ({ context }) => ({
+                                            className: context.selected ? 'p-button' : 'p-button-secondary p-button-outlined'
+                                        })
+                                    }}
+                                />
+                            </div>
+                        )}
 
                         {/* Scale Control */}
                         <div className="mb-3">
@@ -325,9 +415,9 @@ const ResumePreviewPage = () => {
                 {/* Right Side (Toolbar + Preview) */}
                 <div className="col-12 md:col-8 lg:col-9 h-full flex flex-column">
 
-                    {/* Preview Toolbar - NEW */}
+                    {/* Preview Toolbar - UPDATED */}
                     <div className={`p-2 border-bottom-1 surface-border bg-surface-0 flex align-items-center justify-content-between flex-shrink-0 ${styles.previewToolbar}`} style={{ height: `${TOOLBAR_HEIGHT}px` }}>
-                        {/* Left side - Theme and customization controls */}
+                        {/* Left side - Theme and Font preview */}
                         <div className="flex align-items-center gap-3">
                             {selectedTemplate && currentThemes.length > 0 && (
                                 <>
@@ -343,6 +433,19 @@ const ResumePreviewPage = () => {
                                         </React.Fragment>
                                     ))}
                                 </>
+                            )}
+
+                            {/* Current Font Display */}
+                            {selectedTemplate && selectedFont && (
+                                <div className="flex align-items-center gap-2 ml-3">
+                                    <span className="text-xs uppercase font-semibold text-color-secondary">Font:</span>
+                                    <div className="flex align-items-center gap-1 bg-surface-100 px-2 py-1 border-round">
+                                        <i className={`${FONT_ICONS[selectedFont] || FONT_ICONS.default} text-sm text-primary`} />
+                                        <span className="text-xs font-medium text-color">
+                                            {currentFonts.find(f => f.value === selectedFont)?.primary.split(' ')[0] || 'Default'}
+                                        </span>
+                                    </div>
+                                </div>
                             )}
 
                             {/* Font Size Selector */}
@@ -388,8 +491,6 @@ const ResumePreviewPage = () => {
                         </div>
                     </div>
 
-
-
                     {/* Preview Area - Adjust height calculation */}
                     <div
                         ref={previewContentRef}
@@ -402,23 +503,22 @@ const ResumePreviewPage = () => {
                             style={{ width: `${iframeWidth}px`, height: `${iframeHeight}px` }}
                         >
                             {/* Overlays and Iframe */}
-                            <AnimatePresence> {/* Wrap conditional rendering with AnimatePresence */}
+                            <AnimatePresence>
                                 {isLoadingPdf && (
-                                    <motion.div // Use motion.div for animation
-                                        key="pdf-loading-overlay" // Add a unique key for AnimatePresence
+                                    <motion.div
+                                        key="pdf-loading-overlay"
                                         className={`absolute top-0 left-0 w-full h-full flex flex-column align-items-center justify-content-center z-2 bg-white-alpha-80 ${styles.overlayBase}`}
-                                        initial={{ opacity: 0 }} // Start invisible
-                                        animate={{ opacity: 1 }} // Fade in
-                                        exit={{ opacity: 0 }}    // Fade out
-                                        transition={{ duration: 0.3 }} // Control animation speed
+                                        initial={{ opacity: 0 }}
+                                        animate={{ opacity: 1 }}
+                                        exit={{ opacity: 0 }}
+                                        transition={{ duration: 0.3 }}
                                     >
                                         <ProgressSpinner style={{ width: '40px', height: '40px' }} strokeWidth="3" />
-                                        {/* Display cycling loading message */}
                                         <p className="mt-3 text-color-secondary">{LOADING_MESSAGES[loadingMessageIndex]}</p>
                                     </motion.div>
                                 )}
                             </AnimatePresence>
-                            {/* Error Overlay (Can also be animated similarly if desired) */}
+                            {/* Error Overlay */}
                             {!isLoadingPdf && errorPdf && (
                                 <div className={`absolute top-0 left-0 w-full h-full flex flex-column align-items-center justify-content-center z-2 bg-red-100 text-red-700 p-4 border-round ${styles.overlayBase}`}>
                                     <i className="pi pi-exclamation-circle text-3xl mb-2"></i>
@@ -428,8 +528,8 @@ const ResumePreviewPage = () => {
                             {/* PDF Iframe */}
                             {!isLoadingPdf && pdfUrl && !errorPdf && (
                             <iframe
-                                key={pdfUrl} // Key helps React replace the iframe correctly
-                                src={`${pdfUrl}#view=Fit&toolbar=0&navpanes=0&scrollbar=0`} // Changed FitH to Fit
+                                key={pdfUrl}
+                                src={`${pdfUrl}#view=Fit&toolbar=0&navpanes=0&scrollbar=0`}
                                 title={`Resume Preview - ${selectedTemplate?.name || ''}`}
                                 className={styles.pdfIframe}
                                 style={{ width: '100%', height: '100%' }}
@@ -450,17 +550,15 @@ const ResumePreviewPage = () => {
             <Dialog
                 header="Template Preview"
                 visible={isPreviewVisible}
-                style={{ width: '90vw', maxWidth: '600px' }} // Responsive width
+                style={{ width: '90vw', maxWidth: '600px' }}
                 modal
                 onHide={() => setIsPreviewVisible(false)}
                 pt={{
-                    content: { className: 'p-0' } // Remove padding from content area
+                    content: { className: 'p-0' }
                 }}
             >
                 <img src={previewImageUrl} alt="Template Preview" style={{ width: '100%', display: 'block' }} />
             </Dialog>
-            {/* --- End Modal --- */}
-
         </div>
     );
 };
