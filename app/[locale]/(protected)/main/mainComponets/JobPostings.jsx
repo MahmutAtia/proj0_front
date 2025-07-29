@@ -4,15 +4,22 @@ import { Button } from 'primereact/button';
 import { ProgressSpinner } from 'primereact/progressspinner';
 import { Badge } from 'primereact/badge';
 import styles from '../Dashboard.module.css';
-import { useJobService } from '@/hooks/useJobService';
+// Import both the hook and the new utility function
+import { useJobService, filterJobs } from '@/hooks/useJobService';
 import { useTranslation } from '../../../../hooks/useTranslation';
 
 const JobPostings = ({ router }) => {
     const { t } = useTranslation();
-    const { jobs, loading, getFilteredJobs, refresh, isServiceRunning } = useJobService();
+    const { 
+        jobs, 
+        loading, 
+        refresh, 
+        isWaitingForKeywords, 
+        hasActiveCycle 
+    } = useJobService(); // Removed getFilteredJobs from here
 
-    // Get latest 3 jobs for dashboard display
-    const latestJobs = getFilteredJobs({ limit: 3 });
+    // Use the pure utility function directly on the jobs state
+    const latestJobs = filterJobs(jobs, { limit: 3, sortKey: 'recent' });
 
     const formatTimeAgo = (timestamp) => {
         if (!timestamp) return '';
@@ -36,12 +43,17 @@ const JobPostings = ({ router }) => {
             <div className="flex justify-content-between align-items-center mb-3">
                 <div className="flex align-items-center gap-2">
                     <h3 className="text-xl font-bold m-0">{t('dashboard_main.jobPostings.title')}</h3>
-                    {isServiceRunning && (
+                    {hasActiveCycle && (
                         <Badge 
-                            value="LIVE" 
+                            value={
+                                <span className="flex align-items-center">
+                                    <i className="pi pi-spin pi-spinner mr-1" style={{fontSize: '0.7rem'}}></i>
+                                    LIVE
+                                </span>
+                            } 
                             severity="success" 
                             className="text-xs" 
-                            tooltip="Jobs are being updated automatically every 5 minutes"
+                            tooltip="Actively searching for new jobs"
                         />
                     )}
                 </div>
@@ -67,19 +79,20 @@ const JobPostings = ({ router }) => {
                 <p className="text-sm text-color-secondary m-0">
                     {t('dashboard_main.jobPostings.subtitle', { 
                         count: jobs.length,
-                        status: isServiceRunning ? 'live updates' : 'cached'
+                        status: hasActiveCycle ? 'live updates' : 'cached'
                     })}
                 </p>
             </div>
 
-            {loading && jobs.length === 0 ? (
+            {/* This conditional logic will now work correctly */}
+            {loading && jobs.length === 0 && !isWaitingForKeywords ? (
                 <div className="flex justify-content-center align-items-center py-5">
                     <ProgressSpinner style={{ width: '30px', height: '30px' }} />
                 </div>
             ) : latestJobs.length > 0 ? (
                 <ul className="list-none p-0 m-0">
                     {latestJobs.map((job) => (
-                        <li key={job.id} className={`${styles.feedItem} p-3 border-round cursor-pointer hover:surface-hover transition-colors transition-duration-150`}>
+                        <li key={job.id || job.job_url} className={`${styles.feedItem} p-3 border-round cursor-pointer hover:surface-hover transition-colors transition-duration-150`}>
                             <div className="flex justify-content-between align-items-start">
                                 <div className="flex-1">
                                     <div className={`${styles.feedItemTitle} font-semibold mb-1`}>
@@ -122,16 +135,32 @@ const JobPostings = ({ router }) => {
                 </ul>
             ) : (
                 <div className="text-center py-5">
-                    <p className="text-color-secondary mb-3">
-                        {t('dashboard_main.jobPostings.noJobs')}
-                    </p>
-                    <Button
-                        label={t('dashboard_main.jobPostings.startScraping')}
-                        icon="pi pi-play"
-                        className="p-button-sm"
-                        onClick={refresh}
-                        loading={loading}
-                    />
+                    {isWaitingForKeywords ? (
+                        <>
+                            <p className="text-color-secondary mb-3">
+                                {t('dashboard_main.jobPostings.waitingForKeywords') || 'Set a default resume to start finding jobs.'}
+                            </p>
+                            <Button
+                                label={t('dashboard_main.jobPostings.goToResumes') || 'Go to Resumes'}
+                                icon="pi pi-arrow-right"
+                                className="p-button-sm"
+                                onClick={() => router.push('/main/resumes')}
+                            />
+                        </>
+                    ) : (
+                        <>
+                            <p className="text-color-secondary mb-3">
+                                {t('dashboard_main.jobPostings.noJobs') || 'No new jobs found yet.'}
+                            </p>
+                            <Button
+                                label={t('common.refresh') || 'Refresh Now'}
+                                icon="pi pi-refresh"
+                                className="p-button-sm"
+                                onClick={refresh}
+                                loading={loading}
+                            />
+                        </>
+                    )}
                 </div>
             )}
 

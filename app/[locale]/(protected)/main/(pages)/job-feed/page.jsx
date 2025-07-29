@@ -11,7 +11,9 @@ import { Checkbox } from 'primereact/checkbox';
 import { ProgressSpinner } from 'primereact/progressspinner';
 import { Toast } from 'primereact/toast';
 import { Badge } from 'primereact/badge';
-import { useJobService } from '@/hooks/useJobService';
+import { Message } from 'primereact/message';
+
+import { useJobService, filterJobs } from '@/hooks/useJobService'; // Import the new filterJobs function
 import { useTranslation } from '@/hooks/useTranslation';
 import styles from './JobFeed.module.css';
 
@@ -20,8 +22,13 @@ const JobFeedPage = () => {
     const toast = useRef(null);
     const { t } = useTranslation();
     
-    // Use the centralized job service
-    const { jobs: allJobs, loading, getFilteredJobs, refresh, isServiceRunning } = useJobService();
+    const { 
+        jobs: allJobs, 
+        loading, 
+        refresh, 
+        isWaitingForKeywords, 
+        hasActiveCycle 
+    } = useJobService(); // No longer need getFilteredJobs
     
     const [filteredJobs, setFilteredJobs] = useState([]);
     const [searchTerm, setSearchTerm] = useState('');
@@ -38,39 +45,21 @@ const JobFeedPage = () => {
     const [sortKey, setSortKey] = useState(sortOptions[0].value);
     const [layout, setLayout] = useState('grid');
 
+    // This effect now uses the pure utility function, ensuring it's always in sync
+    useEffect(() => {
+        const newFilteredJobs = filterJobs(allJobs, {
+            searchTerm,
+            location: locationFilterInput,
+            isRemote,
+            sortKey,
+        });
+        setFilteredJobs(newFilteredJobs);
+    }, [allJobs, searchTerm, locationFilterInput, isRemote, sortKey]);
+
     // Track mounted state for hydration safety
     useEffect(() => {
         setMounted(true);
     }, []);
-
-    // Apply filters whenever inputs change
-    useEffect(() => {
-        if (!mounted || !getFilteredJobs) return;
-
-        let filtered = getFilteredJobs({
-            searchTerm: searchTerm.trim(),
-            location: locationFilterInput.trim(),
-            isRemote: isRemote
-        });
-
-        // Apply sorting
-        switch (sortKey) {
-            case 'recent':
-                filtered.sort((a, b) => (b.addedAt || 0) - (a.addedAt || 0));
-                break;
-            case 'company_asc':
-                filtered.sort((a, b) => (a.company || '').localeCompare(b.company || ''));
-                break;
-            case 'title_asc':
-                filtered.sort((a, b) => (a.title || '').localeCompare(b.title || ''));
-                break;
-            case 'relevance':
-            default:
-                break;
-        }
-
-        setFilteredJobs(filtered);
-    }, [allJobs, searchTerm, locationFilterInput, isRemote, sortKey, getFilteredJobs, mounted]);
 
     const handleSearch = () => {
         // Trigger a manual refresh of the job service
@@ -172,19 +161,22 @@ const JobFeedPage = () => {
             <div className="flex justify-content-between align-items-center mb-3 md:mb-0">
                 <div className="flex align-items-center gap-2">
                     <h2 className="text-2xl font-bold m-0">{t('jobFeed.title') || 'Job Feed'}</h2>
-                    {isServiceRunning && (
+                    {hasActiveCycle && (
                         <Badge 
-                            value="LIVE" 
+                            value={
+                                <span className="flex align-items-center">
+                                    <i className="pi pi-spin pi-spinner mr-1" style={{fontSize: '0.8rem'}}></i>
+                                    LIVE
+                                </span>
+                            } 
                             severity="success" 
-                            tooltip={t('jobFeed.autoUpdate.description') || 'Jobs are automatically updated every 5 minutes based on your default resume keywords'}
+                            tooltip={t('jobFeed.autoUpdate.description') || 'Actively searching for new jobs...'}
                         />
                     )}
                 </div>
+                {/* Correctly display the job count */}
                 <p className="text-color-secondary m-0">
-                    {t('jobFeed.subtitle', { 
-                        filtered: filteredJobs.length, 
-                        count: allJobs.length 
-                    }) || `Showing ${filteredJobs.length} of ${allJobs.length} jobs found`}
+                    {t('jobFeed.showingJobs', { filtered: filteredJobs.length, total: allJobs.length })}
                 </p>
             </div>
             
@@ -252,11 +244,54 @@ const JobFeedPage = () => {
         );
     }
 
-    if (loading && filteredJobs.length === 0) {
+    // --- NEW CONDITIONAL RENDERING LOGIC ---
+
+    // 1. Handle the "Waiting for Keywords" state
+    if (isWaitingForKeywords) {
+        return (
+            <div className="flex justify-content-center align-items-center min-h-screen">
+                <Card title={t('jobFeed.waiting.title') || 'Start Your Job Search'} className="text-center">
+                    <p className="text-color-secondary">
+                        {t('jobFeed.waiting.description') || 'Please set a default resume with relevant job keywords.'}
+                    </p>
+                    <Button 
+                        label={t('jobFeed.waiting.button') || 'Go to My Resumes'} 
+                        icon="pi pi-arrow-right" 
+                        onClick={() => router.push('/main/resumes')} 
+                    />
+                </Card>
+            </div>
+        );
+    }
+
+    // 2. Handle the initial loading state
+    if (loading && allJobs.length === 0) {
         return (
             <div className="flex justify-content-center align-items-center min-h-screen">
                 <ProgressSpinner />
-                <p className="ml-2">{t('jobFeed.loading') || 'Loading job opportunities...'}</p>
+                <p className="ml-2">{t('jobFeed.loading') || 'Searching for job opportunities...'}</p>
+            </div>
+        );
+    }
+
+    // 3. Handle the "No Jobs Found" state after a full cycle
+    if (!loading && !hasActiveCycle && allJobs.length === 0) {
+        return (
+            <div className="flex justify-content-center align-items-center min-h-screen">
+                <Card title={t('jobFeed.empty.title') || 'No Jobs Found'} className="text-center">
+                    <p className="text-color-secondary">
+                        {t('jobFeed.empty.description') || "We couldn't find any jobs matching your keywords right now."}
+                    </p>
+                    <p className="text-sm text-color-secondary mt-2">
+                        {t('jobFeed.empty.nextSteps') || "We'll search again automatically later. You can also try updating your resume keywords."}
+                    </p>
+                    <Button 
+                        label={t('common.refresh') || 'Refresh Now'} 
+                        icon="pi pi-refresh" 
+                        onClick={refresh} 
+                        className="p-button-outlined mt-2"
+                    />
+                </Card>
             </div>
         );
     }
@@ -265,18 +300,27 @@ const JobFeedPage = () => {
         <div className={styles.jobFeedContainer}>
             <Toast ref={toast} />
             
+            {/* INDICATOR: Show when a cycle is running and jobs are already visible */}
+            {hasActiveCycle && allJobs.length > 0 && (
+                <Message 
+                    severity="info" 
+                    text={t('jobFeed.liveUpdate.message') || "Searching for more jobs in the background..."} 
+                    className="m-3" 
+                />
+            )}
             
             <Card className={styles.pageCard}>
                 <DataView
-                    value={filteredJobs}
-                    itemTemplate={(job) => jobItemTemplate(job, layout)}
-                    layout={layout}
+                    value={filteredJobs} // This will now be correctly populated
                     header={dataviewHeader}
+                    itemTemplate={jobItemTemplate}
+                    layout={layout}
                     paginator={filteredJobs.length > 12}
                     rows={12}
                     alwaysShowPaginator={false}
-                    emptyMessage={loading ? (t('jobFeed.fetching') || 'Fetching jobs...') : (t('jobFeed.empty.description') || 'No job postings found matching your criteria. Try broadening your search!')}
-                    loading={loading && filteredJobs.length > 0}
+                    emptyMessage={t('jobFeed.empty.noMatch') || 'No job postings found matching your current filters.'}
+                    // This condition ensures the overlay only shows when loading AND the view is empty.
+                    loading={loading && filteredJobs.length === 0} 
                     pt={{ header: { className: 'surface-ground' } }}
                 />
             </Card>

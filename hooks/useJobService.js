@@ -2,6 +2,7 @@ import { useState, useEffect, useCallback, useRef } from 'react';
 import { useSession } from 'next-auth/react';
 import { aiApi } from '@/lib/axios';
 import api from '@/lib/axios'; // Import the main api for resume fetching
+import { useJobServiceContext } from '@/contexts/JobServiceContext';
 
 const JOB_SERVICE_CACHE_KEY = 'globalJobService';
 const JOB_SERVICE_EXPIRY_MS = 24 * 60 * 60 * 1000; // 24 hours
@@ -9,21 +10,102 @@ const KEYWORD_INTERVAL_MS = 5 * 60 * 1000; // 5 minutes between keywords
 const RESUMES_CACHE_KEY = 'all_resumes_list_cache'; // Same key as dashboard
 const CACHE_EXPIRY_DURATION = 15 * 60 * 1000; // Same as dashboard (15 minutes)
 
-class JobService {
+// NEW: Exported pure utility function for filtering jobs
+export const filterJobs = (jobs = [], options = {}) => {
+    const {
+        searchTerm = '',
+        location = '',
+        isRemote = false,
+        sortKey = 'relevance',
+        limit = 0,
+    } = options;
+
+    if (!jobs || jobs.length === 0) {
+        return [];
+    }
+
+    let filtered = [...jobs];
+
+    // Apply text search filter
+    if (searchTerm) {
+        const lowerCaseSearchTerm = searchTerm.toLowerCase();
+        filtered = filtered.filter(job =>
+            (job.title && job.title.toLowerCase().includes(lowerCaseSearchTerm)) ||
+            (job.company && job.company.toLowerCase().includes(lowerCaseSearchTerm))
+        );
+    }
+
+    // Apply location filter
+    if (location) {
+        const lowerCaseLocation = location.toLowerCase();
+        filtered = filtered.filter(job =>
+            job.location && job.location.toLowerCase().includes(lowerCaseLocation)
+        );
+    }
+
+    // Apply remote-only filter
+    if (isRemote) {
+        filtered = filtered.filter(job => job.is_remote);
+    }
+
+    // Apply sorting (can be expanded later)
+    if (sortKey === 'recent') {
+        filtered.sort((a, b) => (b.addedAt || 0) - (a.addedAt || 0));
+    }
+
+    // Apply limit
+    if (limit > 0) {
+        return filtered.slice(0, limit);
+    }
+
+    return filtered;
+};
+
+export class JobService {
     constructor() {
         this.jobs = [];
         this.isRunning = false;
+        this.isProcessingKeyword = false;
         this.keywordTimeoutId = null;
+        this.keywordCheckIntervalId = null;
         this.subscribers = new Set();
         this.lastFullCycleTime = 0;
         this.currentKeywordIndex = 0;
         this.keywords = [];
-        this.defaultResume = null;
-        this.userLocation = null;
-        this.isProcessingKeyword = false;
         this.cycleStartTime = 0;
         this.hasStartedCycle = false;
+        this.loading = true;
+        this.isWaitingForKeywords = false; // NEW: True if paused pending user action
+        this.hasActiveCycle = false;      // NEW: True if currently processing a cycle
         this.loadFromCache();
+    }
+
+    // Add the new states to the central state getter
+    getState() {
+        return {
+            jobs: this.jobs,
+            loading: this.loading,
+            isRunning: this.isRunning,
+            isWaitingForKeywords: this.isWaitingForKeywords,
+            hasActiveCycle: this.hasActiveCycle,
+        };
+    }
+
+    // Subscribe to job service updates
+    subscribe(callback) {
+        this.subscribers.add(callback);
+        callback(this.getState()); // Send current state immediately
+
+        // Return unsubscribe function
+        return () => {
+            this.subscribers.delete(callback);
+        };
+    }
+
+    // Notify all subscribers about state changes
+    notifySubscribers() {
+        const state = this.getState();
+        this.subscribers.forEach(callback => callback(state));
     }
 
     // Load cached data on initialization
@@ -31,28 +113,34 @@ class JobService {
         try {
             const cachedData = localStorage.getItem(JOB_SERVICE_CACHE_KEY);
             if (cachedData) {
-                const { 
-                    jobs, 
-                    timestamp, 
-                    lastFullCycleTime, 
-                    currentKeywordIndex, 
+                const {
+                    jobs,
+                    timestamp,
+                    lastFullCycleTime,
+                    currentKeywordIndex,
                     keywords,
                     cycleStartTime,
-                    hasStartedCycle 
+                    hasStartedCycle
                 } = JSON.parse(cachedData);
-                
+
                 this.jobs = jobs || [];
-                this.lastFullCycleTime = lastFullCycleTime || 0;
+                this.lastFullCycleTime = lastFullCycleTime || 0; // Keep 0 for first-time users
                 this.currentKeywordIndex = currentKeywordIndex || 0;
                 this.keywords = keywords || [];
                 this.cycleStartTime = cycleStartTime || 0;
                 this.hasStartedCycle = hasStartedCycle || false;
-                
+
                 console.log(`JobService: Loaded from cache - ${this.jobs.length} jobs, keyword ${this.currentKeywordIndex}/${this.keywords.length}`);
-                console.log(`JobService: Last cycle: ${new Date(this.lastFullCycleTime).toLocaleString()}`);
+                console.log(`JobService: Last cycle: ${this.lastFullCycleTime === 0 ? 'Never (first time)' : new Date(this.lastFullCycleTime).toLocaleString()}`);
+            } else {
+                // First time user - ensure it will start immediately
+                console.log('JobService: First time user - will start immediately');
+                this.lastFullCycleTime = 0;
             }
         } catch (error) {
             console.error('JobService: Failed to load from cache', error);
+            // Reset to ensure first-time start
+            this.lastFullCycleTime = 0;
         }
     }
 
@@ -75,17 +163,6 @@ class JobService {
         }
     }
 
-    // Subscribe to job updates
-    subscribe(callback) {
-        this.subscribers.add(callback);
-        return () => this.subscribers.delete(callback);
-    }
-
-    // Notify all subscribers of updates
-    notifySubscribers() {
-        this.subscribers.forEach(callback => callback(this.jobs));
-    }
-
     // Check if 24-hour cycle has expired
     is24HourCycleExpired() {
         const now = Date.now();
@@ -95,19 +172,13 @@ class JobService {
 
     // Check if currently in middle of a cycle
     isInActiveCycle() {
-        if (!this.hasStartedCycle) return false;
-        if (this.currentKeywordIndex >= this.keywords.length) return false; // Completed cycle
-        
-        const now = Date.now();
-        const timeSinceCycleStart = now - this.cycleStartTime;
-        
-        // If cycle started but it's been more than expected time, consider it stalled
-        const expectedCycleTime = this.keywords.length * KEYWORD_INTERVAL_MS;
-        if (timeSinceCycleStart > expectedCycleTime + (60 * 60 * 1000)) { // Add 1 hour buffer
-            console.log('JobService: Cycle appears stalled, will restart');
+        // An active cycle requires that it has started, has keywords, and hasn't finished them all.
+        if (!this.hasStartedCycle || this.keywords.length === 0 || this.currentKeywordIndex >= this.keywords.length) {
             return false;
         }
-        
+
+        // If it meets the criteria above, it's considered active.
+        // The 24-hour check is for starting a *new* cycle, not for checking if the *current* one is active.
         return true;
     }
 
@@ -117,7 +188,7 @@ class JobService {
             // Use the same cache key as dashboard
             const localData = localStorage.getItem(RESUMES_CACHE_KEY);
             let resumesData = null;
-            
+
             if (localData) {
                 const parsedCache = JSON.parse(localData);
                 if (parsedCache.data && parsedCache.timestamp && (Date.now() - parsedCache.timestamp < CACHE_EXPIRY_DURATION)) {
@@ -133,24 +204,24 @@ class JobService {
                 console.log('JobService: Fetching fresh resumes data');
                 const response = await api.get('/api/resumes/');
                 resumesData = response.data;
-                
+
                 // Cache the resumes data using the same key as dashboard
-                localStorage.setItem(RESUMES_CACHE_KEY, JSON.stringify({ 
-                    data: resumesData, 
-                    timestamp: Date.now() 
+                localStorage.setItem(RESUMES_CACHE_KEY, JSON.stringify({
+                    data: resumesData,
+                    timestamp: Date.now()
                 }));
             }
 
             // Find the default resume
             const defaultResume = resumesData.find(r => r.is_default) || resumesData[0];
-            
+
             if (defaultResume) {
                 this.defaultResume = defaultResume;
                 console.log('JobService: Found default resume:', defaultResume.title);
             } else {
                 console.log('JobService: No default resume found');
             }
-            
+
             return defaultResume;
         } catch (error) {
             console.error('JobService: Failed to get default resume', error);
@@ -209,78 +280,74 @@ class JobService {
             return;
         }
 
+        // Check for cycle completion *before* doing anything else.
         if (this.currentKeywordIndex >= this.keywords.length) {
-            console.log('JobService: All keywords processed for this cycle');
+            console.log('JobService: ✅ All keywords processed for this cycle');
+            this.hasActiveCycle = false;
+            this.isRunning = false; // Cycle is done, so it's not "running"
+            this.loading = false;
+            this.lastFullCycleTime = Date.now();
+            this.hasStartedCycle = false;
+            this.cycleStartTime = 0;
+            this.cleanOldJobs();
+            this.saveToCache();
+            this.notifySubscribers();
+            
+            console.log(`JobService: Cycle complete! Next run will start in ~24 hours.`);
+            // Schedule the next full cycle run
+            setTimeout(() => this.start(), JOB_SERVICE_EXPIRY_MS);
             return;
         }
 
         this.isProcessingKeyword = true;
+        this.loading = true;
+        this.notifySubscribers();
 
         try {
-            // Get location
             const location = await this.getUserLocation();
             if (!location) {
                 console.warn('JobService: Cannot process keyword - no location available');
+                this.currentKeywordIndex++; // Skip to avoid getting stuck
                 return;
             }
 
-            // Get current keyword
             const currentKeyword = this.keywords[this.currentKeywordIndex];
-            console.log(`JobService: Processing keyword ${this.currentKeywordIndex + 1}/${this.keywords.length}: "${currentKeyword}"`);
+            console.log(`JobService: 🔍 Processing keyword ${this.currentKeywordIndex + 1}/${this.keywords.length}: "${currentKeyword}"`);
 
-            // Make API request
-            const requestBody = {
+            const response = await aiApi.post('/scraper/scrape-jobs/', {
                 search_term: currentKeyword,
                 location: location.city,
                 country: location.country,
-            };
-
-            const response = await aiApi.post('/scraper/scrape-jobs/', requestBody);
+            });
+            
             const newJobs = Array.isArray(response.data) ? response.data : (response.data.jobs || []);
 
             if (newJobs.length > 0) {
-                console.log(`JobService: Found ${newJobs.length} jobs for keyword "${currentKeyword}"`);
-                
-                // Add unique jobs to cache
                 const addedCount = this.addUniqueJobs(newJobs);
-                console.log(`JobService: Added ${addedCount} unique jobs. Total jobs: ${this.jobs.length}`);
-                
-                if (addedCount > 0) {
-                    this.saveToCache();
-                    this.notifySubscribers();
-                }
+                console.log(`JobService: Added ${addedCount} unique jobs. Total: ${this.jobs.length}`);
             } else {
                 console.log(`JobService: No jobs found for keyword "${currentKeyword}"`);
             }
 
-            // Move to next keyword
             this.currentKeywordIndex++;
-
-            // Check if we completed full cycle
-            if (this.currentKeywordIndex >= this.keywords.length) {
-                console.log('JobService: ✅ Completed full keyword cycle!');
-                this.currentKeywordIndex = 0; // Reset for next cycle
-                this.lastFullCycleTime = Date.now();
-                this.hasStartedCycle = false;
-                this.cycleStartTime = 0;
-                
-                // Clean old jobs (keep jobs from last 7 days)
-                this.cleanOldJobs();
-                
-                this.saveToCache();
-                console.log(`JobService: Next cycle will start in 24 hours (${new Date(this.lastFullCycleTime + JOB_SERVICE_EXPIRY_MS).toLocaleString()})`);
-            } else {
-                // Save progress
-                this.saveToCache();
-            }
 
         } catch (error) {
             console.error(`JobService: Error processing keyword "${this.keywords[this.currentKeywordIndex]}"`, error);
-            // Still move to next keyword to avoid getting stuck
-            this.currentKeywordIndex++;
-            this.saveToCache();
+            this.currentKeywordIndex++; // Still move to next keyword to avoid getting stuck
         } finally {
             this.isProcessingKeyword = false;
+            this.loading = false; // Keyword is done, UI can update
+            this.saveToCache();
+            this.notifySubscribers();
+            
+            // **Crucial part**: Decide what to do next.
+            if (this.isRunning && this.currentKeywordIndex < this.keywords.length) {
+                // If more keywords are left, schedule the next one.
+                this.scheduleNextKeyword();
+            } else if (this.isRunning) {
+                // If that was the last keyword, call this function again to trigger the completion logic.
+                this.processSingleKeyword();
+            }
         }
     }
 
@@ -288,7 +355,7 @@ class JobService {
     cleanOldJobs() {
         const sevenDaysAgo = Date.now() - (7 * 24 * 60 * 60 * 1000);
         const initialCount = this.jobs.length;
-        
+
         this.jobs = this.jobs.filter(job => {
             // Keep job if it has addedAt timestamp and is within 7 days, or if no timestamp (keep as fallback)
             return !job.addedAt || job.addedAt > sevenDaysAgo;
@@ -319,7 +386,7 @@ class JobService {
         let addedCount = 0;
         newJobs.forEach(newJob => {
             // Check if job already exists (by URL or title+company combination)
-            const exists = this.jobs.some(existingJob => 
+            const exists = this.jobs.some(existingJob =>
                 (existingJob.job_url && newJob.job_url && existingJob.job_url === newJob.job_url) ||
                 (existingJob.title === newJob.title && existingJob.company === newJob.company)
             );
@@ -336,151 +403,196 @@ class JobService {
 
     // Schedule next keyword processing
     scheduleNextKeyword() {
+        if (this.currentKeywordIndex >= this.keywords.length) {
+            return;
+        }
+
+        // Clear any existing timeout to prevent duplicates
         if (this.keywordTimeoutId) {
             clearTimeout(this.keywordTimeoutId);
         }
 
-        // Don't schedule if cycle is complete
-        if (this.currentKeywordIndex >= this.keywords.length) {
-            console.log('JobService: Cycle complete, no more keywords to schedule');
-            return;
-        }
-
         this.keywordTimeoutId = setTimeout(() => {
-            this.processSingleKeyword().then(() => {
-                // Schedule next keyword if still running and not complete
-                if (this.isRunning && this.currentKeywordIndex < this.keywords.length) {
-                    this.scheduleNextKeyword();
-                }
-            });
+            this.processSingleKeyword(); // This will then schedule the *next* one
         }, KEYWORD_INTERVAL_MS);
-        
+
         const nextKeyword = this.keywords[this.currentKeywordIndex];
         console.log(`JobService: Scheduled next keyword "${nextKeyword}" in ${KEYWORD_INTERVAL_MS / 1000 / 60} minutes`);
     }
 
-    // Start the background scraping service
+    // --- REFINED START LOGIC ---
     async start() {
         if (this.isRunning) {
-            console.log('JobService: Already running');
+            console.log('JobService: Call to start() ignored, already running.');
             return;
         }
-        
-        console.log('JobService: Starting background job scraping...');
+        console.log('JobService: Start sequence initiated...');
+        this.isRunning = true; // Tentatively set
+        this.loading = true;
+        this.isWaitingForKeywords = false;
+        this.notifySubscribers();
 
-        // Initialize keywords
+        if (this.keywordCheckIntervalId) {
+            clearInterval(this.keywordCheckIntervalId);
+            this.keywordCheckIntervalId = null;
+        }
+
         const hasKeywords = await this.initializeKeywords();
+
         if (!hasKeywords) {
-            console.warn('JobService: Cannot start - no keywords available');
+            console.warn('JobService: No default resume or keywords found. Entering waiting state.');
+            this.isRunning = false;
+            this.loading = false;
+            this.isWaitingForKeywords = true;
+            this.hasActiveCycle = false;
+            this.notifySubscribers();
+
+            this.keywordCheckIntervalId = setInterval(() => this.start(), 60 * 1000);
             return;
         }
 
-        // Check if 24-hour cycle has expired
-        const cycleExpired = this.is24HourCycleExpired();
-        const inActiveCycle = this.isInActiveCycle();
+        // --- THE CORE LOGIC FIX IS HERE ---
+        const isFirstEverRun = this.lastFullCycleTime === 0 && !this.hasStartedCycle;
+        const hasCycleExpired = this.is24HourCycleExpired();
+        const shouldResume = this.isInActiveCycle();
 
-        console.log(`JobService: Cycle expired: ${cycleExpired}, In active cycle: ${inActiveCycle}`);
-        console.log(`JobService: Current keyword index: ${this.currentKeywordIndex}/${this.keywords.length}`);
-
-        if (cycleExpired && !inActiveCycle) {
-            // Start new 24-hour cycle
-            console.log('JobService: 🚀 Starting NEW 24-hour cycle');
+        if (shouldResume) {
+            // 1. HIGHEST PRIORITY: Resume an in-progress cycle.
+            console.log(`JobService: Resuming active cycle at keyword ${this.currentKeywordIndex + 1}/${this.keywords.length}`);
+            this.hasActiveCycle = true;
+            this.notifySubscribers();
+            this.processSingleKeyword(); // Process immediately to continue where it left off.
+        } else if (isFirstEverRun || hasCycleExpired) {
+            // 2. If not resuming, check if it's time for a new cycle.
+            console.log(`JobService: 🚀 Starting a new 24-hour cycle. First run: ${isFirstEverRun}, Expired: ${hasCycleExpired}`);
             this.currentKeywordIndex = 0;
-            this.hasStartedCycle = true;
             this.cycleStartTime = Date.now();
-            this.isRunning = true;
-            
-            // Process first keyword immediately
-            this.processSingleKeyword().then(() => {
-                if (this.isRunning && this.currentKeywordIndex < this.keywords.length) {
-                    this.scheduleNextKeyword();
-                }
-            });
-        } else if (inActiveCycle) {
-            // Continue existing cycle
-            console.log(`JobService: 📋 Continuing existing cycle from keyword ${this.currentKeywordIndex + 1}/${this.keywords.length}`);
-            this.isRunning = true;
-            
-            // Continue with next keyword
-            if (this.currentKeywordIndex < this.keywords.length) {
-                this.processSingleKeyword().then(() => {
-                    if (this.isRunning && this.currentKeywordIndex < this.keywords.length) {
-                        this.scheduleNextKeyword();
-                    }
-                });
-            }
+            this.hasStartedCycle = true;
+            this.hasActiveCycle = true;
+            this.saveToCache();
+            this.processSingleKeyword(); // Process the first keyword immediately.
         } else {
-            // Waiting for next 24-hour cycle
+            // 3. If not resuming and not time for a new cycle, then wait.
             const timeUntilNextCycle = (this.lastFullCycleTime + JOB_SERVICE_EXPIRY_MS) - Date.now();
             const hoursLeft = Math.ceil(timeUntilNextCycle / (1000 * 60 * 60));
-            console.log(`JobService: ⏰ Waiting for next cycle. ${hoursLeft} hours remaining until ${new Date(this.lastFullCycleTime + JOB_SERVICE_EXPIRY_MS).toLocaleString()}`);
-            this.isRunning = true;
-            
-            // Schedule to start next cycle when time comes
-            setTimeout(() => {
-                if (this.isRunning) {
-                    console.log('JobService: 24 hours elapsed, starting new cycle...');
-                    this.start(); // Recursively start new cycle
-                }
-            }, timeUntilNextCycle);
+            console.log(`JobService: ✅ Cycle complete. Waiting ${hoursLeft} hours for the next run.`);
+            this.isRunning = false;
+            this.loading = false;
+            this.hasActiveCycle = false;
+            this.notifySubscribers();
+            setTimeout(() => this.start(), timeUntilNextCycle);
         }
     }
 
-    // Stop the background scraping service
+    // --- FULLY CORRECTED PROCESS SINGLE KEYWORD ---
+    async processSingleKeyword() {
+        if (this.isProcessingKeyword) {
+            console.log('JobService: Already processing a keyword, skipping...');
+            return;
+        }
+
+        // Check for cycle completion *before* doing anything else.
+        if (this.currentKeywordIndex >= this.keywords.length) {
+            console.log('JobService: ✅ All keywords processed for this cycle');
+            this.hasActiveCycle = false;
+            this.isRunning = false; // Cycle is done, so it's not "running"
+            this.loading = false;
+            this.lastFullCycleTime = Date.now();
+            this.hasStartedCycle = false;
+            this.cycleStartTime = 0;
+            this.cleanOldJobs();
+            this.saveToCache();
+            this.notifySubscribers();
+            
+            console.log(`JobService: Cycle complete! Next run will start in ~24 hours.`);
+            // Schedule the next full cycle run
+            setTimeout(() => this.start(), JOB_SERVICE_EXPIRY_MS);
+            return;
+        }
+
+        this.isProcessingKeyword = true;
+        this.loading = true;
+        this.notifySubscribers();
+
+        try {
+            const location = await this.getUserLocation();
+            if (!location) {
+                console.warn('JobService: Cannot process keyword - no location available');
+                this.currentKeywordIndex++; // Skip to avoid getting stuck
+                return;
+            }
+
+            const currentKeyword = this.keywords[this.currentKeywordIndex];
+            console.log(`JobService: 🔍 Processing keyword ${this.currentKeywordIndex + 1}/${this.keywords.length}: "${currentKeyword}"`);
+
+            const response = await aiApi.post('/scraper/scrape-jobs/', {
+                search_term: currentKeyword,
+                location: location.city,
+                country: location.country,
+            });
+            
+            const newJobs = Array.isArray(response.data) ? response.data : (response.data.jobs || []);
+
+            if (newJobs.length > 0) {
+                const addedCount = this.addUniqueJobs(newJobs);
+                console.log(`JobService: Added ${addedCount} unique jobs. Total: ${this.jobs.length}`);
+            } else {
+                console.log(`JobService: No jobs found for keyword "${currentKeyword}"`);
+            }
+
+            this.currentKeywordIndex++;
+
+        } catch (error) {
+            console.error(`JobService: Error processing keyword "${this.keywords[this.currentKeywordIndex]}"`, error);
+            this.currentKeywordIndex++; // Still move to next keyword to avoid getting stuck
+        } finally {
+            this.isProcessingKeyword = false;
+            this.loading = false; // Keyword is done, UI can update
+            this.saveToCache();
+            this.notifySubscribers();
+            
+            // **Crucial part**: Decide what to do next.
+            if (this.isRunning && this.currentKeywordIndex < this.keywords.length) {
+                // If more keywords are left, schedule the next one.
+                this.scheduleNextKeyword();
+            } else if (this.isRunning) {
+                // If that was the last keyword, call this function again to trigger the completion logic.
+                this.processSingleKeyword();
+            }
+        }
+    }
+
+    // --- NEW STOP METHOD ---
     stop() {
-        if (!this.isRunning) return;
-        
+        console.log('JobService: Stopping all background activity.');
         this.isRunning = false;
+        this.isWaitingForKeywords = false;
+        this.hasActiveCycle = false;
         if (this.keywordTimeoutId) {
             clearTimeout(this.keywordTimeoutId);
             this.keywordTimeoutId = null;
         }
-        console.log('JobService: Stopped background job scraping');
+        if (this.keywordCheckIntervalId) {
+            clearInterval(this.keywordCheckIntervalId);
+            this.keywordCheckIntervalId = null;
+        }
+        this.notifySubscribers();
     }
 
-    // Get current jobs
-    getJobs() {
-        return this.jobs;
-    }
-
-    // Get jobs filtered by criteria
-    getFilteredJobs(filters = {}) {
-        let filteredJobs = [...this.jobs];
-
-        if (filters.searchTerm) {
-            const term = filters.searchTerm.toLowerCase();
-            filteredJobs = filteredJobs.filter(job => 
-                job.title?.toLowerCase().includes(term) ||
-                job.company?.toLowerCase().includes(term) ||
-                job.location?.toLowerCase().includes(term)
-            );
-        }
-
-        if (filters.location) {
-            const location = filters.location.toLowerCase();
-            filteredJobs = filteredJobs.filter(job => 
-                job.location?.toLowerCase().includes(location)
-            );
-        }
-
-        if (filters.isRemote) {
-            filteredJobs = filteredJobs.filter(job => job.is_remote);
-        }
-
-        // Sort by added date (newest first)
-        filteredJobs.sort((a, b) => (b.addedAt || 0) - (a.addedAt || 0));
-
-        return filteredJobs.slice(0, filters.limit || filteredJobs.length);
-    }
-
-    // Manual refresh - process next keyword immediately (only if in active cycle)
+    // --- MODIFIED REFRESH METHOD ---
     async refresh() {
         console.log('JobService: Manual refresh triggered');
-        
+
+        // If not running because it's waiting for keywords, try to start immediately.
+        if (!this.isRunning && this.keywords.length === 0) {
+            console.log('JobService: Refreshing to check for new keywords...');
+            await this.start();
+            return;
+        }
+
         if (this.isInActiveCycle() && this.currentKeywordIndex < this.keywords.length) {
             await this.processSingleKeyword();
         } else if (this.is24HourCycleExpired()) {
-            // Start new cycle if expired
             console.log('JobService: Starting new cycle due to manual refresh');
             await this.start();
         } else {
@@ -493,7 +605,7 @@ class JobService {
         const cycleExpired = this.is24HourCycleExpired();
         const inActiveCycle = this.isInActiveCycle();
         const timeUntilNextCycle = Math.max(0, (this.lastFullCycleTime + JOB_SERVICE_EXPIRY_MS) - Date.now());
-        
+
         return {
             isRunning: this.isRunning,
             currentKeywordIndex: this.currentKeywordIndex,
@@ -515,72 +627,9 @@ class JobService {
 let jobServiceInstance = null;
 
 // Custom hook to use the job service
-export const useJobService = () => {
-    const { data: session, status } = useSession();
-    const [jobs, setJobs] = useState([]);
-    const [loading, setLoading] = useState(true);
-    const [error, setError] = useState(null);
-
-    // Initialize service
-    useEffect(() => {
-        if (status === 'authenticated' && session) {
-            if (!jobServiceInstance) {
-                jobServiceInstance = new JobService();
-            }
-
-            // Subscribe to updates
-            const unsubscribe = jobServiceInstance.subscribe((updatedJobs) => {
-                setJobs(updatedJobs);
-                setLoading(false);
-            });
-
-            // Initial load
-            setJobs(jobServiceInstance.getJobs());
-            setLoading(false);
-
-            // Start the service (it will check if it should actually start based on 24-hour cycle)
-            jobServiceInstance.start();
-
-            return () => {
-                unsubscribe();
-            };
-        }
-    }, [session, status]);
-
-    // Cleanup on unmount
-    useEffect(() => {
-        return () => {
-            if (jobServiceInstance) {
-                jobServiceInstance.stop();
-            }
-        };
-    }, []);
-
-    const getFilteredJobs = useCallback((filters) => {
-        return jobServiceInstance ? jobServiceInstance.getFilteredJobs(filters) : [];
-    }, []);
-
-    const refresh = useCallback(async () => {
-        if (jobServiceInstance) {
-            setLoading(true);
-            await jobServiceInstance.refresh();
-            setLoading(false);
-        }
-    }, []);
-
-    const getStatus = useCallback(() => {
-        return jobServiceInstance ? jobServiceInstance.getStatus() : null;
-    }, []);
-
-    return {
-        jobs,
-        loading,
-        error,
-        getFilteredJobs,
-        refresh,
-        getStatus,
-        isServiceRunning: jobServiceInstance?.isRunning || false
-    };
-};
+export const useJobService = useJobServiceContext;
 
 export default useJobService;
+
+
+
