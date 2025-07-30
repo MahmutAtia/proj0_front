@@ -4,8 +4,10 @@ import { Button } from 'primereact/button';
 import { ProgressSpinner } from 'primereact/progressspinner';
 import { Badge } from 'primereact/badge';
 import styles from '../Dashboard.module.css';
-// Import both the hook and the new utility function
-import { useJobService, filterJobs } from '@/hooks/useJobService';
+// --- FIX IS HERE ---
+// The hook now comes from the context, and the utility function from the hook file.
+import { useJobService } from '@/contexts/JobServiceContext';
+import { filterJobs } from '@/hooks/useJobService';
 import { useTranslation } from '../../../../hooks/useTranslation';
 
 const JobPostings = ({ router }) => {

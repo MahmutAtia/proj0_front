@@ -1,8 +1,5 @@
-import { useState, useEffect, useCallback, useRef } from 'react';
-import { useSession } from 'next-auth/react';
 import { aiApi } from '@/lib/axios';
 import api from '@/lib/axios'; // Import the main api for resume fetching
-import { useJobServiceContext } from '@/contexts/JobServiceContext';
 
 const JOB_SERVICE_CACHE_KEY = 'globalJobService';
 const JOB_SERVICE_EXPIRY_MS = 24 * 60 * 60 * 1000; // 24 hours
@@ -622,14 +619,6 @@ export class JobService {
         };
     }
 }
-
-// Global singleton instance
-let jobServiceInstance = null;
-
-// Custom hook to use the job service
-export const useJobService = useJobServiceContext;
-
-export default useJobService;
 
 
 

@@ -1,20 +1,22 @@
 'use client';
 import React, { createContext, useContext, useEffect, useState, useRef } from 'react';
 import { useSession } from 'next-auth/react';
-import { JobService } from '@/hooks/useJobService'; // We will import the class directly
+// Import the class and the utility function
+import { JobService, filterJobs } from '@/hooks/useJobService'; 
 
 const JobContext = createContext();
 
-export const useJobServiceContext = () => {
+// This is the hook that components will import and use.
+export const useJobService = () => {
     const context = useContext(JobContext);
     if (!context) {
-        throw new Error('useJobServiceContext must be used within a JobServiceProvider');
+        throw new Error('useJobService must be used within a JobServiceProvider');
     }
     return context;
 };
 
 export const JobServiceProvider = ({ children }) => {
-    const { data: session, status } = useSession();
+    const { status } = useSession();
     const jobServiceRef = useRef(null);
 
     // State that components will subscribe to
@@ -30,7 +32,6 @@ export const JobServiceProvider = ({ children }) => {
             const serviceInstance = new JobService();
             jobServiceRef.current = serviceInstance;
 
-            // The subscription now updates all relevant states
             const unsubscribe = serviceInstance.subscribe((updatedState) => {
                 setJobs(updatedState.jobs);
                 setLoading(updatedState.loading);
@@ -41,7 +42,6 @@ export const JobServiceProvider = ({ children }) => {
 
             serviceInstance.start();
 
-            // Set initial state for the UI from the service
             const initialState = serviceInstance.getState();
             setJobs(initialState.jobs);
             setLoading(initialState.loading);
@@ -49,36 +49,30 @@ export const JobServiceProvider = ({ children }) => {
             setIsWaitingForKeywords(initialState.isWaitingForKeywords);
             setHasActiveCycle(initialState.hasActiveCycle);
 
-            // This cleanup function is now more important than ever
             return () => {
                 console.log("JobServiceProvider: Cleaning up service.");
                 unsubscribe();
-                jobServiceRef.current?.stop(); // Call the new stop method
+                jobServiceRef.current?.stop();
                 jobServiceRef.current = null;
             };
         } else if (status === 'unauthenticated' && jobServiceRef.current) {
-            // Also stop the service if the user logs out
             jobServiceRef.current.stop();
             jobServiceRef.current = null;
         }
     }, [status]);
 
-    // Create the value object with safe fallbacks
     const value = {
         jobs,
         loading,
         isServiceRunning,
         isWaitingForKeywords,
         hasActiveCycle,
-        // Safe fallback functions that check if service exists
+        // Expose the pure filterJobs function through the context
         getFilteredJobs: (options = {}) => {
-            if (jobServiceRef.current && jobServiceRef.current.getFilteredJobs) {
-                return jobServiceRef.current.getFilteredJobs(options);
-            }
-            return [];
+            return filterJobs(jobs, options);
         },
         refresh: () => {
-            if (jobServiceRef.current && jobServiceRef.current.refresh) {
+            if (jobServiceRef.current?.refresh) {
                 jobServiceRef.current.refresh();
             }
         },

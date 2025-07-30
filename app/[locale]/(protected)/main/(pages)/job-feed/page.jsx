@@ -13,7 +13,8 @@ import { Toast } from 'primereact/toast';
 import { Badge } from 'primereact/badge';
 import { Message } from 'primereact/message';
 
-import { useJobService, filterJobs } from '@/hooks/useJobService'; // Import the new filterJobs function
+import { useJobService } from '@/contexts/JobServiceContext';
+import { filterJobs } from '@/hooks/useJobService';
 import { useTranslation } from '@/hooks/useTranslation';
 import styles from './JobFeed.module.css';
 
