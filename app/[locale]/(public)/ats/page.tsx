@@ -513,7 +513,7 @@ const ATSCheckerPageContent = () => {
         if (taskIdToRetry) {
             setStatusError(null);
             setPollingAttempts(0);
-            if (postAuthTaskIdToCheck) {
+            if (postAuthTaskIdToRetry) {
                 setPostAuthCheckComplete(false);
                 checkStatus(taskIdToRetry, true);
             } else {
@@ -539,7 +539,8 @@ const ATSCheckerPageContent = () => {
 
     return (
         <div className="p-4 md:p-6 lg:p-8 flex justify-content-center align-items-start min-h-screen bg-gray-100">
-            <motion.div initial="hidden" animate="visible" variants={fadeInUp} className="w-full" style={{ maxWidth: '800px' }}>
+            {/* Make the main container wider */}
+            <motion.div initial="hidden" animate="visible" variants={fadeInUp} className="w-full" style={{ maxWidth: '1200px' }}>
                 <Toast ref={toast} position="top-right" />
                 <Card title="ATS Compatibility Checker" subTitle="See how your resume stacks up against automated screening systems." className={styles.atsCard}>
                     <AnimatePresence>
@@ -742,183 +743,130 @@ const ATSCheckerPageContent = () => {
                         </motion.div>
                     )}
 
+                    {/* --- NEW TWO-COLUMN RESULTS LAYOUT --- */}
                     {!isLoading && apiResponse && !error && (
-                        <motion.div initial="hidden" animate="visible" variants={fadeInUp} className={`mt-5 ${styles.resultsContainer}`}>
-                            <h3 className="text-xl font-semibold mb-3 border-bottom-1 pb-2">Analysis Results:</h3>
-                            <ReactMarkdown
-                                components={{
-                                    h3: ({ node, ...props }) => <h3 className="text-lg font-semibold mt-3 mb-1" {...props} />,
-                                    p: ({ node, ...props }) => <p className="mb-2 leading-normal" {...props} />,
-                                    ul: ({ node, ...props }) => <ul className="list-disc pl-5 mb-3" {...props} />,
-                                    li: ({ node, ...props }) => <li className="mb-1" {...props} />,
-                                    code: ({ node, inline, className, children, ...props }: {
-                                        node?: any;
-                                        inline?: boolean;
-                                        className?: string;
-                                        children?: React.ReactNode;
-                                        [key: string]: any;
-                                    }) => {
-                                        const match = /language-(\w+)/.exec(className || '');
-                                        return !inline ? (
-                                            <pre className={styles.codeBlock} {...props}><code>{children}</code></pre>
-                                        ) : (
-                                            <code className={styles.inlineCode} {...props}>{children}</code>
-                                        );
-                                    }
-                                }}
-                            >
-                                {apiResponse}
-                            </ReactMarkdown>
+                        <motion.div initial="hidden" animate="visible" variants={fadeInUp} className="mt-4">
+                            <div className="grid">
+                                {/* Left Column: Scrollable Report */}
+                                <div className="col-12 lg:col-7">
+                                    <h3 className="text-xl font-semibold mt-0 mb-3">Analysis Report</h3>
+                                    <div className={styles.reportContent}>
+                                        <ReactMarkdown
+                                            components={{
+                                                h3: ({ node, ...props }) => <h3 className="text-lg font-semibold mt-3 mb-1" {...props} />,
+                                                p: ({ node, ...props }) => <p className="mb-2 leading-normal" {...props} />,
+                                                ul: ({ node, ...props }) => <ul className="list-disc pl-5 mb-3" {...props} />,
+                                                li: ({ node, ...props }) => <li className="mb-1" {...props} />,
+                                                code: ({ node, inline, className, children, ...props }: {
+                                                    node?: any;
+                                                    inline?: boolean;
+                                                    className?: string;
+                                                    children?: React.ReactNode;
+                                                    [key: string]: any;
+                                                }) => {
+                                                    const match = /language-(\w+)/.exec(className || '');
+                                                    return !inline ? (
+                                                        <pre className={styles.codeBlock} {...props}><code>{children}</code></pre>
+                                                    ) : (
+                                                        <code className={styles.inlineCode} {...props}>{children}</code>
+                                                    );
+                                                }
+                                            }}
+                                        >
+                                            {apiResponse}
+                                        </ReactMarkdown>
+                                    </div>
+                                </div>
 
-                            <div className="mt-5 pt-4 border-top-1 flex flex-column justify-content-center align-items-center gap-3">
-                                {status !== 'authenticated' && sessionStorage.getItem('pendingTaskId') && !postAuthTaskIdToCheck && !postAuthCheckComplete && (
-                                    <motion.div
-                                        className="w-full text-center p-5 border-1 surface-border border-round bg-gradient-to-br from-blue-100 via-purple-50 to-pink-100 shadow-lg mb-4" // Enhanced background and shadow
-                                        initial={{ opacity: 0, y: 10 }}
-                                        animate={{ opacity: 1, y: 0 }}
-                                        transition={{ duration: 0.4 }}
-                                    >
-                                        <span className="p-3 shadow-2 mb-4 inline-block surface-card" style={{ borderRadius: '50%' }}> {/* Circular icon background */}
-                                            <i className="pi pi-google text-4xl text-primary"></i> {/* Changed icon to Google */}
-                                        </span>
-                                        <h3 className="text-2xl font-bold text-primary-800 mt-0 mb-3">Unlock Full Potential!</h3> {/* Stronger headline */}
-                                        <p className="text-color-secondary text-lg mb-5 px-3">Sign in to save this analysis, access the resume editor, and manage your applications.</p> {/* Clearer value proposition */}
-                                        <motion.div variants={buttonHoverTap} whileHover="hover" whileTap="tap">
+                                {/* Right Column: Sticky Actions Panel */}
+                                <div className="col-12 lg:col-5">
+                                    <div className={`${styles.actionPanel} sticky`} style={{ top: '1rem' }}>
+                                        <h3 className="text-xl font-semibold mt-0 mb-4">Next Steps</h3>
+                                        
+                                        <div className="flex flex-column gap-3">
+                                            {/* All conditional action buttons are now grouped here */}
+
+                                            {status !== 'authenticated' && sessionStorage.getItem('pendingTaskId') && !postAuthTaskIdToCheck && !postAuthCheckComplete && (
+                                                <motion.div
+                                                    className="w-full text-center p-4 border-round bg-primary-50"
+                                                    initial={{ opacity: 0, y: 10 }}
+                                                    animate={{ opacity: 1, y: 0 }}
+                                                >
+                                                    <i className="pi pi-google text-3xl text-primary mb-3"></i>
+                                                    <h4 className="text-lg font-bold text-primary-800 mt-0 mb-2">Unlock Full Potential!</h4>
+                                                    <p className="text-color-secondary mb-4">Sign in to save this analysis and access the resume editor.</p>
+                                                    <motion.div variants={buttonHoverTap} whileHover="hover" whileTap="tap">
+                                                        <Button
+                                                            label="Sign In & Continue"
+                                                            icon="pi pi-google"
+                                                            className="p-button-success p-button-lg w-full"
+                                                            onClick={handleSignInAndRedirect}
+                                                        />
+                                                    </motion.div>
+                                                </motion.div>
+                                            )}
+
+                                            {isCheckingStatus && status === 'authenticated' && (
+                                                <div className="surface-100 p-3 border-round">
+                                                    <div className="flex align-items-center mb-2">
+                                                        <ProgressSpinner style={{ width: '24px', height: '24px' }} strokeWidth="4" className="mr-2" />
+                                                        <span className="font-semibold">Preparing Editor...</span>
+                                                    </div>
+                                                    <p className="text-sm text-color-secondary m-0">This may take a moment while we apply ATS improvements.</p>
+                                                </div>
+                                            )}
+
+                                            {generatedResumeId && !isCheckingStatus && !statusError && (
+                                                <motion.div
+                                                    variants={buttonHoverTap}
+                                                    whileHover="hover"
+                                                    whileTap="tap"
+                                                    animate={{ scale: [1, 1.02, 1] }}
+                                                    transition={{ duration: 1.5, repeat: Infinity }}
+                                                >
+                                                    <Button
+                                                        label="Go to Editor"
+                                                        icon="pi pi-pencil"
+                                                        className="p-button-success p-button-lg w-full p-button-raised"
+                                                        onClick={handleGoToEditor}
+                                                    />
+                                                </motion.div>
+                                            )}
+
+                                            {statusError && !isCheckingStatus && (postAuthTaskIdToCheck || generationTaskId) && (
+                                                <Button
+                                                    label="Retry Preparation"
+                                                    icon="pi pi-exclamation-triangle"
+                                                    className="p-button-danger p-button-outlined w-full"
+                                                    onClick={handleRetry}
+                                                />
+                                            )}
+
+                                            {status === 'authenticated' && !generateNewResume && !generationTaskId && !postAuthTaskIdToCheck && !isCheckingStatus && !statusError && (
+                                                <Button
+                                                    label="Go to Dashboard"
+                                                    icon="pi pi-th-large"
+                                                    className="p-button-outlined w-full"
+                                                    onClick={() => router.push('/main/dashboard')}
+                                                />
+                                            )}
+
+                                            <Divider />
+
                                             <Button
-                                                label="Sign In with Google & Continue" // More descriptive label
-                                                icon="pi pi-google"
-                                                className="p-button-success p-button-xl w-full sm:w-auto shadow-md hover:shadow-lg transition-shadow transition-duration-300 p-button-raised" // Larger button (p-button-xl), raised effect
-                                                onClick={handleSignInAndRedirect}
-                                                tooltip="Securely sign in to save & edit"
-                                                tooltipOptions={{ position: 'bottom', showDelay: 300 }}
+                                                label="Start New Analysis"
+                                                icon="pi pi-refresh"
+                                                className="p-button-secondary p-button-outlined w-full"
+                                                onClick={resetFormAndResults}
+                                                disabled={isCheckingStatus}
                                             />
-                                        </motion.div>
-                                        {/* Removed Divider */}
-                                    </motion.div>
-                                )}
 
-                                <motion.div variants={buttonHoverTap} whileHover="hover" whileTap="tap">
-                                    <Button
-                                        label="Start New Scan"
-                                        icon="pi pi-refresh"
-                                        className="p-button-secondary p-button-outlined w-full sm:w-auto" // Secondary, outlined style
-                                        onClick={resetFormAndResults}
-                                        disabled={isCheckingStatus}
-                                    />
-                                </motion.div>
-
-                                {isCheckingStatus && status === 'authenticated' && (
-                                    <motion.div
-                                        className="w-full sm:w-auto"
-                                        initial={{ opacity: 0 }}
-                                        animate={{ opacity: 1 }}
-                                        transition={{ duration: 0.3 }}
-                                    >
-                                        <div className="surface-card p-3 border-round shadow-2">
-                                            <div className="flex align-items-center mb-2">
-                                                <i className="pi pi-cog pi-spin mr-2 text-primary text-xl"></i>
-                                                <span className="font-semibold text-lg">Optimizing Your Resume</span>
-                                            </div>
-                                            <div className="mb-3">
-                                                <ul className="m-0 p-0 list-none">
-                                                    <motion.li
-                                                        initial={{ opacity: 0 }}
-                                                        animate={{ opacity: 1 }}
-                                                        transition={{ delay: 0.2 }}
-                                                        className="flex align-items-center mb-2"
-                                                    >
-                                                        <i className="pi pi-check-circle text-green-500 mr-2"></i>
-                                                        <span>Formatting structure</span>
-                                                    </motion.li>
-                                                    <motion.li
-                                                        initial={{ opacity: 0 }}
-                                                        animate={{ opacity: 1 }}
-                                                        transition={{ delay: 0.4 }}
-                                                        className="flex align-items-center mb-2"
-                                                    >
-                                                        <i className="pi pi-check-circle text-green-500 mr-2"></i>
-                                                        <span>Applying ATS improvements</span>
-                                                    </motion.li>
-                                                    <motion.li
-                                                        initial={{ opacity: 0 }}
-                                                        animate={{ opacity: 1 }}
-                                                        transition={{ delay: 0.6 }}
-                                                        className="flex align-items-center"
-                                                    >
-                                                        <i className={`${pollingAttempts > 2 ? "pi pi-check-circle text-green-500" : "pi pi-spin pi-spinner text-blue-500"} mr-2`}></i>
-                                                        <span>Preparing editor environment</span>
-                                                    </motion.li>
-                                                </ul>
-                                            </div>
-                                            <div className="flex justify-content-between align-items-center">
-                                                <span className="text-sm text-color-secondary">This may take a moment...</span>
-                                                <ProgressSpinner style={{ width: '20px', height: '20px' }} strokeWidth="4" />
-                                            </div>
+                                            {statusError && !isCheckingStatus && !(postAuthTaskIdToCheck || generationTaskId) && (
+                                                <small className="p-error text-center block">{statusError}</small>
+                                            )}
                                         </div>
-                                    </motion.div>
-                                )}
-
-                                {statusError && !isCheckingStatus && (postAuthTaskIdToCheck || generationTaskId) && (
-                                    <motion.div variants={buttonHoverTap} whileHover="hover" whileTap="tap">
-                                        <Button
-                                            label="Retry Preparation"
-                                            icon="pi pi-exclamation-triangle"
-                                            className="p-button-danger p-button-outlined w-full sm:w-auto"
-                                            onClick={handleRetry}
-                                            tooltip={`Error: ${statusError}. Click to retry.`}
-                                            tooltipOptions={{ position: 'bottom', showDelay: 100 }}
-                                        />
-                                    </motion.div>
-                                )}
-
-                                {generatedResumeId && !isCheckingStatus && !statusError && (
-                                    <motion.div
-                                        variants={buttonHoverTap} // Keep hover/tap effects
-                                        whileHover="hover"
-                                        whileTap="tap"
-                                        // Add a subtle pulse animation
-                                        animate={{
-                                            scale: [1, 1.03, 1], // Scale up and back down
-                                            boxShadow: [ // Add a subtle glow effect
-                                                "0 0 0 0 rgba(40, 167, 69, 0.4)",
-                                                "0 0 0 6px rgba(40, 167, 69, 0)",
-                                                "0 0 0 0 rgba(40, 167, 69, 0)"
-                                            ]
-                                        }}
-                                        transition={{
-                                            duration: 1.8, // Slower, more noticeable pulse
-                                            repeat: Infinity,
-                                            ease: "easeInOut",
-                                            repeatDelay: 1 // Pause between pulses
-                                        }}
-                                        style={{ borderRadius: '6px' }} // Apply border radius for boxShadow
-                                    >
-                                        <Button
-                                            label="Go to Editor"
-                                            icon="pi pi-pencil"
-                                            // Make it the primary action button style
-                                            className="p-button-success p-button-lg w-full sm:w-auto p-button-raised shadow-md" // Larger, raised, success color
-                                            onClick={handleGoToEditor}
-                                            tooltip="Edit this resume"
-                                            tooltipOptions={{ position: 'bottom', showDelay: 300 }}
-                                        />
-                                    </motion.div>
-                                )}
-
-                                {status === 'authenticated' && !generateNewResume && !generationTaskId && !postAuthTaskIdToCheck && !isCheckingStatus && !statusError && (
-                                    <motion.div variants={buttonHoverTap} whileHover="hover" whileTap="tap">
-                                        <Button
-                                            label="Go to Dashboard"
-                                            icon="pi pi-th-large"
-                                            className="p-button-outlined w-full sm:w-auto"
-                                            onClick={() => router.push('/main/dashboard')}
-                                        />
-                                    </motion.div>
-                                )}
-
-                                {statusError && !isCheckingStatus && !(postAuthTaskIdToCheck || generationTaskId) && (
-                                    <small className="p-error text-center sm:text-left w-full sm:w-auto">{statusError}</small>
-                                )}
+                                    </div>
+                                </div>
                             </div>
                         </motion.div>
                     )}

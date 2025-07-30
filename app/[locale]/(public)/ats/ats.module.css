@@ -21,29 +21,26 @@
      border-color: var(--primary-color);
 }
 
-/* Results Container Styling */
-.resultsContainer {
-    background-color: var(--surface-ground); /* Slightly different background */
+
+/* --- NEW STYLES FOR TWO-COLUMN LAYOUT --- */
+
+/* Style for the scrollable report content on the left */
+.reportContent {
+    height: 65vh; /* Set a fixed height */
+    overflow-y: auto; /* Enable vertical scrolling */
+    padding: 1rem;
+    background-color: var(--surface-a);
     border: 1px solid var(--surface-border);
     border-radius: var(--border-radius);
-    padding: 1.5rem 2rem;
-    margin-top: 2rem;
 }
 
-.resultsContainer h3 { /* Style for the main results heading */
-    color: var(--primary-color);
-    border-color: var(--surface-d);
-}
-
-/* Markdown specific styles within results */
-.resultsContainer p {
-    color: var(--text-color-secondary);
-}
-.resultsContainer ul {
-    color: var(--text-color-secondary);
-}
-.resultsContainer li::marker {
-    color: var(--primary-color);
+/* Style for the action panel on the right */
+.actionPanel {
+    background-color: var(--surface-card);
+    border-radius: var(--border-radius-lg);
+    padding: 1.5rem;
+    border: 1px solid var(--surface-border);
+    box-shadow: 0 2px 10px rgba(0,0,0,0.05);
 }
 
 .codeBlock {
