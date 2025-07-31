@@ -513,7 +513,7 @@ const ATSCheckerPageContent = () => {
         if (taskIdToRetry) {
             setStatusError(null);
             setPollingAttempts(0);
-            if (postAuthTaskIdToRetry) {
+            if (postAuthTaskIdToCheck) {
                 setPostAuthCheckComplete(false);
                 checkStatus(taskIdToRetry, true);
             } else {
