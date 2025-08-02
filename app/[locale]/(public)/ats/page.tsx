@@ -169,20 +169,25 @@ const ATSCheckerPageContent = () => {
     useEffect(() => {
         const postAuthTask = searchParams.get('post_auth_task');
         if (status === 'authenticated' && postAuthTask === 'true' && !postAuthCheckComplete) {
+            // Immediately mark the post-auth check as handled to prevent this from re-running.
+            setPostAuthCheckComplete(true);
+
             const pendingTaskId = sessionStorage.getItem('pendingTaskId');
             const pendingApiResponse = sessionStorage.getItem('pendingApiResponse');
+            
             sessionStorage.removeItem('pendingTaskId');
             sessionStorage.removeItem('pendingApiResponse');
-            router.replace('/ats', undefined);
 
             if (pendingTaskId) {
-                setPostAuthTaskIdToCheck(pendingTaskId);
+                // Restore the UI state from before login
+                setShowForm(false);
+                setError(null);
+                setIsLoading(false); // Stop the main page loader
                 if (pendingApiResponse) {
                     setApiResponse(pendingApiResponse);
                 }
-                setShowForm(false);
-                setError(null);
-                setIsLoading(false);
+                // Start the status check for the restored task ID
+                setPostAuthTaskIdToCheck(pendingTaskId);
             } else {
                 toast.current?.show({ severity: 'warn', summary: 'Session Expired?', detail: 'Could not retrieve analysis task after sign-in.' });
                 router.push('/main/dashboard');
@@ -504,15 +509,11 @@ const ATSCheckerPageContent = () => {
         }
     };
 
+    // This function is now simplified. The state is already saved in `handleSubmit`.
     const handleSignInAndRedirect = () => {
-        const taskIdToStore = sessionStorage.getItem('pendingTaskId');
-        if (!taskIdToStore && generationTaskId) {
-            sessionStorage.setItem('pendingTaskId', generationTaskId);
-        }
-        if (apiResponse && !sessionStorage.getItem('pendingApiResponse')) {
-            sessionStorage.setItem('pendingApiResponse', apiResponse);
-        }
-        signIn('google', { callbackUrl: '/ats?post_auth_task=true' });
+        const locale = window.location.pathname.split('/')[1] || 'en';
+        const callbackUrl = `/${locale}/ats?post_auth_task=true`;
+        signIn('google', { callbackUrl });
     };
 
     const isSubmitDisabled = isLoading || !targetRole.trim() || !((resumeInputMethod === 'upload' && resumeFile) || (resumeInputMethod === 'paste' && resumeText.trim()));
