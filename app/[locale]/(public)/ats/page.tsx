@@ -20,7 +20,7 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import styles from './ats.module.css';
 import { Suspense } from 'react';
 import { addOrUpdateResumeInCache } from '@/app/utils/resumeCache'; // 1. Import the cache utility
-
+import api,{ aiApi } from '@/lib/axios';  
 
 
 // Animation Variants
@@ -253,7 +253,7 @@ const ATSCheckerPageContent = () => {
         }
 
         try {
-            const statusApiUrl = `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/resumes/pdf-generation-status/${taskId}/`;
+            const statusApiUrl = `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/task-status/${taskId}/`;
             const fetchOptions: RequestInit = {
                 method: 'GET',
                 headers: {
@@ -276,40 +276,29 @@ const ATSCheckerPageContent = () => {
 
             const statusResult = await response.json();
 
+
             switch (statusResult.status) {
                 case 'SUCCESS':
-                    if (isPostAuthCheck) {
-                        // Post-Auth Flow: Task succeeded, now call the save endpoint
-                        console.log(`Post-auth check SUCCESS for task ${taskId}, calling saveGeneratedResume.`);
-                        // Stop the main loading indicator, save function has its own
-                        setIsCheckingStatus(false);
-                        setPollingAttempts(0);
-                        // Clear interval if it was somehow running (shouldn't be for post-auth, but safety)
-                        if (pollingIntervalRef.current) {
-                            clearInterval(pollingIntervalRef.current);
-                            pollingIntervalRef.current = null;
-                        }
-                        await saveGeneratedResume(taskId); // Call the dedicated save function
-                        // saveGeneratedResume will handle setting generatedResumeId and postAuthCheckComplete
-                    } else {
-                        // Authenticated Polling Flow: Get resume_id directly
-                        const resumeIdFromResult = statusResult.result?.resume_id;
-                        if (resumeIdFromResult) {
-                            // Found resume ID, stop polling and update state
-                            setGeneratedResumeId(String(resumeIdFromResult));
-                            setStatusError(null);
-                            toast.current?.show({ severity: 'info', summary: 'Ready', detail: 'Editor is ready.', life: 2000 });
-                            try { localStorage.removeItem('data'); } catch (e) { }
-                            setIsCheckingStatus(false); // Stop loading on success
-                            setPollingAttempts(0);
-                            // Interval cleared by useEffect cleanup
-                        } else {
-                            // If resume_id is missing even on SUCCESS, treat as error
-                            setIsCheckingStatus(false); // Stop loading
-                            console.warn("Polling status SUCCESS but 'resume_id' was missing in result:", statusResult.result);
-                            throw new Error("Editor prepared, but the resume ID was not found.");
-                        }
+                    // Task succeeded, now call the save endpoint to get the resume details.
+                    // This works for both post-authentication checks and regular polling.
+                    console.log(`Task ${taskId} succeeded, calling saveGeneratedResume.`);
+                    
+                    // Stop polling and related state updates.
+                    setIsCheckingStatus(false);
+                    setPollingAttempts(0);
+                    if (pollingIntervalRef.current) {
+                        clearInterval(pollingIntervalRef.current);
+                        pollingIntervalRef.current = null;
                     }
+                    
+                    // The save function will handle the rest of the UI updates.
+                    await saveGeneratedResume(taskId);
+                    break;
+
+                case 'FAILURE':
+                    setIsCheckingStatus(false);
+                    throw new Error(statusResult.result || "The analysis task failed on the server.");
+
                 case 'PENDING':
                 default:
                     if (pollingAttempts + 1 >= MAX_POLLING_ATTEMPTS) {
@@ -431,32 +420,23 @@ const ATSCheckerPageContent = () => {
         formData.append('formData', JSON.stringify(backendFormData));
 
         try {
-            const apiUrl = `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/resumes/ats-checker/`;
-
-            const fetchOptions: RequestInit = {
-                method: 'POST',
-                body: formData,
+            const response = await aiApi.post('/resumes-v2/ats_checker_and_generate/', formData, {
                 headers: {
                     ...(session?.accessToken && {
                         'Authorization': `Bearer ${session.accessToken}`
                     })
-                },
-            };
-
-            const response = await fetch(apiUrl, fetchOptions);
-
-            if (!response.ok) {
-                let errorDetail = 'Failed to analyze resume. Please try again.';
-                try {
-                    const errorData = await response.json();
-                    errorDetail = errorData.detail || errorData.error || errorData.message || errorDetail;
-                } catch (e) {
-                    errorDetail = response.statusText || errorDetail;
                 }
-                throw new Error(errorDetail);
-            }
+            });
 
-            const result = await response.json();
+            if (!response || !response.data) {
+                console.error("Invalid response from backend:", response);
+                throw new Error("Failed to analyze resume. Please try again.");
+            }
+            // Uncomment this if you want to handle non-200 responses
+
+
+       
+            const result = await response.data;
             const markdownOutput = result.ats_result;
             const taskId = result.generation_task_id;
 
