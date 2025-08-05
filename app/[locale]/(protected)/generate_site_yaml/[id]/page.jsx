@@ -2,7 +2,7 @@
 // pages/resumes/[resumeId]/create-portfolio.js
 import React, { useState, useRef, useEffect } from 'react';
 import { useRouter, useParams } from 'next/navigation';
-import api from '@/lib/axios'; // Adjust the import path as necessary
+import api,{ aiApi } from '@/lib/axios';  
 
 // PrimeReact Components
 import { Steps } from 'primereact/steps';
@@ -18,8 +18,10 @@ import styles from './CreatePortfolioPage.module.css';
 
 // Importing design concept options, color styles, and add-on features
 import { designConceptOptions, colorStyleOptions, addOnFeatureOptions } from './prefrences'
+import { generateYamlFromLocalStorage } from '@/app/utils/utils'; // Adjust the import path as needed
 
-
+const POLLING_INTERVAL = 3000; // 3 seconds
+const MAX_POLLING_ATTEMPTS = 40; // 2 minutes total
 
 
 export default function CreatePortfolioPage({ params: paramsPromise }) {
@@ -35,6 +37,14 @@ export default function CreatePortfolioPage({ params: paramsPromise }) {
     const [isLoading, setIsLoading] = useState(false);
     const [generationResult, setGenerationResult] = useState(null);
     const [currentLoadingMessageIndex, setCurrentLoadingMessageIndex] = useState(0);
+
+    // --- New State for Polling ---
+    const [generationTaskId, setGenerationTaskId] = useState(null);
+    const [isCheckingStatus, setIsCheckingStatus] = useState(false);
+    const [statusError, setStatusError] = useState(null);
+    const [pollingAttempts, setPollingAttempts] = useState(0);
+    const pollingIntervalRef = useRef(null);
+
 
     const loadingMessages = [
         "Crafting your unique layout...",
@@ -56,7 +66,7 @@ export default function CreatePortfolioPage({ params: paramsPromise }) {
 
     useEffect(() => {
         let intervalId;
-        if (isLoading) {
+        if (isLoading || isCheckingStatus) {
             setCurrentLoadingMessageIndex(0); // Reset to the first message when loading starts
             intervalId = setInterval(() => {
                 setCurrentLoadingMessageIndex(prevIndex => (prevIndex + 1) % loadingMessages.length);
@@ -65,7 +75,7 @@ export default function CreatePortfolioPage({ params: paramsPromise }) {
         return () => {
             clearInterval(intervalId);
         };
-    }, [isLoading, loadingMessages.length]);
+    }, [isLoading, isCheckingStatus, loadingMessages.length]);
 
     const stepperItems = [
         { label: 'Design Concept', command: () => setActiveIndex(0) },
@@ -116,6 +126,23 @@ export default function CreatePortfolioPage({ params: paramsPromise }) {
         return lines.join('\n');
     };
 
+    const resetState = () => {
+        setActiveIndex(0);
+        setSelectedConcept(null);
+        setSelectedColorStyle(null);
+        setSelectedAddOns([]);
+        setIsLoading(false);
+        setGenerationResult(null);
+        setGenerationTaskId(null);
+        setIsCheckingStatus(false);
+        setStatusError(null);
+        setPollingAttempts(0);
+        if (pollingIntervalRef.current) {
+            clearInterval(pollingIntervalRef.current);
+            pollingIntervalRef.current = null;
+        }
+    };
+
     const handleSubmitPreferences = async () => {
         if (!selectedConcept || !selectedColorStyle) {
             toast.current?.show({ severity: 'warn', summary: 'Missing Selections', detail: 'Please select a Design Concept and Color Palette.', life: 3000 });
@@ -123,39 +150,117 @@ export default function CreatePortfolioPage({ params: paramsPromise }) {
         }
         setIsLoading(true);
         setGenerationResult(null);
+        setStatusError(null);
         const preferences = constructPreferencesPayload();
 
         try {
-            const response = await api.post(
-                `/api/resumes/generate_website_yaml/`,
-                { resumeId: resumeId, preferences: preferences }
+            // This now returns a task_id
+            const response = await aiApi.post(
+                `/websites/create_resume_website/`,
+                { resumeId: resumeId, preferences: preferences , resume: generateYamlFromLocalStorage(resumeId) } // Pass the YAML directly
             );
-            setGenerationResult({ success: true, data: response.data });
-            toast.current?.show({ severity: 'success', summary: 'Success', detail: 'Website preferences submitted! Generation started.', life: 5000 });
-            // Navigate to the site editor page on success
-            if (response.data && response.data.website_uuid) {
-                router.push(`/site-editor/${response.data.website_uuid}/`);
+            
+            if (response.data && response.data.generation_task_id) {
+                setGenerationTaskId(response.data.generation_task_id);
+                toast.current?.show({ severity: 'info', summary: 'Generation Started', detail: 'Your website is being prepared. Please wait.', life: 4000 });
             } else {
-                // Fallback or error if website_uuid is not in the response
-                console.error("website_uuid not found in response data");
-                toast.current?.show({ severity: 'error', summary: 'Navigation Error', detail: 'Could not retrieve website ID for navigation.', life: 5000 });
+                throw new Error("Failed to start the generation process.");
             }
         } catch (error) {
             console.error("Error submitting preferences:", error);
-            // The global interceptor will handle 403 limit exceeded errors.
-            // We just need to handle other errors here.
             let detail = 'An error occurred while submitting preferences.';
             if (error.response) {
                 detail = `Error: ${error.response.status} - ${error.response.data?.detail || error.response.statusText}`;
             } else if (error.request) {
                 detail = 'No response from server. Check connection or try later.';
             }
-            setGenerationResult({ success: false, error: detail });
+            setStatusError(detail);
             toast.current?.show({ severity: 'error', summary: 'Error', detail: detail, life: 7000 });
         } finally {
             setIsLoading(false);
         }
     };
+
+    // --- Polling Logic (similar to ATS page) ---
+    useEffect(() => {
+        if (generationTaskId && !statusError) {
+            setIsCheckingStatus(true);
+            // Clear any existing interval
+            if (pollingIntervalRef.current) {
+                clearInterval(pollingIntervalRef.current);
+            }
+            // Start polling immediately, then set interval
+            checkStatus(generationTaskId);
+            pollingIntervalRef.current = setInterval(() => checkStatus(generationTaskId), POLLING_INTERVAL);
+        }
+
+        // Cleanup function
+        return () => {
+            if (pollingIntervalRef.current) {
+                clearInterval(pollingIntervalRef.current);
+            }
+        };
+    }, [generationTaskId, statusError]);
+
+
+    const checkStatus = async (taskId) => {
+        if (pollingAttempts >= MAX_POLLING_ATTEMPTS) {
+            setStatusError("Generation is taking longer than expected. Please check your dashboard later.");
+            setIsCheckingStatus(false);
+            clearInterval(pollingIntervalRef.current);
+            return;
+        }
+
+        setPollingAttempts(prev => prev + 1);
+
+        try {
+            const response = await api.get(`api/task-status/${taskId}/`);
+            const statusResult = response.data;
+
+            switch (statusResult.status) {
+                case 'SUCCESS':
+                    clearInterval(pollingIntervalRef.current);
+                    toast.current?.show({ severity: 'success', summary: 'Task Complete', detail: 'Finalizing your website...', life: 3000 });
+                    await saveGeneratedWebsite(taskId);
+                    break;
+                case 'FAILURE':
+                    clearInterval(pollingIntervalRef.current);
+                    setIsCheckingStatus(false);
+                    setStatusError(statusResult.error || "The generation task failed on the server.");
+                    break;
+                case 'PENDING':
+                    // Continue polling
+                    break;
+                default:
+                    // Continue polling
+                    break;
+            }
+        } catch (err) {
+            console.error("Status check error:", err);
+            setStatusError("Could not check generation status. Please try again later.");
+            setIsCheckingStatus(false);
+            clearInterval(pollingIntervalRef.current);
+        }
+    };
+
+    const saveGeneratedWebsite = async (taskId) => {
+        try {
+            const response = await api.post('api/resumes/save_generated_website/', { generation_task_id: taskId });
+            if (response.data && response.data.website_uuid) {
+                toast.current?.show({ severity: 'success', summary: 'Website Ready!', detail: 'Redirecting to the editor...', life: 3000 });
+                setGenerationResult({ success: true, data: response.data });
+                router.push(`/site-editor/${response.data.website_uuid}/`);
+            } else {
+                throw new Error("Could not retrieve website ID after saving.");
+            }
+        } catch (err) {
+            console.error("Save generated website error:", err);
+            setStatusError(err.response?.data?.error || err.message || "An error occurred while finalizing the website.");
+        } finally {
+            setIsCheckingStatus(false);
+        }
+    };
+
 
     const renderStepContent = () => {
         switch (activeIndex) {
@@ -251,11 +356,11 @@ export default function CreatePortfolioPage({ params: paramsPromise }) {
                     </div>
                 );
             case 3: // Review & Generate
-                if (isLoading) {
+                if (isLoading || isCheckingStatus) {
                     return (
                         <div className="text-center p-5">
                             <ProgressSpinner style={{ width: '80px', height: '80px' }} strokeWidth="4" />
-                            <h3 className="mt-4 text-xl font-semibold">Generating Your Design...</h3>
+                            <h3 className="mt-4 text-xl font-semibold">{isCheckingStatus ? 'Preparing Your Website...' : 'Submitting Preferences...'}</h3>
                             <p className="text-lg text-600 mt-2">{loadingMessages[currentLoadingMessageIndex]}</p>
                             <p className="text-sm text-500 mt-4">This can take up to a few minutes. Please don&apos;t close this page.</p>
                         </div>
@@ -265,20 +370,19 @@ export default function CreatePortfolioPage({ params: paramsPromise }) {
                     return (
                         <div className="text-center p-5">
                             <i className="pi pi-check-circle text-green-500 text-6xl mb-3"></i>
-                            <h3 className="mt-3 text-xl font-semibold">Preferences Submitted Successfully!</h3>
-                            <p className="text-lg text-600">Your unique website design generation has been initiated.</p>
-                            <p className="text-sm text-500 mt-2">You will be notified once it&apos;s ready, or check your dashboard.</p>
-                            <Button label="Start New Design" icon="pi pi-plus" className="p-button-outlined mt-4" onClick={() => { setActiveIndex(0); setGenerationResult(null); setSelectedConcept(null); setSelectedColorStyle(null); setSelectedAddOns([]); }} />
+                            <h3 className="mt-3 text-xl font-semibold">Website Ready!</h3>
+                            <p className="text-lg text-600">You are being redirected to your new website editor.</p>
+                            <Button label="Go to Editor Now" icon="pi pi-arrow-right" className="p-button-success mt-4" onClick={() => router.push(`/site-editor/${generationResult.data.website_uuid}/`)} />
                         </div>
                     );
                 }
-                if (generationResult?.error) {
+                if (statusError) {
                     return (
                         <div className="text-center p-5">
                             <i className="pi pi-times-circle text-red-500 text-6xl mb-3"></i>
                             <h3 className="mt-3 text-xl font-semibold">Generation Failed</h3>
-                            <p className="text-lg text-red-700">{generationResult.error}</p>
-                            <Button label="Try Again" icon="pi pi-refresh" className="p-button-danger mt-4" onClick={() => { setIsLoading(false); setGenerationResult(null); }} />
+                            <p className="text-lg text-red-700">{statusError}</p>
+                            <Button label="Try Again" icon="pi pi-refresh" className="p-button-danger mt-4" onClick={resetState} />
                         </div>
                     );
                 }
@@ -312,7 +416,7 @@ export default function CreatePortfolioPage({ params: paramsPromise }) {
                                 icon="pi pi-sparkles"
                                 className="w-full mt-5 p-button-lg p-button-success"
                                 onClick={handleSubmitPreferences}
-                                disabled={!selectedConcept || !selectedColorStyle || isLoading}
+                                disabled={!selectedConcept || !selectedColorStyle || isLoading || isCheckingStatus}
                             />
                         </div>
                     </Card>
@@ -352,13 +456,13 @@ export default function CreatePortfolioPage({ params: paramsPromise }) {
                             label="Back"
                             icon="pi pi-arrow-left"
                             onClick={() => setActiveIndex(Math.max(0, activeIndex - 1))}
-                            disabled={activeIndex === 0 || isLoading}
+                            disabled={activeIndex === 0 || isLoading || isCheckingStatus}
                             className="p-button-secondary"
                         />
                         <Button
-                            label={activeIndex === stepperItems.length - 1 ? (isLoading ? 'Generating...' : 'Generate Design') : 'Next'}
+                            label={activeIndex === stepperItems.length - 1 ? (isLoading || isCheckingStatus ? 'Generating...' : 'Generate Design') : 'Next'}
                             iconPos={activeIndex === stepperItems.length - 1 ? 'left' : 'right'}
-                            icon={activeIndex === stepperItems.length - 1 ? (isLoading ? 'pi pi-spin pi-spinner' : 'pi pi-check') : 'pi pi-arrow-right'}
+                            icon={activeIndex === stepperItems.length - 1 ? (isLoading || isCheckingStatus ? 'pi pi-spin pi-spinner' : 'pi pi-check') : 'pi pi-arrow-right'}
                             onClick={() => {
                                 if (activeIndex === stepperItems.length - 1) {
                                     handleSubmitPreferences();
@@ -372,7 +476,7 @@ export default function CreatePortfolioPage({ params: paramsPromise }) {
                                     setActiveIndex(Math.min(stepperItems.length - 1, activeIndex + 1));
                                 }
                             }}
-                            disabled={isLoading || (activeIndex === 0 && !selectedConcept && activeIndex < stepperItems.length - 1) || (activeIndex === 1 && !selectedColorStyle && activeIndex < stepperItems.length - 1)}
+                            disabled={isLoading || isCheckingStatus || (activeIndex === 0 && !selectedConcept && activeIndex < stepperItems.length - 1) || (activeIndex === 1 && !selectedColorStyle && activeIndex < stepperItems.length - 1)}
                             className={activeIndex === stepperItems.length - 1 ? 'p-button-success' : 'p-button-primary'}
                         />
                     </div>
