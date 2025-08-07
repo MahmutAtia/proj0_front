@@ -1,9 +1,10 @@
 import { Metadata } from 'next';
 import AppConfig from '../../../layout/AppConfig';
 import React from 'react';
-import { JobServiceProvider } from '@/contexts/JobServiceContext';
+import { Providers } from '@/contexts/providers'; 
 
-interface SimpleLayoutProps {
+
+interface ProtectedLayoutProps {
     children: React.ReactNode;
 }
 
@@ -12,14 +13,10 @@ export const metadata: Metadata = {
     description: 'ai'
 };
 
-export default function SimpleLayout({ children }: SimpleLayoutProps) {
+export default function ProtectedLayout({ children }: ProtectedLayoutProps) {
     return (
-        <React.Fragment>
-            <JobServiceProvider> 
-
+        <Providers>
             {children}
-            <AppConfig simple />
-            </JobServiceProvider>
-        </React.Fragment>
+        </Providers>
     );
 }

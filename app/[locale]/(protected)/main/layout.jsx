@@ -22,6 +22,7 @@ import {
 import styles from './Dashboard.module.css';
 import { useTranslation } from '../../../../hooks/useTranslation'; // Import the hook
 import LanguageSwitcher from '../../../components/LanguageSwitcher';
+import TaskNotificationBell from './mainComponets/TaskNotificationBell';
 
 // --- Child Components (defined in the same file) ---
 
@@ -118,15 +119,12 @@ const TopBar = ({ session, userMenuRef, userMenuItems, sidebarRef, onToggleSideb
 
             <div className="flex align-items-center gap-3">
                 <LanguageSwitcher />
-                <Button
-                    icon={<FiBell size={20} />}
-                    className={`${styles.iconButton} p-button-rounded p-button-text`}
-                    badge="2"
-                    badgeClassName="p-badge-danger"
-                />
+                <TaskNotificationBell /> 
                 <div
                     className={`${styles.profileButton} flex align-items-center gap-2 cursor-pointer`}
-                    onClick={(e) => userMenuRef.current.toggle(e)}
+                    onClick={(event) => userMenuRef.current.toggle(event)}
+                    aria-controls="popup_menu_right"
+                    aria-haspopup
                 >
                     <Avatar
                         image={session?.user?.image || undefined}
@@ -138,7 +136,7 @@ const TopBar = ({ session, userMenuRef, userMenuItems, sidebarRef, onToggleSideb
                     <span className="font-medium hidden md:inline">{session?.user?.name || t('dashboard_layout.topbar.userFallback')}</span>
                     <FiChevronDown className="text-600" />
                 </div>
-                <Menu model={userMenuItems} popup ref={userMenuRef} id="user_menu" className="shadow-4" />
+                <Menu model={userMenuItems} popup ref={userMenuRef} id="popup_menu_right" popupAlignment="right" />
             </div>
         </div>
     );

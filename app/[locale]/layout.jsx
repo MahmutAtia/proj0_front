@@ -1,4 +1,5 @@
 import { notFound } from 'next/navigation';
+import { Providers } from '@/contexts/providers';
 
 const locales = ['en', 'tr', 'ar', 'de', 'es'];
 
@@ -20,7 +21,7 @@ export default async function LocaleLayout({ children, params }) {
         <meta name="viewport" content="width=device-width, initial-scale=1" />
       </head>
       <body className={isRTL ? 'rtl' : 'ltr'}>
-        {children}
+      {children}
       </body>
     </html>
   );

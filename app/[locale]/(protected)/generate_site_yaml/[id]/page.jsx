@@ -19,6 +19,7 @@ import styles from './CreatePortfolioPage.module.css';
 // Importing design concept options, color styles, and add-on features
 import { designConceptOptions, colorStyleOptions, addOnFeatureOptions } from './prefrences'
 import { generateYamlFromLocalStorage } from '@/app/utils/utils'; // Adjust the import path as needed
+import { useTasks } from '@/contexts/TaskContext';
 
 const POLLING_INTERVAL = 3000; // 3 seconds
 const MAX_POLLING_ATTEMPTS = 40; // 2 minutes total
@@ -28,7 +29,8 @@ export default function CreatePortfolioPage({ params: paramsPromise }) {
     const params = React.use(paramsPromise);
     const resumeId = params.id;
     const toast = useRef(null);
-    const router = useRouter(); // Ensure useRouter is initialized
+    const router = useRouter(); 
+    const { addTask } = useTasks();
 
     const [activeIndex, setActiveIndex] = useState(0);
     const [selectedConcept, setSelectedConcept] = useState(null);
@@ -161,7 +163,17 @@ export default function CreatePortfolioPage({ params: paramsPromise }) {
             );
             
             if (response.data && response.data.generation_task_id) {
-                setGenerationTaskId(response.data.generation_task_id);
+                const taskId = response.data.generation_task_id;
+                setGenerationTaskId(taskId);
+
+                // Add the task to the global context so it appears in the app bar
+                addTask(
+                    taskId,
+                    "Generating your portfolio website",
+                    "website_generation"
+                );
+
+
                 toast.current?.show({ severity: 'info', summary: 'Generation Started', detail: 'Your website is being prepared. Please wait.', life: 4000 });
             } else {
                 throw new Error("Failed to start the generation process.");
