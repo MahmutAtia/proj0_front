@@ -73,7 +73,6 @@ export default function RootLayout({ children }: RootLayoutProps) {
                     <PrimeReactProvider>
                         <LayoutProvider>
                             {children}
-                            <InstallPWA />
                         </LayoutProvider>
                     </PrimeReactProvider>
                 </AuthProvider>
