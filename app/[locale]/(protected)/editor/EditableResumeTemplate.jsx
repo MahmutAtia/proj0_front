@@ -41,8 +41,9 @@ const SECTION_ICONS = {
 const EditableResumeTemplate = ({
     resumeId,
     linkedDocuments: initialLinkedDocuments,
-    initialSectionOrder, // New prop
-    initialHiddenSections // New prop
+    initialSectionOrder,
+    initialHiddenSections, 
+    personalWebsiteUuid
 }) => {
     const { data, updateData } = useResume();
     const [loading, setLoading] = useState(!data);
@@ -421,8 +422,13 @@ const EditableResumeTemplate = ({
                         tooltip="Generate Website"
                         tooltipOptions={{ position: 'bottom' }}
                         className="p-button-outlined p-button-secondary"
-                        onClick={() => router.push(`/generate_site_yaml/${resumeId}`)}
-                        disabled={loading}
+               onClick={() => {
+                            if (personalWebsiteUuid) {
+                                router.push(`/site-editor/${personalWebsiteUuid}`);
+                            } else {
+                                router.push(`/generate_site_yaml/${resumeId}`);
+                            }
+                        }}                        disabled={loading}
                     />
                     <Button
                         icon="pi pi-download"
