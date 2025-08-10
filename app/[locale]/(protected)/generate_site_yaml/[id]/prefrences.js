@@ -3,20 +3,17 @@ import styles from './CreatePortfolioPage.module.css';
 // Helper for Color Palette Visuals
 const ColorPaletteVisual = ({ colors, gradient }) => {
     if (gradient) {
+        // For gradients, we render a single, wider bar to showcase the color transition.
         return (
             <div
                 style={{
                     background: gradient,
-                    width: '100%',
-                    height: '60px',
-                    borderRadius: '4px',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center'
+                    width: '150px', // Wider than a single color swatch to display the gradient
+                    height: '60px', // Same height as the other color swatches for consistency
+                    borderRadius: '4px'
                 }}
                 className="shadow-1"
             >
-                {/* Optional: text on gradient */}
             </div>
         );
     }
@@ -40,167 +37,283 @@ const designConceptOptions = [
         description: 'A sleek, modern design inspired by code editors. Perfect for showcasing technical precision and dynamic data with an artistic twist.', // User-Facing Description
         visualElement: () => <i className={`pi pi-code ${styles.visualIcon} text-cyan-500`}></i>, // Visual Cue Idea: { } with glowing dot
         aiInstructions: {
-            core: "Design a personal website with an overall aesthetic inspired by code editors, terminals, and digital interfaces, featuring a clean, modern, and artistic interpretation. The design should emphasize structure, precision, and dynamic data representation, conveying a technical, clean, and subtly complex feel. Implement a strong grid system with defined sections resembling code blocks or terminal windows. Use sharp corners, subtle borders, and potentially fixed-width sections that scroll horizontally within a vertical flow. Elements might align based on code indentation principles. Incorporate custom icons resembling command-line symbols or code syntax elements. Backgrounds can feature subtle grid patterns, abstracted binary code streams, or geometric shapes. Ensure code snippets are beautifully styled.",
+            core: "Design a personal website with an overall aesthetic inspired by code editors, and digital interfaces, featuring a clean, modern, and artistic interpretation. The design should emphasize structure, precision, and dynamic data representation, conveying a technical, clean, and subtly complex feel. Implement a strong grid system with defined sections resembling code blocks or terminal windows. Use sharp corners, subtle borders, and potentially fixed-width sections that scroll horizontally within a vertical flow. Elements might align based on code indentation principles. Incorporate custom icons resembling command-line symbols or code syntax elements. Backgrounds can feature subtle grid patterns, abstracted binary code streams, or geometric shapes. Ensure code snippets are beautifully styled.",
             animation: "Implement a 'Syntax Highlight Reveal' animation: as the user scrolls, sections or key pieces of text (like skill lists or project descriptions) are dynamically 'syntax highlighted,' as if code is being parsed in real-time. Interactive elements should glow or pulse like active processes.",
-            defaultColorGuidance: {
-                light: "For light mode, use a light grey or off-white background (e.g., #F5F5F5, #ECEFF1), with black or dark grey text (e.g., #212121, #37474F). Employ vibrant accents (e.g., electric blue #007BFF, neon green #39FF14, bright purple #7F00FF, hot pink #FF69B4) for code elements, interactive parts, or syntax highlighting.",
-                dark: "For dark mode, use a dominant deep, muted technical background (e.g., charcoal #263238, deep navy #1A237E, dark forest green #003300), with light mono-spaced text (e.g., #E0E0E0, #CFD8DC). Implement glowing vibrant accents (e.g., electric blue #50S8FF, neon green #6FFF4F, bright purple #BF5FFF, hot pink #FF85C7) to highlight interactive elements, code snippets, or key stats, creating a true terminal feel."
-            }
+
+        }
+    },
+       {
+        id: 'minimalistBrutalist',
+        userFacingText: 'Minimalist Brutalist',
+        description: 'Bold, unapologetic design with stark typography, raw geometric shapes, and intentional use of negative space. Emphasizes content over decoration.',
+        visualElement: () => <i className={`pi pi-stop ${styles.visualIcon} text-900`}></i>,
+        aiInstructions: {
+            core: "Create a bold, minimalist brutalist design with stark geometric shapes, heavy typography, and intentional use of negative space. Use chunky, sans-serif fonts with strong contrast. Implement blocky, rectangular sections with sharp edges. Background should be predominantly white or stark colors with bold accent blocks. Typography should be oversized for headers with plenty of whitespace. Grid system should be rigid and apparent. Avoid rounded corners, gradients, or decorative elements.",
+            animation: "Implement 'Block Slide' animations: sections slide in as solid geometric blocks, and interactive elements transform with sharp, immediate transitions rather than smooth curves.",
         }
     },
     {
-        id: 'abstractSculpture',
-        userFacingText: 'Abstract Portfolio Sculpture',
-        description: 'An experimental, artistic design treating your website as a dynamic, abstract sculpture. Expect unexpected forms and fluid transitions.',
-        visualElement: () => <i className={`pi pi-slack ${styles.visualIcon} text-purple-500`}></i>, // Visual Cue: morphing, abstract shapes (pi-slack as placeholder)
+        id: 'architectBlueprint',
+        userFacingText: 'Architect\'s Blueprint',
+        description: 'A clean, technical design that mimics an architectural blueprint with grid lines, precise annotations, and a drafting aesthetic.',
+        visualElement: () => <i className={`pi pi-compass ${styles.visualIcon} text-blue-600`}></i>,
         aiInstructions: {
-            core: "Design a personal website that functions as a dynamic, abstract sculpture or art installation. The focus should be on form, movement, and unexpected transitions, creating an artistic, experimental, and highly unique feel. Employ non-traditional layouts with overlapping elements, skewed sections, or elements that break the grid. Shapes should be abstract – blobs, waves, shattered glass effects, or impossible geometry. Integrate abstract generative art backgrounds, distorted or manipulated photography, custom icons that are abstract shapes, and potentially use noise or grain as a texture.",
-            animation: "Implement a 'Section Transformation' animation: as the user scrolls or navigates between sections, the transition should be a complex visual transformation where elements morph, shatter, or dissolve into the next section's content, rather than a simple fade or slide. Hover effects should involve elements subtly changing shape or color gradient.",
-            defaultColorGuidance: {
-                light: "For light mode, use a dominant bold color or gradient (e.g., a vibrant coral #FF7F50 or a teal-to-purple gradient) with high contrast text (e.g., dark grey #333333 or white #FFFFFF) and distinct accent colors (e.g., lemon yellow #FFFACD or electric lime #CCFF00).",
-                dark: "For dark mode, shift to a different, equally bold dominant color or gradient (e.g., deep indigo #4B0082 or a magenta-to-cyan gradient), maintaining high contrast with text (e.g., light grey #D3D3D3 or vibrant cyan #00FFFF) and accent colors. Both modes should be visually striking and can use duotones, split complementary, or highly saturated palettes."
-            }
+            core: "Construct the website with an architectural blueprint theme. Use a background with a subtle grid pattern. Employ thin, precise lines for borders and dividers. Typography should be a clean, technical sans-serif or a narrow, capitalized font, reminiscent of drafting text. Use annotations, measurement lines, and simple geometric shapes (circles, squares) as decorative motifs. The layout should be highly organized and structured.",
+            animation: "Animate elements by having their outlines 'drawn' into view, as if being sketched by a drafter. On hover, elements could reveal more detailed annotations or a subtle fill."
         }
     },
     {
-        id: 'layeredDepthPortal',
-        userFacingText: 'Layered Depth & Portal Effect',
-        description: 'An immersive design creating a strong sense of depth, as if looking through portals into different content planes. Polished and intriguing.',
-        visualElement: () => <i className={`pi pi-clone ${styles.visualIcon} text-teal-500`}></i>, // Visual Cue: overlapping semi-transparent planes (pi-clone)
+        id: 'digitalGarden',
+        userFacingText: 'Digital Garden',
+        description: 'An interconnected, non-linear layout that visualizes projects and skills as a network of ideas, emphasizing connections and growth.',
+        visualElement: () => <i className={`pi pi-share-alt ${styles.visualIcon} text-green-500`}></i>,
         aiInstructions: {
-            core: "Design a personal website that creates a strong sense of depth and dimensionality, giving the impression that content exists on different planes or that the user is looking through 'portals' into different sections. The feel should be immersive, intriguing, and polished. Utilize z-index extensively to create overlapping elements. Frame sections with shapes suggesting windows or portals. Backgrounds should incorporate subtle parallax effects. Include elements with realistic shadows and highlights, translucent overlays (using rgba or opacity), and background images or videos that appear distant. Icons might have a subtle 3D tilt.",
-            animation: "Implement a 'Scroll-Triggered Layer Shift & Portal Zoom' animation: as the user scrolls, different layers of content move at varying speeds (parallax). Clicking on a portfolio item or section link should trigger a smooth animation where the view 'zooms' into that section as if passing through a portal.",
-            defaultColorGuidance: {
-                light: "For light mode, use a base of sophisticated light neutrals (e.g., soft grey #E0E0E0, pale beige #F5F5DC) combined with translucent light overlays (e.g., rgba(255, 255, 255, 0.7)) and pops of color that appear 'behind' or 'in front' of layers (e.g., muted teal #78C2C4, warm ochre #CC7722). Use subtle shadows to create depth.",
-                dark: "For dark mode, use a base of deep neutrals (e.g., deep grey #36454F, muted navy #2C3E50) with darker translucent overlays (e.g., rgba(0, 0, 0, 0.5)). Enhance depth with more pronounced shadows and potentially subtle glowing edges (e.g., a soft white or light blue glow) on 'upper' layers. Accent colors should be chosen to stand out against the darker background (e.g., vibrant gold #FFD700, cool lavender #E6E6FA)."
-            }
+            core: "Design the site as a 'digital garden' or knowledge graph. The structure should feel interconnected, using lines or other visual cues to link related projects, skills, and blog posts. The layout can be more organic than a standard linear page. Use tags and backlinks prominently. The aesthetic is clean, intellectual, and modern, focusing on clarity and relationships between content.",
+            animation: "On hover or scroll, animate the connecting lines between related items. Nodes or cards could gently pulse or scale up to indicate their relationship to the current content being viewed."
         }
     },
     {
-        id: 'gridBreakingKinetic',
-        userFacingText: 'Grid-Breaking Kinetic Display',
-        description: 'A bold, dynamic design where elements energetically move, shift, and break free from traditional grids. Modern and attention-grabbing.',
-        visualElement: () => <i className={`pi pi-arrows-alt ${styles.visualIcon} text-orange-500`}></i>, // Visual Cue: arrows breaking out of a grid (pi-arrows-alt)
+        id: 'kineticTypography',
+        userFacingText: 'Kinetic Typography',
+        description: 'A dynamic, minimalist design where oversized, animated typography is the primary visual element, creating a bold and expressive experience.',
+        visualElement: () => <i className={`pi pi-font ${styles.visualIcon} text-gray-700`}></i>,
         aiInstructions: {
-            core: "Design a personal website that is highly dynamic and energetic, characterized by elements that move, shift, and break free from traditional grid constraints, focusing on motion and visual impact. The feel should be bold, modern, and attention-grabbing. While an underlying grid may provide structure, many elements should intentionally break out of their grid cells. Use diagonal lines, skewed angles, and elements that overlap or intersect dynamically. Incorporate animated typography (kinetic type), background particle effects, and elements that trail or leave echoes as they move. Icons might spin or pulse.",
-            animation: "Implement 'Kinetic Text & Element Trails': The main headline or key text elements should be animated (e.g., letters scatter and reform, words slide into place). Interactive elements should leave subtle visual trails or echoes as the cursor moves over them or they are clicked.",
-            defaultColorGuidance: {
-                light: "For light mode, use a clean, bright background (e.g., white #FFFFFF or very light grey #FAFAFA) with moving elements in vibrant or strong contrasting colors (e.g., primary red #FF0000, deep blue #0000FF, black #000000). Trails/effects should be subtle but visible.",
-                dark: "For dark mode, use a dark background (e.g., near black #121212 or dark charcoal #1E1E1E) where moving elements stand out dramatically, potentially with glowing trails or effects in bright, saturated colors (e.g., electric yellow #FFFF33, vivid cyan #00FFFF, bright magenta #FF00FF)."
-            }
+            core: "Create a design where typography is the hero. Use a minimalist layout with very few decorative elements, allowing the text itself to be the main visual. Employ large, bold, and expressive font choices for headings. The core of the design is how text is presented and animated. Content is arranged in simple, clean blocks to support the typographic focus.",
+            animation: "Implement text-focused animations as the primary interactive feedback. Words can animate on scroll (e.g., changing weight, size, or position), letters can shuffle on hover, and section transitions can be driven by dramatic typographic changes."
+        }
+    },
+        {
+        id: 'neonCyberpunk',
+        userFacingText: 'Neon Cyberpunk',
+        description: 'A futuristic, high-tech aesthetic with glowing neon elements, dark backgrounds, and sci-fi inspired interfaces.',
+        visualElement: () => <i className={`pi pi-bolt ${styles.visualIcon} text-purple-400`}></i>,
+        aiInstructions: {
+            core: "Design a cyberpunk-inspired portfolio with dark, metallic backgrounds and electric neon accents. Use glowing borders, holographic effects, and futuristic UI elements. Typography should be sharp and tech-focused with occasional glitch effects. Implement circuit-board patterns, hexagonal grids, and LED-style indicators. Color scheme dominated by deep blacks/grays with electric blues, purples, and greens.",
+            animation: "Implement 'Digital Pulse' animations: elements pulse with neon light, text has subtle glitch effects, and interactive elements create electric spark animations on hover. Add scanning line effects and holographic shimmer transitions."
         }
     },
     {
-        id: 'handcraftedSketchbook',
-        userFacingText: 'Handcrafted Digital Sketchbook',
-        description: 'A personal, authentic design blending digital precision with the warmth of handcrafted elements. Feels tactile and creatively unique.',
-        visualElement: () => <i className={`pi pi-pencil ${styles.visualIcon} text-yellow-700`}></i>, // Visual Cue: pencil drawing a digital element
+        id: 'marvelHero',
+        userFacingText: 'Marvel Hero Universe',
+        description: 'Bold, comic book-inspired design with dynamic layouts, heroic typography, and action-packed visual elements.',
+        visualElement: () => <i className={`pi pi-flash ${styles.visualIcon} text-red-600`}></i>,
         aiInstructions: {
-            core: "Design a personal website that blends digital precision with the warmth and imperfection of hand-drawn or handcrafted elements, creating a personal, authentic, and creatively tactile feel. Layouts should be clean and structured but incorporate elements that look sketched, cut out, or taped onto the page. Use subtle irregularities in lines and shapes. Include custom hand-drawn illustrations or icons (digitized), and background textures resembling paper, canvas, or subtle noise. Typography might include a mix of clean sans-serif and a hand-written style font for accents.",
-            animation: "Implement a 'Sketch Reveal & Element Stickiness' animation: as sections load or elements appear, they animate as if being quickly sketched onto the page. Interactive elements should have a subtle 'sticky' effect, slightly pulling towards the cursor on hover before snapping back.",
-            defaultColorGuidance: {
-                light: "For light mode, use a light, textured background (e.g., off-white paper texture #F8F8F0, cream #FFFDD0) with darker text (e.g., charcoal #36454F, sepia #704214) and hand-drawn style elements in natural drawing colors (e.g., pencil grey, muted blues, greens, or reds). Accent colors should feel like markers or paint (e.g., a vibrant but slightly desaturated orange #F4A261).",
-                dark: "For dark mode, use a darker, textured background (e.g., charcoal paper #505050, dark canvas #3B3B3B) with lighter text (e.g., off-white #EAEAEA, light chalky blue #A0D2DB) and hand-drawn elements that appear sketched in white, light pastels, or metallic colors. Accent colors should be chosen to pop against the dark background while maintaining the handcrafted feel (e.g., a muted gold #BC8F8F)."
-            }
+            core: "Create a superhero comic book aesthetic with bold, dynamic layouts inspired by Marvel comics. Use comic book panel layouts, bold serif and sans-serif typography, and dramatic color contrasts. Implement speech bubble elements, pow/zap style callouts, and heroic iconography. Backgrounds can feature subtle halftone patterns and comic book textures.",
+            animation: "Implement 'Hero Impact' animations: elements burst into view with comic book style impact effects, text appears with dramatic scaling, and interactive elements create 'POW!' style feedback with particle effects."
         }
     },
     {
-        id: 'glitchArtInterface',
-        userFacingText: 'Glitch Art Interface',
-        description: 'An edgy, cyberpunk-inspired design embracing digital imperfections, pixelation, and CRT effects. Boldly unconventional and futuristic.',
-        visualElement: () => <i className={`pi pi-bolt ${styles.visualIcon} text-green-500`}></i>, // Visual Cue: pixelated/distorted text (pi-bolt for energy/glitch)
+        id: 'medicalProfessional',
+        userFacingText: 'Medical Professional',
+        description: 'Clean, trustworthy design inspired by medical interfaces with precise layouts, calming colors, and scientific elements.',
+        visualElement: () => <i className={`pi pi-heart ${styles.visualIcon} text-blue-500`}></i>,
         aiInstructions: {
-            core: "Design a personal website with a 'Glitch Art' aesthetic, inspired by digital errors, cyberpunk interfaces, and retro-futurism. The design should feel edgy, unconventional, and visually striking, embracing pixelation, chromatic aberration, scan lines, and distorted text or image effects. Layouts can be somewhat chaotic but should maintain usability. Use monospace fonts and digital-looking UI elements.",
-            animation: "Implement 'Interactive Glitches & Text Corruption': On hover or scroll, elements might briefly glitch, pixelate, or show chromatic aberration. Text snippets might animate as if momentarily 'corrupting' and then resolving. Backgrounds could feature subtle, animated scan lines or digital noise.",
-            defaultColorGuidance: {
-                light: "For light mode, use a stark light background (e.g., very light grey #EFEFEF or clinical white #FFFFFF) with sharp black or dark grey text. Glitch effects should introduce vibrant, jarring accent colors like electric green (#00FF00), magenta (#FF00FF), and cyan (#00FFFF), often in pixelated or blocky forms.",
-                dark: "For dark mode, use a deep black (#000000) or very dark grey (#111111) background, reminiscent of old CRT monitors. Text should be a bright, glowing color like phosphor green (#39FF14), amber (#FFBF00), or electric blue (#007BFF). Glitch accents should be intense and luminous."
-            }
+            core: "Design a professional medical/healthcare portfolio with clean, sterile aesthetics. Use precise grid layouts, medical iconography, and subtle anatomical or molecular patterns. Typography should be highly legible and professional. Implement EKG-line dividers, pill-shaped buttons, and medical chart-inspired data visualization.",
+            animation: "Implement 'Vital Signs' animations: elements appear with heartbeat-like pulses, progress bars mimic EKG readings, and hover effects create gentle, healing-inspired glows."
         }
     },
     {
-        id: 'minimalistZenGarden',
-        userFacingText: 'Minimalist Zen Garden',
-        description: 'A serene, minimalist design focusing on balance, negative space, and subtle natural textures. Calm, elegant, and thoughtfully structured.',
-        visualElement: () => <i className={`pi pi-circle-off ${styles.visualIcon} text-gray-500`}></i>, // Visual Cue: simple stones/raked sand (pi-circle-off for emptiness/space)
+        id: 'mechanicalEngineer',
+        userFacingText: 'Mechanical Blueprint',
+        description: 'Industrial design inspired by engineering blueprints, technical drawings, and mechanical precision.',
+        visualElement: () => <i className={`pi pi-cog ${styles.visualIcon} text-orange-600`}></i>,
         aiInstructions: {
-            core: "Design a personal website with a 'Minimalist Zen Garden' aesthetic. The design must prioritize ample negative space, balanced compositions, and a sense of calm and tranquility. Use subtle natural textures (e.g., fine sand, smooth stone, soft wood grain) and a very restrained approach to elements. Typography should be clean, elegant, and highly legible. The layout should feel open and uncluttered, guiding the user's focus gently.",
-            animation: "Implement 'Subtle Fades & Gentle Ripples' animations: Content sections should fade in gently. Interactive elements might have very subtle ripple or soft glow effects on hover, reminiscent of water or light. Avoid jarring or fast animations. Focus on smooth, almost imperceptible transitions.",
-            defaultColorGuidance: {
-                light: "For light mode, use a base of soft, warm whites (e.g., #FBFBFB, #FAF0E6) or very light, muted earth tones (e.g., pale sand #F4A460 but much lighter and desaturated). Text should be a soft dark grey or muted brown. Accent colors should be inspired by nature: moss green (#8FBC8F), stone grey (#808080), water blue (#ADD8E6), all used sparingly.",
-                dark: "For dark mode, use deep, calming charcoals (#36454F), dark slate greys (#2F4F4F), or muted indigo (#483D8B). Text should be a soft off-white or very light grey. Accent colors remain nature-inspired but adjusted for contrast, perhaps a moonlit silver (#C0C0C0) or a deep forest green (#006400) used minimally."
-            }
+            core: "Create an industrial engineering aesthetic with technical blueprint styling. Use precise line work, technical annotations, and mechanical iconography. Implement gear motifs, technical drawings as backgrounds, and industrial color schemes. Typography should be technical and precise with monospace elements for measurements.",
+            animation: "Implement 'Mechanical Motion' animations: gears rotate on hover, elements slide in like mechanical parts assembling, and interactive feedback includes industrial sound-inspired visual effects."
         }
     },
     {
-        id: 'retroFuturisticHolo',
-        userFacingText: 'Retro-Futuristic Holo-Interface',
-        description: 'A design inspired by retro sci-fi interfaces, holographic displays, and glowing neon lines. Futuristic with a nostalgic, tangible tech feel.',
-        visualElement: () => <i className={`pi pi-desktop ${styles.visualIcon} text-indigo-500`}></i>, // Visual Cue: glowing translucent button (pi-desktop already used, maybe pi-globe for holo)
+        id: 'electricalCircuit',
+        userFacingText: 'Electrical Circuit',
+        description: 'High-tech design inspired by circuit boards, electrical schematics, and electronic components.',
+        visualElement: () => <i className={`pi pi-wifi ${styles.visualIcon} text-green-400`}></i>,
         aiInstructions: {
-            core: "Design a personal website with a 'Retro-Futuristic Holo-Interface' aesthetic. This should evoke the feeling of interacting with a holographic display from 70s/80s sci-fi. Emphasize glowing lines, translucent panels, sharp vector graphics, and a sense of projected light. Use geometric shapes, grids, and data visualization motifs. Typography can be clean and futuristic, or slightly retro-digital.",
-            animation: "Implement 'Scan Lines & Holographic Shimmer' animations: Subtle horizontal scan lines can animate across the background or panels. Elements on hover might shimmer or have a slight 'flicker' as if projected. Transitions between sections could involve elements assembling from light or dissolving into particles.",
-            defaultColorGuidance: {
-                light: "For light mode, use a very light, almost ethereal background (e.g., pale cyan #E0FFFF or light silver #D3D3D3) to suggest a brightly lit environment. Holographic elements and text should be in vibrant, glowing colors like electric blue (#00FFFF), neon pink (#FF007F), and bright orange (#FFA500), often with outer glows. Borders and accents can be sharp white or light grey.",
-                dark: "For dark mode, use a deep space blue (#000030), black (#000000), or dark purple (#301934) background. Glowing elements should be the primary light source: neon cyan (#00BFFF), laser red (#FF0000), vibrant green (#00FF00). Translucent panels can have subtle internal lighting effects."
-            }
+            core: "Design an electrical engineering portfolio with circuit board aesthetics. Use trace lines as design elements, electronic component shapes, and LED-style indicators. Implement PCB green backgrounds, copper trace pathways, and electronic schematic symbols. Typography should be technical and precise.",
+            animation: "Implement 'Current Flow' animations: traces light up sequentially like electrical current, components glow when activated, and interactions create electrical arc effects."
+        }
+    },
+    {
+        id: 'animeAesthetic',
+        userFacingText: 'Anime Aesthetic',
+        description: 'Vibrant, anime-inspired design with bold colors, dynamic compositions, and Japanese visual elements.',
+        visualElement: () => <i className={`pi pi-star ${styles.visualIcon} text-pink-500`}></i>,
+        aiInstructions: {
+            core: "Create an anime-inspired portfolio with vibrant colors, dynamic asymmetrical layouts, and Japanese aesthetic elements. Use bold, stylized typography, cherry blossom motifs, and geometric shapes. Implement anime-style character silhouettes, manga panel layouts, and traditional Japanese patterns.",
+            animation: "Implement 'Anime Transform' animations: elements appear with sparkle effects, dramatic scaling animations, and speed-line backgrounds during transitions."
+        }
+    },
+
+    {
+        id: 'minimalistLuxury',
+        userFacingText: 'Minimalist Luxury',
+        description: 'High-end, sophisticated design with premium materials, subtle animations, and elegant spacing.',
+        visualElement: () => <i className={`pi pi-gem ${styles.visualIcon} text-yellow-600`}></i>,
+        aiInstructions: {
+            core: "Create a luxury portfolio with premium aesthetics. Use generous white space, high-quality typography, and subtle material design elements. Implement gold accents, marble textures, and premium color palettes. Layout should be spacious and breathable with attention to micro-interactions.",
+            animation: "Implement 'Luxury Float' animations: elements gently float and scale with premium easing curves, subtle parallax effects, and elegant hover states with soft shadows."
         }
     }
 ];
+
+
+
+
+
+    
+
 
 const colorStyleOptions = [
     {
-        id: 'monochromaticMinimal',
-        userFacingText: 'Monochromatic & Minimal',
-        description: 'Clean and sophisticated. Uses shades and tints of a single core color for a harmonious and understated look.',
-        visualElement: () => <ColorPaletteVisual gradient="linear-gradient(to right, #e3f2fd, #90caf9, #42a5f5, #1e88e5, #0d47a1)" />, // Shades of blue gradient
+        id: 'slate',
+        userFacingText: 'Cool Slate',
+        description: 'A professional and calming palette of cool grays and blues.',
+        visualElement: () => <ColorPaletteVisual colors={['#F8FAFC', '#E2E8F0', '#64748B', '#3B82F6', '#1E293B']} />,
         aiInstructions: {
-            light: "Apply a 'Monochromatic & Minimal' color style. Select a single base color (e.g., a muted blue, grey, or even a desaturated warm tone like beige). Use various tints (lighter versions) of this color for backgrounds and larger surfaces, and shades (darker versions) for text, borders, and key accents. Ensure sufficient contrast for readability. Introduce white or very light grey as a neutral.",
-            dark: "Apply a 'Monochromatic & Minimal' color style. Use a dark shade of the chosen base color (or a complementary dark neutral like charcoal if the base color is very light) for the background. Use lighter tints and mid-tones of the base color, or a contrasting light neutral (like off-white), for text and interactive elements. The focus is on subtlety and sophistication."
+            light: "Use a light, cool gray (#F8FAFC) for the background. Use a darker slate gray (#64748B) for secondary text and borders. Main text should be a very dark, near-black slate (#1E293B). Use a vibrant, professional blue (#3B82F6) as the primary accent for links, buttons, and highlights.",
+            dark: "Use a deep, dark slate blue (#0F172A) for the background. Lighter panels can use a slightly less saturated dark gray (#1E293B). Text should be a soft, light gray (#E2E8F0). The accent blue (#3B82F6) should be brightened slightly to ensure high contrast and visibility."
         }
     },
     {
-        id: 'vibrantEnergetic',
-        userFacingText: 'Vibrant & Energetic',
-        description: 'Bold and lively. Features a palette of bright, saturated colors to create an energetic and attention-grabbing feel.',
-        visualElement: () => <ColorPaletteVisual colors={['#FFEB3B', '#FF4081', '#00E676']} />, // Yellow, Pink, Green
+        id: 'forest',
+        userFacingText: 'Forest & Amber',
+        description: 'An earthy, organic palette with deep greens and a warm amber accent.',
+        visualElement: () => <ColorPaletteVisual colors={['#F0FDF4', '#A3E635', '#4D7C0F', '#F59E0B', '#14532D']} />,
         aiInstructions: {
-            light: "Apply a 'Vibrant & Energetic' color style. Use a clean, bright neutral background (white or very light grey). Employ a palette of 2-3 highly saturated, vibrant accent colors (e.g., electric blue, sunny yellow, Kelly green) for key elements, calls to action, and graphical features. Ensure text remains highly legible in a dark, contrasting color.",
-            dark: "Apply a 'Vibrant & Energetic' color style. Use a deep, dark neutral background (near-black or very dark grey). The vibrant accent colors from the light mode should be adapted to 'glow' or stand out intensely against the dark background (e.g., their luminosity might be increased, or they might be paired with subtle outer glows). Text should be a bright, contrasting light color."
-        }
-    },
-
-    {
-        id: 'techNoirCyberpunk',
-        userFacingText: 'Tech Noir / Cyberpunk Glow',
-        description: 'Dark and futuristic. Dominated by deep blacks and greys, highlighted by sharp, glowing neon accents like blues, purples, and pinks.',
-        visualElement: () => <ColorPaletteVisual colors={['#0D0221', '#2DE2E6', '#F6019D', '#7F00FF']} />, // Deep dark, neon cyan, neon pink, neon purple
-        aiInstructions: {
-            light: "Apply a 'Tech Noir / Cyberpunk Glow' color style. (This is less common for 'Tech Noir' but can be interpreted as a 'daylight' version of a cyberpunk city or a sterile lab). Use a very light grey or off-white, almost clinical background. Accent colors should be sharp and digital: electric blue, vibrant purple, hot pink, bright cyan, used for UI elements, borders, or highlights. Text in a crisp dark grey or black.",
-            dark: "Apply a 'Tech Noir / Cyberpunk Glow' color style. This is the primary expression. Use a deep black or very dark charcoal/navy background. The main visual interest comes from glowing neon accents: electric blue, vibrant magenta/pink, acid green, vivid purple. These should be used for text highlights, interactive elements, borders, and graphical details, creating a strong contrast and futuristic feel."
+            light: "Use an off-white or very light green (#F0FDF4) background. Use a muted, earthy green (#4D7C0F) for secondary elements. Main text should be a deep forest green (#14532D). Use a warm, vibrant amber or gold (#F59E0B) as the contrasting accent color.",
+            dark: "Use a very dark, desaturated green (#14532D) as the background. Panels can be a slightly lighter charcoal green. Text should be a light, warm off-white. The amber accent (#F59E0B) remains the primary highlight, providing a warm glow against the dark background. A secondary lime green accent (#A3E635) can be used for minor details."
         }
     },
     {
-        id: 'pastelSoft',
-        userFacingText: 'Pastel & Soft',
-        description: 'Light, airy, and gentle. Features a palette of soft pastel colors for a calm, dreamy, and approachable aesthetic.',
-        visualElement: () => <ColorPaletteVisual colors={['#E6E6FA', '#FFDAB9', '#AFEEEE', '#FFB6C1']} />, // Lavender, Peach, Pale Turquoise, Light Pink
+        id: 'noir',
+        userFacingText: 'Noir & Neon',
+        description: 'A high-contrast, futuristic palette of black, white, and a single electric accent.',
+        visualElement: () => <ColorPaletteVisual colors={['#000000', '#FFFFFF', '#F97316', '#FFFFFF', '#000000']} />,
         aiInstructions: {
-            light: "Apply a 'Pastel & Soft' color style. Use a white or very light pastel background (e.g., pale mint, baby blue, soft pink). Primary colors for elements and accents should be a harmonious selection of pastels (e.g., lavender, peach, light yellow, sky blue). Text should be a soft dark grey or a darker shade of one of the pastel hues for readability.",
-            dark: "Apply a 'Pastel & Soft' color style. (A less common interpretation for pastels, often becomes 'muted' rather than 'dark pastel'). Use a muted dark background (e.g., a deep desaturated blue, a dark heather grey, or a muted plum). Pastel accents should be brightened slightly to stand out, or use lighter versions of the chosen pastels. Text in a light, soft off-white or a very pale pastel."
+            light: "Use a stark white (#FFFFFF) background. All text and primary lines should be pure black (#000000). Use a single, vibrant neon color (e.g., electric orange #F97316, magenta #EC4899, or cyan #0EA5E9) as the only accent for all interactive elements. The look is extremely high-contrast and minimal.",
+            dark: "Use a pure black (#000000) background. All text should be stark white (#FFFFFF). The same single, vibrant neon accent color from the light theme should be used, creating a glowing effect against the black canvas. Maintain the extreme high-contrast, minimalist aesthetic."
         }
     },
     {
-        id: 'highContrastDuotone',
-        userFacingText: 'High-Contrast Duotone/Tritone',
-        description: 'Striking and graphic. Uses only two or three bold, contrasting colors (plus black/white) for a dramatic and memorable visual impact.',
-        visualElement: () => <ColorPaletteVisual colors={['#000000', '#FFFF00', '#FF0000']} />, // Black, Yellow, Red for Tritone example
+        id: 'creme',
+        userFacingText: 'Crème & Ink',
+        description: 'A warm, elegant palette with off-white, beige, and a deep, rich accent.',
+        visualElement: () => <ColorPaletteVisual colors={['#FEFDFB', '#F1EFEA', '#D97706', '#7F1D1D', '#1C1917']} />,
         aiInstructions: {
-            light: "Apply a 'High-Contrast Duotone/Tritone' color style. Select two (duotone) or three (tritone) dominant, highly contrasting colors (e.g., black and vibrant yellow; or dark teal, bright orange, and cream). Typically, one of the chosen colors (or white/off-white) will serve as the background. The other color(s) will be used for text, elements, and graphical treatments. Ensure extreme contrast for impact and readability.",
-            dark: "Apply a 'High-Contrast Duotone/Tritone' color style. Select two (duotone) or three (tritone) dominant, highly contrasting colors. Typically, a dark version of one of the colors (or black/near-black) will serve as the background. The other color(s) will be used for text and elements, often appearing brighter or more luminous against the dark base. The key is maintaining the limited, high-impact palette."
+            light: "Use a warm, creamy off-white (#FEFDFB) for the background. Secondary surfaces can use a slightly darker beige (#F1EFEA). Text should be a near-black, warm 'ink' color (#1C1917). For accents, use a deep, rich color like burgundy (#7F1D1D) or a muted, warm orange (#D97706).",
+            dark: "Use a dark, warm brown or charcoal (#1C1917) for the background. Text should be a soft, creamy off-white (#FEFDFB). The rich accent color (burgundy or warm orange) should be adapted to be slightly more luminous to stand out against the dark background, providing an elegant, low-light feel."
         }
+    },
+    {
+        id: 'rose',
+        userFacingText: 'Rosé & Quartz',
+        description: 'A modern, soft palette with muted pinks, grays, and a gentle feel.',
+        visualElement: () => <ColorPaletteVisual colors={['#FFF1F2', '#FECDD3', '#F43F5E', '#57534E', '#1C1917']} />,
+        aiInstructions: {
+            light: "Use a very light, almost white rosé color (#FFF1F2) for the background. Use a soft, muted pink (#FECDD3) for panels or highlights. Text should be a dark, warm gray (#1C1917). The primary accent should be a bolder, more saturated rose or magenta color (#F43F5E).",
+            dark: "Use a dark, muted stone-gray (#57534E) for the background. Text should be a light, soft pink (#FECDD3). The main rosé accent (#F43F5E) should be used for interactive elements, providing a punch of color against the muted, dark backdrop."
+        }
+    },
+    {
+    id: 'oceanDeep',
+    userFacingText: 'Ocean Deep',
+    description: 'Sophisticated deep blues and teals with pearl white accents, evoking trust and depth.',
+    visualElement: () => <ColorPaletteVisual colors={['#F0F9FF', '#0EA5E9', '#0F172A', '#06B6D4', '#164E63']} />,
+    aiInstructions: {
+        light: "Use a crisp, clean white (#F0F9FF) background. Primary text should be deep navy (#0F172A). Use ocean blue (#0EA5E9) for primary buttons and links. Teal (#06B6D4) works as secondary accent. Create a sense of depth and trust with these oceanic tones.",
+        dark: "Use deep ocean navy (#164E63) as background. Light text should be pearl white (#F0F9FF). Bright cyan (#06B6D4) becomes the primary accent, with sky blue (#0EA5E9) for secondary elements. Creates a deep, professional underwater feel."
     }
-];
+},
+{
+    id: 'sunset',
+    userFacingText: 'Sunset Gradient',
+    description: 'Warm sunset colors blending from golden yellow to deep purple, creating an energetic and creative vibe.',
+    visualElement: () => <ColorPaletteVisual gradient="linear-gradient(135deg, #FEF3C7 0%, #F59E0B 25%, #EF4444 50%, #7C3AED 75%, #1E1B4B 100%)" />,
+    aiInstructions: {
+        light: "Use warm cream (#FEF3C7) backgrounds with gradient accents. Text should be deep purple (#1E1B4B). Use the sunset gradient for headers, buttons, and key elements. Orange (#F59E0B) and red (#EF4444) work as individual accent colors.",
+        dark: "Dark purple (#1E1B4B) background with cream text (#FEF3C7). The sunset gradient becomes more vibrant against dark backgrounds. Use individual sunset colors strategically for highlights and interactive elements."
+    }
+},
+{
+    id: 'monochrome',
+    userFacingText: 'Pure Monochrome',
+    description: 'Timeless black and white with perfect gray scales, emphasizing content and typography.',
+    visualElement: () => <ColorPaletteVisual colors={['#FFFFFF', '#F3F4F6', '#9CA3AF', '#374151', '#000000']} />,
+    aiInstructions: {
+        light: "Pure white (#FFFFFF) background with true black (#000000) text. Use gray scales (#F3F4F6, #9CA3AF, #374151) for depth and hierarchy. Focus on typography, shadows, and spacing. No color distractions.",
+        dark: "True black (#000000) background with pure white (#FFFFFF) text. Same gray scales for hierarchy but inverted. Emphasis on stark contrast and clean typography. Minimal use of effects beyond shadows."
+    }
+},
+{
+    id: 'emerald',
+    userFacingText: 'Emerald Luxury',
+    description: 'Rich emerald greens with gold accents, creating an elegant and luxurious feel.',
+    visualElement: () => <ColorPaletteVisual colors={['#ECFDF5', '#10B981', '#065F46', '#F59E0B', '#1F2937']} />,
+    aiInstructions: {
+        light: "Light mint background (#ECFDF5) with rich emerald (#065F46) text. Use bright emerald (#10B981) for interactive elements and gold (#F59E0B) sparingly for luxury accents. Creates sophisticated, high-end feel.",
+        dark: "Deep forest green (#065F46) background with light mint (#ECFDF5) text. Bright emerald (#10B981) for primary actions, gold (#F59E0B) for premium highlights. Evokes luxury and nature."
+    }
+},
+{
+    id: 'cosmic',
+    userFacingText: 'Cosmic Purple',
+    description: 'Deep space purples with electric accents, perfect for creative and tech-focused portfolios.',
+    visualElement: () => <ColorPaletteVisual colors={['#FAF5FF', '#A855F7', '#581C87', '#10B981', '#0F172A']} />,
+    aiInstructions: {
+        light: "Very light purple (#FAF5FF) background with deep purple (#581C87) text. Bright purple (#A855F7) for primary elements, electric green (#10B981) for special accents. Creates creative, innovative atmosphere.",
+        dark: "Deep space black (#0F172A) background with light purple (#FAF5FF) text. Vibrant purple (#A855F7) glows against dark background, electric green (#10B981) creates striking contrast."
+    }
+},
+{
+    id: 'coral',
+    userFacingText: 'Coral Reef',
+    description: 'Living coral and turquoise inspired by tropical reefs, vibrant yet professional.',
+    visualElement: () => <ColorPaletteVisual colors={['#FFF7ED', '#FB923C', '#EA580C', '#0891B2', '#164E63']} />,
+    aiInstructions: {
+        light: "Warm cream (#FFF7ED) background with deep teal (#164E63) text. Living coral (#FB923C) for primary actions, deeper coral (#EA580C) for emphasis, turquoise (#0891B2) for secondary elements.",
+        dark: "Deep ocean teal (#164E63) background with cream (#FFF7ED) text. Vibrant coral colors (#FB923C, #EA580C) pop against dark background, turquoise (#0891B2) provides cool balance."
+    }
+},
+{
+    id: 'arctic',
+    userFacingText: 'Arctic Frost',
+    description: 'Cool whites and icy blues with silver accents, creating a clean, modern, high-tech feel.',
+    visualElement: () => <ColorPaletteVisual colors={['#FFFFFF', '#F1F5F9', '#64748B', '#0EA5E9', '#0F172A']} />,
+    aiInstructions: {
+        light: "Pure white (#FFFFFF) with subtle gray (#F1F5F9) panels. Cool gray (#64748B) for secondary text, icy blue (#0EA5E9) for accents, deep navy (#0F172A) for primary text. Clean, minimal, high-tech aesthetic.",
+        dark: "Deep navy (#0F172A) background with ice white (#FFFFFF) text. Cool gray (#64748B) for secondary elements, electric blue (#0EA5E9) glows like ice crystals. Creates sophisticated tech feel."
+    }
+},
+{
+    id: 'vintage',
+    userFacingText: 'Vintage Sepia',
+    description: 'Warm sepia tones with burnt orange accents, perfect for creative and artistic portfolios.',
+    visualElement: () => <ColorPaletteVisual colors={['#FEF7ED', '#FED7AA', '#EA580C', '#92400E', '#1C1917']} />,
+    aiInstructions: {
+        light: "Warm cream (#FEF7ED) background with rich brown (#1C1917) text. Use sepia tones (#FED7AA) for panels, burnt orange (#EA580C) for accents, deeper brown (#92400E) for emphasis. Vintage, artistic feel.",
+        dark: "Rich dark brown (#1C1917) background with warm cream (#FEF7ED) text. Sepia tones become highlights, burnt orange (#EA580C) provides warm glow against dark background."
+    }
+},
+{
+    id: 'electric',
+    userFacingText: 'Electric Lime',
+    description: 'High-energy lime green with charcoal and white, perfect for modern, energetic portfolios.',
+    visualElement: () => <ColorPaletteVisual colors={['#F7FEE7', '#84CC16', '#365314', '#FFFFFF', '#18181B']} />,
+    aiInstructions: {
+        light: "Light lime background (#F7FEE7) with dark green (#365314) text. Electric lime (#84CC16) for primary actions, pure white (#FFFFFF) for contrast panels, creates energetic, modern feel.",
+        dark: "Charcoal black (#18181B) background with lime highlights (#F7FEE7). Electric lime (#84CC16) glows intensely against dark background, creating high-energy, modern aesthetic."
+    }
+},
+{
+    id: 'goldenHour',
+    userFacingText: 'Golden Hour',
+    description: 'Warm golden yellows and deep browns, creating a cozy, premium, and inviting atmosphere.',
+    visualElement: () => <ColorPaletteVisual colors={['#FFFBEB', '#F59E0B', '#D97706', '#92400E', '#1C1917']} />,
+    aiInstructions: {
+        light: "Warm ivory (#FFFBEB) background with rich brown (#1C1917) text. Golden yellow (#F59E0B) for primary elements, amber (#D97706) for emphasis, creates warm, inviting, premium feel.",
+        dark: "Rich dark brown (#1C1917) background with golden cream (#FFFBEB) text. Gold colors (#F59E0B, #D97706) glow warmly against dark background, creating cozy, luxury atmosphere."
+    }
+},
+]
 
 const addOnFeatureOptions = [
     {
@@ -224,27 +337,7 @@ const addOnFeatureOptions = [
         visualElement: () => <i className={`pi pi-th-large ${styles.addOnVisualIcon} text-700`}></i>,
         aiInstruction: "Design the background of the website (or specific key sections) to be interactive, subtly reacting to the user's mouse movement or scroll position (e.g., subtle parallax, shifting gradients, particle effects that follow the cursor)."
     },
-    {
-        id: 'splitScreenLayout',
-        userFacingText: 'Split-Screen Layout (for specific sections)',
-        description: 'Use a split-screen layout for sections like \'About Me\' or \'Contact\' for a balanced content display.',
-        visualElement: () => <i className={`pi pi-table ${styles.addOnVisualIcon} text-700`}></i>,
-        aiInstruction: "For relevant sections (e.g., About Me, Contact, specific Project details), utilize a split-screen layout where content is divided into two distinct vertical or horizontal panes, potentially with different background treatments or scrolling behaviors."
-    },
-    {
-        id: 'masonryPortfolio',
-        userFacingText: 'Masonry or Irregular Grid Portfolio',
-        description: 'Display portfolio projects in a dynamic masonry or irregular grid for a visually engaging layout.',
-        visualElement: () => <i className={`pi pi-microsoft ${styles.addOnVisualIcon} text-700`}></i>,
-        aiInstruction: "Design the portfolio section using a masonry or irregular grid layout where project items have varying heights and/or widths and are packed tightly together, creating a visually dynamic and modern display."
-    },
-    {
-        id: 'fullScreenNav',
-        userFacingText: 'Full-Screen Navigation Overlay',
-        description: 'Implement a full-screen navigation menu that overlays the content when opened.',
-        visualElement: () => <i className={`pi pi-window-maximize ${styles.addOnVisualIcon} text-700`}></i>,
-        aiInstruction: "When the navigation menu is opened (especially on mobile/tablet, but potentially as an option on desktop), it should appear as a full-screen overlay that covers the main content, providing a focused navigation experience. Style this overlay according to the chosen design concept and color style."
-    },
+
     {
         id: 'subtle3DElements',
         userFacingText: 'Subtle 3D Elements or Perspective',
@@ -258,13 +351,6 @@ const addOnFeatureOptions = [
         description: 'Include generative art (algorithmically created visuals) as a dynamic background or unique design elements.',
         visualElement: () => <i className={`pi pi-share-alt ${styles.addOnVisualIcon} text-700`}></i>, // pi-share-alt for node-like structure
         aiInstruction: "Integrate generative art principles into the design, either as a dynamic background, unique section dividers, interactive elements whose appearance is algorithmically generated, or abstract patterns that subtly shift or evolve. This should align with the overall aesthetic."
-    },
-    {
-        id: 'interactiveSkills',
-        userFacingText: 'Interactive Skill Visualization',
-        description: 'Showcase skills in a creative, interactive way beyond a simple list (e.g., skill tree, constellation).',
-        visualElement: () => <i className={`pi pi-sitemap ${styles.addOnVisualIcon} text-700`}></i>,
-        aiInstruction: "Design a creative and interactive way to visualize skills (e.g., not just a list or static progress bars). This could be a force-directed graph, an interactive constellation where clicking a star reveals skill details, a draggable skill tree, a radial chart with interactive segments, or another unique visual metaphor that users can explore. The visualization should be thematically consistent with the chosen design concept."
     },
     {
         id: 'uniqueFooter',
@@ -287,20 +373,7 @@ const addOnFeatureOptions = [
         visualElement: () => <i className={`pi pi-star ${styles.addOnVisualIcon} text-700`}></i>, // pi-star for "custom/special"
         aiInstruction: "Develop and implement a custom set of icons to be used throughout the website (for navigation, section headers, lists, social links, etc.). These icons must be stylistically cohesive and perfectly aligned with the chosen Design Concept and Color Style, reinforcing the overall aesthetic."
     },
-    {
-        id: 'horizontalScroll',
-        userFacingText: 'Horizontal Scrolling Sections',
-        description: 'Incorporate sections that scroll horizontally, offering a unique way to navigate content like galleries or timelines.',
-        visualElement: () => <i className={`pi pi-arrows-h ${styles.addOnVisualIcon} text-700`}></i>,
-        aiInstruction: "Design one or more key sections of the website (e.g., a project gallery, a timeline, a step-by-step process) to utilize horizontal scrolling within the primary vertical scroll of the page. Ensure clear visual cues for horizontal interactivity and intuitive navigation (e.g., scrollbar, arrows, drag functionality)."
-    },
-    {
-        id: 'microinteractions',
-        userFacingText: 'Microinteractions & Hover Effects',
-        description: 'Enhance user experience with delightful microinteractions and creative hover effects on buttons, links, and images.',
-        visualElement: () => <i className={`pi pi-sparkles ${styles.addOnVisualIcon} text-700`}></i>, // pi-sparkles for "delightful"
-        aiInstruction: "Implement meaningful microinteractions and creative hover effects on interactive elements such as buttons, links, navigation items, and portfolio thumbnails. These should provide clear feedback, add a touch of personality, and align with the chosen Design Concept (e.g., a button might subtly change shape, glow, reveal an icon, or have a textured feedback on hover/click)."
-    },
+
     {
         id: 'variableFonts',
         userFacingText: 'Variable Font Integration',
