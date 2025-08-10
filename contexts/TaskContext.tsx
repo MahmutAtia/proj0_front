@@ -23,11 +23,11 @@ export interface Task {
 
 interface TaskContextType {
     tasks: Task[];
-    addTask: (taskId: string, title: string, type: Task['task_type']) => void;
+    isSaving: string | null; // Expose saving state
+    addTask: (taskId: string, title:string, type: Task['task_type']) => void;
     removeTask: (taskId: string) => void;
     clearCompleted: () => void;
     handleSaveAndRedirect: (task: Task) => Promise<void>;
-
 }
 
 const TaskContext = createContext<TaskContextType | undefined>(undefined);
@@ -66,7 +66,28 @@ export const TaskProvider = ({ children }: { children: React.ReactNode }) => {
             console.error("Failed to parse tasks from localStorage", error);
             localStorage.removeItem('tasks');
         }
-    }, []);
+
+        // Add event listener to sync tasks across tabs
+        const handleStorageChange = (event: StorageEvent) => {
+            if (event.key === 'tasks' && event.newValue) {
+                try {
+                    const newTasks = JSON.parse(event.newValue);
+                    // Update state only if it's different to avoid loops
+                    if (JSON.stringify(tasks) !== JSON.stringify(newTasks)) {
+                        setTasks(newTasks);
+                    }
+                } catch (error) {
+                    console.error("Failed to parse tasks from storage event", error);
+                }
+            }
+        };
+
+        window.addEventListener('storage', handleStorageChange);
+
+        return () => {
+            window.removeEventListener('storage', handleStorageChange);
+        };
+    }, []); // Run only on mount
 
     // Persist tasks to localStorage whenever they change
     useEffect(() => {
@@ -104,22 +125,21 @@ export const TaskProvider = ({ children }: { children: React.ReactNode }) => {
         }
     }, [status, tasks]); // Depend on the full tasks array
 
-    const saveGeneratedWebsite = async (taskId: string) => {
+    const saveGeneratedWebsite = async (task: Task) => {
         try {
-            const response = await api.post('api/resumes/save_generated_website/', { generation_task_id: taskId });
+            const response = await api.post('api/resumes/save_generated_website/', { generation_task_id: task.id });
             if (response.data && response.data.website_uuid) {
                 toast.current?.show({ severity: 'success', summary: 'Website Ready!', detail: 'Redirecting to the editor...', life: 3000 });
                 router.push(`/site-editor/${response.data.website_uuid}/`);
-                
+                // Remove the task after successful save and redirect
+                removeTask(task.id);
             } else {
                 throw new Error("Could not retrieve website ID after saving.");
             }
-
         } catch (err) {
             console.error("Save generated website error:", err);
             toast.current?.show({ severity: 'error', summary: 'Save Failed', detail: 'An error occurred while saving the website.' });
         }
-
     };
 
     const handleSaveAndRedirect = async (task: Task) => {
@@ -129,14 +149,17 @@ export const TaskProvider = ({ children }: { children: React.ReactNode }) => {
         }
 
         setIsSaving(task.id);
+        toast.current?.clear(); // Clear any related sticky toasts
 
-        if (task.task_type === 'website_generation') {
-            await saveGeneratedWebsite(task.id);
+        try {
+            if (task.task_type === 'website_generation') {
+                await saveGeneratedWebsite(task);
+            }
+            // Future task types like 'resume_generation' can be handled here
+            // else if (task.task_type === 'resume_generation') { ... }
+        } finally {
+            setIsSaving(null);
         }
-        // Future task types like 'resume_generation' can be handled here
-        // else if (task.task_type === 'resume_generation') { ... }
-
-        setIsSaving(null);
     };
 
     const handleTaskSuccess = useCallback((task: Task) => {
@@ -144,9 +167,9 @@ export const TaskProvider = ({ children }: { children: React.ReactNode }) => {
             <div className="flex flex-column" style={{ flex: '1' }}>
                 <div className="flex align-items-center">
                     <i className="pi pi-check-circle text-green-500 text-2xl mr-2"></i>
-                    <div className="font-bold">{task.notification_title || 'Task Complete!'}</div>
+                    <div className="font-bold">{task.notification_title} Ready</div>
                 </div>
-                <div className="font-medium text-sm mt-2">Your new item is generated and ready.</div>
+                <div className="font-medium text-sm mt-2">Your generated content is ready to be saved and viewed.</div>
                 <div className="grid mt-3">
                     <div className="col-6">
                         <Button
@@ -169,11 +192,11 @@ export const TaskProvider = ({ children }: { children: React.ReactNode }) => {
 
         toast.current?.show({
             severity: 'success',
-            summary: 'Success',
+            summary: 'Generation Complete',
             content: toastContent,
             sticky: true,
         });
-    }, [isSaving]);
+    }, [isSaving, handleSaveAndRedirect]);
 
     const handleTaskFailure = useCallback((task: Task) => {
         toast.current?.show({
@@ -233,6 +256,7 @@ export const TaskProvider = ({ children }: { children: React.ReactNode }) => {
     // The value provided to the context now includes tasks and management functions
     const contextValue: TaskContextType = {
         tasks,
+        isSaving,
         addTask,
         removeTask,
         clearCompleted,
