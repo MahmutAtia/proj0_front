@@ -175,27 +175,27 @@ export const authOptions: NextAuthOptions = {
 
         async session({ session, token }) {
             if (token) {
-                session.user = {
+                session.user = { // do not get image from token, the image is already in session.user it is coming from google
                     ...session.user,
-                    ...token.user,
                     name: token.user.first_name && token.user.last_name
                         ? `${token.user.first_name} ${token.user.last_name}`.trim()
                         : token.user.username || token.user.email,
                     email: token.user.email,
-                    image: token.user.image || null,
                 };
             }
 
             session.accessToken = token.access_token;
             session.refreshToken = token.refresh_token;
             session.error = token.error;
+
             
             // Log final session state for debugging
             console.log('🎫 Final Session:', {
                 hasUser: !!session.user,
                 hasAccessToken: !!session.accessToken,
                 error: session.error,
-                userEmail: session.user?.email || 'none'
+                userEmail: session.user?.email || 'none',
+                user: session.user
             });
 
             return session;
