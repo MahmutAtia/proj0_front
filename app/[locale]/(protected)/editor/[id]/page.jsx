@@ -36,7 +36,6 @@ const ResumeEditorPage = ({ params: paramsPromise }) => {
             setInitialHiddenSections(null); // Reset
             setPersonalWebsiteUuid(null); // Reset
             setFetchError(null);
-
             const localResumes = getResumesFromCache();
             let foundInLocal = false;
             if (localResumes) {
@@ -50,6 +49,8 @@ const ResumeEditorPage = ({ params: paramsPromise }) => {
                         setPersonalWebsiteUuid(resumeItem.personal_website_uuid || null); // Load website UUID
                         foundInLocal = true;
                         console.log("Loaded resume from local cache.");
+                        // site uuid
+                        console.log("Personal Website UUID from cache:", resumeItem.personal_website_uuid);
                     }
                 } catch (e) {
                     console.error("Error parsing local cache data:", e);

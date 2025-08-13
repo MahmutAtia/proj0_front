@@ -6,6 +6,7 @@ import api from '@/lib/axios';
 import { useRouter } from 'next/navigation';
 import { Toast } from 'primereact/toast';
 import { Button } from 'primereact/button';
+import { getResumesFromCache, setResumesCache, addOrUpdateResumeInCache } from '@/app/utils/resumeCache';
 
 const POLLING_INTERVAL = 5000; // 5 seconds
 
@@ -24,7 +25,7 @@ export interface Task {
 interface TaskContextType {
     tasks: Task[];
     isSaving: string | null; // Expose saving state
-    addTask: (taskId: string, title:string, type: Task['task_type']) => void;
+    addTask: (taskId: string, title:string, type: Task['task_type'], resumeId: number) => void;
     removeTask: (taskId: string) => void;
     clearCompleted: () => void;
     handleSaveAndRedirect: (task: Task) => Promise<void>;
@@ -126,10 +127,35 @@ export const TaskProvider = ({ children }: { children: React.ReactNode }) => {
     }, [status, tasks]); // Depend on the full tasks array
 
     const saveGeneratedWebsite = async (task: Task) => {
+        // The task must have a resume_id to associate the website with.
+        if (!task.resume_id) {
+            console.error("Task is missing resume_id, cannot save website.", task);
+            toast.current?.show({ severity: 'error', summary: 'Save Failed', detail: 'Cannot associate website with a resume.' });
+            return;
+        }
+
         try {
             const response = await api.post('api/resumes/save_generated_website/', { generation_task_id: task.id });
             if (response.data && response.data.website_uuid) {
                 toast.current?.show({ severity: 'success', summary: 'Website Ready!', detail: 'Redirecting to the editor...', life: 3000 });
+
+                // --- Corrected Cache Update Logic ---
+                const allResumes = getResumesFromCache();
+                if (allResumes) {
+                    const resumeToUpdate = allResumes.find(r => r.id === task.resume_id);
+                    if (resumeToUpdate) {
+                        // Merge existing data with the new website_uuid
+                        const updatedResume = {
+                            ...resumeToUpdate,
+                            personal_website_uuid: response.data.website_uuid,
+                            updated_at: new Date().toISOString() // Also update the timestamp
+                        };
+                        // Pass the complete, updated object to the cache function
+                        addOrUpdateResumeInCache(updatedResume);
+                    }
+                }
+                // --- End of Correction ---
+
                 router.push(`/site-editor/${response.data.website_uuid}/`);
                 // Remove the task after successful save and redirect
                 removeTask(task.id);
@@ -235,12 +261,13 @@ export const TaskProvider = ({ children }: { children: React.ReactNode }) => {
         }
     }, [tasks, pollTasks]);
 
-    const addTask = (taskId: string, title: string, type: Task['task_type']) => {
+    const addTask = (taskId: string, title: string, type: Task['task_type'], resumeId: number) => {
         const newTask: Task = {
             id: taskId,
             status: 'PENDING',
             notification_title: title,
             task_type: type,
+            resume_id: resumeId, // Ensure resume_id is passed and stored
         };
         setTasks(prevTasks => [newTask, ...prevTasks]);
     };

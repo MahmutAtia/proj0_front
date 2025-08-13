@@ -170,7 +170,8 @@ export default function CreatePortfolioPage({ params: paramsPromise }) {
                 addTask(
                     taskId,
                     "Generating your portfolio website",
-                    "website_generation"
+                    "website_generation",
+                    resumeId, // Pass the resumeId to associate with this task
                 );
 
 
