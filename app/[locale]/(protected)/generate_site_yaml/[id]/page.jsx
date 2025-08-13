@@ -17,12 +17,12 @@ import { Message } from 'primereact/message'; // For the hint/warning
 import styles from './CreatePortfolioPage.module.css';
 
 // Importing design concept options, color styles, and add-on features
-import { designConceptOptions, colorStyleOptions, addOnFeatureOptions } from './prefrences'
+import { designConceptOptions, colorStyleOptions } from './prefrences'
 import { generateYamlFromLocalStorage } from '@/app/utils/utils'; // Adjust the import path as needed
 import { useTasks } from '@/contexts/TaskContext';
 
 const POLLING_INTERVAL = 3000; // 3 seconds
-const MAX_POLLING_ATTEMPTS = 40; // 2 minutes total
+const MAX_POLLING_ATTEMPTS = 40 //
 
 
 export default function CreatePortfolioPage({ params: paramsPromise }) {
@@ -35,7 +35,6 @@ export default function CreatePortfolioPage({ params: paramsPromise }) {
     const [activeIndex, setActiveIndex] = useState(0);
     const [selectedConcept, setSelectedConcept] = useState(null);
     const [selectedColorStyle, setSelectedColorStyle] = useState(null);
-    const [selectedAddOns, setSelectedAddOns] = useState([]);
     const [isLoading, setIsLoading] = useState(false);
     const [generationResult, setGenerationResult] = useState(null);
     const [currentLoadingMessageIndex, setCurrentLoadingMessageIndex] = useState(0);
@@ -82,19 +81,8 @@ export default function CreatePortfolioPage({ params: paramsPromise }) {
     const stepperItems = [
         { label: 'Design Concept', command: () => setActiveIndex(0) },
         { label: 'Color Palette', command: () => setActiveIndex(1) },
-        { label: 'Add-on Features', command: () => setActiveIndex(2) },
-        { label: 'Review & Generate', command: () => setActiveIndex(3) }
+        { label: 'Review & Generate', command: () => setActiveIndex(2) }
     ];
-
-    const handleAddOnSelection = (e) => {
-        let _selectedAddOns = [...selectedAddOns];
-        if (e.checked) {
-            _selectedAddOns.push(e.value);
-        } else {
-            _selectedAddOns = _selectedAddOns.filter(item => item.id !== e.value.id);
-        }
-        setSelectedAddOns(_selectedAddOns);
-    };
 
     const constructPreferencesPayload = () => {
         const lines = [];
@@ -117,14 +105,6 @@ export default function CreatePortfolioPage({ params: paramsPromise }) {
             lines.push(`For dark mode: ${selectedColorStyle.aiInstructions.dark} (from ${selectedColorStyle.userFacingText} Color Style)`);
         }
 
-        // Add-on Features
-        if (selectedAddOns && selectedAddOns.length > 0) {
-            if (lines.length > 0 && lines[lines.length - 1] !== "") lines.push(""); // Add a blank line if there's preceding content and it's not already a blank line
-            selectedAddOns.forEach((addon) => {
-                lines.push(`${addon.aiInstruction} (from ${addon.userFacingText} Add-on)`);
-            });
-        }
-
         return lines.join('\n');
     };
 
@@ -132,7 +112,6 @@ export default function CreatePortfolioPage({ params: paramsPromise }) {
         setActiveIndex(0);
         setSelectedConcept(null);
         setSelectedColorStyle(null);
-        setSelectedAddOns([]);
         setIsLoading(false);
         setGenerationResult(null);
         setGenerationTaskId(null);
@@ -335,38 +314,7 @@ export default function CreatePortfolioPage({ params: paramsPromise }) {
                         ))}
                     </div>
                 );
-            case 2: // Add-on Features
-                return (
-                    <div className="grid">
-                        {addOnFeatureOptions.map(feature => (
-                            <div key={feature.id} className="col-12 md:col-6 lg:col-4 p-2">
-                                <div
-                                    className={`${styles.addOnCard} ${selectedAddOns.some(item => item.id === feature.id) ? styles.selectedAddOnCard : ''}`}
-                                    onClick={() => {
-                                        const isSelected = selectedAddOns.some(item => item.id === feature.id);
-                                        handleAddOnSelection({ value: feature, checked: !isSelected });
-                                    }}
-                                >
-                                    <div className={styles.addOnVisualElementContainer}>
-                                        {feature.visualElement()}
-                                    </div>
-                                    <div className="ml-3 flex-grow-1">
-                                        <span className="font-medium text-lg">{feature.userFacingText}</span>
-                                        <p className="text-sm text-600 mt-1 mb-0">{feature.description}</p>
-                                    </div>
-                                    <Checkbox
-                                        inputId={`feature_${feature.id}`} // Ensure unique inputId
-                                        value={feature}
-                                        onChange={handleAddOnSelection}
-                                        checked={selectedAddOns.some(item => item.id === feature.id)}
-                                        className="ml-auto"
-                                    />
-                                </div>
-                            </div>
-                        ))}
-                    </div>
-                );
-            case 3: // Review & Generate
+        case 2: // Review & Generate
                 if (isLoading || isCheckingStatus) {
                     return (
                         <div className="text-center p-5">
@@ -413,13 +361,7 @@ export default function CreatePortfolioPage({ params: paramsPromise }) {
                                 </div>
                                 <div>
                                     <strong className="text-gray-700 block mb-1">Additional Features:</strong>
-                                    {selectedAddOns.length > 0 ? (
-                                        <ul className="list-disc pl-5 mt-1">
-                                            {selectedAddOns.map(addon => <li key={addon.id} className="text-gray-600 text-lg">{addon.userFacingText}</li>)}
-                                        </ul>
-                                    ) : (
-                                        <p className="text-gray-600 text-lg">None</p>
-                                    )}
+                                    <p className="text-gray-600 text-lg">None</p>
                                 </div>
                             </div>
                             <Button
