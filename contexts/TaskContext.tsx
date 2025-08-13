@@ -20,7 +20,9 @@ export interface Task {
     action_url?: string;
     notification_title?: string;
     task_type?: 'resume_generation' | 'website_generation';
-}
+    resume_id?: number;
+
+}   
 
 interface TaskContextType {
     tasks: Task[];
