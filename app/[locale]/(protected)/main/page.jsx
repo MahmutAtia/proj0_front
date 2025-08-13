@@ -1,41 +1,25 @@
 "use client";
-import React, { useState, useRef, useEffect, useMemo } from 'react';
+import React, { useState, useRef, useMemo } from 'react';
 import { useSession } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
-import Link from 'next/link';
 import { Button } from 'primereact/button';
 import { Card } from 'primereact/card';
-import { Avatar } from 'primereact/avatar';
-import { Menu } from 'primereact/menu';
-import { Ripple } from 'primereact/ripple';
 import { ProgressSpinner } from 'primereact/progressspinner';
-import { Divider } from 'primereact/divider';
-import { InputText } from 'primereact/inputtext';
-import { IoSparkles } from "react-icons/io5";
 import {
-    FiArchive, FiFileText, FiBriefcase, FiGlobe, FiCheckSquare, FiAward, FiSettings,
-    FiLogOut, FiBell, FiSearch, FiChevronDown, FiUser, FiStar, FiEdit,
-    FiList, FiFolder, FiInfo, FiMenu, FiChevronLeft, FiChevronRight, FiPlusSquare
+    FiFileText, FiPlusSquare, FiBriefcase, FiGlobe, FiStar, FiEdit,
+    FiList, FiFolder, FiArchive
 } from 'react-icons/fi';
 import styles from './Dashboard.module.css';
 import JobPostings from './mainComponets/JobPostings';
 import ScholarshipList from './mainComponets/ScholarshipList';
 import api from '@/lib/axios'; 
-import { Toast } from 'primereact/toast';
 
-import { Dialog } from 'primereact/dialog'; // If not already there for other purposes
-import GenerateDocumentDialog from '../editor/components/GenerateDocumentDialog'; // Adjust path as needed
-import CreateResumeFromExistingDialog from '../editor/components/CreateResumeFromExistingDialog'; // Adjust path as neededimport
-import { useTranslation } from '../../../../hooks/useTranslation'; // Import the hook
+import GenerateDocumentDialog from '../editor/components/GenerateDocumentDialog';
+import  CreateResumeFromExistingDialog  from '../editor/components/CreateResumeFromExistingDialog';
+import { useTranslation } from '../../../../hooks/useTranslation';
+import { useDashboard } from './DashboardContext'; // Import the context hook
 
-// Make sure RESUMES_CACHE_KEY and CACHE_EXPIRY_DURATION are accessible here or re-defined
-// Or better, use a shared context/hook for resume data and default resume logic.
-
-const RESUMES_CACHE_KEY_DASHBOARD = 'all_resumes_list_cache'; // Same key as ResumeListPage
-const CACHE_EXPIRY_DURATION_DASHBOARD = 15 * 60 * 1000;
-
-
-
+// Removed cache constants and related logic from here
 
 const WelcomeBanner = ({ userName }) => {
     const { t } = useTranslation();
@@ -242,195 +226,107 @@ const RelatedDocumentsList = ({ documents, resumeTitle, onManageDocuments, isLoa
 
 // --- Main Dashboard Page Component (Updated) ---
 const DashboardPage = () => {
+    // Get all data from the context provided by layout.jsx
+    const {
+        allResumes,
+        defaultResume,
+        relatedDocuments,
+        loadingResumes,
+        toast
+    } = useDashboard();
+
     const { data: session, status: sessionStatus } = useSession();
     const router = useRouter();
-    const toast = useRef(null);
-    const { t } = useTranslation(); // Main hook
+    const { t } = useTranslation();
 
-    const [allResumes, setAllResumes] = useState([]);
-    const [defaultResume, setDefaultResume] = useState(null);
-    const [relatedDocuments, setRelatedDocuments] = useState([]);
-    const [loadingResumes, setLoadingResumes] = useState(true);
     const [isGenerateDocDialogVisible, setIsGenerateDocDialogVisible] = useState(false);
     const [showCreateDialog, setShowCreateDialog] = useState(false);
 
-    // Fetch all resumes and identify default
-    useEffect(() => {
-        const loadInitialData = async () => {
-            if (sessionStatus === 'loading' || !session) return;
-
-            setLoadingResumes(true);
-            try {
-                // Use caching logic similar to ResumeListPage
-                const localData = localStorage.getItem(RESUMES_CACHE_KEY_DASHBOARD);
-                let resumesData = null;
-                if (localData) {
-                    const parsedCache = JSON.parse(localData);
-                    if (parsedCache.data && parsedCache.timestamp && (Date.now() - parsedCache.timestamp < CACHE_EXPIRY_DURATION_DASHBOARD)) {
-                        resumesData = parsedCache.data;
-                    } else {
-                        localStorage.removeItem(RESUMES_CACHE_KEY_DASHBOARD);
+    const transformedResumesForDialog = useMemo(() => {
+        return (allResumes || []).map(resume => {
+            const docTypesObject = {};
+            if (resume.generated_documents_data && Array.isArray(resume.generated_documents_data)) {
+                resume.generated_documents_data.forEach(doc => {
+                    if (doc.document_type) {
+                        docTypesObject[doc.document_type] = true;
                     }
-                }
-
-                if (!resumesData) {
-                    const response = await api.get(`/api/resumes/`);
-                    resumesData = response.data;
-                    localStorage.setItem(RESUMES_CACHE_KEY_DASHBOARD, JSON.stringify({ data: resumesData, timestamp: Date.now() }));
-                }
-
-                setAllResumes(resumesData || []);
-                const currentDefault = (resumesData || []).find(r => r.is_default);
-                setDefaultResume(currentDefault || null);
-                if (currentDefault) {
-                    setRelatedDocuments(currentDefault.generated_documents_data || []);
-                } else {
-                    setRelatedDocuments([]);
-                }
-
-            } catch (err) {
-                console.error("Error fetching resumes for dashboard:", err);
-                toast.current?.show({ severity: 'error', summary: t('common.error'), detail: t('dashboard_main.toast.loadError') });
-                setAllResumes([]);
-                setDefaultResume(null);
-                setRelatedDocuments([]);
-            } finally {
-                setLoadingResumes(false);
+                });
             }
-        };
-        loadInitialData();
-    }, [session, sessionStatus, t]);
+            return {
+                id: resume.id,
+                json_content: docTypesObject,
+                resume: resume.resume,         // <-- Add this line
+                about: resume.about || "",     // <-- And this line
+            };
+        });
+    }, [allResumes]);
 
-const transformedResumesForDialog = useMemo(() => {
-    return allResumes.map(resume => {
-        const docTypesObject = {};
-        if (resume.generated_documents_data && Array.isArray(resume.generated_documents_data)) {
-            resume.generated_documents_data.forEach(doc => {
-                if (doc.document_type) {
-                    docTypesObject[doc.document_type] = true;
-                }
-            });
-        }
-        return {
-            id: resume.id,
-            json_content: docTypesObject,
-            resume: resume.resume,         // <-- Add this line
-            about: resume.about || "",     // <-- And this line
-        };
-    });
-}, [allResumes]);
-    const handleSetDefaultResume = async () => {
-        if (!defaultResume && allResumes.length > 0) {
-            // If no default is set, and there are resumes, prompt to select one or go to resumes page
-            toast.current?.show({ severity: 'info', summary: t('dashboard_main.toast.actionRequiredSummary'), detail: t('dashboard_main.toast.actionRequiredDetail') });
-            router.push('/main/resumes'); // Or open a dialog to select
-            return;
-        }
-        if (!defaultResume) {
-            toast.current?.show({ severity: 'warn', summary: t('dashboard_main.toast.noResumeSummary'), detail: t('dashboard_main.toast.noResumeDetail') });
-            return;
+
+    const getQuickActions = (currentDefaultResume) => {
+        let portfolioRoute = '/site-editor'; // Fallback route
+        const locale = router.locale;
+
+        if (currentDefaultResume) {
+            // If a site UUID exists, go to the editor for that site
+            if (currentDefaultResume.personal_website_uuid) {
+                portfolioRoute = `/site-editor/${currentDefaultResume.personal_website_uuid}`;
+            } else {
+                // Otherwise, go to the page to generate a new site for the resume
+                portfolioRoute = `/generate_site_yaml/${currentDefaultResume.id}`;
+            }
         }
 
-
-        const newDefaultState = !defaultResume.is_default;
-        // Optimistic UI update
-        const oldDefaultResume = { ...defaultResume };
-        const oldAllResumes = [...allResumes];
-
-        setDefaultResume(prev => prev ? { ...prev, is_default: newDefaultState } : null);
-        setAllResumes(prevResumes => prevResumes.map(r => {
-            if (r.id === defaultResume.id) return { ...r, is_default: newDefaultState };
-            if (newDefaultState && r.is_default) return { ...r, is_default: false }; // Unset other defaults
-            return r;
-        }));
-
-
-        try {
-            // API call to update the default status
-            // This endpoint should handle setting one resume as default and unsetting others.
-            // If your backend doesn't do that, you might need two calls or a more specific endpoint.
-            await api.patch(`/api/resumes/${defaultResume.id}/`,
-                { is_default: newDefaultState }
-            );
-
-            // Update cache
-            const updatedCacheResumes = allResumes.map(r => {
-                if (r.id === defaultResume.id) return { ...r, is_default: newDefaultState };
-                if (newDefaultState && r.is_default && r.id !== defaultResume.id) return { ...r, is_default: false };
-                return r;
-            });
-            localStorage.setItem(RESUMES_CACHE_KEY_DASHBOARD, JSON.stringify({ data: updatedCacheResumes, timestamp: Date.now() }));
-
-            toast.current?.show({ severity: 'success', summary: t('common.success'), detail: t('dashboard_main.toast.updateSuccess') });
-        } catch (err) {
-            console.error("Error setting default resume:", err);
-            toast.current?.show({ severity: 'error', summary: t('common.error'), detail: t('dashboard_main.toast.updateError') });
-            // Revert optimistic update
-            setDefaultResume(oldDefaultResume);
-            setAllResumes(oldAllResumes);
-        }
+        return [
+            {
+                title: t('dashboard_main.quickActions.createDocument.title'),
+                icon: <FiFileText size={28} className={styles.actionIconForeground} />, // Enhanced icon
+                description: t('dashboard_main.quickActions.createDocument.description'),
+                onClick: () => {
+                    if (allResumes.length === 0) {
+                        toast.current?.show({ severity: 'warn', summary: t('dashboard_main.toast.noResumeSummary'), detail: t('dashboard_main.toast.noResumeForDoc'), life: 4000 });
+                        return;
+                    }
+                    setIsGenerateDocDialogVisible(true);
+                },
+                buttonLabel: t('dashboard_main.quickActions.createDocument.button')
+            },
+            {
+                title: t('dashboard_main.quickActions.newResume.title'),
+                icon: <FiPlusSquare size={28} className={styles.actionIconForeground} />, // Changed icon for consistency
+                description: t('dashboard_main.quickActions.newResume.description'),
+                onClick: () => {
+                    if (allResumes.length === 0) {
+                        toast.current?.show({ severity: 'warn', summary: t('dashboard_main.toast.noResumeSummary'), detail: t('dashboard_main.toast.noResumeForDoc'), life: 4000 });
+                        return;
+                    }
+                    setShowCreateDialog(true);
+                },
+                buttonLabel: t('dashboard_main.quickActions.newResume.button')
+            },
+            {
+                title: t('dashboard_main.quickActions.myPortfolio.title'),
+                icon: <FiGlobe size={28} className={styles.actionIconForeground} />,
+                description: t('dashboard_main.quickActions.myPortfolio.description'),
+                route: portfolioRoute, // Use the dynamically determined route
+                buttonLabel: t('dashboard_main.quickActions.myPortfolio.button')
+            },
+            {
+                title: t('dashboard_main.quickActions.jobSearch.title'),
+                icon: <FiBriefcase size={28} className={styles.actionIconForeground} />,
+                description: t('dashboard_main.quickActions.jobSearch.description'),
+                route: '/main/job-feed',
+                buttonLabel: t('dashboard_main.quickActions.jobSearch.button')
+            },
+        ];
     };
-
-    const getQuickActions = (currentDefaultResume) => [
-        {
-            title: t('dashboard_main.quickActions.createDocument.title'),
-            icon: <FiFileText size={28} className={styles.actionIconForeground} />, // Enhanced icon
-            description: t('dashboard_main.quickActions.createDocument.description'),
-            onClick: () => {
-                if (allResumes.length === 0) {
-                    toast.current?.show({ severity: 'warn', summary: t('dashboard_main.toast.noResumeSummary'), detail: t('dashboard_main.toast.noResumeForDoc'), life: 4000 });
-                    return;
-                }
-                setIsGenerateDocDialogVisible(true);
-            },
-            buttonLabel: t('dashboard_main.quickActions.createDocument.button')
-        },
-        {
-            title: t('dashboard_main.quickActions.newResume.title'),
-            icon: <FiPlusSquare size={28} className={styles.actionIconForeground} />, // Changed icon for consistency
-            description: t('dashboard_main.quickActions.newResume.description'),
-            onClick: () => {
-                if (allResumes.length === 0) {
-                    toast.current?.show({ severity: 'warn', summary: t('dashboard_main.toast.noResumeSummary'), detail: t('dashboard_main.toast.noResumeForDoc'), life: 4000 });
-                    return;
-                }
-                setShowCreateDialog(true);
-            },
-            buttonLabel: t('dashboard_main.quickActions.newResume.button')
-        },
-        {
-            title: t('dashboard_main.quickActions.myPortfolio.title'),
-            icon: <FiGlobe size={28} className={styles.actionIconForeground} />,
-            description: t('dashboard_main.quickActions.myPortfolio.description'),
-            route: currentDefaultResume ? `/main/site-editor/${currentDefaultResume.personal_website_uuid || currentDefaultResume.id}` : '/main/site-editor',
-            buttonLabel: t('dashboard_main.quickActions.myPortfolio.button')
-        },
-        {
-            title: t('dashboard_main.quickActions.jobSearch.title'),
-            icon: <FiBriefcase size={28} className={styles.actionIconForeground} />,
-            description: t('dashboard_main.quickActions.jobSearch.description'),
-            route: '/main/job-feed',
-            buttonLabel: t('dashboard_main.quickActions.jobSearch.button')
-        },
-    ];
 
     const quickActions = getQuickActions(defaultResume);
 
     const handleCreationSuccess = (newResumeId) => {
-        // console.log("New resume created with ID:", newResumeId);
-        // Optionally, navigate to the new resume or refresh data
-        // router.push(`/editor/${newResumeId}`);
+        // To refresh data, we might need to reload or use a more advanced state management
         setShowCreateDialog(false);
-        // Refresh resume list
-    };
 
-    if (sessionStatus === "loading") {
-        return (
-            <div className="flex justify-content-center align-items-center min-h-screen surface-ground">
-                <ProgressSpinner style={{ width: '50px', height: '50px' }} strokeWidth="4" animationDuration=".5s" />
-            </div>
-        );
-    }
+    };
 
     if (sessionStatus === "unauthenticated") {
         router.push('/login');
@@ -439,7 +335,8 @@ const transformedResumesForDialog = useMemo(() => {
 
     return (
         <>
-            <Toast ref={toast} />
+            {/* Toast is now rendered in the layout, so we can remove it from here if we want */}
+            {/* <Toast ref={toast} /> */}
             <WelcomeBanner userName={session?.user?.name} />
             <QuickActionsGrid actions={quickActions} />
 
@@ -505,7 +402,7 @@ const transformedResumesForDialog = useMemo(() => {
 
 export default DashboardPage;
 
-// Add to your Dashboard.module.css:
+// CSS comments remain the same
 /*
 .dashboardCardCompact {
     // Standard card styles, maybe less padding if needed
@@ -528,7 +425,7 @@ export default DashboardPage;
 .documentItem {
     transition: background-color 0.2s;
 }
-.documentItem:hover {
+// .documentItem:hover {
     background-color: var(--surface-200) !important;
 }
 */

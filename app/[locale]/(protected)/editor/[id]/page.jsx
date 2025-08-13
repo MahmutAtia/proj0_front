@@ -20,6 +20,7 @@ const ResumeEditorPage = ({ params: paramsPromise }) => {
     const [linkedDocuments, setLinkedDocuments] = useState([]);
     const [initialSectionOrder, setInitialSectionOrder] = useState(null); // New state
     const [initialHiddenSections, setInitialHiddenSections] = useState(null); // New state
+    const [personalWebsiteUuid, setPersonalWebsiteUuid] = useState(null); // State for website UUID
     const [fetchError, setFetchError] = useState(null);
     const router = useRouter();
     const toast = useRef(null);
@@ -33,8 +34,8 @@ const ResumeEditorPage = ({ params: paramsPromise }) => {
             setLinkedDocuments([]);
             setInitialSectionOrder(null); // Reset
             setInitialHiddenSections(null); // Reset
+            setPersonalWebsiteUuid(null); // Reset
             setFetchError(null);
-
             const localResumes = getResumesFromCache();
             let foundInLocal = false;
             if (localResumes) {
@@ -45,8 +46,11 @@ const ResumeEditorPage = ({ params: paramsPromise }) => {
                         setLinkedDocuments(resumeItem.generated_documents_data || []);
                         setInitialSectionOrder(resumeItem.sections_sort || null); // Load sections_sort
                         setInitialHiddenSections(resumeItem.hidden_sections || null); // Load hidden_sections
+                        setPersonalWebsiteUuid(resumeItem.personal_website_uuid || null); // Load website UUID
                         foundInLocal = true;
                         console.log("Loaded resume from local cache.");
+                        // site uuid
+                        console.log("Personal Website UUID from cache:", resumeItem.personal_website_uuid);
                     }
                 } catch (e) {
                     console.error("Error parsing local cache data:", e);
@@ -78,6 +82,7 @@ const ResumeEditorPage = ({ params: paramsPromise }) => {
                         setLinkedDocuments(response.data.generated_documents_data || []);
                         setInitialSectionOrder(response.data.sections_sort || null); // Load sections_sort from API
                         setInitialHiddenSections(response.data.hidden_sections || null); // Load hidden_sections from API
+                        setPersonalWebsiteUuid(response.data.personal_website_uuid || null); // Load website UUID from API
                         
                         // Update the cache with the newly fetched data
                         addOrUpdateResumeInCache(response.data);
@@ -134,6 +139,7 @@ const ResumeEditorPage = ({ params: paramsPromise }) => {
                         linkedDocuments={linkedDocuments}
                         initialSectionOrder={initialSectionOrder} // Pass new prop
                         initialHiddenSections={initialHiddenSections} // Pass new prop
+                        personalWebsiteUuid={personalWebsiteUuid} // Pass website UUID
                     />
                 </ResumeProvider>
             )}

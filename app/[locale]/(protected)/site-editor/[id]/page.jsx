@@ -497,7 +497,7 @@ const PersonalSiteEditorPage = ({ params: paramsPromise }) => {
         ${block.css || ''}
     </style>
 </head>
-<body>
+<body data-render-context="editor">
     <script>
         // This script runs immediately to set the theme class, preventing FOUC.
         (function() {
@@ -799,7 +799,7 @@ const EditorToolbar = ({
     hasUnsavedChanges,
     onEditGlobal
 }) => {
-    const siteUrl = `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/${resumeId}/`;
+    const siteUrl = `${process.env.NEXT_PUBLIC_BACKEND_URL}/${resumeId}/`;
 
     return (
         <div className="p-3 surface-ground border-bottom-1 surface-border flex flex-wrap justify-content-between align-items-center sticky top-0 z-5 gap-2" style={{ zIndex: 1010 }}>

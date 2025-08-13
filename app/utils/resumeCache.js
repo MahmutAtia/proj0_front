@@ -34,18 +34,22 @@ export const setResumesCache = (resumes) => {
 
 /**
  * Adds or updates a single resume in the localStorage cache.
- * @param {object} resumeItem - The full resume item object to add or update.
+ * If the resume exists, it merges the new data with the old data.
+ * @param {object} resumeItem - The resume item object to add or update. Can be a partial object as long as it has an `id`.
  */
 export const addOrUpdateResumeInCache = (resumeItem) => {
-    if (!resumeItem || !resumeItem.id) return;
+    if (!resumeItem || !resumeItem.id) {
+        console.error("Cannot update cache: resume item or its ID is missing.", resumeItem);
+        return;
+    }
 
     try {
         const resumes = getResumesFromCache() || [];
         const index = resumes.findIndex(r => r.id === resumeItem.id);
 
         if (index > -1) {
-            // Update existing resume
-            resumes[index] = resumeItem;
+            // Update existing resume by merging new data into it
+            resumes[index] = { ...resumes[index], ...resumeItem };
         } else {
             // Add new resume to the top of the list
             resumes.unshift(resumeItem);

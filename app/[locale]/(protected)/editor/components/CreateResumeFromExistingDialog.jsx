@@ -9,9 +9,9 @@ import { Message } from 'primereact/message';
 import axios from 'axios';
 import { useSession } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
-import yaml from 'js-yaml';
 import { motion, AnimatePresence } from 'framer-motion';
-import { getResumesFromCache, addOrUpdateResumeInCache } from '@/app/utils/resumeCache';
+import { addOrUpdateResumeInCache } from '@/app/utils/resumeCache';
+import { generateYamlFromLocalStorage } from '@/app/utils/utils'; // Adjust the import path as needed
 
 const languageOptions = [
     { label: 'English', value: 'en' },
@@ -64,34 +64,6 @@ const CreateResumeFromExistingDialog = ({
             clearInterval(intervalId);
         };
     }, [loading]);
-
-    /**
-     * Finds a resume by ID in local storage and converts it to a sorted YAML string.
-     * This function now returns the YAML string or throws an error.
-     * @param {string | number} resumeId The ID of the resume to process.
-     * @returns {string} The YAML string representation of the resume.
-     */
-    const generateYamlFromLocalStorage = (resumeId) => {
-        // FIX: Use the centralized cache utility function to read from the correct key.
-        const resumes = getResumesFromCache(); 
-        if (!resumes) {
-            throw new Error('Resume cache not found. Please visit the dashboard to load resumes.');
-        }
-
-        const resumeItem = resumes.find((item) => item.id == resumeId); // Loose comparison
-
-        if (!resumeItem || !resumeItem.resume) {
-            throw new Error(`Resume with ID ${resumeId} not found in local cache.`);
-        }
-
-        // Convert the resume data to a sorted YAML string and return it
-        return yaml.dump(resumeItem.resume, {
-            indent: 2,
-            lineWidth: -1,
-            noRefs: true,
-            sortKeys: true // Sorts keys alphabetically
-        });
-    };
 
     useEffect(() => {
         if (visible) {
