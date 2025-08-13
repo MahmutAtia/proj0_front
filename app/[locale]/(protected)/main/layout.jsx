@@ -1,5 +1,5 @@
 "use client";
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef, useEffect } from 'react'; // Removed cloneElement
 import { useSession, signOut } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
@@ -20,9 +20,15 @@ import {
     FiList, FiFolder, FiInfo, FiMenu, FiChevronLeft, FiChevronRight
 } from 'react-icons/fi';
 import styles from './Dashboard.module.css';
-import { useTranslation } from '../../../../hooks/useTranslation'; // Import the hook
+import { useTranslation } from '../../../../hooks/useTranslation';
 import LanguageSwitcher from '../../../components/LanguageSwitcher';
 import TaskNotificationBell from './mainComponets/TaskNotificationBell';
+import DashboardContext from './DashboardContext'; // Import the context
+import api from '@/lib/axios';
+
+
+const RESUMES_CACHE_KEY_DASHBOARD = 'all_resumes_list_cache'; // Same key as ResumeListPage
+const CACHE_EXPIRY_DURATION_DASHBOARD = 15 * 60 * 1000;
 
 // --- Child Components (defined in the same file) ---
 
@@ -152,25 +158,58 @@ export default function Layout({ children }) {
     const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
     const { t } = useTranslation(); // Use translation hook
 
-    // Placeholder data - replace with actual data fetching
-    const [defaultResume, setDefaultResume] = useState({
-        title: "Senior Software Engineer",
-        lastUpdated: "2025-05-15",
-        is_default: true,
-        id: '123'
-    });
-    const [relatedDocuments, setRelatedDocuments] = useState([
-        { id: 'doc1', name: 'Cover Letter' }, { id: 'doc2', name: 'Motivation Letter' }
-    ]);
-    const [recentJobs, setRecentJobs] = useState([
-        { id: 1, title: "Frontend Developer", company: "Tech Solutions Inc.", location: "Remote" },
-        { id: 2, title: "Product Manager", company: "Innovate Hub", location: "New York, NY" },
-        { id: 3, title: "UX Designer", company: "Creative Minds LLC", location: "San Francisco, CA" },
-    ]);
-    const [scholarships, setScholarships] = useState([
-        { id: 1, title: "Future Leaders Scholarship", provider: "Education Foundation", deadline: "2025-08-01" },
-        { id: 2, title: "Tech Innovators Grant", provider: "Science & Tech Fund", deadline: "2025-09-15" },
-    ]);
+        // --- State moved from page.jsx to layout.jsx ---
+    const [allResumes, setAllResumes] = useState([]);
+    const [defaultResume, setDefaultResume] = useState(null);
+    const [relatedDocuments, setRelatedDocuments] = useState([]);
+    const [loadingResumes, setLoadingResumes] = useState(true);
+
+    useEffect(() => {
+        const loadInitialData = async () => {
+            if (status === 'loading' || !session) return;
+
+            setLoadingResumes(true);
+            try {
+                const localData = localStorage.getItem(RESUMES_CACHE_KEY_DASHBOARD);
+                let resumesData = null;
+                if (localData) {
+                    const parsedCache = JSON.parse(localData);
+                    if (parsedCache.data && parsedCache.timestamp && (Date.now() - parsedCache.timestamp < CACHE_EXPIRY_DURATION_DASHBOARD)) {
+                        resumesData = parsedCache.data;
+                    } else {
+                        localStorage.removeItem(RESUMES_CACHE_KEY_DASHBOARD);
+                    }
+                }
+
+                if (!resumesData) {
+                    const response = await api.get(`/api/resumes/`);
+                    resumesData = response.data;
+                    localStorage.setItem(RESUMES_CACHE_KEY_DASHBOARD, JSON.stringify({ data: resumesData, timestamp: Date.now() }));
+                }
+
+                setAllResumes(resumesData || []);
+                const currentDefault = (resumesData || []).find(r => r.is_default);
+                setDefaultResume(currentDefault || null);
+                if (currentDefault) {
+                    setRelatedDocuments(currentDefault.generated_documents_data || []);
+                } else {
+                    setRelatedDocuments([]);
+                }
+
+            } catch (err) {
+                console.error("Error fetching resumes for dashboard:", err);
+                toast.current?.show({ severity: 'error', summary: t('common.error'), detail: t('dashboard_main.toast.loadError') });
+                setAllResumes([]);
+                setDefaultResume(null);
+                setRelatedDocuments([]);
+            } finally {
+                setLoadingResumes(false);
+            }
+        };
+        loadInitialData();
+    }, [session, status, t]);
+
+
 
     // Load sidebar state from localStorage
     useEffect(() => {
@@ -190,6 +229,7 @@ export default function Layout({ children }) {
         }
     }, [status, session, router]);
 
+
     const toggleSidebar = () => {
         const newState = !sidebarCollapsed;
         setSidebarCollapsed(newState);
@@ -203,14 +243,26 @@ export default function Layout({ children }) {
         { label: t('dashboard_layout.userMenu.logout'), icon: 'pi pi-sign-out', command: () => signOut({ callbackUrl: '/login' }) }
     ];
 
-    const sidebarNavItems = [
-        { label: t('dashboard_layout.sidebar.overview'), icon: <FiGrid />, route: '/main' },
-        { label: t('dashboard_layout.sidebar.resumes'), icon: <FiFileText />, route: '/main/resumes' },
-        { label: t('dashboard_layout.sidebar.myWebsite'), icon: <FiGlobe />, route: defaultResume ? `/main/site-editor/${defaultResume.id}` : '/main/site-editor' },
-        { label: t('dashboard_layout.sidebar.atsChecker'), icon: <FiCheckSquare />, route: '/ats' },
-        { label: t('dashboard_layout.sidebar.jobFeed'), icon: <FiBriefcase />, route: '/main/job-feed' },
-        { label: t('dashboard_layout.sidebar.scholarships'), icon: <FiAward />, route: '/main/scholarship-feed' },
-    ];
+    const getSidebarNavItems = (resume) => {
+            let websiteRoute = '/site-editor'; // Default if no resume
+            if (resume) {
+                if (resume.personal_website_uuid) {
+                    websiteRoute = `/site-editor/${resume.personal_website_uuid}`;
+                } else {
+                    // Use the locale from the useTranslation hook
+                    websiteRoute = `/generate_site_yaml/${resume.id}`;
+                }
+            }
+
+            return [
+                { label: t('dashboard_layout.sidebar.overview'), icon: <FiGrid />, route: '/main' },
+                { label: t('dashboard_layout.sidebar.resumes'), icon: <FiFileText />, route: '/main/resumes' },
+                { label: t('dashboard_layout.sidebar.myWebsite'), icon: <FiGlobe />, route: websiteRoute },
+                { label: t('dashboard_layout.sidebar.atsChecker'), icon: <FiCheckSquare />, route: '/ats' },
+                { label: t('dashboard_layout.sidebar.jobFeed'), icon: <FiBriefcase />, route: '/main/job-feed' },
+                { label: t('dashboard_layout.sidebar.scholarships'), icon: <FiAward />, route: '/main/scholarship-feed' },
+            ];
+        };
 
 
     if (status === "loading") {
@@ -243,50 +295,65 @@ export default function Layout({ children }) {
         toast.current.show({ severity: 'success', summary, detail, life: 3000 });
     };
 
+    // Create the value object to pass to the provider
+    const contextValue = {
+        allResumes,
+        setAllResumes,
+        defaultResume,
+        setDefaultResume,
+        relatedDocuments,
+        setRelatedDocuments,
+        loadingResumes,
+        toast,
+    };
+
     return (
-        <div className={`${styles.dashboardLayout}`}>
-            <Toast ref={toast} />
+        <DashboardContext.Provider value={contextValue}>
+            <div className={`${styles.dashboardLayout}`}>
+                <Toast ref={toast} />
 
-            {/* Sidebar */}
-            <div
-                ref={sidebarRef}
-                className={`${styles.sidebar} ${sidebarCollapsed ? styles.sidebarCollapsed : ''} shadow-2 flex-shrink-0 hidden lg:flex lg:flex-column`}
-                style={{ width: sidebarCollapsed ? '80px' : '280px' }}
-            >
-                <SidebarLogo collapsed={sidebarCollapsed} />
+                {/* Sidebar */}
+                <div
+                    ref={sidebarRef}
+                    className={`${styles.sidebar} ${sidebarCollapsed ? styles.sidebarCollapsed : ''} shadow-2 flex-shrink-0 hidden lg:flex lg:flex-column`}
+                    style={{ width: sidebarCollapsed ? '80px' : '280px' }}
+                >
+                    <SidebarLogo collapsed={sidebarCollapsed} />
 
-                {/* Scrollable sidebar nav area */}
-                <div className={`${styles.sidebarNavContainer} ${styles.sidebarScrollbar}`}>
-                    <SidebarNav
-                        items={sidebarNavItems}
-                        currentPath={router.pathname}
-                        router={router}
-                        collapsed={sidebarCollapsed}
+                    {/* Scrollable sidebar nav area */}
+                    <div className={`${styles.sidebarNavContainer} ${styles.sidebarScrollbar}`}>
+                        <SidebarNav
+                            items={getSidebarNavItems(defaultResume)}
+                            currentPath={router.pathname}
+                            router={router}
+                            collapsed={sidebarCollapsed}
+                        />
+                    </div>
+
+                    <SidebarFooter router={router} collapsed={sidebarCollapsed} />
+                </div>
+
+                {/* Main Content */}
+                <div
+                    className={`${styles.mainContent} ${sidebarCollapsed ? styles.mainContentExpanded : ''} flex flex-column flex-grow-1`}
+                >
+                    <TopBar
+                        session={session}
+                        userMenuRef={userMenuRef}
+                        userMenuItems={userMenuItems}
+                        sidebarRef={sidebarRef}
+                        onToggleSidebar={toggleSidebar}
+                        sidebarCollapsed={sidebarCollapsed}
                     />
-                </div>
 
-                <SidebarFooter router={router} collapsed={sidebarCollapsed} />
-            </div>
-
-            {/* Main Content */}
-            <div
-                className={`${styles.mainContent} ${sidebarCollapsed ? styles.mainContentExpanded : ''} flex flex-column flex-grow-1`}
-            >
-                <TopBar
-                    session={session}
-                    userMenuRef={userMenuRef}
-                    userMenuItems={userMenuItems}
-                    sidebarRef={sidebarRef}
-                    onToggleSidebar={toggleSidebar}
-                    sidebarCollapsed={sidebarCollapsed}
-                />
-
-                {/* This is the ONLY scrollable main area */}
-                <div className={`${styles.mainScrollArea} ${styles.mainScrollbar}`}>
-                    {children}
+                    {/* This is the ONLY scrollable main area */}
+                    <div className={`${styles.mainScrollArea} ${styles.mainScrollbar}`}>
+                        {children}
+                    </div>
                 </div>
             </div>
-        </div>
+        </DashboardContext.Provider>
     );
 };
+
 

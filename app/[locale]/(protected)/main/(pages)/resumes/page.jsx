@@ -10,9 +10,10 @@ import { Toast } from 'primereact/toast';
 import { InputText } from 'primereact/inputtext';
 import { DataView, DataViewLayoutOptions } from 'primereact/dataview';
 import { Tag } from 'primereact/tag';
-import { FiFileText, FiEdit, FiPlusSquare, FiArchive, FiAlertCircle, FiStar, FiCheck, FiX, FiMoreVertical } from 'react-icons/fi';
+import { FiFileText, FiEdit, FiPlusSquare, FiArchive, FiAlertCircle, FiStar, FiCheck, FiX, FiMoreVertical, FiEdit2 } from 'react-icons/fi';
 import { Dialog } from 'primereact/dialog';
 import { Menu } from 'primereact/menu';
+import { ConfirmDialog, confirmDialog } from 'primereact/confirmdialog'; // Import ConfirmDialog
 import ResumeDocumentsDialog from './ResumeDocumentsDialog';
 import CreateResumeFromExistingDialog from '../../../editor/components/CreateResumeFromExistingDialog';
 import { getResumesFromCache, setResumesCache, addOrUpdateResumeInCache } from '@/app/utils/resumeCache';
@@ -148,6 +149,18 @@ const ResumeListPage = () => {
         }
     };
 
+    const confirmSetDefault = (resume) => {
+        confirmDialog({
+            message: t('resumes.confirmSetDefaultMessage'),
+            header: t('resumes.confirmSetDefaultTitle'),
+            icon: 'pi pi-info-circle',
+            acceptClassName: 'p-button-primary',
+            acceptLabel: t('common.yes'),
+            rejectLabel: t('common.no'),
+            accept: () => handleSetDefault(resume),
+        });
+    };
+
     const handleSetDefault = (resume) => {
         if (resume.is_default) return;
         handleUpdateResume(resume.id, { is_default: true });
@@ -197,28 +210,36 @@ const ResumeListPage = () => {
     const resumeItemTemplate = (resume, currentLayout) => {
         if (!resume) return null;
 
+        // The menu is no longer needed as its actions are now direct buttons.
         const menuItems = [
             {
-                label: t('resumes.editTitle'),
-                icon: <FiEdit className="mr-2" />,
-                command: (e) => {
-                    e.originalEvent.stopPropagation();
-                    startEditingTitle(resume, e.originalEvent);
-                }
-            },
-            {
-                label: t('resumes.setAsDefault'),
-                icon: <FiStar className="mr-2" />,
-                disabled: resume.is_default,
-                command: (e) => {
-                    e.originalEvent.stopPropagation();
-                    handleSetDefault(resume);
+                label: t('resumes.archive'),
+                icon: <FiArchive className="mr-2" />,
+                command: () => {
+                    // Placeholder for archive functionality
+                    toast.current.show({ severity: 'info', summary: 'Info', detail: 'Archive feature coming soon!', life: 3000 });
                 }
             }
         ];
 
         const displayDate = resume.updated_at || resume.created_at;
         const documents = resume.generated_documents_data || [];
+
+
+        const renderResumeIcon = (resumeData) => {
+            // This function now expects `resumeData.icon` to be a PrimeIcon class string (e.g., "pi pi-user").
+            // If the string is missing or empty, it falls back to a default React Icon component.
+            const iconClass = resumeData.icon && resumeData.icon.trim() !== "" ? resumeData.icon : null;
+
+            if (iconClass) {
+                // This will correctly render a PrimeIcon.
+                return <i className={`${iconClass} text-3xl text-primary-600`}></i>;
+            }
+            
+            // Default fallback icon using React Icons
+            return <FiFileText className="text-3xl text-primary-600" />;
+        };
+
 
         if (currentLayout === 'list') {
             return (
@@ -230,11 +251,11 @@ const ResumeListPage = () => {
                                 style={{ width: '70px', height: '70px' }}
                                 onClick={() => handleViewEditResume(resume)}
                             >
-                                <i className={`pi ${resume.icon || 'pi-id-card'} text-3xl text-primary-600`}></i>
+                                {renderResumeIcon(resume)}
                             </div>
                             <div className="flex flex-column sm:flex-row justify-content-between align-items-start flex-1 gap-3">
                                 <div className={`flex flex-column align-items-start gap-1 flex-grow-1 ${isRTL ? 'align-items-end' : ''}`}>
-                                    <div className="text-lg font-semibold text-900 flex align-items-center" onClick={() => handleViewEditResume(resume)}>
+                                    <div className="text-lg font-semibold text-900 flex align-items-center gap-2" onClick={() => handleViewEditResume(resume)}>
                                         {editingResumeId === resume.id ? (
                                             <div className="flex align-items-center">
                                                 <InputText value={editingTitle} onChange={(e) => setEditingTitle(e.target.value)} autoFocus onClick={e => e.stopPropagation()} className="p-inputtext-sm" />
@@ -243,7 +264,8 @@ const ResumeListPage = () => {
                                             </div>
                                         ) : (
                                             <>
-                                                {resume.title || t('resumes.untitledResume')}
+                                                <span className="cursor-pointer hover:text-primary-600">{resume.title || t('resumes.untitledResume')}</span>
+                                                <FiEdit2 className="cursor-pointer text-gray-500 hover:text-primary-600" onClick={(e) => startEditingTitle(resume, e)} />
                                                 {resume.is_default && <Tag severity="contrast" value={t('resumes.defaultTag')} className={`${isRTL ? 'mr-2' : 'ml-2'} text-xs p-tag-rounded`} icon={<FiStar className={isRTL ? 'ml-1' : 'mr-1'}/>}></Tag>}
                                             </>
                                         )}
@@ -264,6 +286,15 @@ const ResumeListPage = () => {
                                             className="p-button-sm p-button-info w-full"
                                             onClick={(e) => { e.stopPropagation(); handleViewEditResume(resume); }}
                                         />
+                                        {!resume.is_default && (
+                                            <Button
+                                                icon={<FiStar />}
+                                                className="p-button-sm p-button-secondary p-button-outlined"
+                                                onClick={(e) => { e.stopPropagation(); confirmSetDefault(resume); }}
+                                                tooltip={t('resumes.setAsDefault')}
+                                                tooltipOptions={{ position: 'top' }}
+                                            />
+                                        )}
                                         <Menu model={menuItems} popup ref={el => menuRefs.current[resume.id] = el} id={`menu_${resume.id}`} />
                                         <Button icon={<FiMoreVertical />} className="p-button-sm p-button-secondary p-button-outlined" onClick={(e) => { e.stopPropagation(); menuRefs.current[resume.id].toggle(e); }} aria-controls={`menu_${resume.id}`} aria-haspopup />
                                     </div>
@@ -298,12 +329,9 @@ const ResumeListPage = () => {
                         <div onClick={() => handleViewEditResume(resume)} className="cursor-pointer">
                             <div className="flex justify-content-between align-items-start mb-3">
                                 <div className="flex-shrink-0 flex justify-content-center align-items-center bg-primary-50 border-round" style={{ width: '50px', height: '50px' }}>
-                                    <i className={`pi ${resume.icon || 'pi-id-card'} text-2xl text-primary-600`}></i>
+                                    {renderResumeIcon(resume)}
                                 </div>
-                                <div>
-                                    <Menu model={menuItems} popup ref={el => menuRefs.current[resume.id] = el} id={`menu_grid_${resume.id}`} />
-                                    <Button icon={<FiMoreVertical />} className="p-button-text p-button-secondary p-button-rounded" onClick={(e) => { e.stopPropagation(); menuRefs.current[resume.id].toggle(e); }} aria-controls={`menu_grid_${resume.id}`} aria-haspopup />
-                                </div>
+
                             </div>
                             <div className="flex flex-column align-items-center gap-2">
                                 {editingResumeId === resume.id ? (
@@ -313,9 +341,12 @@ const ResumeListPage = () => {
                                         <Button icon={<FiX />} className="p-button-text p-button-danger" onClick={(e) => { e.stopPropagation(); cancelEditingTitle(); }} />
                                     </div>
                                 ) : (
-                                    <h4 className="font-semibold text-md mb-0 text-center line-clamp-2" style={{ minHeight: '2.4em' }}>
-                                        {resume.title || t('resumes.untitledResume')}
-                                    </h4>
+                                    <div className="flex items-center justify-center gap-2">
+                                        <h4 className="font-semibold text-md mb-0 text-center line-clamp-2" style={{ minHeight: '2.4em' }}>
+                                            {resume.title || t('resumes.untitledResume')}
+                                        </h4>
+                                        <FiEdit2 className="cursor-pointer text-gray-500 hover:text-primary-600 flex-shrink-0" onClick={(e) => startEditingTitle(resume, e)} />
+                                    </div>
                                 )}
                                 {resume.is_default && <Tag severity="contrast" value={t('resumes.defaultTag')} className="mt-1 text-xs p-tag-rounded" icon={<FiStar className={isRTL ? 'ml-1' : 'mr-1'}/>}></Tag>}
                                 <p className="text-xs text-color-secondary mt-1 text-center line-clamp-2" style={{ minHeight: '2.4em' }}>
@@ -342,6 +373,14 @@ const ResumeListPage = () => {
                                 className="p-button-sm p-button-info w-full"
                                 onClick={(e) => { e.stopPropagation(); handleViewEditResume(resume); }}
                             />
+                            {!resume.is_default && (
+                                <Button
+                                    label={t('resumes.setAsDefault')}
+                                    icon={<FiStar className={isRTL ? 'ml-2' : 'mr-2'}/>}
+                                    className="p-button-sm p-button-secondary p-button-outlined w-full"
+                                    onClick={(e) => { e.stopPropagation(); confirmSetDefault(resume); }}
+                                />
+                            )}
                             {documents.length > 0 && (
                                 <Button
                                     label={t('common.documents')}
@@ -431,6 +470,7 @@ const ResumeListPage = () => {
     return (
         <div className="p-0">
             <Toast ref={toast} />
+            <ConfirmDialog />
             <div className="resume-list-page-card shadow-none border-round-none md:border-round md:shadow-2">
                 <DataView
                     value={filteredResumes}
