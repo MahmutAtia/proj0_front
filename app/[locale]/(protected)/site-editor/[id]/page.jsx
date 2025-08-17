@@ -803,7 +803,14 @@ const EditorToolbar = ({
 
     return (
         <div className="p-3 surface-ground border-bottom-1 surface-border flex flex-wrap justify-content-between align-items-center sticky top-0 z-5 gap-2" style={{ zIndex: 1010 }}>
-            <div>
+            <div className="flex align-items-center gap-2">
+                <Button
+                    icon="pi pi-arrow-left"
+                    className="p-button-text p-button-secondary"
+                    tooltip="Back to Dashboard"
+                    tooltipOptions={{ position: 'bottom' }}
+                    onClick={() => router.push('/main')}
+                />
                 <Button
                     label="Edit Global Settings"
                     icon="pi pi-cog"
