@@ -361,7 +361,7 @@ const ResumePreviewPage = () => {
                     <div className="p-4 border-top-1 surface-border">
                         <h3 className="text-lg font-semibold mb-3 text-color">Preview Settings</h3>
 
-                        {/* Font Selector with Icons - UPDATED */}
+                        {/* Font Selector */}
                         {selectedTemplate && currentFonts.length > 0 && (
                             <div className="mb-4">
                                 <div className="flex align-items-center justify-content-between mb-2">
@@ -383,20 +383,40 @@ const ResumePreviewPage = () => {
                             </div>
                         )}
 
-                        {/* Scale Control */}
-                        <div className="mb-3">
-                            <div className="flex align-items-center justify-content-between mb-2">
-                                <label className="text-sm font-medium text-color-secondary">Preview Scale</label>
-                                <span className="text-sm font-medium text-color-secondary w-3rem text-right">{scale}%</span>
+                        {/* Avatar and Icons Toggles */}
+                        <div className="space-y-3">
+                            {/* Avatar Toggle */}
+                            <div className="flex align-items-center justify-content-between">
+                                <div className="flex align-items-center">
+                                    <i className="pi pi-user mr-2 text-color-secondary"></i>
+                                    <label htmlFor="avatarToggle" className="text-sm font-medium text-color">Show Avatar</label>
+                                    <Tooltip target=".avatar-tooltip" content="Display your profile picture on the resume." position="top" />
+                                    <i className="pi pi-info-circle ml-2 text-xs text-color-secondary avatar-tooltip cursor-pointer"></i>
+                                </div>
+                                <ToggleButton
+                                    id="avatarToggle"
+                                    checked={showAvatar}
+                                    onChange={(e) => setShowAvatar(e.value)}
+                                    className={`w-3rem h-2rem ${styles.centeredToggle}`}
+                                    disabled={isLoadingOptions || isLoadingPdf}
+                                />
                             </div>
-                            <Slider
-                                value={scale}
-                                onChange={handleScaleChange}
-                                min={50}
-                                max={150}
-                                step={5}
-                                className="w-full"
-                            />
+                            {/* Icons Toggle */}
+                            <div className="flex align-items-center justify-content-between">
+                                <div className="flex align-items-center">
+                                    <i className="pi pi-at mr-2 text-color-secondary"></i>
+                                    <label htmlFor="iconsToggle" className="text-sm font-medium text-color">Show  Icons</label>
+                                    <Tooltip target=".icons-tooltip" content="Display icons (e.g., for email, phone) next to contact info." position="top" />
+                                    <i className="pi pi-info-circle ml-2 text-xs text-color-secondary icons-tooltip cursor-pointer"></i>
+                                </div>
+                                <ToggleButton
+                                    id="iconsToggle"
+                                    checked={showIcons}
+                                    onChange={(e) => setShowIcons(e.value)}
+                                    className={`w-3rem h-2rem ${styles.centeredToggle}`}
+                                    disabled={isLoadingOptions || isLoadingPdf}
+                                />
+                            </div>
                         </div>
                     </div>
 
@@ -451,44 +471,37 @@ const ResumePreviewPage = () => {
                             )}
 
                             {/* Font Size Selector */}
-                            <div className="flex align-items-center gap-2 ml-3">
+                            
+                        </div>
+
+                        {/* Right side - Scale and Size controls */}
+                        <div className="flex align-items-center gap-4">
+                            {/* Font Size Selector */}
+                            <div className="flex align-items-center gap-2">
                                 <span className="text-xs uppercase font-semibold text-color-secondary">Size:</span>
                                 <SelectButton 
                                     value={fontScale} 
                                     onChange={(e) => setFontScale(e.value)} 
                                     options={[
-                                        { label: 'S', value: 'small' },
-                                        { label: 'M', value: 'medium' },
-                                        { label: 'L', value: 'large' }
+                                        { label: 'S', value: 'small', tooltip: 'Small Font' },
+                                        { label: 'M', value: 'medium', tooltip: 'Medium Font' },
+                                        { label: 'L', value: 'large', tooltip: 'Large Font' }
                                     ]}
+                                    itemTemplate={(option) => {
+                                        return <span data-pr-tooltip={option.tooltip}>{option.label}</span>
+                                    }}
                                     size="small"
                                     disabled={isLoadingOptions || isLoadingPdf}
                                 />
                             </div>
-                        </div>
 
-                        {/* Right side - Icons and Avatar toggles */}
-                        <div className="flex align-items-center gap-3">
-                            {/* Icons Toggle */}
+                            {/* Scale Control */}
                             <div className="flex align-items-center gap-2">
-                                <span className="text-xs uppercase font-semibold text-color-secondary">Icons:</span>
-                                <ToggleButton
-                                    checked={showIcons}
-                                    onChange={(e) => setShowIcons(e.value)}
-                                    className={`w-3rem h-2rem ${styles.centeredToggle}`}
-                                    disabled={isLoadingOptions || isLoadingPdf}
-                                />
-                            </div>
-
-                            {/* Avatar Toggle */}
-                            <div className="flex align-items-center gap-2">
-                                <span className="text-xs uppercase font-semibold text-color-secondary">Avatar:</span>
-                                <ToggleButton
-                                    checked={showAvatar}
-                                    onChange={(e) => setShowAvatar(e.value)}
-                                    className={`w-3rem h-2rem ${styles.centeredToggle}`}
-                                    disabled={isLoadingOptions || isLoadingPdf}
-                                />
+                                <span className="text-xs uppercase font-semibold text-color-secondary">Zoom:</span>
+                                <Button icon="pi pi-search-minus" text rounded severity="secondary" onClick={() => setScale(s => Math.max(50, s - 10))} disabled={isLoadingPdf || scale <= 50} tooltip="Zoom Out" tooltipOptions={{position: 'bottom'}} />
+                                <Tooltip target=".scale-tooltip" content={`${scale}%`} position="bottom" />
+                                <span className="text-sm font-semibold w-3rem text-center scale-tooltip tabular-nums">{scale}%</span>
+                                <Button icon="pi pi-search-plus" text rounded severity="secondary" onClick={() => setScale(s => Math.min(150, s + 10))} disabled={isLoadingPdf || scale >= 150} tooltip="Zoom In" tooltipOptions={{position: 'bottom'}} />
                             </div>
                         </div>
                     </div>
