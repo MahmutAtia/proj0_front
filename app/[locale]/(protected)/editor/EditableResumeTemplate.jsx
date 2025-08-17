@@ -406,14 +406,22 @@ const EditableResumeTemplate = ({
             {/* Header */}
             <header className={classNames(styles.editorHeader, "flex justify-content-between align-items-center p-3 border-bottom-1 surface-border")}>
                 <div className="flex align-items-center">
-                    <Button
+                                        <Button
+                        icon="pi pi-arrow-left"
+                        className="p-button-text p-button-secondary"
+                        tooltip="Back to Dashboard"
+                        tooltipOptions={{ position: 'bottom' }}
+                        onClick={() => router.push('/main')}
+                    />
+                   <Button
                         icon="pi pi-bars"
-                        className={classNames(styles.sidebarToggleButton, "p-button-text p-button-secondary mr-2")}
+                        className={classNames(styles.sidebarToggleButton, "p-button-text p-button-secondary", "lg:hidden")}
                         onClick={() => setSidebarVisible(!sidebarVisible)}
                         aria-controls="resume-sidebar"
                         aria-expanded={sidebarVisible}
                     />
                     <h1 className="text-xl md:text-2xl font-semibold m-0">Resume Editor</h1>
+
                 </div>
                 <div className="flex gap-2 align-items-center">
                     {loading && <ProgressSpinner style={{ width: '2rem', height: '2rem' }} strokeWidth="6" />}
