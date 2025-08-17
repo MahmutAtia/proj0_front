@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState, useEffect, useRef, useCallback } from 'react';
+import { useRouter } from 'next/navigation';
 import {aiApi} from '@/lib/axios';
 import api from '@/lib/axios';
 import { Dialog } from 'primereact/dialog';
@@ -800,7 +801,7 @@ const EditorToolbar = ({
     onEditGlobal
 }) => {
     const siteUrl = `${process.env.NEXT_PUBLIC_BACKEND_URL}/${resumeId}/`;
-
+    const router = useRouter();
     return (
         <div className="p-3 surface-ground border-bottom-1 surface-border flex flex-wrap justify-content-between align-items-center sticky top-0 z-5 gap-2" style={{ zIndex: 1010 }}>
             <div className="flex align-items-center gap-2">
