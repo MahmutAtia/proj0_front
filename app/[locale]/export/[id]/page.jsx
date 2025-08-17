@@ -32,43 +32,43 @@ const LOADING_MESSAGES = [
     "Just a moment...",
 ];
 
-// --- Font icon mapping for different font styles ---
-const FONT_ICONS = {
+// --- Font label mapping for different font styles ---
+const FONT_LABELS = {
     // Clean/Modern fonts
-    'roboto-opensans': 'pi pi-font',
-    'inter-sourcesans': 'pi pi-align-left',
-    'inter-poppins': 'pi pi-pencil',
-    'montserrat-sourcesans': 'pi pi-bold',
-    'nunitosans-opensans': 'pi pi-italic',
-    'nunitosans-sourceserif': 'pi pi-underline',
-    'system-georgia': 'pi pi-desktop',
-    'ibmplexsans-ibmplexserif': 'pi pi-code',
+    'roboto-opensans': 'Modern',
+    'inter-sourcesans': 'Crisp',
+    'inter-poppins': 'Stylish',
+    'montserrat-sourcesans': 'Bold',
+    'nunitosans-opensans': 'Soft',
+    'nunitosans-sourceserif': 'Minimal',
+    'system-georgia': 'System',
+    'ibmplexsans-ibmplexserif': 'Techy',
     
     // Elegant/Classic fonts
-    'lato-merriweather': 'pi pi-star',
-    'nunito-crimson': 'pi pi-heart',
-    'crimson-lato': 'pi pi-crown',
-    'playfair-sourcesans': 'pi pi-bookmark',
-    'cormorant-lato': 'pi pi-book',
-    'librebaskerville-opensans': 'pi pi-graduation-cap',
+    'lato-merriweather': 'Elegant',
+    'nunito-crimson': 'Plush',
+    'crimson-lato': 'Classic',
+    'playfair-sourcesans': 'Display',
+    'cormorant-lato': 'Refined',
+    'librebaskerville-opensans': 'Formal',
     
     // Creative/Modern fonts
-    'poppins-merriweather': 'pi pi-palette',
-    'comfortaa-opensans': 'pi pi-sun',
-    'raleway-lora': 'pi pi-moon',
-    'quicksand-crimson': 'pi pi-sparkles',
-    'inter-charter': 'pi pi-file-edit',
-    'karla-spectral': 'pi pi-image',
+    'poppins-merriweather': 'Creative',
+    'comfortaa-opensans': 'Rounded',
+    'raleway-lora': 'Airy',
+    'quicksand-crimson': 'Friendly',
+    'inter-charter': 'Sharp',
+    'karla-spectral': 'Quirky',
     
     // Professional/Corporate fonts
-    'sourcesans-sourceserif': 'pi pi-briefcase',
-    'roboto-robotoslab': 'pi pi-building',
-    'calibri-times': 'pi pi-verified',
-    'arial-georgia': 'pi pi-shield',
-    'worksans-lora': 'pi pi-cog',
+    'sourcesans-sourceserif': 'Corp',
+    'roboto-robotoslab': 'Solid',
+    'calibri-times': 'Official',
+    'arial-georgia': 'Standard',
+    'worksans-lora': 'Crafted',
     
     // Default fallback
-    'default': 'pi pi-font'
+    'default': 'Aa'
 };
 
 const ResumePreviewPage = () => {
@@ -280,7 +280,7 @@ const ResumePreviewPage = () => {
     // --- Options for the Font SelectButton ---
     const fontSelectButtonOptions = currentFonts.map(font => ({
         value: font.value,
-        icon: FONT_ICONS[font.value] || FONT_ICONS.default,
+        label: FONT_LABELS[font.value] || FONT_LABELS.default, // Use label instead of icon
         tooltip: `${font.name} - ${font.description}`
     }));
 
@@ -290,7 +290,7 @@ const ResumePreviewPage = () => {
         return (
             <>
                 <Tooltip target={`.font-option-${option.value}`} content={option.tooltip} position="top" showDelay={300} />
-                <i className={`pi ${option.icon} font-option-${option.value}`} />
+                <span className={`font-option-${option.value} text-sm`}>{option.label}</span>
             </>
         );
     };
@@ -440,7 +440,9 @@ const ResumePreviewPage = () => {
                                 <div className="flex align-items-center gap-2 ml-3">
                                     <span className="text-xs uppercase font-semibold text-color-secondary">Font:</span>
                                     <div className="flex align-items-center gap-1 bg-surface-100 px-2 py-1 border-round">
-                                        <i className={`${FONT_ICONS[selectedFont] || FONT_ICONS.default} text-sm text-primary`} />
+                                        <span className="text-sm font-bold text-primary">
+                                            {FONT_LABELS[selectedFont] || FONT_LABELS.default}
+                                        </span>
                                         <span className="text-xs font-medium text-color">
                                             {currentFonts.find(f => f.value === selectedFont)?.primary.split(' ')[0] || 'Default'}
                                         </span>
