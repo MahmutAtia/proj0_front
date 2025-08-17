@@ -149,6 +149,36 @@ const ResumeListPage = () => {
         }
     };
 
+    const confirmDelete = (resume) => {
+        confirmDialog({
+            message: (
+                <div>
+                    <p>{t('resumes.confirmDeleteMessage')}</p>
+                    <p className="font-bold mt-3">{t('resumes.confirmDeleteWarning')}</p>
+                </div>
+            ),
+            header: t('resumes.confirmDeleteTitle'),
+            icon: 'pi pi-exclamation-triangle',
+            acceptClassName: 'p-button-danger',
+            acceptLabel: t('common.delete'),
+            rejectLabel: t('common.cancel'),
+            accept: () => handleDeleteResume(resume.id),
+        });
+    };
+
+    const handleDeleteResume = async (resumeId) => {
+        try {
+            await api.delete(`/api/resumes/${resumeId}/`);
+            const updatedResumes = resumes.filter(r => r.id !== resumeId);
+            setResumes(updatedResumes);
+            setResumesCache(updatedResumes); // Update the cache
+            toast.current.show({ severity: 'success', summary: t('common.success'), detail: t('resumes.resumeDeletedSuccessfully'), life: 3000 });
+        } catch (err) {
+            console.error("Failed to delete resume:", err);
+            toast.current.show({ severity: 'error', summary: t('common.error'), detail: t('errors.failedToDeleteResume'), life: 5000 });
+        }
+    };
+
     const confirmSetDefault = (resume) => {
         confirmDialog({
             message: t('resumes.confirmSetDefaultMessage'),
@@ -295,8 +325,13 @@ const ResumeListPage = () => {
                                                 tooltipOptions={{ position: 'top' }}
                                             />
                                         )}
-                                        <Menu model={menuItems} popup ref={el => menuRefs.current[resume.id] = el} id={`menu_${resume.id}`} />
-                                        <Button icon={<FiMoreVertical />} className="p-button-sm p-button-secondary p-button-outlined" onClick={(e) => { e.stopPropagation(); menuRefs.current[resume.id].toggle(e); }} aria-controls={`menu_${resume.id}`} aria-haspopup />
+                                        <Button
+                                            icon="pi pi-trash"
+                                            className="p-button-sm p-button-danger p-button-outlined"
+                                            onClick={(e) => { e.stopPropagation(); confirmDelete(resume); }}
+                                            tooltip={t('common.delete')}
+                                            tooltipOptions={{ position: 'top' }}
+                                        />
                                     </div>
                                     {documents.length > 0 ? (
                                         <Button
@@ -381,6 +416,12 @@ const ResumeListPage = () => {
                                     onClick={(e) => { e.stopPropagation(); confirmSetDefault(resume); }}
                                 />
                             )}
+                            <Button
+                                label={t('common.delete')}
+                                icon="pi pi-trash"
+                                className="p-button-sm p-button-danger p-button-outlined w-full"
+                                onClick={(e) => { e.stopPropagation(); confirmDelete(resume); }}
+                            />
                             {documents.length > 0 && (
                                 <Button
                                     label={t('common.documents')}
