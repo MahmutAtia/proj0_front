@@ -6,7 +6,7 @@ import { Button } from 'primereact/button';
 import { Toast } from 'primereact/toast';
 import { ProgressSpinner } from 'primereact/progressspinner';
 import { Message } from 'primereact/message';
-import axios from 'axios';
+import api ,{aiApi} from '@/lib/axios'; // Ensure this import matches your axios setup
 import { useSession } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -109,8 +109,8 @@ const CreateResumeFromExistingDialog = ({
                 job_description: jobDescription,
                 instructions: additionalInstructions
             };
-
-            const response = await axios.post(apiUrl, payload, {
+            // Send the request to the AI API
+            const response = await aiApi.post(apiUrl, payload, {
                 headers: {
                     'Content-Type': 'application/json',
                     ...(session?.accessToken && {
