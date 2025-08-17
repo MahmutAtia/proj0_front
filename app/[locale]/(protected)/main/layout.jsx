@@ -163,13 +163,20 @@ export default function Layout({ children }) {
     const [defaultResume, setDefaultResume] = useState(null);
     const [relatedDocuments, setRelatedDocuments] = useState([]);
     const [loadingResumes, setLoadingResumes] = useState(true);
+    const [isDataValid, setIsDataValid] = useState(false);
 
     useEffect(() => {
         const loadInitialData = async () => {
-            if (status === 'loading' || !session) return;
+            if (status !== 'authenticated') {
+                setLoadingResumes(false);
+                return;
+            }
 
             setLoadingResumes(true);
+            setIsDataValid(false); // Always reset validity check on load
+
             try {
+                // Your cache logic is fine, but we'll re-validate the content of the cache.
                 const localData = localStorage.getItem(RESUMES_CACHE_KEY_DASHBOARD);
                 let resumesData = null;
                 if (localData) {
@@ -181,34 +188,43 @@ export default function Layout({ children }) {
                     }
                 }
 
+                // If cache is invalid or empty, fetch from API
                 if (!resumesData) {
                     const response = await api.get(`/api/resumes/`);
                     resumesData = response.data;
+                    // Cache the new data regardless of whether it's empty or not
                     localStorage.setItem(RESUMES_CACHE_KEY_DASHBOARD, JSON.stringify({ data: resumesData, timestamp: Date.now() }));
                 }
 
-                setAllResumes(resumesData || []);
-                const currentDefault = (resumesData || []).find(r => r.is_default);
-                setDefaultResume(currentDefault || null);
+                // --- CRITICAL CHECK ---
+                // Now, check if the final resumesData (from cache or API) is empty.
+                if (!resumesData || resumesData.length === 0) {
+                    router.push('/ats');
+                    // IMPORTANT: Do not proceed. The loading spinner will show until redirect completes.
+                    return; 
+                }
+
+                // If we reach here, data is valid and not empty.
+                setAllResumes(resumesData);
+                const currentDefault = resumesData.find(r => r.is_default) || resumesData[0];
+                setDefaultResume(currentDefault);
                 if (currentDefault) {
                     setRelatedDocuments(currentDefault.generated_documents_data || []);
-                } else {
-                    setRelatedDocuments([]);
                 }
+                setIsDataValid(true); // Grant permission to render the dashboard
 
             } catch (err) {
                 console.error("Error fetching resumes for dashboard:", err);
                 toast.current?.show({ severity: 'error', summary: t('common.error'), detail: t('dashboard_main.toast.loadError') });
-                setAllResumes([]);
-                setDefaultResume(null);
-                setRelatedDocuments([]);
+                // In case of an error, we can also redirect to a safe page or show an error state
+                // For now, we'll just stop the loading spinner and let the user see an empty/error state.
             } finally {
                 setLoadingResumes(false);
             }
         };
-        loadInitialData();
-    }, [session, status, t]);
 
+        loadInitialData();
+    }, [session, status, t, router]); // Added router to dependency array
 
 
     // Load sidebar state from localStorage
@@ -265,7 +281,7 @@ export default function Layout({ children }) {
         };
 
 
-    if (status === "loading") {
+    if (status === "loading" || loadingResumes || !isDataValid) {
         return (
             <div className="flex justify-content-center align-items-center min-h-screen surface-ground">
                 <ProgressSpinner style={{ width: '50px', height: '50px' }} strokeWidth="4" animationDuration=".5s" />
@@ -274,7 +290,6 @@ export default function Layout({ children }) {
     }
 
     // If unauthenticated, the useEffect will handle the redirect.
-    // We still need to prevent rendering the rest of the layout for unauthenticated users.
     if (status === "unauthenticated") {
         // Optionally, render a loading spinner or null while redirecting
         return (
