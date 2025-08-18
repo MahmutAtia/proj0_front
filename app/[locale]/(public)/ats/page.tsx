@@ -20,7 +20,8 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import styles from './ats.module.css';
 import { Suspense } from 'react';
 import { addOrUpdateResumeInCache } from '@/app/utils/resumeCache'; // 1. Import the cache utility
-import api,{ aiApi } from '@/lib/axios';  
+import api,{ aiApi } from '@/lib/axios'; 
+
 
 
 // Animation Variants
@@ -425,7 +426,7 @@ const ATSCheckerPageContent = () => {
         formData.append('formData', JSON.stringify(backendFormData));
 
         try {
-            const response = await aiApi.post('/resumes-v2/ats_checker_and_generate/', formData, {
+            const response = await aiApi.post('/resumes-v2/ats_checker_and_generate', formData, {
                 headers: {
                     ...(session?.accessToken && {
                         'Authorization': `Bearer ${session.accessToken}`
