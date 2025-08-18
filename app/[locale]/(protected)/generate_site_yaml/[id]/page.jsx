@@ -137,7 +137,7 @@ export default function CreatePortfolioPage({ params: paramsPromise }) {
         try {
             // This now returns a task_id
             const response = await aiApi.post(
-                `/websites/create_resume_website/`,
+                `/websites/create_resume_website`,
                 { resumeId: resumeId, preferences: preferences , resume: generateYamlFromLocalStorage(resumeId) } // Pass the YAML directly
             );
             
