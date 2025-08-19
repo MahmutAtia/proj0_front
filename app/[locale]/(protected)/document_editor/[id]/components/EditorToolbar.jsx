@@ -2,6 +2,7 @@
 import React from 'react';
 import { Button } from 'primereact/button';
 import { ProgressSpinner } from 'primereact/progressspinner';
+import { useRouter } from 'next/navigation';
 
 
 // --- Child Component: EditorToolbar ---
@@ -27,8 +28,23 @@ const EditorToolbar = ({
     onDownloadWord,
     isDownloadingWord
 }) => {
+    const router = useRouter();
+
     return (
-        <div className="p-3 surface-ground border-bottom-1 surface-border flex justify-content-end align-items-center sticky top-0 z-5 gap-2">
+        <div className="p-3 surface-ground border-bottom-1 surface-border flex justify-content-between align-items-center sticky top-0 z-5 gap-2">
+                       <Button
+                icon="pi pi-arrow-left"
+                className="p-button-text p-button-secondary"
+                tooltip="Back to Dashboard"
+                tooltipOptions={{ position: 'bottom' }}
+                onClick={() => router.push('/main')}
+            />
+
+
+            {/* Right-aligned buttons */}
+           
+             <div className="flex justify-content-end align-items-center gap-2">
+
             {/* Unsaved Changes Indicator */}
             {hasUnsavedChanges && !isSaving && (
                 <i
@@ -74,6 +90,8 @@ const EditorToolbar = ({
                 tooltip={hasUnsavedChanges ? "Save your latest changes" : "No changes to save"}
                 tooltipOptions={{ position: 'bottom' }}
             />
+            </div>
+
             <style jsx>{`
                 .animation-pulse {
                     animation: pulse 1.5s infinite cubic-bezier(0.4, 0, 0.6, 1);
