@@ -829,7 +829,7 @@ const ATSCheckerPageContent = () => {
                                                     label="Go to Dashboard"
                                                     icon="pi pi-th-large"
                                                     className="p-button-outlined w-full"
-                                                    onClick={() => router.push('/main/dashboard')}
+                                                    onClick={() => router.push('/main')}
                                                 />
                                             )}
 
