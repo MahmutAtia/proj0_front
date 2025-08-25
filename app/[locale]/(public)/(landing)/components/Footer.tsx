@@ -7,8 +7,8 @@ import { FaLinkedin, FaTwitter, FaGithub } from 'react-icons/fa';
 import { IoSparkles } from 'react-icons/io5';
 import styles from '../styles/Footer.module.css'; // Import the CSS module
 
-// --- Framer Motion Variants (assuming these are defined elsewhere or pass as props) ---
-const buttonHover = { // Assuming this is for social icons
+// --- Framer Motion Variants ---
+const buttonHover = {
     hover: { scale: 1.1, transition: { type: 'spring', stiffness: 400, damping: 15 } },
     tap: { scale: 0.9 },
 };
@@ -21,7 +21,7 @@ const Footer = () => {
             links: [
                 { label: "Features", href: "#features" },
                 { label: "Pricing", href: "#pricing" },
-                { label: "ATS Checker", href: "#ats-checker" },
+                { label: "ATS Checker", href: "/ats" },
                 { label: "Templates", href: "#" }, // Placeholder href
             ]
         },
@@ -45,8 +45,8 @@ const Footer = () => {
         {
             title: "Legal",
             links: [
-                { label: "Privacy Policy", href: "#" },
-                { label: "Terms of Service", href: "#" },
+                { label: "Privacy Policy", href: "/privacy" },
+                { label: "Terms of Service", href: "/terms" },
             ]
         }
     ];
@@ -76,7 +76,14 @@ const Footer = () => {
                             <ul>
                                 {section.links.map((link) => (
                                     <li key={link.label}>
-                                        <Link href={link.href}>{link.label}</Link>
+                                        {link.href === '#' ? (
+                                            <span className={styles.disabledLink}>
+                                                {link.label}
+                                                <span className={styles.comingSoonBadge}>Coming Soon</span>
+                                            </span>
+                                        ) : (
+                                            <Link href={link.href}>{link.label}</Link>
+                                        )}
                                     </li>
                                 ))}
                             </ul>
@@ -85,7 +92,7 @@ const Footer = () => {
                 </div>
             </div>
             <div className={styles.footerBottom}>
-                <div className={styles.container}> {/* Wrap bottom content in container too */}
+                <div className={styles.container}>
                     <p className={styles.copyrightText}>
                         © {new Date().getFullYear()} CareerFlow AI. All rights reserved.
                     </p>
@@ -95,4 +102,4 @@ const Footer = () => {
     );
 };
 
-export default Footer; // Make sure to export
+export default Footer;

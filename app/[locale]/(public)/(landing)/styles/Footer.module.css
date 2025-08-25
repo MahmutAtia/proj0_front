@@ -114,6 +114,28 @@
     margin: 0; /* m-0 */
 }
 
+.disabledLink {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem; /* Adjusted gap */
+    color: var(--text-color-secondary);
+    cursor: not-allowed;
+    opacity: 0.8;
+}
+
+.comingSoonBadge {
+    font-size: 0.7rem; /* Slightly larger for readability */
+    font-weight: 700; /* Bolder */
+    line-height: 1;
+    padding: 4px 8px; /* More vertical padding */
+    border-radius: 12px; /* Softer, pill-shaped */
+    background-color: var(--surface-200, #E5E7EB); /* A lighter, neutral gray */
+    color: var(--text-color-secondary, #6B7280); /* Darker text for contrast */
+    border: 1px solid var(--surface-300, #D1D5DB); /* Subtle border for definition */
+    text-transform: uppercase;
+    letter-spacing: 0.05em; /* Slightly wider letter spacing */
+}
+
 /* Desktop layout adjustments */
 @media (min-width: 768px) {
     .footerContainer {
