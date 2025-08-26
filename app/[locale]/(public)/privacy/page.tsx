@@ -97,7 +97,7 @@ const PrivacyPolicyPage = () => {
                             </section>
 
                             <section>
-                                <h2 className="text-xl font-semibold text-gray-900 mb-3">8. Children's Privacy</h2>
+                                <h2 className="text-xl font-semibold text-gray-900 mb-3">8. Childrens Privacy</h2>
                                 <p>
                                     Our service is not intended for individuals under the age of 16. We do not knowingly collect personal information from children. If we become aware that we have collected data from a child without parental consent, we will take steps to remove that information.
                                 </p>

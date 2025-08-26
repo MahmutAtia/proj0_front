@@ -15,7 +15,7 @@ const TermsOfServicePage = () => {
                             <section>
                                 <h2 className="text-xl font-semibold text-gray-900 mb-3">1. Acceptance of Terms</h2>
                                 <p>
-                                    By accessing and using CareerFlow AI ("we," "our," or "us"), you accept and agree to be bound by the terms and provision of this agreement. If you do not agree to abide by the above, please do not use this service.
+                                    By accessing and using CareerFlow AI (&quot;we,&quot; &quot;our,&quot; or &quot;us&quot;), you accept and agree to be bound by the terms and provision of this agreement. If you do not agree to abide by the above, please do not use this service.
                                 </p>
                             </section>
 
