@@ -433,19 +433,6 @@ const EnhancedAvatarEditor = ({
                     />
                 )}
 
-                {/* PDF Inclusion Toggle */}
-                {avatar && onIncludeInPDFChange && (
-                    <div className="flex align-items-center gap-2">
-                        <Checkbox
-                            inputId="include-in-pdf"
-                            checked={includeInPDF}
-                            onChange={(e) => onIncludeInPDFChange(e.checked)}
-                        />
-                        <label htmlFor="include-in-pdf" className="text-sm cursor-pointer">
-                            Include in PDF/Website
-                        </label>
-                    </div>
-                )}
 
                 {/* Quick Actions */}
                 {avatar && (
