@@ -19,7 +19,7 @@ import { signIn, useSession } from 'next-auth/react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import styles from './ats.module.css';
 import { Suspense } from 'react';
-import { addOrUpdateResumeInCache } from '@/app/utils/resumeCache'; // 1. Import the cache utility
+import { addOrUpdateResumeInCache, getResumesFromCache } from '@/app/utils/resumeCache'; // 1. Import getResumesFromCache
 import api,{ aiApi } from '@/lib/axios'; 
 
 
@@ -59,7 +59,8 @@ const ATSCheckerPageContent = () => {
     const [showForm, setShowForm] = useState(true);
 
     // New state for authenticated users
-    const [generateNewResume, setGenerateNewResume] = useState(false); // Default to creating a new resume
+    const [generateNewResume, setGenerateNewResume] = useState(true); // Default to creating a new resume
+    const [userHasResumes, setUserHasResumes] = useState<boolean | null>(null); // null = unchecked, false = no resumes, true = has resumes
 
     // State for background task polling
     const [generationTaskId, setGenerationTaskId] = useState<string | null>(null);
@@ -158,6 +159,19 @@ const ATSCheckerPageContent = () => {
     const customUploader = async (event: FileUploadHandlerEvent) => {
         event.options.clear();
     };
+
+    useEffect(() => {
+        // Check for existing resumes only when the user is authenticated.
+        if (status === 'authenticated') {
+            const cachedResumes = getResumesFromCache();
+            const hasResumes = cachedResumes && cachedResumes.length > 0;
+            setUserHasResumes(hasResumes);
+            // If the user has no resumes, we must create one. Otherwise, let them choose.
+            setGenerateNewResume(!hasResumes);
+        } else {
+            setUserHasResumes(false);
+        }
+    }, [status]);
 
     useEffect(() => {
         return () => {
@@ -382,21 +396,19 @@ const ATSCheckerPageContent = () => {
                 pollingIntervalRef.current = null;
             }
         };
-    }, [generationTaskId, postAuthTaskIdToCheck, generatedResumeId, statusError, session?.accessToken]);
+    }, [generationTaskId, postAuthTaskIdToCheck]);
 
     const handleSubmit = async () => {
-        const isResumeProvided = (resumeInputMethod === 'upload' && resumeFile) || (resumeInputMethod === 'paste' && resumeText.trim());
-        if (!isResumeProvided) {
-            toast.current?.show({ severity: 'warn', summary: 'Missing Resume', detail: `Please ${resumeInputMethod === 'upload' ? 'upload your resume file' : 'paste your resume text'}.` });
-            return;
+        // --- Early Returns for Validation ---
+        if (isLoading) return;
+        if (targetRole.trim() === '') {
+            return toast.current?.show({ severity: 'warn', summary: 'Missing Role', detail: 'Please specify a target role for your resume.' });
         }
-        if (!targetRole.trim()) {
-            toast.current?.show({ severity: 'warn', summary: 'Missing Role', detail: 'Please enter the target role.' });
-            return;
+        if (resumeInputMethod === 'upload' && !resumeFile) {
+            return toast.current?.show({ severity: 'warn', summary: 'No File Selected', detail: 'Please upload your resume file.' });
         }
-        if (includeJobDescription && !jobDescription.trim()) {
-            toast.current?.show({ severity: 'warn', summary: 'Missing Job Description', detail: 'Please paste the job description or uncheck the box.' });
-            return;
+        if (resumeInputMethod === 'paste' && !resumeText.trim()) {
+            return toast.current?.show({ severity: 'warn', summary: 'No Text Provided', detail: 'Please paste your resume text.' });
         }
 
         setIsLoading(true);
@@ -499,7 +511,7 @@ const ATSCheckerPageContent = () => {
         if (taskIdToRetry) {
             setStatusError(null);
             setPollingAttempts(0);
-            if (postAuthTaskIdToCheck) {
+            if (postAuthTaskIdToRetry) {
                 setPostAuthCheckComplete(false);
                 checkStatus(taskIdToRetry, true);
             } else {
@@ -625,7 +637,8 @@ const ATSCheckerPageContent = () => {
                                         />
                                     </div>
 
-                                    {status === 'authenticated' && (
+                                    {/* Conditionally show the 'Create new resume' option */}
+                                    {status === 'authenticated' && userHasResumes && (
                                         <div className="field col-12 mt-3 mb-0 p-3 border-1 surface-border border-round bg-surface-50">
                                             <div className="field-checkbox flex align-items-center">
                                                 <Checkbox
@@ -636,7 +649,7 @@ const ATSCheckerPageContent = () => {
                                                 />
                                                 <label htmlFor="generateNew" className="ml-2 font-semibold">Create a new resume entry from this analysis?</label>
                                             </div>
-                                            <Message severity="warn" text="Checking this box will add a new resume to your dashboard after the analysis." className="mt-2 text-sm" />
+                                            <Message severity="info" text="Uncheck this if you only want the ATS score without creating a new resume entry." className="mt-2 text-sm" />
                                         </div>
                                     )}
 
