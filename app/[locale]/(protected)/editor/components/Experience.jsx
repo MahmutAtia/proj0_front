@@ -233,13 +233,7 @@ const Experience = ({ sectionKey }) => {
                         <div className="flex justify-content-between align-items-start">
                             <span className="font-semibold" title="Company Name">{exp.company}</span>
                             <span className="text-500 text-right flex-shrink-0 ml-2" title="Employment Period">
-                                {exp.start_date && exp.start_date !== '' ? (
-                                    new Date(exp.start_date).toLocaleDateString()
-                                ) : ''} - {exp.end_date && exp.end_date !== '' ? (
-                                    exp.end_date === 'Current' || exp.end_date === 'current' 
-                                        ? 'Current'
-                                        : new Date(exp.end_date).toLocaleDateString()
-                                ) : 'Current'}
+                                {exp.start_date || ''} - {exp.end_date || 'Current'}
                             </span>
                         </div>
                         <span className="text-primary font-medium" title="Job Title">{exp.title}</span>

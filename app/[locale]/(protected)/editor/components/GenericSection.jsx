@@ -243,7 +243,7 @@ const GenericSection = ({ sectionKey }) => {
         }
 
         if (isDateField(field) && item[field]) {
-            return <span className="text-500" title={label}>{new Date(item[field]).toLocaleDateString()}</span>;
+            return <span className="text-500" title={label}>{item[field]}</span>;
         }
 
         if (isMultilineField(field)) {
