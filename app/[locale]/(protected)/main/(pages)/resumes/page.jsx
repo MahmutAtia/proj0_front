@@ -325,13 +325,15 @@ const ResumeListPage = () => {
                                                 tooltipOptions={{ position: 'top' }}
                                             />
                                         )}
-                                        <Button
-                                            icon="pi pi-trash"
-                                            className="p-button-sm p-button-danger p-button-outlined"
-                                            onClick={(e) => { e.stopPropagation(); confirmDelete(resume); }}
-                                            tooltip={t('common.delete')}
-                                            tooltipOptions={{ position: 'top' }}
-                                        />
+                                        {resumes.length > 1 && (
+                                            <Button
+                                                icon="pi pi-trash"
+                                                className="p-button-sm p-button-danger p-button-outlined"
+                                                onClick={(e) => { e.stopPropagation(); confirmDelete(resume); }}
+                                                tooltip={t('common.delete')}
+                                                tooltipOptions={{ position: 'top' }}
+                                            />
+                                        )}
                                     </div>
                                     {documents.length > 0 ? (
                                         <Button
@@ -416,12 +418,14 @@ const ResumeListPage = () => {
                                     onClick={(e) => { e.stopPropagation(); confirmSetDefault(resume); }}
                                 />
                             )}
-                            <Button
-                                label={t('common.delete')}
-                                icon="pi pi-trash"
-                                className="p-button-sm p-button-danger p-button-outlined w-full"
-                                onClick={(e) => { e.stopPropagation(); confirmDelete(resume); }}
-                            />
+                            {resumes.length > 1 && (
+                                <Button
+                                    label={t('common.delete')}
+                                    icon="pi pi-trash"
+                                    className="p-button-sm p-button-danger p-button-outlined w-full"
+                                    onClick={(e) => { e.stopPropagation(); confirmDelete(resume); }}
+                                />
+                            )}
                             {documents.length > 0 && (
                                 <Button
                                     label={t('common.documents')}
