@@ -109,7 +109,7 @@ const ResumeEditorPage = ({ params: paramsPromise }) => {
                         life: 5000
                     });
                      if (error.response?.status === 404 || error.response?.status === 403) {
-                         setTimeout(() => router.push('/main/dashboard'), 3000);
+                         setTimeout(() => router.push('/main'), 3000);
                      }
                 }
             }
@@ -127,7 +127,7 @@ const ResumeEditorPage = ({ params: paramsPromise }) => {
                         <i className="pi pi-exclamation-triangle text-red-500" style={{ fontSize: '2rem' }}></i>
                         <p className="mt-3 text-lg font-medium">Error Loading Resume</p>
                         <p className="text-color-secondary">{fetchError}</p>
-                        <Button label="Go to Dashboard" icon="pi pi-arrow-left" className="p-button-text mt-2" onClick={() => router.push('/main/dashboard')} />
+                        <Button label="Go to Dashboard" icon="pi pi-arrow-left" className="p-button-text mt-2" onClick={() => router.push('/main')} />
                     </div>
                 </div>
             )}

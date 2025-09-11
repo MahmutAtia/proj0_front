@@ -205,7 +205,7 @@ const ATSCheckerPageContent = () => {
                 setPostAuthTaskIdToCheck(pendingTaskId);
             } else {
                 toast.current?.show({ severity: 'warn', summary: 'Session Expired?', detail: 'Could not retrieve analysis task after sign-in.' });
-                router.push('/main/dashboard');
+                router.push('/main');
             }
         }
     }, [status, searchParams, router, postAuthCheckComplete]);
