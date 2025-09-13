@@ -1,226 +1,357 @@
 {
-  "common": {
-    "loading": "Cargando...",
-    "error": "Error",
-    "save": "Guardar",
-    "cancel": "Cancelar",
-    "delete": "Eliminar",
-    "edit": "Editar",
-    "create": "Crear",
-    "search": "Buscar...",
-    "tryAgain": "Intentar de nuevo",
-    "documents": "Documentos",
-    "remote": "Remoto",
-    "source": "Fuente",
-    "day": "día",
-    "hour": "hora",
-    "ago": "hace",
-    "justNow": "Ahora mismo",
-    "sortBy": "Ordenar por",
-    "refresh": "Actualizar",
-    "viewAll": "Ver todo"
-  },
-  "resumes": {
-    "title": "Mis Currículums",
-    "createNew": "Crear Nuevo Currículum",
-    "searchPlaceholder": "Buscar Currículums...",
-    "loadingResumes": "Cargando currículums...",
-    "noResumesFound": "No se encontraron currículums. ¡Haz clic en 'Crear Nuevo Currículum' para empezar!",
-    "failedToLoad": "Error al Cargar Currículums",
-    "manageResume": "Gestionar Currículum",
-    "viewDocuments": "Ver Documentos ({count})",
-    "addDocuments": "Agregar Documentos",
-    "untitledResume": "Currículum Sin Título",
-    "noDescription": "No hay descripción disponible",
-    "defaultTag": "Predeterminado",
-    "updated": "Actualizado: {date}",
-    "documentsCount": "{count} documento(s)"
-  },
-"hero": {
-  "title_part1": "¿Currículum ",
-  "rejected": "Rechazado",
-  "title_part2": "? ¿Otra vez?",
-  "title_part3": "Vamos a arreglarlo.",
-  "subtitle_part1": "Escapa de la búsqueda laboral aplastante. ¿Sabías que la mayoría de trabajos solo necesitan un ",
-  "subtitle_styled": "currículum personalizado",
-  "subtitle_part2": " para superar los bots? Lo construimos contigo, usando IA.",
-  "description": "Eres brillante, hábil y estás listo. Pero tu aplicación desaparece en el abismo del ATS. El problema no eres tú, es el sistema. CareerFlow AI crea currículums y portafolios que te hacen destacar.",
-  "startFreeResume": "Comenzar mi Currículum Gratis con IA",
-  "checkScore": "Revisar mi Puntuación ATS",
-  "imageAlt": "Equipo profesional logrando éxito profesional con tecnología"
-},"header": {
-  "logo": "CareerFlow",
-  "theStruggle": "El Desafío",
-  "yourEdge": "Tu Ventaja",
-  "howItWorks": "Cómo Funciona",
-  "pricing": "Precios",
-  "atsCheck": "Verificación ATS ✨",
-  "login": "Iniciar Sesión",
-  "getStarted": "Comenzar",
-  "atsTooltipTitle": "¿Qué es un ATS? 🤔",
-  "atsTooltipText": "ATS = Reclutador Robot 🤖 Escanea currículums. ¿Pierdes palabras clave? 💨 ¡Ignorado! 👉 ¡Haz clic para verificar el tuyo! ✅"
-},
-"atsChecker": {
-  "title_part1": "¿Los Robots están ",
-  "ghosted": "Ignorando tu Currículum?",
-  "title_part2": "",
-  "subtitle": "No adivines. Sube tu currículum ahora para una verificación de compatibilidad ATS 100% GRATUITA e instantánea. Obtén insights accionables para asegurar que un humano realmente vea tu aplicación.",
-  "scanResume": "Escanear mi Currículum GRATIS",
-  "disclaimer": "Sin trucos, no se requiere registro para el escaneo.",
-  "imageAlt": "Representación visual de un escaneo de currículum ATS"
-},
-"struggle": {
-  "title_part1": "¿Atrapado en el ",
-  "abyss": "Abismo",
-  "title_part2": " de Aplicaciones?",
-  "subtitle": "Eres calificado, motivado y estás listo. Sin embargo, el ciclo se repite: esfuerzo, rechazo, duda. Liberémonos de lo que te detiene.",
-  "painPoints": {
-    "blackHole": {
-      "title": "El Agujero Negro del Currículum",
-      "text": "Aplicaciones infinitas, silencio ensordecedor. ¿Sientes que tu currículum desaparece? Es una frustración común."
+    "common": {
+        "loading": "Cargando...",
+        "error": "Error",
+        "save": "Guardar",
+        "cancel": "Cancelar",
+        "delete": "Eliminar",
+        "edit": "Editar",
+        "create": "Crear",
+        "search": "Buscar...",
+        "tryAgain": "Intentar de nuevo",
+        "documents": "Documentos",
+        "remote": "Remoto",
+        "source": "Fuente",
+        "day": "día",
+        "hour": "hora",
+        "ago": "hace",
+        "justNow": "Ahora mismo",
+        "sortBy": "Ordenar por",
+        "refresh": "Actualizar",
+        "viewAll": "Ver todo"
     },
-    "timeSink": {
-      "title": "El Sumidero de Tiempo",
-      "text": "Ajustando constantemente currículums, escribiendo cartas de presentación... La búsqueda de empleo no debería consumir toda tu vida."
+    "resumes": {
+        "title": "Mis Currículums",
+        "createNew": "Crear Nuevo Currículum",
+        "searchPlaceholder": "Buscar Currículums...",
+        "loadingResumes": "Cargando currículums...",
+        "noResumesFound": "No se encontraron currículums. ¡Haz clic en 'Crear Nuevo Currículum' para empezar!",
+        "failedToLoad": "Error al Cargar los Currículums",
+        "manageResume": "Gestionar Currículum",
+        "viewDocuments": "Ver Documentos ({count})",
+        "addDocuments": "Agregar Documentos",
+        "untitledResume": "Currículum Sin Título",
+        "noDescription": "No hay descripción disponible",
+        "defaultTag": "Predeterminado",
+        "updated": "Actualizado: {date}",
+        "documentsCount": "{count} documento(s)"
     },
-    "visibility": {
-      "title": "El Problema de Visibilidad",
-      "text": "¿Currículum genérico? ¿Sin portafolio? ¿Luchando para mostrar tus habilidades únicas y destacar entre la multitud?"
+    "errors": {
+        "userNotAuthenticated": "Usuario no autenticado.",
+        "backendUrlNotConfigured": "La URL del backend (NEXT_PUBLIC_BACKEND_URL) no está configurada.",
+        "requestTimeout": "La solicitud expiró. Por favor, revisa tu conexión o inténtalo de nuevo.",
+        "serverError": "Error del Servidor: {status} - {message}",
+        "noResponse": "Sin respuesta del servidor. Revisa la conexión de red o el estado del backend.",
+        "unexpectedError": "Ocurrió un error inesperado.",
+        "invalidDataFormat": "Se recibió un formato de datos no válido del backend.",
+        "couldNotLoadResumes": "No se pudieron cargar los currículums. Por favor, inténtalo de nuevo más tarde."
     },
-    "atsGauntlet": {
-      "title": "El Desafío ATS",
-      "text": "¿Confundido por las palabras clave? ¿Preocupado por el formato? Superar los bots se siente como una batalla perdida."
+    "hero": {
+        "title_part1": "¿Tu currículum fue ",
+        "rejected": "rechazado",
+        "title_part2": "? ¿Otra vez?",
+        "title_part3": "Vamos a solucionarlo.",
+        "subtitle_part1": "Escapa de la agotadora búsqueda de empleo. ¿Sabías que la mayoría de los trabajos necesitan un ",
+        "subtitle_styled": "currículum a medida",
+        "subtitle_part2": " solo para pasar los filtros automáticos? Los creamos *contigo*, usando IA.",
+        "description": "Eres brillante, cualificado y estás listo. Pero tu solicitud se desvanece en el abismo de los ATS. No eres tú, es el sistema. CareerFlow AI crea currículums y portafolios que logran que te vean.",
+        "startFreeResume": "Empezar Mi Currículum con IA Gratis",
+        "checkScore": "Revisar Mi Puntuación ATS",
+        "imageAlt": "Profesionales colaborando y alcanzando el éxito profesional con tecnología"
+    },
+    "header": {
+        "logo": "CareerFlow",
+        "theStruggle": "El Obstáculo",
+        "yourEdge": "Tu Ventaja",
+        "howItWorks": "Cómo Funciona",
+        "pricing": "Precios",
+        "atsCheck": "Análisis ATS ✨",
+        "login": "Iniciar Sesión",
+        "getStarted": "Comenzar",
+        "atsTooltipTitle": "¿Qué es un ATS? 🤔",
+        "atsTooltipText": "ATS = Reclutador Robot 🤖 Escanea currículums. ¿Te faltan palabras clave? 💨 ¡Ignorado! 👉 ¡Haz clic para revisar el tuyo! ✅"
+    },
+    "struggle": {
+        "title_part1": "¿Atascado en el ",
+        "abyss": "Abismo de las Solicitudes?",
+        "title_part2": "",
+        "subtitle": "Estás cualificado, tienes empuje y estás listo. Sin embargo, el ciclo se repite: esfuerzo, rechazo, duda. Liberémonos de lo que te frena.",
+        "painPoints": {
+            "blackHole": {
+                "title": "El Agujero Negro de los Currículums",
+                "text": "Solicitudes interminables, silencio ensordecedor. ¿Sientes que tu currículum simplemente desaparece? Es una frustración común."
+            },
+            "timeSink": {
+                "title": "El Ladrón de Tiempo",
+                "text": "Ajustar constantemente currículums, escribir cartas de presentación... La búsqueda de empleo no debería consumir toda tu vida."
+            },
+            "visibility": {
+                "title": "El Problema de la Visibilidad",
+                "text": "¿Un currículum genérico? ¿Sin portafolio? ¿Luchas por mostrar tus habilidades únicas y destacar entre la multitud?"
+            },
+            "atsGauntlet": {
+                "title": "La Prueba del ATS",
+                "text": "¿Confundido por las palabras clave? ¿Preocupado por el formato? Superar los filtros automáticos parece una batalla perdida."
+            }
+        },
+        "missingOut": {
+            "title": "No Dejes que Tácticas Obsoletas te Cuesten Oportunidades",
+            "text": "Una solicitud genérica no es suficiente en {year}. Portafolios que destacan, currículums específicos y mostrar tu valor único son esenciales. ¿Son tus materiales realmente competitivos?"
+        }
+    },
+    "features": {
+        "title": "Tu Nueva Ventaja: ",
+        "aiAndBrilliance": "IA + Tu Genialidad",
+        "subtitle": "CareerFlow AI no es solo otra herramienta. Es tu socio inteligente, diseñado para amplificar tus fortalezas y navegar las complejidades del mercado laboral moderno.",
+        "hyperPersonalized": {
+            "title": "Borradores de IA Hiper-Personalizados",
+            "text": "La IA analiza las descripciones de trabajo Y tu perfil para crear currículums y cartas únicos y específicos en segundos. ¡Adiós a lo genérico!"
+        },
+        "conquerAts": {
+            "title": "Conquista el ATS",
+            "text": "Formato optimizado, análisis de palabras clave y un verificador de puntuación ATS instantáneo y GRATUITO aseguran que pases los filtros automáticos."
+        },
+        "ownCorner": {
+            "title": "Tu Propio Rincón en la Web",
+            "text": "Genera un sitio web y portafolio profesional e impresionante a partir de tu currículum. Edítalo fácilmente con IA y compártelo al instante."
+        },
+        "aiEditing": {
+            "title": "Varita Mágica de Edición con IA",
+            "text": "¿Necesitas que una sección sea más fuerte? ¿Más concisa? Solo pídeselo a la IA. Edita cualquier cosa en tiempo real con simples instrucciones. ✨"
+        }
+    },
+    "howItWorks": {
+        "title": "La IA es tu Copiloto, no el Piloto",
+        "subtitle": "Olvida las plantillas robóticas. Mezclamos la velocidad de la IA con tu voz única. Siempre tienes el control, creando solicitudes que son efectivas y auténticamente *tuyas*.",
+        "steps": {
+            "input": {
+                "title": "Entrada y Contexto",
+                "text": "Proporciona tus detalles, experiencias y la descripción del trabajo/beca objetivo. Dale a la IA el combustible que necesita."
+            },
+            "aiMagic": {
+                "title": "Borradores Mágicos con IA",
+                "text": "Nuestra IA genera borradores iniciales a medida de currículums, cartas y contenido web en momentos, optimizados para ATS e impacto."
+            },
+            "refine": {
+                "title": "Refina y Personaliza",
+                "text": "Usa herramientas intuitivas e instrucciones de IA ('Haz que esto suene más seguro') para pulir, añadir tu toque único y hacerlo perfecto."
+            }
+        }
+    },
+    "pricing": {
+        "title": "Planes Simples, Resultados Poderosos",
+        "subtitle": "Elige el plan que se ajuste a tu trayectoria. Comienza gratis, mejora en cualquier momento. Sin cargos ocultos.",
+        "popular": "POPULAR",
+        "currentPlan": "Plan Actual",
+        "reactivate": "Reactivar",
+        "getStartedFree": "Comenzar Gratis",
+        "choosePlan": "Elegir Plan",
+        "loadingPlans": "Cargando planes de precios...",
+        "errorTitle": "¡Ups! Algo salió mal.",
+        "noPlansTitle": "No Hay Planes Disponibles",
+        "noPlansText": "Los planes de precios no están disponibles actualmente. Por favor, vuelve a intentarlo más tarde."
+    },
+    "atsChecker": {
+        "title_part1": "¿Tu currículum está siendo ",
+        "ghosted": "ignorado por robots?",
+        "title_part2": "",
+        "subtitle": "No adivines. Sube tu currículum ahora para una verificación de compatibilidad ATS 100% GRATIS e instantánea. Obtén información práctica para asegurar que un humano realmente vea tu solicitud.",
+        "scanResume": "Escanear Mi Currículum GRATIS",
+        "disclaimer": "Sin trucos, no se requiere registro para el escaneo.",
+        "imageAlt": "Representación visual de un escaneo de currículum ATS"
+    },
+    "footer": {
+        "tagline": "Empoderando a buscadores de empleo y estudiantes con IA para crear oportunidades y construir futuros más brillantes.",
+        "product": "Producto",
+        "features": "Características",
+        "pricing": "Precios",
+        "atsChecker": "Verificador ATS",
+        "templates": "Plantillas",
+        "resources": "Recursos",
+        "blog": "Blog",
+        "guides": "Guías",
+        "faq": "Preguntas Frecuentes",
+        "support": "Soporte",
+        "company": "Empresa",
+        "aboutUs": "Sobre Nosotros",
+        "careers": "Empleo",
+        "contact": "Contacto",
+        "legal": "Legal",
+        "privacyPolicy": "Política de Privacidad",
+        "termsOfService": "Términos de Servicio",
+        "copyright": "©  CareerFlow AI. Todos los derechos reservados."
+    },
+    "dashboard": {
+        "welcome": "Bienvenido de vuelta",
+        "overview": "Resumen",
+        "recentActivity": "Actividad Reciente",
+        "quickActions": "Acciones Rápidas"
+    },
+    "navigation": {
+        "home": "Inicio",
+        "dashboard": "Panel",
+        "resumes": "Currículums",
+        "profile": "Perfil",
+        "settings": "Configuración",
+        "logout": "Cerrar Sesión"
+    },
+    "dashboard_main": {
+        "jobPostings": {
+            "title": "Últimas Ofertas de Empleo",
+            "subtitle": "Mostrando {count} empleos ({status})",
+            "noJobs": "Aún no se han encontrado empleos. El sistema buscará automáticamente empleos basados en las palabras clave de tu currículum predeterminado.",
+            "startScraping": "Iniciar Búsqueda de Empleo",
+            "viewMore": "Ver {count} empleos más"
+        },
+        "welcomeBanner": {
+            "title": "¡Bienvenido de vuelta, {userName}!",
+            "userFallback": "Usuario",
+            "subtitle": "Aquí tienes el resumen de tu panel de carrera."
+        },
+        "actionCard": {
+            "explore": "Explorar"
+        },
+        "quickActions": {
+            "createDocument": {
+                "title": "Crear Nuevo Documento",
+                "description": "Genera una carta de presentación, recomendación u otro documento profesional.",
+                "button": "Generar Ahora"
+            },
+            "newResume": {
+                "title": "Nuevo Currículum",
+                "description": "Crea un nuevo currículum destacado desde cero o a partir de una plantilla.",
+                "button": "Crear Currículum"
+            },
+            "myPortfolio": {
+                "title": "Mi Portafolio",
+                "description": "Gestiona y publica tu sitio web profesional personal.",
+                "button": "Editar Sitio"
+            },
+            "jobSearch": {
+                "title": "Búsqueda de Empleo",
+                "description": "Descubre y sigue oportunidades de empleo relevantes.",
+                "button": "Buscar Empleos"
+            }
+        },
+        "defaultResume": {
+            "title": "Currículum Predeterminado",
+            "loading": "Cargando Currículum Predeterminado...",
+            "lastUpdated": "Última actualización: {date}",
+            "noDefaultSelected": "No se ha seleccionado un currículum predeterminado. Elige uno para personalizar tu panel.",
+            "changeDefault": "Cambiar Predeterminado",
+            "selectDefault": "Seleccionar Predeterminado",
+            "buttonChooseDefault": "Elige tu Currículum Predeterminado",
+            "tooltipEdit": "Editar Currículum Predeterminado",
+            "tooltipViewAll": "Ver todos los currículums para seleccionar o cambiar el predeterminado"
+        },
+        "relatedDocuments": {
+            "title": "Documentos Vinculados",
+            "loading": "Cargando documentos...",
+            "selectDefaultPrompt": "Selecciona un currículum predeterminado para ver aquí sus documentos vinculados.",
+            "documentsFor": "Documentos para \"{resumeTitle}\"",
+            "manageAll": "Gestionar Todos",
+            "viewMore": "Ver {count} más...",
+            "noDocuments": "Aún no hay documentos vinculados a este currículum.",
+            "addDocument": "Agregar Documento",
+            "tooltipManageAll": "Ir a la Página de Documentos"
+        },
+        "toast": {
+            "loadError": "No se pudieron cargar los datos del currículum.",
+            "actionRequiredSummary": "Acción Requerida",
+            "actionRequiredDetail": "Por favor, selecciona un currículum para establecer como predeterminado desde la página \"Todos los Currículums\".",
+            "noResumeSummary": "Sin Currículum",
+            "noResumeDetail": "No se ha seleccionado ningún currículum para cambiar el estado predeterminado.",
+            "noResumeForDoc": "Por favor, crea un currículum antes de generar documentos.",
+            "updateSuccess": "Estado del currículum principal actualizado.",
+            "updateError": "No se pudo actualizar el estado del currículum principal.",
+            "generationStartedSummary": "Generación de Documento Iniciada",
+            "generationStartedDetail": "Tu documento se está generando."
+        },
+        "dialog": {
+            "resumeIdLabel": "ID del Currículum: {id}"
+        }
+    },
+    "dashboard_layout": {
+        "logo": "CareerFlow",
+        "sidebar": {
+            "settings": "Configuración",
+            "overview": "Vista General",
+            "resumes": "Currículums",
+            "myWebsite": "Mi Sitio Web",
+            "atsChecker": "Verificador ATS",
+            "jobFeed": "Feed de Empleos",
+            "scholarships": "Becas"
+        },
+        "topbar": {
+            "expandSidebar": "Expandir Barra Lateral",
+            "collapseSidebar": "Contraer Barra Lateral",
+            "searchPlaceholder": "Buscar en el panel...",
+            "userFallback": "Usuario"
+        },
+        "userMenu": {
+            "profile": "Perfil",
+            "settings": "Configuración",
+            "logout": "Cerrar Sesión"
+        },
+        "toast": {
+            "setDefault": "Currículum establecido como predeterminado.",
+            "unsetDefault": "Se ha quitado el currículum como predeterminado."
+        }
+    },
+    "login": {
+        "errorSummary": "Error",
+        "errorDetail": "Fallo al iniciar sesión con {{provider}}",
+        "welcomeBack": "¡Bienvenido de nuevo, {{name}}!",
+        "signInWithGoogle": "Iniciar sesión con Google",
+        "signInWithLinkedIn": "Iniciar sesión con LinkedIn"
+    },
+    "accessDenied": {
+        "title": "Acceso Denegado",
+        "message": "No tienes los permisos necesarios.",
+        "imageAlt": "Imagen de Acceso Denegado",
+        "goToDashboard": "Ir al Panel"
+    },
+    "errorPage": {
+        "title": "Ocurrió un Error",
+        "message": "Algo salió mal.",
+        "imageAlt": "Imagen de Error",
+        "goToDashboard": "Ir al Panel"
+    },
+    "jobFeed": {
+        "title": "Feed de Empleos",
+        "subtitle": "Mostrando {filtered} de {count} empleos encontrados",
+        "loading": "Cargando oportunidades de empleo...",
+        "loadingInitial": "Cargando feed de empleos...",
+        "fetching": "Obteniendo empleos...",
+        "searchStarted": "Búsqueda Iniciada",
+        "searchStartedDetail": "Actualizando empleos según tus criterios...",
+        "autoUpdate": {
+            "status": "Estado de Auto-Actualización",
+            "active": "Activo",
+            "inactive": "Inactivo",
+            "description": "Los empleos se actualizan automáticamente cada 5 minutos según las palabras clave de tu currículum predeterminado",
+            "inactiveDescription": "Las actualizaciones automáticas de empleos no están activas"
+        },
+        "filters": {
+            "search": "Título del puesto, palabra clave...",
+            "location": "Ciudad o País",
+            "remoteOnly": "Solo Remoto"
+        },
+        "sorting": {
+            "relevance": "Relevancia",
+            "recent": "Más Reciente",
+            "company": "Empresa A-Z",
+            "title": "Título A-Z"
+        },
+        "job": {
+            "locationNotSpecified": "No especificado",
+            "addedAgo": "Añadido",
+            "viewOn": "Ver en",
+            "applyNow": "Postular Ahora"
+        },
+        "empty": {
+            "title": "No se encontraron empleos",
+            "description": "No se encontraron ofertas de empleo que coincidan con tus criterios. ¡Intenta ampliar tu búsqueda!"
+        }
     }
-  },
-  "missingOut": {
-    "title": "No Dejes que las Tácticas Obsoletas te Cuesten",
-    "text": "Una aplicación genérica no es suficiente en {year}. Portafolios destacados, currículums dirigidos y mostrar tu valor único son esenciales. ¿Son realmente competitivos tus materiales?"
-  }
-},
-  "dashboard_main": {
-    "jobPostings": {
-      "title": "Últimas Ofertas de Trabajo",
-      "subtitle": "Mostrando {count} trabajos ({status})",
-      "noJobs": "No se encontraron trabajos aún. El sistema buscará automáticamente trabajos basándose en las palabras clave de tu currículum predeterminado.",
-      "startScraping": "Comenzar Búsqueda de Trabajo",
-      "viewMore": "Ver {count} trabajos más"
-    },
-    "welcomeBanner": {
-      "title": "¡Bienvenido de vuelta, {userName}!",
-      "userFallback": "Usuario",
-      "subtitle": "Aquí tienes una vista general de tu panel de carrera."
-    },
-    "actionCard": {
-      "explore": "Explorar"
-    },
-    "quickActions": {
-      "createDocument": {
-        "title": "Crear Nuevo Documento",
-        "description": "Generar una carta de presentación, recomendación u otro documento profesional.",
-        "button": "Generar Ahora"
-      },
-      "newResume": {
-        "title": "Nuevo Currículum",
-        "description": "Crear un nuevo currículum destacado desde cero o una plantilla.",
-        "button": "Crear Currículum"
-      },
-      "myPortfolio": {
-        "title": "Mi Portafolio",
-        "description": "Gestionar y publicar tu sitio web de carrera personal.",
-        "button": "Editar Sitio"
-      },
-      "jobSearch": {
-        "title": "Búsqueda de Trabajo",
-        "description": "Descubrir y seguir oportunidades laborales relevantes.",
-        "button": "Buscar Trabajos"
-      }
-    },
-    "defaultResume": {
-      "title": "Currículum Predeterminado",
-      "loading": "Cargando Currículum Predeterminado...",
-      "lastUpdated": "Última actualización: {date}",
-      "noDefaultSelected": "No hay currículum predeterminado seleccionado. Elige uno para personalizar tu panel.",
-      "changeDefault": "Cambiar Predeterminado",
-      "selectDefault": "Seleccionar Predeterminado",
-      "buttonChooseDefault": "Elige Tu Currículum Predeterminado",
-      "tooltipEdit": "Editar Currículum Predeterminado",
-      "tooltipViewAll": "Ver todos los currículums para seleccionar o cambiar el predeterminado"
-    },
-    "relatedDocuments": {
-      "title": "Documentos Vinculados",
-      "loading": "Cargando documentos...",
-      "selectDefaultPrompt": "Selecciona un currículum predeterminado para ver sus documentos vinculados aquí.",
-      "documentsFor": "Documentos para \"{resumeTitle}\"",
-      "manageAll": "Gestionar Todos",
-      "viewMore": "Ver {count} más...",
-      "noDocuments": "No hay documentos vinculados a este currículum aún.",
-      "addDocument": "Agregar Documento",
-      "tooltipManageAll": "Ir a la Página de Documentos"
-    },
-    "toast": {
-      "loadError": "No se pudieron cargar los datos del currículum.",
-      "actionRequiredSummary": "Acción Requerida",
-      "actionRequiredDetail": "Por favor selecciona un currículum para establecer como predeterminado desde la página \"Todos los Currículums\".",
-      "noResumeSummary": "Sin Currículum",
-      "noResumeDetail": "No hay currículum seleccionado para cambiar el estado predeterminado.",
-      "noResumeForDoc": "Por favor crea un currículum primero antes de generar documentos.",
-      "updateSuccess": "Estado del currículum maestro actualizado.",
-      "updateError": "No se pudo actualizar el estado del currículum maestro.",
-      "generationStartedSummary": "Generación de Documento Iniciada",
-      "generationStartedDetail": "Se está generando tu documento."
-    },
-    "dialog": {
-      "resumeIdLabel": "ID del Currículum: {id}"
-    }
-  },
-  "dashboard_layout": {
-    "logo": "CareerFlow",
-    "sidebar": {
-      "settings": "Configuración",
-      "overview": "Visión General",
-      "resumes": "Currículums",
-      "myWebsite": "Mi Sitio Web",
-      "atsChecker": "Verificador ATS",
-      "jobFeed": "Ofertas de Empleo",
-      "scholarships": "Becas"
-    },
-    "topbar": {
-      "expandSidebar": "Expandir Barra Lateral",
-      "collapseSidebar": "Contraer Barra Lateral",
-      "searchPlaceholder": "Buscar en el panel...",
-      "userFallback": "Usuario"
-    },
-    "userMenu": {
-      "profile": "Perfil",
-      "settings": "Configuración",
-      "logout": "Cerrar Sesión"
-    },
-    "toast": {
-      "setDefault": "Currículum establecido como predeterminado.",
-      "unsetDefault": "Currículum ya no es el predeterminado."
-    }
-  },
-  "errors": {
-    "userNotAuthenticated": "Usuario no autenticado.",
-    "backendUrlNotConfigured": "URL del backend (NEXT_PUBLIC_BACKEND_URL) no está configurada.",
-    "requestTimeout": "La solicitud ha expirado. Verifique su conexión o intente de nuevo.",
-    "serverError": "Error del Servidor: {status} - {message}",
-    "noResponse": "Sin respuesta del servidor. Verifique la conexión de red o el estado del backend.",
-    "unexpectedError": "Ha ocurrido un error inesperado.",
-    "invalidDataFormat": "Formato de datos inválido recibido del backend.",
-    "couldNotLoadResumes": "No se pudieron cargar los currículums. Por favor, intente de nuevo más tarde."
-  },
-  "login": {
-    "errorSummary": "Error",
-    "errorDetail": "Error al iniciar sesión con {{provider}}",
-    "welcomeBack": "¡Bienvenido de nuevo, {{name}}!",
-    "signInWithGoogle": "Iniciar sesión con Google",
-    "signInWithLinkedIn": "Iniciar sesión con LinkedIn"
-  },
-  "accessDenied": {
-    "title": "Acceso denegado",
-    "message": "No tienes los permisos necesarios.",
-    "imageAlt": "Imagen de acceso denegado",
-    "goToDashboard": "Ir al panel de control"
-  }
 }

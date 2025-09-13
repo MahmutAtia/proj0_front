@@ -1,15 +1,16 @@
-"use client"; // This component is a client component
+'use client'; // This component is a client component
 
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { FiGift, FiZap, FiUsers, FiCheckCircle, FiLoader, FiAlertTriangle, FiShoppingCart, FiBriefcase, FiStar } from 'react-icons/fi'; // Added more icons for variety
 import api from '@/lib/axios'; // Adjust the import path as necessary
 import styles from '../styles/PricingSection.module.css';
+import { useTranslation } from '../../../../hooks/useTranslation'; // Add translation hook
 
 // --- Framer Motion Variants ---
 const fadeInUp = {
     initial: { opacity: 0, y: 40 },
-    animate: { opacity: 1, y: 0, transition: { duration: 0.6, ease: [0.6, -0.05, 0.01, 0.99] } },
+    animate: { opacity: 1, y: 0, transition: { duration: 0.6, ease: [0.6, -0.05, 0.01, 0.99] } }
 };
 
 const staggerContainer = (staggerChildren = 0.1, delayChildren = 0) => ({
@@ -17,14 +18,14 @@ const staggerContainer = (staggerChildren = 0.1, delayChildren = 0) => ({
     animate: {
         transition: {
             staggerChildren: staggerChildren,
-            delayChildren: delayChildren,
-        },
-    },
+            delayChildren: delayChildren
+        }
+    }
 });
 
 const buttonHover = {
     hover: { scale: 1.05, transition: { type: 'spring', stiffness: 300 } },
-    tap: { scale: 0.95 },
+    tap: { scale: 0.95 }
 };
 
 // --- Icon Mapping ---
@@ -39,7 +40,7 @@ const iconMap: { [key: string]: React.ElementType } = {
     premium: FiStar,
     business: FiBriefcase,
     teams: FiUsers,
-    enterprise: FiUsers,
+    enterprise: FiUsers
     // Add more specific mappings based on your plan names/slugs if needed
 };
 
@@ -55,9 +56,9 @@ const getPlanIcon = (planName?: string): React.ElementType => {
     return iconMap.default;
 };
 
-
 // --- Pricing Section ---
 const PricingSection = () => {
+    const { t, isRTL } = useTranslation();
     const [plans, setPlans] = useState<any[]>([]);
     const [isLoading, setIsLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
@@ -79,23 +80,24 @@ const PricingSection = () => {
                     tagline: plan.description || `Explore the ${plan.name} plan.`, // Use description as tagline
                     iconComponent: getPlanIcon(plan.name), // Dynamically get icon
                     features: plan.features || [],
-                    buttonLabel: (currentSubscription: any | null) => { // Function to determine button label
+                    buttonLabel: (currentSubscription: any | null) => {
+                        // Function to determine button label
                         if (currentSubscription?.plan?.id === plan.id && !currentSubscription?.is_canceling) {
-                            return "Current Plan";
+                            return t('pricing.currentPlan');
                         }
                         if (currentSubscription?.plan?.id === plan.id && currentSubscription?.is_canceling) {
-                            return "Reactivate";
+                            return t('pricing.reactivate');
                         }
-                        return plan.name?.toLowerCase().includes('free') || plan.price === "0" || plan.price === 0 ? "Get Started Free" : "Choose Plan";
+                        return plan.name?.toLowerCase().includes('free') || plan.price === '0' || plan.price === 0 ? t('pricing.getStartedFree') : t('pricing.choosePlan');
                     },
                     buttonClass: plan.is_popular ? 'button-primary' : 'button-secondary',
                     popular: plan.is_popular || false,
-                    actionUrl: `/main/plans#${plan.id}`, // Link to the plans page, potentially with an anchor
+                    actionUrl: `/main/plans#${plan.id}` // Link to the plans page, potentially with an anchor
                 }));
                 setPlans(formattedPlans);
             } catch (err) {
-                console.error("Error fetching pricing plans:", err);
-                setError("Failed to load pricing plans. Please try again later.");
+                console.error('Error fetching pricing plans:', err);
+                setError('Failed to load pricing plans. Please try again later.');
             } finally {
                 setIsLoading(false);
             }
@@ -113,7 +115,7 @@ const PricingSection = () => {
         return (
             <section id="pricing" className={`${styles.container || ''} section-padding ${styles.textCenter}`}>
                 <FiLoader className={`${styles.loadingIcon} spin`} size={48} />
-                <p className={styles.subheading}>Loading pricing plans...</p>
+                <p className={styles.subheading}>{t('pricing.loadingPlans')}</p>
             </section>
         );
     }
@@ -122,7 +124,7 @@ const PricingSection = () => {
         return (
             <section id="pricing" className={`${styles.container || ''} section-padding ${styles.textCenter}`}>
                 <FiAlertTriangle className={styles.errorIcon} size={48} />
-                <h2 className={styles.heading}>Oops! Something went wrong.</h2>
+                <h2 className={styles.heading}>{t('pricing.errorTitle')}</h2>
                 <p className={styles.subheading}>{error}</p>
             </section>
         );
@@ -131,56 +133,34 @@ const PricingSection = () => {
     if (plans.length === 0) {
         return (
             <section id="pricing" className={`${styles.container || ''} section-padding ${styles.textCenter}`}>
-                <h2 className={styles.heading}>No Plans Available</h2>
-                <p className={styles.subheading}>
-                    Pricing plans are currently unavailable. Please check back later.
-                </p>
+                <h2 className={styles.heading}>{t('pricing.noPlansTitle')}</h2>
+                <p className={styles.subheading}>{t('pricing.noPlansText')}</p>
             </section>
         );
     }
 
     return (
         <section id="pricing" className={`${styles.container || ''} section-padding`}>
-            <motion.div
-                className={`${styles.textCenter} ${styles.marginBottom6}`}
-                variants={fadeInUp}
-                initial="initial"
-                whileInView="animate"
-                viewport={{ once: true }}
-            >
-                <h2 className={styles.heading}>Simple Plans, Powerful Results</h2>
-                <p className={styles.subheading}>
-                    Choose the plan that fits your journey. Start free, upgrade anytime. No hidden fees.
-                </p>
+            <motion.div className={`${styles.textCenter} ${styles.marginBottom6}`} variants={fadeInUp} initial="initial" whileInView="animate" viewport={{ once: true }}>
+                <h2 className={styles.heading}>{t('pricing.title')}</h2>
+                <p className={styles.subheading}>{t('pricing.subtitle')}</p>
             </motion.div>
 
-            <motion.div
-                className={styles.pricingGrid}
-                variants={staggerContainer(0.1)}
-                initial="initial"
-                whileInView="animate"
-                viewport={{ once: true, amount: 0.1 }}
-            >
+            <motion.div className={styles.pricingGrid} variants={staggerContainer(0.1)} initial="initial" whileInView="animate" viewport={{ once: true, amount: 0.1 }}>
                 {plans.map((plan) => {
                     const PlanIcon = plan.iconComponent; // Use the mapped component
                     // For buttonLabel, if it's a function, you might call it here
                     // if you have access to subscription status. Otherwise, use as is.
-                    const buttonLabelText = typeof plan.buttonLabel === 'function'
-                        ? plan.buttonLabel(null) // Pass null or actual subscription if available
-                        : plan.buttonLabel;
+                    const buttonLabelText =
+                        typeof plan.buttonLabel === 'function'
+                            ? plan.buttonLabel(null) // Pass null or actual subscription if available
+                            : plan.buttonLabel;
 
                     return (
-                        <motion.div
-                            key={plan.id}
-                            className={`${styles.pricingCard} ${plan.popular ? styles.popular : ''}`}
-                            variants={fadeInUp}
-                        >
+                        <motion.div key={plan.id} className={`${styles.pricingCard} ${plan.popular ? styles.popular : ''}`} variants={fadeInUp}>
                             {plan.popular && <div className={styles.popularBadge}>POPULAR</div>}
                             <div className={styles.textCenter}>
-                                <PlanIcon
-                                    className={styles.planIcon}
-                                    style={{ color: plan.popular ? 'var(--primary)' : 'var(--secondary)' }}
-                                />
+                                <PlanIcon className={styles.planIcon} style={{ color: plan.popular ? 'var(--primary)' : 'var(--secondary)' }} />
                                 <h3 className={styles.planName}>{plan.name}</h3>
                                 <p className={styles.planTagline}>{plan.tagline}</p>
                                 <div className={styles.priceWrapper}>
@@ -189,13 +169,7 @@ const PricingSection = () => {
                                 </div>
                             </div>
 
-                            <motion.button
-                                className={`button ${plan.buttonClass} ${styles.buttonFullWidth} ${styles.marginTopAuto}`}
-                                variants={buttonHover}
-                                whileHover="hover"
-                                whileTap="tap"
-                                onClick={() => window.location.href = plan.actionUrl}
-                            >
+                            <motion.button className={`button ${plan.buttonClass} ${styles.buttonFullWidth} ${styles.marginTopAuto}`} variants={buttonHover} whileHover="hover" whileTap="tap" onClick={() => (window.location.href = plan.actionUrl)}>
                                 {buttonLabelText}
                             </motion.button>
                         </motion.div>
@@ -205,7 +179,6 @@ const PricingSection = () => {
         </section>
     );
 };
-
 
 export default PricingSection;
 // <ul className={styles.featuresList}>

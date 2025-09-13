@@ -1,4 +1,4 @@
-"use client"; // This component is a client component   
+'use client'; // This component is a client component
 
 import React from 'react';
 import Link from 'next/link';
@@ -6,47 +6,49 @@ import { motion } from 'framer-motion';
 import { FaLinkedin, FaTwitter, FaGithub } from 'react-icons/fa';
 import { IoSparkles } from 'react-icons/io5';
 import styles from '../styles/Footer.module.css'; // Import the CSS module
+import { useTranslation } from '../../../../hooks/useTranslation'; // Add translation hook
 
 // --- Framer Motion Variants ---
 const buttonHover = {
     hover: { scale: 1.1, transition: { type: 'spring', stiffness: 400, damping: 15 } },
-    tap: { scale: 0.9 },
+    tap: { scale: 0.9 }
 };
 
 // --- Footer ---
 const Footer = () => {
+    const { t, isRTL } = useTranslation();
     const footerLinkSections = [
         {
-            title: "Product",
+            title: t('footer.product'),
             links: [
-                { label: "Features", href: "#features" },
-                { label: "Pricing", href: "#pricing" },
-                { label: "ATS Checker", href: "/ats" },
-                { label: "Templates", href: "#" }, // Placeholder href
+                { label: t('footer.features'), href: '#features' },
+                { label: t('footer.pricing'), href: '#pricing' },
+                { label: t('footer.atsChecker'), href: '/ats' },
+                { label: t('footer.templates'), href: '#' } // Placeholder href
             ]
         },
         {
-            title: "Resources",
+            title: t('footer.resources'),
             links: [
-                { label: "Blog", href: "#" },
-                { label: "Guides", href: "#" },
-                { label: "FAQ", href: "#" },
-                { label: "Support", href: "#" },
+                { label: t('footer.blog'), href: '#' },
+                { label: t('footer.guides'), href: '#' },
+                { label: t('footer.faq'), href: '#' },
+                { label: t('footer.support'), href: '#' }
             ]
         },
         {
-            title: "Company",
+            title: t('footer.company'),
             links: [
-                { label: "About Us", href: "#" },
-                { label: "Careers", href: "#" },
-                { label: "Contact", href: "#" },
+                { label: t('footer.aboutUs'), href: '#' },
+                { label: t('footer.careers'), href: '#' },
+                { label: t('footer.contact'), href: '#' }
             ]
         },
         {
-            title: "Legal",
+            title: t('footer.legal'),
             links: [
-                { label: "Privacy Policy", href: "/privacy" },
-                { label: "Terms of Service", href: "/terms" },
+                { label: t('footer.privacyPolicy'), href: '/privacy' },
+                { label: t('footer.termsOfService'), href: '/terms' }
             ]
         }
     ];
@@ -59,13 +61,17 @@ const Footer = () => {
                         <IoSparkles className={styles.logoIcon} />
                         <span>CareerFlow AI</span>
                     </Link>
-                    <p className={styles.aboutText}>
-                        Empowering job seekers and students with AI to create opportunities and build brighter futures.
-                    </p>
+                    <p className={styles.aboutText}>{t('footer.tagline')}</p>
                     <div className={styles.socialLinks}>
-                        <motion.a href="#" target="_blank" rel="noopener noreferrer" className={styles.socialLink} variants={buttonHover} whileHover="hover" whileTap="tap"><FaLinkedin /></motion.a>
-                        <motion.a href="#" target="_blank" rel="noopener noreferrer" className={styles.socialLink} variants={buttonHover} whileHover="hover" whileTap="tap"><FaTwitter /></motion.a>
-                        <motion.a href="#" target="_blank" rel="noopener noreferrer" className={styles.socialLink} variants={buttonHover} whileHover="hover" whileTap="tap"><FaGithub /></motion.a>
+                        <motion.a href="#" target="_blank" rel="noopener noreferrer" className={styles.socialLink} variants={buttonHover} whileHover="hover" whileTap="tap">
+                            <FaLinkedin />
+                        </motion.a>
+                        <motion.a href="#" target="_blank" rel="noopener noreferrer" className={styles.socialLink} variants={buttonHover} whileHover="hover" whileTap="tap">
+                            <FaTwitter />
+                        </motion.a>
+                        <motion.a href="#" target="_blank" rel="noopener noreferrer" className={styles.socialLink} variants={buttonHover} whileHover="hover" whileTap="tap">
+                            <FaGithub />
+                        </motion.a>
                     </div>
                 </div>
 
@@ -94,7 +100,7 @@ const Footer = () => {
             <div className={styles.footerBottom}>
                 <div className={styles.container}>
                     <p className={styles.copyrightText}>
-                        © {new Date().getFullYear()} CareerFlow AI. All rights reserved.
+                        {new Date().getFullYear()} {t('footer.copyright')}
                     </p>
                 </div>
             </div>
