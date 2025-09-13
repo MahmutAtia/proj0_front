@@ -10,6 +10,7 @@ import { Dialog } from 'primereact/dialog';
 import { useSession } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
 import api from '@/lib/axios';
+ import { PolarEmbedCheckout } from '@polar-sh/checkout/embed';
 
 const PlansPage = () => {
     const { data: session } = useSession();
@@ -25,6 +26,7 @@ const PlansPage = () => {
 
     useEffect(() => {
         setMounted(true);
+        PolarEmbedCheckout.init();
         fetchPlans();
         if (session?.accessToken) {
             fetchCurrentSubscription();
@@ -75,47 +77,82 @@ const PlansPage = () => {
         }
     };
 
-    const handleSubscribe = async (planId) => {
-        if (!session?.accessToken) {
-            showToast('warn', 'Authentication Required', 'Please log in to subscribe to a plan');
-            return;
-        }
 
-        setSubscribing(planId);
+const handleSubscribe = async (planId, isFree = false) => {
+    if (!session?.accessToken) {
+        showToast('warn', 'Authentication Required', 'Please log in to subscribe to a plan');
+        return;
+    }
 
-        try {
+    setSubscribing(planId);
+
+    try {
+        const isReactivating = currentSubscription?.is_canceling && currentSubscription?.plan?.id === planId;
+
+        if (isReactivating) {
+            // Handle reactivation logic here, assuming it's similar to a free subscription for the backend
             const response = await api.post(`/api/subscribe/`, {
                 plan_id: planId,
-                variant: 'dummy'
             });
-
             if (response.data.success) {
-                let severity = 'success';
-                let summary = 'Success';
-                let detail = response.data.message;
-
-                if (response.data.already_subscribed) {
-                    severity = 'info';
-                    summary = 'Already Subscribed';
-                } else if (response.data.reactivated) {
-                    severity = 'success';
-                    summary = 'Reactivated';
-                    detail = 'Your subscription has been reactivated without additional charge!';
-                }
-
-                showToast(severity, summary, detail);
+                showToast('success', 'Subscription Reactivated', 'Your plan is active again!');
                 fetchCurrentSubscription();
             } else {
-                showToast('error', 'Subscription Failed', response.data.error || 'An error occurred');
+                showToast('error', 'Reactivation Failed', response.data.error || 'Could not reactivate subscription.');
             }
-        } catch (error) {
-            console.error('Error subscribing:', error);
-            showToast('error', 'Subscription Failed', error.response?.data?.error || 'Network error occurred');
-        } finally {
-            setSubscribing(null);
+            return; // Exit after handling reactivation
         }
-    };
 
+        if (isFree) {
+            const response = await api.post(`/api/subscribe/`, {
+                plan_id: planId,
+            });
+            if (response.data.success) {
+                showToast('success', 'Subscription Started', 'You are now on the free plan!');
+                fetchCurrentSubscription();
+            } else {
+                showToast('error', 'Subscription Failed', response.data.error || 'Could not start free subscription.');
+            }
+            return; // Exit after handling free subscription
+        }
+
+        // Handle paid plans with the new programmatic approach for the overlay
+        if (!isReactivating && !isFree) {
+            const response = await api.post(`/api/polar/create-checkout/`, {
+                plan_id: planId,
+                embed_origin: window.location.origin,
+            });
+
+            if (response.data.checkout_url) {
+                console.log('Checkout URL:', response.data.checkout_url);
+                // Programmatically create the embedded checkout
+                const checkout = await PolarEmbedCheckout.create(
+                    response.data.checkout_url,
+                    'light' // You can specify 'light' or 'dark' theme
+                );
+
+                // Optional: Add event listeners for a better user experience
+                checkout.addEventListener('success', (event) => {
+                    showToast('success', 'Purchase Successful', 'Your subscription is now active!');
+                    fetchCurrentSubscription();
+                });
+
+                checkout.addEventListener('close', (event) => {
+                    // The user closed the checkout, you might want to log this or reset state
+                    console.log("Checkout was closed by the user.");
+                });
+
+            } else {
+                showToast('error', 'Subscription Failed', response.data.error || 'Could not create checkout session.');
+            }
+        }
+    } catch (error) {
+        console.error('Error subscribing:', error);
+        showToast('error', 'Subscription Failed', error.response?.data?.error || 'Network error occurred');
+    } finally {
+        setSubscribing(null);
+    }
+};
     const handleCancelSubscription = async (immediate = false) => {
         if (!session?.accessToken) return;
 
@@ -371,7 +408,7 @@ const PlansPage = () => {
                                             className="w-full"
                                             severity={isPopular ? 'info' : (isFree ? 'success' : 'primary')}
                                             loading={subscribing === plan.id}
-                                            onClick={() => handleSubscribe(plan.id)}
+                                            onClick={() => handleSubscribe(plan.id, isFree)}
                                         />
                                     )}
                                 </div>
