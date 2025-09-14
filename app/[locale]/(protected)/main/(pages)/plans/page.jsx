@@ -7,10 +7,13 @@ import { Toast } from 'primereact/toast';
 import { ProgressSpinner } from 'primereact/progressspinner';
 import { Divider } from 'primereact/divider';
 import { Dialog } from 'primereact/dialog';
+import { Dropdown } from 'primereact/dropdown';
+import { InputTextarea } from 'primereact/inputtextarea';
 import { useSession } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
 import api from '@/lib/axios';
- import { PolarEmbedCheckout } from '@polar-sh/checkout/embed';
+import { PolarEmbedCheckout } from '@polar-sh/checkout/embed';
+
 
 const PlansPage = () => {
     const { data: session } = useSession();
@@ -23,6 +26,22 @@ const PlansPage = () => {
     const [cancelDialog, setCancelDialog] = useState(false);
     const [canceling, setCanceling] = useState(false);
     const [mounted, setMounted] = useState(false);
+    const [reactivating, setReactivating] = useState(false);
+    
+    // New states for the cancellation flow
+    const [cancelStep, setCancelStep] = useState(1);
+    const [cancelReason, setCancelReason] = useState(null);
+    const [cancelComment, setCancelComment] = useState('');
+
+    const cancellationReasons = [
+        { label: 'It\'s too expensive', value: 'too_expensive' },
+        { label: 'I\'m missing some features', value: 'missing_features' },
+        { label: 'I switched to another service', value: 'switched_service' },
+        { label: 'I\'m not using it enough', value: 'unused' },
+        { label: 'I\'m not happy with the quality', value: 'low_quality' },
+        { label: 'It\'s too complicated to use', value: 'too_complex' },
+        { label: 'Other', value: 'other' },
+    ];
 
     useEffect(() => {
         setMounted(true);
@@ -78,7 +97,7 @@ const PlansPage = () => {
     };
 
 
-const handleSubscribe = async (planId, isFree = false) => {
+const handleSubscribe = async (planId) => {
     if (!session?.accessToken) {
         showToast('warn', 'Authentication Required', 'Please log in to subscribe to a plan');
         return;
@@ -87,72 +106,64 @@ const handleSubscribe = async (planId, isFree = false) => {
     setSubscribing(planId);
 
     try {
-        const isReactivating = currentSubscription?.is_canceling && currentSubscription?.plan?.id === planId;
+        // Always call the single endpoint. The backend will handle if it's free or paid.
+        const response = await api.post(`/api/polar/create-checkout/`, {
+            plan_id: planId,
+        });
 
-        if (isReactivating) {
-            // Handle reactivation logic here, assuming it's similar to a free subscription for the backend
-            const response = await api.post(`/api/subscribe/`, {
-                plan_id: planId,
-            });
-            if (response.data.success) {
-                showToast('success', 'Subscription Reactivated', 'Your plan is active again!');
+        // Handle successful free subscription or reactivation from the backend
+        if (response.data.is_free) {
+            showToast('success', 'Subscription Active', response.data.message || 'Your plan has been activated!');
+            fetchCurrentSubscription();
+        }
+        // Handle paid subscription by creating the checkout embed
+        else if (response.data.checkout_url) {
+                        console.log(response.data);
+
+            const checkout = await PolarEmbedCheckout.create(
+                response.data.checkout_url,
+                'light'
+            );
+
+            checkout.addEventListener('success', (event) => {
+                showToast('success', 'Purchase Successful', 'Your subscription is now active!');
                 fetchCurrentSubscription();
-            } else {
-                showToast('error', 'Reactivation Failed', response.data.error || 'Could not reactivate subscription.');
-            }
-            return; // Exit after handling reactivation
-        }
-
-        if (isFree) {
-            const response = await api.post(`/api/subscribe/`, {
-                plan_id: planId,
-            });
-            if (response.data.success) {
-                showToast('success', 'Subscription Started', 'You are now on the free plan!');
-                fetchCurrentSubscription();
-            } else {
-                showToast('error', 'Subscription Failed', response.data.error || 'Could not start free subscription.');
-            }
-            return; // Exit after handling free subscription
-        }
-
-        // Handle paid plans with the new programmatic approach for the overlay
-        if (!isReactivating && !isFree) {
-            const response = await api.post(`/api/polar/create-checkout/`, {
-                plan_id: planId,
-                embed_origin: window.location.origin,
             });
 
-            if (response.data.checkout_url) {
-                console.log('Checkout URL:', response.data.checkout_url);
-                // Programmatically create the embedded checkout
-                const checkout = await PolarEmbedCheckout.create(
-                    response.data.checkout_url,
-                    'light' // You can specify 'light' or 'dark' theme
-                );
-
-                // Optional: Add event listeners for a better user experience
-                checkout.addEventListener('success', (event) => {
-                    showToast('success', 'Purchase Successful', 'Your subscription is now active!');
-                    fetchCurrentSubscription();
-                });
-
-                checkout.addEventListener('close', (event) => {
-                    // The user closed the checkout, you might want to log this or reset state
-                    console.log("Checkout was closed by the user.");
-                });
-
-            } else {
-                showToast('error', 'Subscription Failed', response.data.error || 'Could not create checkout session.');
-            }
+            checkout.addEventListener('close', (event) => {
+                console.log("Checkout was closed by the user.");
+            });
+        } else {
+            // Handle any other case as an error
+            showToast('error', 'Subscription Failed', response.data.error || 'Could not process subscription.');
         }
+
     } catch (error) {
         console.error('Error subscribing:', error);
-        showToast('error', 'Subscription Failed', error.response?.data?.error || 'Network error occurred');
+        showToast('error', 'Subscription Failed', error.response?.data?.error || 'A network error occurred.');
     } finally {
         setSubscribing(null);
     }
 };
+
+    const handleReactivateSubscription = async () => {
+        if (!session?.accessToken) return;
+
+        setReactivating(true);
+        try {
+            const response = await api.post(`/api/reactivate/`);
+            if (response.data.success) {
+                showToast('success', 'Subscription Reactivated', 'Your subscription will now auto-renew.');
+                fetchCurrentSubscription(); // Refresh subscription state
+            }
+        } catch (error) {
+            console.error('Error reactivating subscription:', error);
+            showToast('error', 'Reactivation Failed', error.response?.data?.error || 'Failed to reactivate subscription');
+        } finally {
+            setReactivating(false);
+        }
+    };
+
     const handleCancelSubscription = async (immediate = false) => {
         if (!session?.accessToken) return;
 
@@ -160,17 +171,15 @@ const handleSubscribe = async (planId, isFree = false) => {
 
         try {
             const response = await api.post(`/api/cancel/`, {
-                immediate: immediate
+                immediate: immediate,
+                reason: cancelReason,
+                comment: cancelComment,
             });
 
             if (response.data.success) {
-                const message = immediate
-                    ? 'Subscription canceled immediately'
-                    : 'Subscription will end at the current billing period';
-
-                showToast('success', 'Subscription Canceled', message);
+                showToast('success', 'Subscription Canceled', response.data.message);
                 fetchCurrentSubscription();
-                setCancelDialog(false);
+                closeCancelDialog();
             }
         } catch (error) {
             console.error('Error canceling subscription:', error);
@@ -178,6 +187,16 @@ const handleSubscribe = async (planId, isFree = false) => {
         } finally {
             setCanceling(false);
         }
+    };
+
+    const closeCancelDialog = () => {
+        setCancelDialog(false);
+        // Reset state for next time
+        setTimeout(() => {
+            setCancelStep(1);
+            setCancelReason(null);
+            setCancelComment('');
+        }, 300);
     };
 
     const isCurrentPlan = (planId) => {
@@ -293,7 +312,8 @@ const handleSubscribe = async (planId, isFree = false) => {
                                         label="Reactivate"
                                         severity="success"
                                         size="small"
-                                        onClick={() => handleSubscribe(currentSubscription.plan.id)}
+                                        loading={reactivating}
+                                        onClick={handleReactivateSubscription}
                                     />
                                 ) : (
                                     <Button
@@ -408,7 +428,7 @@ const handleSubscribe = async (planId, isFree = false) => {
                                             className="w-full"
                                             severity={isPopular ? 'info' : (isFree ? 'success' : 'primary')}
                                             loading={subscribing === plan.id}
-                                            onClick={() => handleSubscribe(plan.id, isFree)}
+                                            onClick={() => handleSubscribe(plan.id)}
                                         />
                                     )}
                                 </div>
@@ -503,50 +523,91 @@ const handleSubscribe = async (planId, isFree = false) => {
             <Dialog
                 header="Cancel Subscription"
                 visible={cancelDialog}
-                onHide={() => setCancelDialog(false)}
+                onHide={closeCancelDialog}
                 style={{ width: '500px' }}
                 modal
+                footer={
+                    cancelStep === 2 ? (
+                        <div>
+                            <Button label="Back" icon="pi pi-arrow-left" text onClick={() => setCancelStep(1)} />
+                            <Button 
+                                label="Confirm Cancellation" 
+                                icon="pi pi-check" 
+                                severity="warning" 
+                                loading={canceling}
+                                onClick={() => handleCancelSubscription(false)} 
+                                disabled={!cancelReason}
+                            />
+                        </div>
+                    ) : null
+                }
             >
-                <div className="text-center mb-4">
-                    <i className="pi pi-exclamation-triangle text-orange-500 text-6xl mb-4"></i>
-                    <h4 className="text-xl mb-3">Cancel Your Subscription?</h4>
-                    <p className="text-600 line-height-3">
-                        Choose how you&apos;d like to cancel your subscription. You can always reactivate it later.
-                    </p>
-                </div>
+                {cancelStep === 1 && (
+                    <div>
+                        <div className="text-center mb-4">
+                            <i className="pi pi-exclamation-triangle text-orange-500 text-6xl mb-4"></i>
+                            <h4 className="text-xl mb-3">Are you sure?</h4>
+                            <p className="text-600 line-height-3">
+                                How would you like to proceed with your cancellation?
+                            </p>
+                        </div>
+                        <div className="flex flex-column gap-3">
+                            <Button
+                                label="Cancel at Period End"
+                                tooltip="We'll ask for brief feedback on the next step."
+                                tooltipOptions={{ position: 'bottom' }}
+                                icon="pi pi-calendar"
+                                className="w-full"
+                                severity="warning"
+                                onClick={() => setCancelStep(2)}
+                            />
+                            <Button
+                                label="Nevermind, Keep My Plan"
+                                icon="pi pi-heart"
+                                className="w-full"
+                                severity="secondary"
+                                outlined
+                                onClick={closeCancelDialog}
+                            />
+                        </div>
+                    </div>
+                )}
 
-                <div className="flex flex-column gap-3">
-                    <Button
-                        label="Cancel at Period End"
-                        icon="pi pi-calendar"
-                        className="w-full"
-                        severity="warning"
-                        loading={canceling}
-                        onClick={() => handleCancelSubscription(false)}
-                    />
-                    <Button
-                        label="Cancel Immediately"
-                        icon="pi pi-times"
-                        className="w-full"
-                        severity="danger"
-                        loading={canceling}
-                        onClick={() => handleCancelSubscription(true)}
-                    />
-                    <Button
-                        label="Keep My Subscription"
-                        icon="pi pi-heart"
-                        className="w-full"
-                        severity="secondary"
-                        outlined
-                        onClick={() => setCancelDialog(false)}
-                    />
-                </div>
-
-                <div className="text-center mt-4">
-                    <small className="text-600">
-                        💡 You can reactivate your subscription anytime before it expires without any additional charges.
-                    </small>
-                </div>
+                {cancelStep === 2 && (
+                    <div>
+                        <div className="text-center mb-4">
+                            <i className="pi pi-comment text-blue-500 text-5xl mb-4"></i>
+                            <h4 className="text-xl mb-3">We're sad to see you go!</h4>
+                            <p className="text-600 line-height-3">
+                                Please share why you're canceling. Your feedback is vital for us to improve.
+                            </p>
+                        </div>
+                        <div className="flex flex-column gap-4">
+                            <div className="flex flex-column gap-2">
+                                <label htmlFor="cancelReason">Primary reason for canceling</label>
+                                <Dropdown
+                                    id="cancelReason"
+                                    value={cancelReason}
+                                    options={cancellationReasons}
+                                    onChange={(e) => setCancelReason(e.value)}
+                                    placeholder="Select a reason"
+                                    className="w-full"
+                                />
+                            </div>
+                            <div className="flex flex-column gap-2">
+                                <label htmlFor="cancelComment">Any other feedback? (Optional)</label>
+                                <InputTextarea
+                                    id="cancelComment"
+                                    value={cancelComment}
+                                    onChange={(e) => setCancelComment(e.target.value)}
+                                    rows={3}
+                                    className="w-full"
+                                    autoResize
+                                />
+                            </div>
+                        </div>
+                    </div>
+                )}
             </Dialog>
         </div>
     );
