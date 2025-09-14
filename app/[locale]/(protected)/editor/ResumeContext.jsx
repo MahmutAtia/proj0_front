@@ -51,7 +51,10 @@ export const ResumeProvider = ({ children, initialData }) => {
                 newData[section] = [];
             }
             if (Array.isArray(newData[section])) {
-                newData[section].push({ id: uuidv4(), ...getDefaultItem(section) });
+                const newItem = getDefaultItem(section);
+                // Add a unique ID for drag-and-drop
+                newItem.id = `${section}-${crypto.randomUUID()}`; 
+                newData[section].push(newItem);
             }
             return newData;
         });
@@ -76,8 +79,31 @@ export const ResumeProvider = ({ children, initialData }) => {
         });
     };
 
+
+
+    const moveSectionItem = (section, index, direction) => {
+        setData((prevData) => {
+            const newData = { ...prevData };
+            const items = Array.from(newData[section]);
+            const item = items[index];
+
+            const newIndex = direction === 'up' ? index - 1 : index + 1;
+
+            if (newIndex < 0 || newIndex >= items.length) {
+                return prevData; // Invalid move
+            }
+
+            items.splice(index, 1);
+            items.splice(newIndex, 0, item);
+
+            newData[section] = items;
+            return newData;
+        });
+    };
+
     const getDefaultItem = (section) => {
-        return defaultItems[section] || {};
+        const defaultItem = defaultSections[section] || {};
+        return defaultItem;
     };
 
 
@@ -88,12 +114,12 @@ export const ResumeProvider = ({ children, initialData }) => {
                 data,
                 setData,
                 editMode,
-                setEditMode,
                 toggleEditMode,
                 addSectionItem,
                 removeSectionItem,
+                moveSectionItem,
                 getDefaultItem,
-                defaultSections, // Provide default sections to the context
+                defaultSections,
             }}
         >
             {children}

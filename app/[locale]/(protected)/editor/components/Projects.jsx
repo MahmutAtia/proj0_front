@@ -9,7 +9,7 @@ import './styles.css';
 
 const Projects = ({ sectionKey }) => {
     const toast = useRef(null);
-    const { data, setData, toggleEditMode, editMode, removeSectionItem } = useResume();
+    const { data, setData, toggleEditMode, editMode, removeSectionItem, addSectionItem, moveSectionItem } = useResume();
     const projects = data[sectionKey] || [];
     const historyRef = useRef([]);
     const firstItemRef = useRef(null);
@@ -118,7 +118,7 @@ const Projects = ({ sectionKey }) => {
         >
             {projects.map((project, index) => (
                 <ItemWrapper
-                    key={index}
+                    key={project.id || index}
                     itemRef={index === 0
                         ? firstItemRef
                         : index === projects.length - 1
@@ -133,9 +133,11 @@ const Projects = ({ sectionKey }) => {
                     canUndo={historyRef.current.length > 0}
                     onAIUpdate={(updatedData) => handleAIUpdate(index, updatedData)}
                     sectionData={project}
-                    sectionTitle={sectionKey.split('_').map(word =>
-                        word.charAt(0).toUpperCase() + word.slice(1)
-                    ).join(' ')}
+                    sectionTitle="Projects"
+                    onMoveUp={() => moveSectionItem(sectionKey, index, 'up')}
+                    onMoveDown={() => moveSectionItem(sectionKey, index, 'down')}
+                    isFirst={index === 0}
+                    isLast={index === projects.length - 1}
                     editContent={
                         <div className="flex flex-column gap-3">
                             <InputText

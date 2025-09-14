@@ -7,12 +7,11 @@ import { Button } from 'primereact/button';
 import { useResume } from '../ResumeContext';
 import SectionWrapper from './SectionWrapper';
 import ItemWrapper from './ItemWrapper';
-import ArrowIndicator from './ArrowIndicator';
 import './styles.css';
 
 const Experience = ({ sectionKey }) => {
     const toast = useRef(null);
-    const { data, setData, toggleEditMode, editMode, removeSectionItem } = useResume();
+    const { data, setData, toggleEditMode, editMode, removeSectionItem, addSectionItem, moveSectionItem } = useResume();
     const experiences = data[sectionKey] || [];
     const historyRef = useRef([]);
     const firstItemRef = useRef(null);
@@ -35,7 +34,7 @@ const Experience = ({ sectionKey }) => {
 
     const addExperience = () => {
         const newIndex = experiences.length;
-        const newExperience = {
+        addSectionItem(sectionKey, {
             company: '',
             title: '',
             start_date: '',
@@ -43,12 +42,9 @@ const Experience = ({ sectionKey }) => {
             location: '',
             description: '',
             technologies: []
-        };
-        const newData = { ...data };
-        newData[sectionKey] = [...experiences, newExperience];
-        setData(newData);
+        });
         setNewItemIndex(newIndex);
-        toggleItemEditMode(experiences.length);
+        toggleEditMode(sectionKey, newIndex);
 
         setTimeout(() => {
             lastItemRef.current?.scrollIntoView({
@@ -148,14 +144,15 @@ const Experience = ({ sectionKey }) => {
     };
 
     return (<SectionWrapper
-        title="Experience" onAdd={addExperience} toast={toast}
+        title="Experience" 
+        onAdd={addExperience} 
+        toast={toast}
+        sectionKey={sectionKey}
         className="scroll-mt-[120px] pt-4"
     >
         {experiences.map((exp, index) => (
-
-
             <ItemWrapper
-                key={index}
+                key={exp.id || index}
                 itemRef={index === 0
                     ? firstItemRef
                     : index === experiences.length - 1
@@ -170,9 +167,11 @@ const Experience = ({ sectionKey }) => {
                 canUndo={historyRef.current.length > 0}
                 onAIUpdate={(updatedData) => handleAIUpdate(index, updatedData)}
                 sectionData={exp}
-                sectionTitle={sectionKey.split('_').map(word =>
-                    word.charAt(0).toUpperCase() + word.slice(1)
-                ).join(' ')}
+                sectionTitle="Experience"
+                onMoveUp={() => moveSectionItem(sectionKey, index, 'up')}
+                onMoveDown={() => moveSectionItem(sectionKey, index, 'down')}
+                isFirst={index === 0}
+                isLast={index === experiences.length - 1}
                 editContent={
                     <div className="flex flex-column gap-3">
                         <InputText

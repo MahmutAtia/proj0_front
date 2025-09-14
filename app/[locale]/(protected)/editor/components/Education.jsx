@@ -10,7 +10,7 @@ import './styles.css';
 
 const Education = ({ sectionKey }) => {
     const toast = useRef(null);
-    const { data, setData, toggleEditMode, editMode, removeSectionItem } = useResume();
+    const { data, setData, toggleEditMode, editMode, removeSectionItem, addSectionItem, moveSectionItem } = useResume();
     const education = data[sectionKey] || [];
     const historyRef = useRef([]);
     const firstItemRef = useRef(null);
@@ -27,7 +27,7 @@ const Education = ({ sectionKey }) => {
 
     const addEducation = () => {
         const newIndex = education.length;
-        const newEducation = {
+        addSectionItem(sectionKey, {
             institution: '',
             degree: '',
             major: '',
@@ -35,12 +35,9 @@ const Education = ({ sectionKey }) => {
             graduation_date: '',
             gpa: '',
             relevant_courses: []
-        };
-        const newData = { ...data };
-        newData[sectionKey] = [...education, newEducation];
-        setData(newData);
+        });
         setNewItemIndex(newIndex);
-        toggleEditMode(sectionKey, education.length);
+        toggleEditMode(sectionKey, newIndex);
 
         setTimeout(() => {
             lastItemRef.current?.scrollIntoView({
@@ -151,11 +148,12 @@ const Education = ({ sectionKey }) => {
             title="Education"
             onAdd={addEducation}
             toast={toast}
+            sectionKey={sectionKey}
             className="scroll-mt-[100px]"
         >
             {education.map((edu, index) => (
                 <ItemWrapper
-                    key={index}
+                    key={edu.id || index}
                     itemRef={index === 0
                         ? firstItemRef
                         : index === education.length - 1
@@ -170,9 +168,11 @@ const Education = ({ sectionKey }) => {
                     canUndo={historyRef.current.length > 0}
                     onAIUpdate={(updatedData) => handleAIUpdate(index, updatedData)}
                     sectionData={edu}
-                    sectionTitle={sectionKey.split('_').map(word =>
-                        word.charAt(0).toUpperCase() + word.slice(1)
-                    ).join(' ')}
+                    sectionTitle="Education"
+                    onMoveUp={() => moveSectionItem(sectionKey, index, 'up')}
+                    onMoveDown={() => moveSectionItem(sectionKey, index, 'down')}
+                    isFirst={index === 0}
+                    isLast={index === education.length - 1}
                     editContent={
                         <div className="flex flex-column gap-3">
                             <InputText

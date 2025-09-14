@@ -18,7 +18,7 @@ const ARRAY_FIELDS = [
 
 const GenericSection = ({ sectionKey }) => {
     const toast = useRef(null);
-    const { data, setData, editMode, toggleEditMode, removeSectionItem, getDefaultItem } = useResume();
+    const { data, setData, editMode, toggleEditMode, removeSectionItem, addSectionItem, moveSectionItem, getDefaultItem } = useResume();
     const items = Array.isArray(data[sectionKey]) ? data[sectionKey] : [];
     const [newItemIndex, setNewItemIndex] = useState(null);
     const firstItemRef = useRef(null);
@@ -343,7 +343,7 @@ const GenericSection = ({ sectionKey }) => {
         ).join(' ')} onAdd={addItem} toast={toast}>
             {items.map((item, index) => (
                 <ItemWrapper
-                    key={index}
+                    key={item.id || index}
                     sectionTitle={sectionKey.split('_').map(word =>
                         word.charAt(0).toUpperCase() + word.slice(1)
                     ).join(' ')}
@@ -355,7 +355,10 @@ const GenericSection = ({ sectionKey }) => {
                     onAIUpdate={(updatedData) => handleAIUpdate(index, updatedData)}
                     canUndo={historyRef.current[index]?.length > 0} sectionData={item}
                     onDelete={() => handleDelete(index)}
-
+                    onMoveUp={() => moveSectionItem(sectionKey, index, 'up')}
+                    onMoveDown={() => moveSectionItem(sectionKey, index, 'down')}
+                    isFirst={index === 0}
+                    isLast={index === items.length - 1}
                     editContent={
                         <div className="flex flex-column gap-3">
                             {renderFields(item, index)}
