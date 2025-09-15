@@ -426,7 +426,7 @@ const handlePlanAction = async (planId) => {
                                     <Divider className="my-4" />
 
                                     <div className="mb-5 flex-grow-1">
-                                        <h4 className="font-semibold mb-4 text-center text-800">What's Included:</h4>
+                                        <h4 className="font-semibold mb-4 text-center text-800">What&apos;s Included:</h4>
                                         <ul className="list-none p-0 m-0">
                                             {planFeatures.map((feature, index) => (
                                                 <li key={index} className="flex align-items-start mb-3">
@@ -574,9 +574,9 @@ const handlePlanAction = async (planId) => {
                     <div>
                         <div className="text-center mb-4">
                             <i className="pi pi-comment text-blue-500 text-5xl mb-4"></i>
-                            <h4 className="text-xl mb-3">We're sad to see you go!</h4>
+                            <h4 className="text-xl mb-3">We&apos;re sad to see you go!</h4>
                             <p className="text-600 line-height-3">
-                                Please share why you're canceling. Your feedback is vital for us to improve.
+                                Please share why you&apos;re canceling. Your feedback is vital for us to improve.
                             </p>
                         </div>
                         <div className="flex flex-column gap-4">
