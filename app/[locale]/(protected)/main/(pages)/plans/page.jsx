@@ -97,50 +97,42 @@ const PlansPage = () => {
     };
 
 
-const handleSubscribe = async (planId) => {
+const handlePlanAction = async (planId) => {
     if (!session?.accessToken) {
-        showToast('warn', 'Authentication Required', 'Please log in to subscribe to a plan');
+        showToast('warn', 'Authentication Required', 'Please log in to manage plans');
         return;
     }
 
     setSubscribing(planId);
 
     try {
-        // Always call the single endpoint. The backend will handle if it's free or paid.
-        const response = await api.post(`/api/polar/create-checkout/`, {
-            plan_id: planId,
-        });
-
-        // Handle successful free subscription or reactivation from the backend
-        if (response.data.is_free) {
-            showToast('success', 'Subscription Active', response.data.message || 'Your plan has been activated!');
+        // Case 1: User has an active subscription and is changing to a DIFFERENT plan
+        if (currentSubscription?.has_subscription && !isCurrentPlan(planId)) {
+            const response = await api.post(`/api/update-plan/`, { new_plan_id: planId });
+            showToast('success', 'Plan Updated', response.data.message);
             fetchCurrentSubscription();
         }
-        // Handle paid subscription by creating the checkout embed
-        else if (response.data.checkout_url) {
-                        console.log(response.data);
-
-            const checkout = await PolarEmbedCheckout.create(
-                response.data.checkout_url,
-                'light'
-            );
-
-            checkout.addEventListener('success', (event) => {
-                showToast('success', 'Purchase Successful', 'Your subscription is now active!');
-                fetchCurrentSubscription();
-            });
-
-            checkout.addEventListener('close', (event) => {
-                console.log("Checkout was closed by the user.");
-            });
-        } else {
-            // Handle any other case as an error
-            showToast('error', 'Subscription Failed', response.data.error || 'Could not process subscription.');
+        // Case 2: User has a canceling subscription and is reactivating it
+        else if (currentSubscription?.is_canceling && isCurrentPlan(planId)) {
+            await handleReactivateSubscription();
         }
+        // Case 3: User has no subscription, create a new one
+        else {
+            const response = await api.post(`/api/polar/create-checkout/`, { plan_id: planId });
 
+            if (response.data.checkout_url) {
+                const checkout = await PolarEmbedCheckout.create(response.data.checkout_url, 'light');
+                checkout.addEventListener('success', () => {
+                    showToast('success', 'Purchase Successful', 'Your subscription is now active!');
+                    fetchCurrentSubscription();
+                });
+            } else {
+                showToast('error', 'Subscription Failed', response.data.error || 'Could not process subscription.');
+            }
+        }
     } catch (error) {
-        console.error('Error subscribing:', error);
-        showToast('error', 'Subscription Failed', error.response?.data?.error || 'A network error occurred.');
+        console.error('Error performing plan action:', error);
+        showToast('error', 'Action Failed', error.response?.data?.error || 'A network error occurred.');
     } finally {
         setSubscribing(null);
     }
@@ -471,7 +463,7 @@ const handleSubscribe = async (planId) => {
                                                 iconPos="right"
                                                 className={`w-full ${isPopular ? 'p-button-primary' : 'p-button-outlined p-button-primary'}`}
                                                 loading={subscribing === plan.id}
-                                                onClick={() => handleSubscribe(plan.id)}
+                                                onClick={() => handlePlanAction(plan.id)}
                                             />
                                         )}
                                     </div>
