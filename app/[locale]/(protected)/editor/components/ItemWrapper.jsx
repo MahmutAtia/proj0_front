@@ -17,7 +17,11 @@ const ItemWrapper = ({
     editContent,
     viewContent,
     itemRef,
-    isNewItem
+    isNewItem,
+    onMoveUp,
+    onMoveDown,
+    isFirst,
+    isLast
 }) => {
     const [showDeleteDialog, setShowDeleteDialog] = useState(false);
     const [aiPrompt, setAiPrompt] = useState('');
@@ -49,22 +53,43 @@ const ItemWrapper = ({
     );
 
     return (
-        <div ref={itemRef} className={`relative scroll-mt-[100px] ${isNewItem ? 'animate-fadeIn' : ''}`}>
-            <div className="surface-card p-3 border-1 surface-border border-round shadow-1 hover:shadow-3 transition-shadow">
+        <div
+            ref={itemRef}
+            className={`relative scroll-mt-[100px] ${isNewItem ? 'animate-fadeIn' : ''}`}
+        >
+            <div className={`surface-card p-3 border-1 surface-border border-round shadow-1 hover:shadow-3 transition-shadow`}>
                 <ConfirmDialog />
                 <div className="flex justify-content-between align-items-center mb-3">
-                    <Button
-                        icon="pi pi-pencil"
-                        className="p-button-rounded p-button-text"
-                        onClick={onEdit}
-                        tooltip="Edit Section"
-                    />
-                    <Button
-                        icon="pi pi-trash"
-                        className="p-button-rounded p-button-danger p-button-text"
-                        onClick={() => setShowDeleteDialog(true)}
-                        tooltip="Delete Section"
-                    />
+                    <div className="flex align-items-center">
+                        <Button
+                            icon="pi pi-pencil"
+                            className="p-button-rounded p-button-text"
+                            onClick={onEdit}
+                            tooltip="Edit Section"
+                        />
+                    </div>
+                    <div className="flex align-items-center gap-1">
+                         <Button
+                            icon="pi pi-arrow-up"
+                            className="p-button-rounded p-button-text p-button-secondary"
+                            onClick={onMoveUp}
+                            disabled={isFirst}
+                            tooltip="Move Up"
+                        />
+                        <Button
+                            icon="pi pi-arrow-down"
+                            className="p-button-rounded p-button-text p-button-secondary"
+                            onClick={onMoveDown}
+                            disabled={isLast}
+                            tooltip="Move Down"
+                        />
+                        <Button
+                            icon="pi pi-trash"
+                            className="p-button-rounded p-button-danger p-button-text"
+                            onClick={() => setShowDeleteDialog(true)}
+                            tooltip="Delete Section"
+                        />
+                    </div>
                 </div>
 
                 {viewContent}
@@ -84,8 +109,6 @@ const ItemWrapper = ({
                             <div className="flex flex-column gap-3">
                                 {editContent}
                             </div>
-
-
                         </div>
 
                         {/* Sticky AI Assistant and Undo Button at the Bottom */}

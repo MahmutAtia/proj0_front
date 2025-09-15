@@ -2,7 +2,7 @@ import React from 'react';
 import { Button } from 'primereact/button';
 import { Toast } from 'primereact/toast';
 
-const SectionWrapper = ({ title, onAdd, children, toast }) => {
+const SectionWrapper = ({ title, onAdd, children, toast, sectionKey }) => {
     return (
         <div className="surface-card p-4 border-round-xl shadow-2">
             <Toast ref={toast} />
