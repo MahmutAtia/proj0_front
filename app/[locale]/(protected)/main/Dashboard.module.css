@@ -1,8 +1,9 @@
-/* Layout container - prevent global scrolling */
+/* Replace the existing styles with these modern updates */
+
+/* Layout container - modern background */
 .dashboardLayout {
-    background-color: var(--surface-ground);
-    height: 100vh; /* Full viewport height */
-    overflow: hidden; /* Prevent global scrolling */
+    height: 100vh;
+    overflow: hidden;
     display: flex;
 }
 
@@ -16,19 +17,18 @@
     overflow: hidden; /* Prevent scrolling at this level */
 }
 
-/* Main scrollable area - the ONLY place with overflow-y: auto */
+/* Main scrollable area with modern styling */
 .mainScrollArea {
     flex: 1;
     overflow-y: auto;
-    padding: 1.5rem;
+    padding: 2.5rem;
 }
 
-/* Modern Sidebar Styling */
+/* Modern Sidebar with glass effect */
 .sidebar {
-    background-color: var(--surface-overlay);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
     transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    border-right: 1px solid var(--surface-border);
-    box-shadow: 0 4px 10px rgba(0,0,0,.03), 0 0 2px rgba(0,0,0,.06);
     z-index: 999;
     position: relative;
     height: 100vh;
@@ -42,10 +42,10 @@
     position: absolute;
     top: 0;
     left: 0;
-    width: 4px;
+    width: 3px;
     height: 100%;
-    background: linear-gradient(180deg, var(--primary-color) 0%, var(--primary-color-shade) 100%);
-    opacity: 0.7;
+    background: linear-gradient(180deg, #3b82f6 0%, #8b5cf6 100%);
+    opacity: 0.8;
 }
 
 .sidebarCollapsed {
@@ -80,57 +80,59 @@
     display: flex;
     align-items: center;
     cursor: pointer;
-    padding: 0.85rem 1.25rem;
-    border-radius: 10px;
-    color: var(--text-color-secondary);
-    transition: all 0.2s ease;
+    padding: 1rem 1.5rem;
+    border-radius: 16px;
+    color: #64748b;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     margin-bottom: 0.5rem;
-    width: calc(100% - 1.75rem);
+    width: calc(100% - 2rem);
     margin-left: auto;
     margin-right: auto;
     text-align: left;
     background-color: transparent;
     border: none;
     position: relative;
+    font-weight: 500;
 }
 
 .sidebarLink:hover {
-    background-color: rgba(var(--primary-color-rgb), 0.04);
-    color: var(--primary-color);
-    transform: translateY(-2px);
-    box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+    background: linear-gradient(135deg, rgba(59, 130, 246, 0.08) 0%, rgba(139, 92, 246, 0.08) 100%);
+    color: #3b82f6;
+    transform: translateX(4px);
+    box-shadow: 0 10px 25px -5px rgba(59, 130, 246, 0.1);
 }
 
 .sidebarLinkIcon {
     margin-right: 1rem;
     font-size: 1.25rem;
-    min-width: 20px;
+    min-width: 24px; /* Increased size */
     transition: all 0.2s;
 }
 
 .sidebarLinkText {
     font-weight: 500;
-    font-size: 0.95rem;
+    font-size: 1rem; /* Slightly larger */
     transition: all 0.2s;
 }
 
 .sidebarItemActive {
-    background: rgba(var(--primary-color-rgb), 0.08) !important;
-    color: var(--primary-700) !important;
+    background: linear-gradient(135deg, rgba(59, 130, 246, 0.12) 0%, rgba(139, 92, 246, 0.12) 100%) !important;
+    color: #1e40af !important;
     font-weight: 600;
-    box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+    box-shadow: 0 10px 25px -5px rgba(59, 130, 246, 0.15);
+    border: 1px solid rgba(59, 130, 246, 0.2);
 }
 
 .sidebarItemActive::before {
     content: '';
     position: absolute;
-    left: -7px;
+    left: -8px;
     top: 50%;
     transform: translateY(-50%);
     width: 4px;
-    height: 65%;
-    background: var(--primary-color);
-    border-radius: 0 5px 5px 0;
+    height: 70%;
+    background: linear-gradient(180deg, #3b82f6 0%, #8b5cf6 100%);
+    border-radius: 0 8px 8px 0;
 }
 
 .sidebarItemActive .sidebarLinkIcon,
@@ -141,8 +143,8 @@
 .sidebarItemActive:hover {
     background: linear-gradient(
         90deg,
-        rgba(var(--primary-color-rgb), 0.12) 0%,
-        rgba(var(--primary-color-rgb), 0.2) 100%
+        rgba(var(--primary-color-rgb), 0.15) 0%, /* Stronger gradient on hover */
+        rgba(var(--primary-color-rgb), 0.25) 100%
     ) !important;
 }
 
@@ -161,23 +163,24 @@
     align-items: center;
     justify-content: center;
     margin-right: 0.75rem;
-    color: var(--primary-color);
     transition: all 0.3s;
-    width: 40px;
-    height: 40px;
-    background: rgba(var(--primary-color-rgb), 0.1);
-    border-radius: 10px;
+    width: 48px;
+    height: 48px;
+    background: linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%);
+    border-radius: 16px;
+    box-shadow: 0 10px 25px -5px rgba(59, 130, 246, 0.3);
 }
 
 .logoIcon {
-    font-size: 1.75rem;
+    font-size: 1.5rem;
+    color: white;
 }
 
 .logoText {
-    font-size: 1.35rem;
-    font-weight: 600;
-    letter-spacing: 0.5px;
-    background: linear-gradient(120deg, var(--text-color) 0%, var(--primary-color) 100%);
+    font-size: 1.5rem;
+    font-weight: 700;
+    letter-spacing: -0.5px;
+    background: linear-gradient(135deg, #1e40af 0%, #7c3aed 100%);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
@@ -185,327 +188,208 @@
 
 /* Improved Topbar */
 .topbar {
-    background: var(--surface-card);
-    height: 70px;
-    border-bottom: 1px solid var(--surface-border);
-    padding: 0 1.75rem;
-    backdrop-filter: blur(10px);
-    -webkit-backdrop-filter: blur(10px);
-    box-shadow: 0 2px 10px rgba(0,0,0,.025);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    height: 80px;
+    padding: 0 2.5rem;
     display: flex;
     align-items: center;
 }
 
-.toggleButton {
-    width: 2.5rem;
-    height: 2.5rem;
-    transition: all 0.2s;
-    background-color: rgba(var(--primary-color-rgb), 0.05);
-    color: var(--primary-600);
-    border-radius: 8px;
-}
-
-.toggleButton:hover {
-    background-color: rgba(var(--primary-color-rgb), 0.1);
-    transform: scale(1.05);
-}
-
-.searchContainer {
+/* Modern action cards with gradients */
+.quickActionCard {
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border-radius: 24px;
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    height: 100%;
+    overflow: hidden;
     position: relative;
-    width: 100%;
-    max-width: 30rem;
+}
+
+.quickActionCard::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: linear-gradient(90deg, #3b82f6 0%, #8b5cf6 100%);
+    opacity: 0;
+    transition: opacity 0.3s;
+}
+
+.quickActionCard:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.15);
+    border-color: rgba(59, 130, 246, 0.2);
+}
+
+.quickActionCard:hover::before {
+    opacity: 1;
+}
+
+.quickActionCard .p-card-content {
+    padding: 2rem;
+}
+
+.quickActionCard .actionIcon {
+    font-size: 3rem;
+    margin-bottom: 1.5rem;
+    background: linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%);
+    color: white;
+    padding: 1.25rem;
+    border-radius: 20px;
+    display: inline-flex;
     transition: all 0.3s;
+    box-shadow: 0 10px 25px -5px rgba(59, 130, 246, 0.3);
 }
 
-.searchInput {
-    width: 100%;
-    border-radius: 20px !important;
-    background-color: var(--surface-ground) !important;
-    border-color: var(--surface-border) !important;
-    padding-left: 2.5rem !important;
-    transition: all 0.3s;
-    height: 40px;
+.quickActionCard:hover .actionIcon {
+    transform: scale(1.1) rotate(5deg);
+    box-shadow: 0 20px 40px -10px rgba(59, 130, 246, 0.4);
 }
 
-.searchInput:hover, .searchInput:focus {
-    background-color: var(--surface-section) !important;
-    border-color: var(--primary-400) !important;
-    box-shadow: 0 0 0 2px rgba(var(--primary-color-rgb), 0.1);
+/* Modern page headers with gradients */
+.pageHeader {
+    font-size: 3rem;
+    font-weight: 800;
+    background: linear-gradient(135deg, #1e293b 0%, #3b82f6 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    margin-bottom: 1rem;
+    letter-spacing: -1px;
 }
 
-.iconButton {
-    width: 40px;
-    height: 40px;
-    transition: transform 0.2s, background-color 0.2s;
+.pageSubheader {
+    font-size: 1.25rem;
+    color: #64748b;
+    margin-bottom: 3rem;
+    font-weight: 400;
+    line-height: 1.6;
+}
+
+/* Modern dashboard cards */
+.dashboardCard {
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border-radius: 24px;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    overflow: hidden;
+}
+
+.dashboardCard:hover {
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.1);
+    transform: translateY(-2px);
+}
+
+/* Modern job items */
+.jobItem {
+    padding: 1.25rem;
+    border-bottom: 1px solid rgba(148, 163, 184, 0.1);
+    transition: all 0.3s ease;
+    border-radius: 16px;
+    margin-bottom: 0.75rem;
+}
+
+.jobItem:hover {
+    background: linear-gradient(135deg, rgba(59, 130, 246, 0.03) 0%, rgba(139, 92, 246, 0.03) 100%);
+    transform: translateX(4px);
+    box-shadow: 0 4px 12px -2px rgba(59, 130, 246, 0.1);
+}
+
+.jobIconContainer {
     display: flex;
     align-items: center;
     justify-content: center;
+    width: 48px;
+    height: 48px;
+    background: linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%);
+    border-radius: 16px;
+    color: white;
+    font-size: 1.25rem;
+    flex-shrink: 0;
+    box-shadow: 0 8px 20px -5px rgba(59, 130, 246, 0.3);
 }
 
-.iconButton:hover {
-    transform: translateY(-2px);
-    background-color: var(--surface-hover) !important;
+/* Modern buttons */
+.modernButton {
+    border-radius: 16px;
+    font-weight: 600;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: 0 4px 12px -2px rgba(0, 0, 0, 0.1);
+    background: linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%);
+    border: none;
+    color: white;
 }
 
+.modernButton:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 12px 24px -4px rgba(59, 130, 246, 0.3);
+}
+
+/* Profile button with modern styling */
 .profileButton {
-    transition: all 0.2s;
-    border-radius: 12px;
-    padding: 0.35rem 1rem;
-    background-color: var(--surface-ground);
+    transition: all 0.3s;
+    border-radius: 20px;
+    padding: 0.5rem 1.25rem;
+    background: rgba(255, 255, 255, 0.9);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(148, 163, 184, 0.1);
 }
 
 .profileButton:hover {
-    background-color: var(--surface-hover);
+    background: rgba(255, 255, 255, 1);
     transform: translateY(-2px);
+    box-shadow: 0 8px 20px -5px rgba(0, 0, 0, 0.1);
 }
 
 .profileAvatar {
-    border: 2px solid var(--primary-200);
-    box-shadow: 0 0 0 2px rgba(255,255,255,0.1);
+    border: 2px solid white;
+    box-shadow: 0 4px 12px -2px rgba(59, 130, 246, 0.3);
     transition: all 0.3s;
 }
 
 .profileButton:hover .profileAvatar {
     transform: scale(1.05);
+    box-shadow: 0 8px 20px -2px rgba(59, 130, 246, 0.4);
 }
 
-/* Notification badge improvements */
-.notificationButton {
-    position: relative;
-}
-
-.notificationBadge {
-    position: absolute;
-    top: -2px;
-    right: -2px;
-    background-color: var(--primary-color);
-    color: var(--primary-color-text);
-    font-size: 0.65rem;
-    font-weight: 700;
-    padding: 0 0.35rem;
-    min-width: 1.25rem;
-    height: 1.25rem;
-    border-radius: 1.25rem;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
-
-.quickActionCard {
-    background-color: var(--surface-card);
-    border-radius: 12px;
-    transition: all 0.3s ease;
-    box-shadow: 0 2px 4px rgba(0,0,0,.05);
-    height: 100%;
-    border: none;
-    overflow: hidden;
-}
-
-.quickActionCard:hover {
-    transform: translateY(-4px);
-    box-shadow: 0 8px 15px rgba(0,0,0,.1);
-}
-
-.quickActionCard .p-card-content {
-    padding: 1.5rem;
-}
-
-.quickActionCard .actionIcon {
-    font-size: 2.5rem;
-    margin-bottom: 1.25rem;
-    color: var(--primary-color);
-    background-color: rgba(var(--primary-color-rgb), 0.1);
-    padding: 1rem;
-    border-radius: 50%;
-    display: inline-flex;
+/* Modern toggle button */
+.toggleButton {
+    width: 3rem;
+    height: 3rem;
     transition: all 0.3s;
+    background: linear-gradient(135deg, rgba(59, 130, 246, 0.1) 0%, rgba(139, 92, 246, 0.1) 100%);
+    color: #3b82f6;
+    border-radius: 16px;
+    border: 1px solid rgba(59, 130, 246, 0.2);
 }
 
-.quickActionCard:hover .actionIcon {
-    transform: scale(1.1);
-    background-color: rgba(var(--primary-color-rgb), 0.15);
+.toggleButton:hover {
+    background: linear-gradient(135deg, rgba(59, 130, 246, 0.15) 0%, rgba(139, 92, 246, 0.15) 100%);
+    transform: scale(1.05);
+    box-shadow: 0 8px 20px -5px rgba(59, 130, 246, 0.2);
 }
 
-.pageHeader {
-    font-size: 2rem;
-    font-weight: 700;
-    color: var(--text-color);
-    margin-bottom: 0.75rem;
-}
-
-.pageSubheader {
-    font-size: 1rem;
-    color: var(--text-color-secondary);
-    margin-bottom: 2.5rem;
-}
-
-.sectionTitle {
-    font-size: 1.25rem;
-    font-weight: 600;
-    color: var(--text-color);
-    margin-bottom: 1.5rem;
-    padding-bottom: 0.5rem;
-    border-bottom: 1px solid var(--surface-border);
-}
-
-.feedItem {
-    padding: 1rem 0;
-    border-bottom: 1px solid var(--surface-border);
-    transition: all 0.2s;
-}
-
-.feedItem:hover {
-    background-color: rgba(var(--primary-color-rgb), 0.02);
-}
-
-.feedItem:last-child {
-    border-bottom: none;
-    padding-bottom: 0;
-}
-
-.feedItem:first-child {
-    padding-top: 0;
-}
-
-.feedItemTitle {
-    font-weight: 600;
-    color: var(--text-color);
-    margin-bottom: 0.35rem;
-    font-size: 1rem;
-}
-
-.feedItemSubtitle {
-    font-size: 0.875rem;
-    color: var(--text-color-secondary);
-}
-
-.defaultResumeCard .p-card-content,
-.feedsColumnCard .p-card-content {
-    padding: 1.5rem;
-}
-
-.defaultResumeCard .p-card-title,
-.feedsColumnCard .p-card-title {
-    font-size: 1.25rem;
-    font-weight: 600;
-    margin-bottom: 1rem;
-    color: var(--text-color);
-}
-
-/* Card styles */
-.dashboardCard {
-    background-color: var(--surface-card);
-    border-radius: 12px;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
-    transition: all 0.3s;
-    border: none;
-}
-
-.dashboardCard:hover {
-    box-shadow: 0 4px 12px rgba(0,0,0,0.12);
-}
-
-.dashboardCardCompact {
-    padding: 1.25rem;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
-    transition: box-shadow 0.2s;
-}
-
-.dashboardCardCompact:hover {
-    box-shadow: 0 4px 12px rgba(0,0,0,0.12);
-}
-
-.noResumeCard {
-    border: 2px dashed var(--surface-300);
-    background-color: var(--surface-50);
-}
-
-.sectionTitleCompact {
-    font-size: 1.1rem;
-    font-weight: 600;
-    color: var(--text-color-secondary);
-}
-
-.relatedDocsSection {
-    padding: 1rem;
-    background-color: var(--surface-ground);
-    border-radius: var(--border-radius);
-    margin-top: 1rem;
-}
-
-.documentItem {
-    transition: background-color 0.2s;
-    cursor: pointer;
-}
-
-.documentItem:hover {
-    background-color: var(--surface-200) !important;
-}
-
-@keyframes slideInLeft {
-    from { transform: translateX(-100%); }
-    to { transform: translateX(0); }
-}
-
-@media (max-width: 991.98px) {
-    .mainContent {
-        width: 100%;
+/* Enhanced mobile responsive */
+@media (max-width: 768px) {
+    .mainScrollArea {
+        padding: 1.5rem;
     }
-    .sidebar:not(.sidebarMobileOverlay) {
-        display: none !important;
-    }
+    
     .pageHeader {
-        font-size: 1.75rem;
+        font-size: 2.25rem;
     }
-    .pageSubheader {
-        margin-bottom: 1.5rem;
+    
+    .quickActionCard .p-card-content {
+        padding: 1.5rem;
+    }
+    
+    .quickActionCard .actionIcon {
+        font-size: 2.5rem;
+        padding: 1rem;
     }
 }
 
-/* Mobile sidebar overlay */
-.sidebarMobileOverlay {
-    position: fixed;
-    left: 0;
-    top: 0;
-    height: 100vh;
-    width: 280px !important;
-    z-index: 1000;
-    animation: slideInDrawer 0.3s forwards;
-    overflow: hidden;
-    display: flex;
-    flex-direction: column;
-}
-
-@keyframes slideInDrawer {
-    from { transform: translateX(-100%); }
-    to { transform: translateX(0); }
-}
-
-/* Custom scrollbar styling - Fixed for CSS Modules */
-.sidebarScrollbar::-webkit-scrollbar,
-.mainScrollbar::-webkit-scrollbar {
-    width: 6px;
-    height: 6px;
-}
-
-.sidebarScrollbar::-webkit-scrollbar-track,
-.mainScrollbar::-webkit-scrollbar-track {
-    background: transparent;
-}
-
-.sidebarScrollbar::-webkit-scrollbar-thumb,
-.mainScrollbar::-webkit-scrollbar-thumb {
-    background: rgba(0,0,0,0.1);
-    border-radius: 10px;
-}
-
-.sidebarScrollbar::-webkit-scrollbar-thumb:hover,
-.mainScrollbar::-webkit-scrollbar-thumb:hover {
-    background: rgba(0,0,0,0.2);
-}
-
-/* Firefox */
-.sidebarScrollbar, .mainScrollbar {
-    scrollbar-width: thin;
-    scrollbar-color: rgba(0,0,0,0.1) transparent;
-}

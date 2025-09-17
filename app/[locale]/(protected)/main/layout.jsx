@@ -351,13 +351,13 @@ export default function Layout({ children }) {
 
     return (
         <DashboardContext.Provider value={contextValue}>
-            <div className={`${styles.dashboardLayout}`}>
+            <div className={`${styles.dashboardLayout} bg-gray-50`}>
                 <Toast ref={toast} />
 
                 {/* Sidebar */}
                 <div
                     ref={sidebarRef}
-                    className={`${styles.sidebar} ${sidebarCollapsed ? styles.sidebarCollapsed : ''} shadow-2 flex-shrink-0 lg:flex lg:flex-column ${mobileSidebarVisible ? styles.sidebarMobileOverlay : 'hidden'}`}
+                    className={`${styles.sidebar} surface-card shadow-3 border-right-1 surface-border ${sidebarCollapsed ? styles.sidebarCollapsed : ''} flex-shrink-0 lg:flex lg:flex-column ${mobileSidebarVisible ? styles.sidebarMobileOverlay : 'hidden'}`}
                     style={{ 
                         width: sidebarCollapsed ? '80px' : '280px',
                         transition: 'width 0.3s cubic-bezier(0.4, 0, 0.2, 1)' 
@@ -380,10 +380,7 @@ export default function Layout({ children }) {
 
                 {/* Main Content */}
                 <div
-                    className={`${styles.mainContent} ${sidebarCollapsed ? styles.mainContentExpanded : ''} flex flex-column flex-grow-1`}
-                    style={{
-                        transition: 'margin-left 0.3s cubic-bezier(0.4, 0, 0.2, 1)'
-                    }}
+                    className={`${styles.mainContent} bg-gray-50 ${sidebarCollapsed ? styles.mainContentExpanded : ''} flex flex-column flex-grow-1`}
                 >
                     <TopBar
                         session={session}
@@ -395,8 +392,7 @@ export default function Layout({ children }) {
                         mobileToggleButtonRef={mobileToggleButtonRef}
                     />
 
-                    {/* This is the ONLY scrollable main area */}
-                    <div className={`${styles.mainScrollArea} ${styles.mainScrollbar}`}>
+                    <div className={`${styles.mainScrollArea} bg-gray-50`}>
                         {loadingResumes || !isDataValid ? (
                              <div className="flex justify-content-center align-items-center h-full">
                                 <ProgressSpinner style={{ width: '50px', height: '50px' }} strokeWidth="4" />
