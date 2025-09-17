@@ -164,7 +164,11 @@ export default function Layout({ children }) {
     const [relatedDocuments, setRelatedDocuments] = useState([]);
     const [loadingResumes, setLoadingResumes] = useState(true);
     const [isDataValid, setIsDataValid] = useState(false);
-
+    useEffect(() => {
+        console.log("NEXT_PUBLIC_BACKEND_URL:", process.env.NEXT_PUBLIC_BACKEND_URL);
+        console.log("NEXT_PUBLIC_AI_API_URL:", process.env.NEXT_PUBLIC_AI_API_URL);
+        console.log("NEXT_PUBLIC_IPDATA_API_KEY:", process.env.NEXT_PUBLIC_IPDATA_API_KEY);
+    }, []);
     useEffect(() => {
         const loadInitialData = async () => {
             if (status !== 'authenticated') {
@@ -281,23 +285,21 @@ export default function Layout({ children }) {
         };
 
 
-    if (status === "loading" || loadingResumes || !isDataValid) {
+    // If session is loading or user is unauthenticated, show a full-page spinner.
+    if (status === "loading") {
         return (
             <div className="flex justify-content-center align-items-center min-h-screen surface-ground">
                 <ProgressSpinner style={{ width: '50px', height: '50px' }} strokeWidth="4" animationDuration=".5s" />
             </div>
         );
     }
-
-    // If unauthenticated, the useEffect will handle the redirect.
     if (status === "unauthenticated") {
-        // Optionally, render a loading spinner or null while redirecting
+        // The useEffect hook will handle the redirect, but we can show a spinner in the meantime.
         return (
             <div className="flex justify-content-center align-items-center min-h-screen surface-ground">
                 <ProgressSpinner style={{ width: '50px', height: '50px' }} strokeWidth="4" animationDuration=".5s" />
             </div>
         );
-        // Or simply: return null;
     }
 
     const handleSetDefaultResume = () => {
@@ -363,7 +365,13 @@ export default function Layout({ children }) {
 
                     {/* This is the ONLY scrollable main area */}
                     <div className={`${styles.mainScrollArea} ${styles.mainScrollbar}`}>
-                        {children}
+                        {loadingResumes || !isDataValid ? (
+                             <div className="flex justify-content-center align-items-center h-full">
+                                <ProgressSpinner style={{ width: '50px', height: '50px' }} strokeWidth="4" />
+                            </div>
+                        ) : (
+                            children
+                        )}
                     </div>
                 </div>
             </div>
