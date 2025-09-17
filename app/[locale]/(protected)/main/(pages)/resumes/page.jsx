@@ -274,7 +274,7 @@ const ResumeListPage = () => {
         if (currentLayout === 'list') {
             return (
                 <div className="col-12">
-                    <div className="p-4 surface-card border-1 surface-border border-round hover:shadow-3 transition-shadow transition-duration-200">
+                    <div className="p-4 surface-card shadow-2 border-1 surface-border border-round-2xl hover:shadow-4 transition-all transition-duration-300">
                         <div className={`flex flex-column xl:flex-row xl:align-items-start gap-4 ${isRTL ? 'xl:flex-row-reverse' : ''}`}>
                             <div
                                 className="flex-shrink-0 flex justify-content-center align-items-center bg-primary-50 border-round cursor-pointer"
@@ -362,7 +362,7 @@ const ResumeListPage = () => {
         if (currentLayout === 'grid') {
             return (
                 <div className="col-12 sm:col-6 md:col-4 xl:col-3 p-2">
-                    <div className="p-4 border-1 surface-border surface-card border-round h-full flex flex-column justify-content-between hover:shadow-3 transition-shadow transition-duration-200">
+                    <div className="p-4 surface-card shadow-2 border-1 surface-border border-round-2xl h-full flex flex-column justify-content-between hover:shadow-4 transition-all transition-duration-300">
                         <div onClick={() => handleViewEditResume(resume)} className="cursor-pointer">
                             <div className="flex justify-content-between align-items-start mb-3">
                                 <div className="flex-shrink-0 flex justify-content-center align-items-center bg-primary-50 border-round" style={{ width: '50px', height: '50px' }}>
@@ -444,28 +444,30 @@ const ResumeListPage = () => {
 
     const renderDataViewHeader = () => {
         return (
-            <div className={`flex flex-column md:flex-row md:justify-content-between md:align-items-center p-4 surface-section border-bottom-1 surface-border ${isRTL ? 'md:flex-row-reverse' : ''}`}>
-                <div className={`flex align-items-center ${isRTL ? 'flex-row-reverse' : ''}`}>
-                    <h1 className="m-0 text-xl font-bold text-900">{t('resumes.title')}</h1>
-                    <Button
-                        icon={<FiPlusSquare className={isRTL ? 'ml-2' : 'mr-2'}/>}
-                        label={t('resumes.createNew')}
-                        className={`p-button-primary p-button-sm ${isRTL ? 'mr-3' : 'ml-3'}`}
-                        onClick={() => setIsCreateDialogVisible(true)}
-                    />
-                </div>
-                <div className="flex align-items-center gap-2 mt-3 md:mt-0">
-                    <span className="p-input-icon-left">
-                        <i className="pi pi-search" />
-                        <InputText
-                            value={globalFilter}
-                            onChange={(e) => setGlobalFilter(e.target.value)}
-                            placeholder={t('resumes.searchPlaceholder')}
-                            className="p-inputtext-sm"
-                            style={{minWidth: '180px'}}
+            <div className="bg-primary-gradient p-4 border-round-top-2xl">
+                <div className={`flex flex-column md:flex-row md:justify-content-between md:align-items-center gap-4 ${isRTL ? 'md:flex-row-reverse' : ''}`}>
+                    <div className={`flex align-items-center ${isRTL ? 'flex-row-reverse' : ''}`}>
+                        <h1 className="m-0 text-2xl font-bold text-white">{t('resumes.title')}</h1>
+                        <Button
+                            icon={<FiPlusSquare className={isRTL ? 'ml-2' : 'mr-2'}/>}
+                            label={t('resumes.createNew')}
+                            className={`bg-white text-primary hover:bg-gray-100 border-round-lg px-4 py-2 border-none font-semibold ${isRTL ? 'mr-3' : 'ml-3'}`}
+                            onClick={() => setIsCreateDialogVisible(true)}
                         />
-                    </span>
-                    <DataViewLayoutOptions layout={layout} onChange={(e) => setLayout(e.value)} />
+                    </div>
+                    <div className="flex align-items-center gap-2">
+                        <span className="p-input-icon-left">
+                            <i className="pi pi-search" />
+                            <InputText
+                                value={globalFilter}
+                                onChange={(e) => setGlobalFilter(e.target.value)}
+                                placeholder={t('resumes.searchPlaceholder')}
+                                className="border-round-lg border-none p-3 bg-white"
+                                style={{minWidth: '180px'}}
+                            />
+                        </span>
+                        <DataViewLayoutOptions layout={layout} onChange={(e) => setLayout(e.value)} />
+                    </div>
                 </div>
             </div>
         );
@@ -513,26 +515,23 @@ const ResumeListPage = () => {
     });
 
     return (
-        <div className="p-0">
+        <div className="min-h-screen">
             <Toast ref={toast} />
             <ConfirmDialog />
-            <div className="resume-list-page-card shadow-none border-round-none md:border-round md:shadow-2">
-                <DataView
-                    value={filteredResumes}
-                    itemTemplate={resumeItemTemplate}
-                    layout={layout}
-                    header={dataviewHeader}
-                    paginator
-                    rows={layout === 'grid' ? 12 : 5}
-                    rowsPerPageOptions={layout === 'grid' ? [12, 24, 36] : [5, 10, 15]}
-                    loading={loading}
-                    emptyMessage={error ? t('errors.couldNotLoadResumes') : t('resumes.noResumesFound')}
-                    sortField="updated_at"
-                    sortOrder={-1}
-                    pt={{ header: { className: 'p-0 border-none' } }}
-                />
-            </div>
-
+            <DataView
+                value={filteredResumes}
+                itemTemplate={resumeItemTemplate}
+                layout={layout}
+                header={dataviewHeader}
+                paginator
+                rows={layout === 'grid' ? 12 : 5}
+                rowsPerPageOptions={layout === 'grid' ? [12, 24, 36] : [5, 10, 15]}
+                loading={loading}
+                emptyMessage={error ? t('errors.couldNotLoadResumes') : t('resumes.noResumesFound')}
+                sortField="updated_at"
+                sortOrder={-1}
+                className="m-0"
+            />
             <ResumeDocumentsDialog
                 visible={isDocumentsDialogVisible}
                 onHide={onHideDocumentsDialog}
