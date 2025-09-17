@@ -28,6 +28,10 @@ const PlansPage = () => {
     const [mounted, setMounted] = useState(false);
     const [reactivating, setReactivating] = useState(false);
     
+    // States for plan change confirmation dialog
+    const [planChangeDialog, setPlanChangeDialog] = useState(false);
+    const [targetPlan, setTargetPlan] = useState(null);
+    
     // New states for the cancellation flow
     const [cancelStep, setCancelStep] = useState(1);
     const [cancelReason, setCancelReason] = useState(null);
@@ -96,47 +100,61 @@ const PlansPage = () => {
         }
     };
 
-
-const handlePlanAction = async (planId) => {
-    if (!session?.accessToken) {
-        showToast('warn', 'Authentication Required', 'Please log in to manage plans');
-        return;
-    }
-
-    setSubscribing(planId);
-
-    try {
-        // Case 1: User has an active subscription and is changing to a DIFFERENT plan
-        if (currentSubscription?.has_subscription && !isCurrentPlan(planId)) {
-            const response = await api.post(`/api/update-plan/`, { new_plan_id: planId });
-            showToast('success', 'Plan Updated', response.data.message);
-            fetchCurrentSubscription();
+    const performPlanAction = async (planId) => {
+        if (!session?.accessToken) {
+            showToast('warn', 'Authentication Required', 'Please log in to manage plans');
+            return;
         }
-        // Case 2: User has a canceling subscription and is reactivating it
-        else if (currentSubscription?.is_canceling && isCurrentPlan(planId)) {
-            await handleReactivateSubscription();
-        }
-        // Case 3: User has no subscription, create a new one
-        else {
-            const response = await api.post(`/api/polar/create-checkout/`, { plan_id: planId });
+    
+        setSubscribing(planId);
+    
+        try {
+            const isCurrentlyOnPaidPlan = currentSubscription?.has_subscription && !currentSubscription?.plan?.is_free;
 
-            if (response.data.checkout_url) {
-                const checkout = await PolarEmbedCheckout.create(response.data.checkout_url, 'light');
-                checkout.addEventListener('success', () => {
-                    showToast('success', 'Purchase Successful', 'Your subscription is now active!');
-                    fetchCurrentSubscription();
-                });
-            } else {
-                showToast('error', 'Subscription Failed', response.data.error || 'Could not process subscription.');
+            // Case 1: User is on a PAID plan and is changing to a DIFFERENT plan
+            if (isCurrentlyOnPaidPlan && !isCurrentPlan(planId)) {
+                const response = await api.post(`/api/update-plan/`, { new_plan_id: planId });
+                showToast('success', 'Plan Updated', response.data.message);
+                fetchCurrentSubscription();
             }
+            // Case 2: User has a canceling PAID subscription and is reactivating it
+            else if (currentSubscription?.is_canceling && isCurrentPlan(planId)) {
+                await handleReactivateSubscription();
+            }
+            // Case 3: User has no subscription OR is on a free plan. Go to checkout.
+            else {
+                const response = await api.post(`/api/polar/create-checkout/`, { plan_id: planId });
+    
+                if (response.data.checkout_url) {
+                    const checkout = await PolarEmbedCheckout.create(response.data.checkout_url, 'light');
+                    checkout.addEventListener('success', () => {
+                        showToast('success', 'Purchase Successful', 'Your subscription is now active!');
+                        fetchCurrentSubscription();
+                    });
+                } else {
+                    showToast('error', 'Subscription Failed', response.data.error || 'Could not process subscription.');
+                }
+            }
+        } catch (error) {
+            console.error('Error performing plan action:', error);
+            showToast('error', 'Action Failed', error.response?.data?.error || 'A network error occurred.');
+        } finally {
+            setSubscribing(null);
         }
-    } catch (error) {
-        console.error('Error performing plan action:', error);
-        showToast('error', 'Action Failed', error.response?.data?.error || 'A network error occurred.');
-    } finally {
-        setSubscribing(null);
-    }
-};
+    };
+
+    const handlePlanAction = (planId, planName) => {
+        const isCurrentlyOnPaidPlan = currentSubscription?.has_subscription && !currentSubscription?.plan?.is_free;
+
+        // Only show confirmation if user is on a PAID plan and switching to another plan.
+        if (isCurrentlyOnPaidPlan && !isCurrentPlan(planId)) {
+            setTargetPlan({ id: planId, name: planName });
+            setPlanChangeDialog(true);
+        } else {
+            // For new subscriptions or upgrades from free, proceed immediately to checkout.
+            performPlanAction(planId);
+        }
+    };
 
     const handleReactivateSubscription = async () => {
         if (!session?.accessToken) return;
@@ -463,7 +481,7 @@ const handlePlanAction = async (planId) => {
                                                 iconPos="right"
                                                 className={`w-full ${isPopular ? 'p-button-primary' : 'p-button-outlined p-button-primary'}`}
                                                 loading={subscribing === plan.id}
-                                                onClick={() => handlePlanAction(plan.id)}
+                                                onClick={() => handlePlanAction(plan.id, plan.name)}
                                             />
                                         )}
                                     </div>
@@ -605,6 +623,35 @@ const handlePlanAction = async (planId) => {
                         </div>
                     </div>
                 )}
+            </Dialog>
+
+            {/* Plan Change Confirmation Dialog */}
+            <Dialog
+                header="Confirm Plan Change"
+                visible={planChangeDialog}
+                style={{ width: '450px' }}
+                modal
+                onHide={() => setPlanChangeDialog(false)}
+                footer={
+                    <div>
+                        <Button label="Cancel" icon="pi pi-times" onClick={() => setPlanChangeDialog(false)} className="p-button-text" />
+                        <Button
+                            label="Confirm Switch"
+                            icon="pi pi-check"
+                            loading={subscribing === targetPlan?.id}
+                            onClick={() => {
+                                performPlanAction(targetPlan.id);
+                                setPlanChangeDialog(false);
+                            }}
+                            autoFocus
+                        />
+                    </div>
+                }
+            >
+                <div className="flex align-items-center">
+                    <i className="pi pi-exclamation-triangle mr-3" style={{ fontSize: '2rem' }} />
+                    <span>Are you sure you want to switch to the <strong>{targetPlan?.name}</strong> plan?</span>
+                </div>
             </Dialog>
         </div>
     );
