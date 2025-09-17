@@ -90,21 +90,16 @@ const SidebarFooter = ({ router, collapsed }) => {
     );
 };
 
-const TopBar = ({ session, userMenuRef, userMenuItems, sidebarRef, onToggleSidebar, sidebarCollapsed }) => {
+const TopBar = ({ session, userMenuRef, userMenuItems, onToggleSidebar, onToggleMobileSidebar, sidebarCollapsed, mobileToggleButtonRef }) => {
     const { t } = useTranslation();
     return (
         <div className={`${styles.topbar} flex justify-content-between align-items-center sticky top-0 z-5`}>
             <div className="flex align-items-center gap-3">
                 <Button
+                    ref={mobileToggleButtonRef}
                     icon={<FiMenu size={20} />}
                     className="p-button-rounded p-button-text p-button-plain mr-2 lg:hidden"
-                    onClick={() => {
-                        const sidebar = sidebarRef.current;
-                        if (sidebar) {
-                            sidebar.classList.toggle('hidden');
-                            sidebar.classList.toggle(styles.sidebarMobileOverlay);
-                        }
-                    }}
+                    onClick={onToggleMobileSidebar}
                 />
                 <Button
                     icon={sidebarCollapsed ? <FiChevronRight size={18} /> : <FiChevronLeft size={18} />}
@@ -113,14 +108,6 @@ const TopBar = ({ session, userMenuRef, userMenuItems, sidebarRef, onToggleSideb
                     tooltip={sidebarCollapsed ? t('dashboard_layout.topbar.expandSidebar') : t('dashboard_layout.topbar.collapseSidebar')}
                     tooltipOptions={{ position: 'bottom' }}
                 />
-
-                <div className={`${styles.searchContainer} p-input-icon-left hidden md:block ml-3`}>
-                    <i className="pi pi-search" />
-                    <InputText
-                        className={`${styles.searchInput}`}
-                        placeholder={t('dashboard_layout.topbar.searchPlaceholder')}
-                    />
-                </div>
             </div>
 
             <div className="flex align-items-center gap-3">
@@ -155,7 +142,9 @@ export default function Layout({ children }) {
     const toast = useRef(null);
     const userMenuRef = useRef(null);
     const sidebarRef = useRef(null);
+    const mobileToggleButtonRef = useRef(null); // Ref for the mobile toggle button
     const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
+    const [mobileSidebarVisible, setMobileSidebarVisible] = useState(false); // State for mobile sidebar
     const { t } = useTranslation(); // Use translation hook
 
         // --- State moved from page.jsx to layout.jsx ---
@@ -231,6 +220,39 @@ export default function Layout({ children }) {
     }, [session, status, t, router]); // Added router to dependency array
 
 
+    // Effect to handle clicks outside the mobile sidebar to close it
+    useEffect(() => {
+        const handleClickOutside = (event) => {
+            // If the click is on the toggle button, do nothing.
+            if (mobileToggleButtonRef.current && mobileToggleButtonRef.current.contains(event.target)) {
+                return;
+            }
+
+            if (mobileSidebarVisible && sidebarRef.current && !sidebarRef.current.contains(event.target)) {
+                setMobileSidebarVisible(false);
+            }
+        };
+
+        document.addEventListener('mousedown', handleClickOutside);
+        return () => {
+            document.removeEventListener('mousedown', handleClickOutside);
+        };
+    }, [mobileSidebarVisible]); // Only re-run if mobileSidebarVisible changes
+
+
+    // Effect to hide mobile sidebar on window resize to desktop
+    useEffect(() => {
+        const handleResize = () => {
+            if (window.innerWidth >= 992) { // Corresponds to lg breakpoint
+                setMobileSidebarVisible(false);
+            }
+        };
+
+        window.addEventListener('resize', handleResize);
+        return () => window.removeEventListener('resize', handleResize);
+    }, []);
+
+
     // Load sidebar state from localStorage
     useEffect(() => {
         const storedState = localStorage.getItem('sidebarCollapsed');
@@ -256,6 +278,10 @@ export default function Layout({ children }) {
         localStorage.setItem('sidebarCollapsed', JSON.stringify(newState));
     };
 
+    const toggleMobileSidebar = () => {
+        setMobileSidebarVisible(prev => !prev);
+    };
+
     const userMenuItems = [
         { label: t('dashboard_layout.userMenu.profile'), icon: 'pi pi-user', command: () => router.push('/main/profile') },
         { label: t('dashboard_layout.userMenu.settings'), icon: 'pi pi-cog', command: () => router.push('/main/settings') },
@@ -278,7 +304,6 @@ export default function Layout({ children }) {
                 { label: t('dashboard_layout.sidebar.overview'), icon: <FiGrid />, route: '/main' },
                 { label: t('dashboard_layout.sidebar.resumes'), icon: <FiFileText />, route: '/main/resumes' },
                 { label: t('dashboard_layout.sidebar.myWebsite'), icon: <FiGlobe />, route: websiteRoute },
-                { label: t('dashboard_layout.sidebar.atsChecker'), icon: <FiCheckSquare />, route: '/ats' },
                 { label: t('dashboard_layout.sidebar.jobFeed'), icon: <FiBriefcase />, route: '/main/job-feed' },
                 { label: t('dashboard_layout.sidebar.scholarships'), icon: <FiAward />, route: '/main/scholarship-feed' },
             ];
@@ -332,8 +357,11 @@ export default function Layout({ children }) {
                 {/* Sidebar */}
                 <div
                     ref={sidebarRef}
-                    className={`${styles.sidebar} ${sidebarCollapsed ? styles.sidebarCollapsed : ''} shadow-2 flex-shrink-0 hidden lg:flex lg:flex-column`}
-                    style={{ width: sidebarCollapsed ? '80px' : '280px' }}
+                    className={`${styles.sidebar} ${sidebarCollapsed ? styles.sidebarCollapsed : ''} shadow-2 flex-shrink-0 lg:flex lg:flex-column ${mobileSidebarVisible ? styles.sidebarMobileOverlay : 'hidden'}`}
+                    style={{ 
+                        width: sidebarCollapsed ? '80px' : '280px',
+                        transition: 'width 0.3s cubic-bezier(0.4, 0, 0.2, 1)' 
+                    }}
                 >
                     <SidebarLogo collapsed={sidebarCollapsed} />
 
@@ -353,14 +381,18 @@ export default function Layout({ children }) {
                 {/* Main Content */}
                 <div
                     className={`${styles.mainContent} ${sidebarCollapsed ? styles.mainContentExpanded : ''} flex flex-column flex-grow-1`}
+                    style={{
+                        transition: 'margin-left 0.3s cubic-bezier(0.4, 0, 0.2, 1)'
+                    }}
                 >
                     <TopBar
                         session={session}
                         userMenuRef={userMenuRef}
                         userMenuItems={userMenuItems}
-                        sidebarRef={sidebarRef}
                         onToggleSidebar={toggleSidebar}
+                        onToggleMobileSidebar={toggleMobileSidebar}
                         sidebarCollapsed={sidebarCollapsed}
+                        mobileToggleButtonRef={mobileToggleButtonRef}
                     />
 
                     {/* This is the ONLY scrollable main area */}
