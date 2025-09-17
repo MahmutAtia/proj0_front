@@ -81,7 +81,7 @@ const ScholarshipList = ({ router }) => {
             <div className="flex flex-column justify-content-center align-items-center h-full text-center text-color-secondary p-4">
                 <FiAward size="48" className="mb-3" />
                 <h4 className="font-bold">Coming Soon!</h4>
-                <p>We're working hard to bring you scholarship opportunities. Stay tuned!</p>
+                <p>We are working hard to bring you scholarship opportunities. Stay tuned!</p>
             </div>
         </Card>
     );
