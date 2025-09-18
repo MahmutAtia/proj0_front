@@ -361,7 +361,7 @@ const ResumeListPage = () => {
                         <Button
                             icon={<FiPlusSquare className={isRTL ? 'ml-2' : 'mr-2'}/>}
                             label={t('resumes.createNew')}
-                            className={`bg-white text-primary hover:bg-gray-100 border-round-lg px-4 py-2 border-none font-semibold ${isRTL ? 'mr-3' : 'ml-3'}`}
+                            className={`bg-primary text-primary hover:bg-primary-100 border-round-lg px-4 py-2 border-none font-semibold ${isRTL ? 'mr-3' : 'ml-3'}`}
                             onClick={() => setIsCreateDialogVisible(true)}
                         />
                     </div>
