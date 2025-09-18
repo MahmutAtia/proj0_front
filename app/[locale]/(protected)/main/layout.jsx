@@ -126,6 +126,7 @@ const TopBar = ({ session, userMenuRef, userMenuItems, onToggleSidebar, onToggle
                         className={styles.profileAvatar}
                         style={{ width: '2.2rem', height: '2.2rem' }}
                     />
+                    {/* TODO: Fix white text issue on dark mode */}
                     <span className="font-medium hidden md:inline">{session?.user?.name || t('dashboard_layout.topbar.userFallback')}</span>
                     <FiChevronDown className="text-600" />
                 </div>
@@ -351,7 +352,7 @@ export default function Layout({ children }) {
 
     return (
         <DashboardContext.Provider value={contextValue}>
-            <div className={`${styles.dashboardLayout} bg-gray-50`}>
+            <div className={`${styles.dashboardLayout} bg-primary-50`}>
                 <Toast ref={toast} />
 
                 {/* Sidebar */}
@@ -380,7 +381,7 @@ export default function Layout({ children }) {
 
                 {/* Main Content */}
                 <div
-                    className={`${styles.mainContent} bg-gray-50 ${sidebarCollapsed ? styles.mainContentExpanded : ''} flex flex-column flex-grow-1`}
+                    className={`${styles.mainContent} bg-primary-50 ${sidebarCollapsed ? styles.mainContentExpanded : ''} flex flex-column flex-grow-1`}
                 >
                     <TopBar
                         session={session}
