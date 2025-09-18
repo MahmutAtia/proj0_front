@@ -270,96 +270,6 @@ const ResumeListPage = () => {
             return <FiFileText className="text-3xl text-primary-600" />;
         };
 
-
-        if (currentLayout === 'list') {
-            return (
-                <div className="col-12">
-                    <div className="p-4 surface-card shadow-2 border-1 surface-border border-round-2xl hover:shadow-4 transition-all transition-duration-300">
-                        <div className={`flex flex-column xl:flex-row xl:align-items-start gap-4 ${isRTL ? 'xl:flex-row-reverse' : ''}`}>
-                            <div
-                                className="flex-shrink-0 flex justify-content-center align-items-center bg-primary-50 border-round cursor-pointer"
-                                style={{ width: '70px', height: '70px' }}
-                                onClick={() => handleViewEditResume(resume)}
-                            >
-                                {renderResumeIcon(resume)}
-                            </div>
-                            <div className="flex flex-column sm:flex-row justify-content-between align-items-start flex-1 gap-3">
-                                <div className={`flex flex-column align-items-start gap-1 flex-grow-1 ${isRTL ? 'align-items-end' : ''}`}>
-                                    <div className="text-lg font-semibold text-900 flex align-items-center gap-2" onClick={() => handleViewEditResume(resume)}>
-                                        {editingResumeId === resume.id ? (
-                                            <div className="flex align-items-center">
-                                                <InputText value={editingTitle} onChange={(e) => setEditingTitle(e.target.value)} autoFocus onClick={e => e.stopPropagation()} className="p-inputtext-sm" />
-                                                <Button icon={<FiCheck />} className="p-button-text p-button-success ml-1" onClick={(e) => { e.stopPropagation(); saveTitle(resume.id); }} />
-                                                <Button icon={<FiX />} className="p-button-text p-button-danger" onClick={(e) => { e.stopPropagation(); cancelEditingTitle(); }} />
-                                            </div>
-                                        ) : (
-                                            <>
-                                                <span className="cursor-pointer hover:text-primary-600">{resume.title || t('resumes.untitledResume')}</span>
-                                                <FiEdit2 className="cursor-pointer text-gray-500 hover:text-primary-600" onClick={(e) => startEditingTitle(resume, e)} />
-                                                {resume.is_default && <Tag severity="contrast" value={t('resumes.defaultTag')} className={`${isRTL ? 'mr-2' : 'ml-2'} text-xs p-tag-rounded`} icon={<FiStar className={isRTL ? 'ml-1' : 'mr-1'}/>}></Tag>}
-                                            </>
-                                        )}
-                                    </div>
-                                    <p className={`text-sm text-color-secondary mb-1 line-clamp-2 ${isRTL ? 'text-right' : ''}`} style={{ minHeight: '2.4em' }} onClick={() => handleViewEditResume(resume)}>
-                                        {resume.about || t('resumes.noDescription')}
-                                    </p>
-                                    <span className="text-xs text-color-secondary" onClick={() => handleViewEditResume(resume)}>
-                                        <i className={`pi pi-calendar ${isRTL ? 'ml-1' : 'mr-1'}`}></i>
-                                        {t('resumes.updated', { date: displayDate ? new Date(displayDate).toLocaleDateString() : 'N/A' })}
-                                    </span>
-                                </div>
-                                <div className="flex flex-row sm:flex-column align-items-stretch sm:align-items-end gap-2" style={{minWidth: '180px'}}>
-                                    <div className="flex gap-2">
-                                        <Button
-                                            label={t('resumes.manageResume')}
-                                            icon={<FiEdit className={isRTL ? 'ml-2' : 'mr-2'}/>}
-                                            className="p-button-sm p-button-info w-full"
-                                            onClick={(e) => { e.stopPropagation(); handleViewEditResume(resume); }}
-                                        />
-                                        {!resume.is_default && (
-                                            <Button
-                                                icon={<FiStar />}
-                                                className="p-button-sm p-button-secondary p-button-outlined"
-                                                onClick={(e) => { e.stopPropagation(); confirmSetDefault(resume); }}
-                                                tooltip={t('resumes.setAsDefault')}
-                                                tooltipOptions={{ position: 'top' }}
-                                            />
-                                        )}
-                                        {resumes.length > 1 && (
-                                            <Button
-                                                icon="pi pi-trash"
-                                                className="p-button-sm p-button-danger p-button-outlined"
-                                                onClick={(e) => { e.stopPropagation(); confirmDelete(resume); }}
-                                                tooltip={t('common.delete')}
-                                                tooltipOptions={{ position: 'top' }}
-                                            />
-                                        )}
-                                    </div>
-                                    {documents.length > 0 ? (
-                                        <Button
-                                            label={t('resumes.viewDocuments', { count: documents.length })}
-                                            icon={<FiFileText className={isRTL ? 'ml-2' : 'mr-2'}/>}
-                                            className="p-button-sm p-button-outlined p-button-secondary w-full"
-                                            onClick={(e) => { e.stopPropagation(); openDocumentsDialog(resume); }}
-                                        />
-                                    ) : (
-                                        <Button
-                                            label={t('resumes.addDocuments')}
-                                            icon={<FiPlusSquare className={isRTL ? 'ml-2' : 'mr-2'}/>}
-                                            className="p-button-sm p-button-text p-button-secondary w-full"
-                                            onClick={(e) => { e.stopPropagation(); handleViewEditResume(resume); }}
-                                            tooltip="Open resume to add documents"
-                                        />
-                                    )}
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            );
-        }
-
-        if (currentLayout === 'grid') {
             return (
                 <div className="col-12 sm:col-6 md:col-4 xl:col-3 p-2">
                     <div className="p-4 surface-card shadow-2 border-1 surface-border border-round-2xl h-full flex flex-column justify-content-between hover:shadow-4 transition-all transition-duration-300">
@@ -439,7 +349,7 @@ const ResumeListPage = () => {
                     </div>
                 </div>
             );
-        }
+        
     };
 
     const renderDataViewHeader = () => {
@@ -447,7 +357,7 @@ const ResumeListPage = () => {
             <div className="bg-primary-gradient p-4 border-round-top-2xl">
                 <div className={`flex flex-column md:flex-row md:justify-content-between md:align-items-center gap-4 ${isRTL ? 'md:flex-row-reverse' : ''}`}>
                     <div className={`flex align-items-center ${isRTL ? 'flex-row-reverse' : ''}`}>
-                        <h1 className="m-0 text-2xl font-bold text-white">{t('resumes.title')}</h1>
+                        <h1 className="m-0 text-2xl font-bold">{t('resumes.title')}</h1>
                         <Button
                             icon={<FiPlusSquare className={isRTL ? 'ml-2' : 'mr-2'}/>}
                             label={t('resumes.createNew')}
@@ -456,17 +366,17 @@ const ResumeListPage = () => {
                         />
                     </div>
                     <div className="flex align-items-center gap-2">
-                        <span className="p-input-icon-left">
+                        <div className="p-input-icon-left">
                             <i className="pi pi-search" />
                             <InputText
                                 value={globalFilter}
                                 onChange={(e) => setGlobalFilter(e.target.value)}
                                 placeholder={t('resumes.searchPlaceholder')}
-                                className="border-round-lg border-none p-3 bg-white"
-                                style={{minWidth: '180px'}}
+                                className="border-round-lg border-none p-3 pl-5"
+                                style={{minWidth: '200px'}}
                             />
-                        </span>
-                        <DataViewLayoutOptions layout={layout} onChange={(e) => setLayout(e.value)} />
+                        </div>
+                        <DataViewLayoutOptions layout={layout} onChange={(e) => setLayout(e.value)} style={{ display: 'none' }} />
                     </div>
                 </div>
             </div>

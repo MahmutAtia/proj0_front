@@ -74,40 +74,7 @@ const JobFeedPage = () => {
     };
 
     const jobItemTemplate = (job, currentLayout) => {
-        if (currentLayout === 'list') {
-            return (
-                <div className="col-12">
-                    <div className="surface-card shadow-2 border-1 surface-border border-round-2xl mb-3 hover:shadow-4 transition-all transition-duration-300">
-                        <div className="flex flex-column xl:flex-row xl:align-items-start p-4 gap-4">
-                            <div className="flex flex-column sm:flex-row justify-content-between align-items-center xl:align-items-start flex-1 gap-4">
-                                <div className="flex flex-column align-items-center sm:align-items-start gap-3">
-                                    <div className="text-2xl font-bold text-900">{job.title}</div>
-                                    <div className="text-lg text-600">{job.company}</div>
-                                    <div className="flex align-items-center gap-3">
-                                        <span className="text-600"><i className="pi pi-map-marker mr-1 text-primary"></i>{job.location || t('jobFeed.job.locationNotSpecified') || 'Not specified'}</span>
-                                        {job.is_remote && (<span className="bg-green-100 text-green-800 px-2 py-1 border-round-lg text-sm font-semibold">{t('common.remote') || 'Remote'}</span>)}
-                                    </div>
-                                    {job.addedAt && (
-                                        <div className="text-sm text-500">
-                                            {t('jobFeed.job.addedAgo') || 'Added'} {formatTimeAgo(job.addedAt)}
-                                        </div>
-                                    )}
-                                    <a href={job.job_url} target="_blank" rel="noopener noreferrer" className="bg-primary-100 text-primary-700 hover:bg-primary-200 transition-colors px-3 py-2 border-round-lg text-sm font-semibold no-underline">
-                                        {t('jobFeed.job.viewOn') || 'View on'} {job.site || t('common.source') || 'Source'} <i className="pi pi-external-link ml-1"></i>
-                                    </a>
-                                </div>
-                                <div className="flex sm:flex-column align-items-center sm:align-items-end gap-3 sm:gap-2">
-                                    {job.site && <span className="bg-gray-100 text-gray-800 px-2 py-1 border-round-lg text-xs font-semibold">{job.site.toUpperCase()}</span>}
-                                    <Button label={t('jobFeed.job.applyNow') || 'Apply Now'} icon="pi pi-send" className="bg-primary text-white hover:bg-primary-600 border-round-xl px-4 py-2 border-none font-semibold" onClick={() => window.open(job.job_url, '_blank')} />
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            );
-        }
-
-        return ( // Grid Layout
+        return ( // Grid Layout only
             <div className="col-12 sm:col-6 lg:col-4 xl:col-3 p-2">
                 <div className="surface-card shadow-2 border-1 surface-border border-round-2xl h-full hover:shadow-4 transition-all transition-duration-300">
                     <div className="p-4 h-full flex flex-column">
@@ -131,7 +98,7 @@ const JobFeedPage = () => {
                             <a href={job.job_url} target="_blank" rel="noopener noreferrer" className="bg-primary-100 text-primary-700 hover:bg-primary-200 transition-colors px-3 py-2 border-round-lg text-sm font-semibold no-underline text-center">
                                 {t('jobFeed.job.viewOn') || 'View on'} {job.site || t('common.source') || 'Source'}
                             </a>
-                            <Button label={t('jobFeed.job.applyNow') || 'Apply Now'} icon="pi pi-send" className="bg-primary text-white hover:bg-primary-600 border-round-xl px-3 py-2 border-none font-semibold w-full" onClick={() => window.open(job.job_url, '_blank')} />
+                            <Button label={t('jobFeed.job.applyNow') || 'Apply Now'} icon="pi pi-send" className="bg-primary hover:bg-primary-600 border-round-xl px-3 py-2 border-none font-semibold w-full" onClick={() => window.open(job.job_url, '_blank')} />
                         </div>
                     </div>
                 </div>
@@ -162,15 +129,15 @@ const JobFeedPage = () => {
             <div className="flex flex-column lg:flex-row lg:justify-content-between gap-4">
                 <div className="flex flex-column sm:flex-row sm:justify-content-between sm:align-items-center gap-3">
                     <div className="flex align-items-center gap-2">
-                        <h2 className="text-3xl font-bold m-0 text-white">{t('jobFeed.title') || 'Job Feed'}</h2>
+                        <h2 className="text-3xl font-bold m-0 ">{t('jobFeed.title') || 'Job Feed'}</h2>
                         {hasActiveCycle && (
-                            <span className="bg-white-alpha-20 text-white px-3 py-1 border-round-xl text-sm font-semibold flex align-items-center">
+                            <span className="bg-white-alpha-20  px-3 py-1 border-round-xl text-sm font-semibold flex align-items-center">
                                 <i className="pi pi-spin pi-spinner mr-1" style={{fontSize: '0.8rem'}}></i>
                                 LIVE
                             </span>
                         )}
                     </div>
-                    <p className="text-white-alpha-90 m-0 text-sm">
+                    <p className="text-900 m-0 text-sm">
                         {t('jobFeed.showingJobs', { filtered: filteredJobs.length, total: allJobs.length })}
                     </p>
                 </div>
@@ -197,7 +164,7 @@ const JobFeedPage = () => {
                             loading={loading}
                             tooltip={t('common.search') || 'Search'} 
                             tooltipOptions={{position: 'bottom'}}
-                            className="bg-white text-primary hover:bg-gray-100 border-round-lg px-4 py-3 border-none"
+                            className="bg-white text-primary hover:bg-gray-100 border-round-lg px-3 py-3 border-none flex-shrink-0"
                         />
                     </div>
                     
@@ -208,7 +175,7 @@ const JobFeedPage = () => {
                                 onChange={e => setIsRemote(e.checked ?? false)} 
                                 checked={isRemote}
                             />
-                            <label htmlFor="remote" className="ml-2 text-white font-medium">{t('jobFeed.filters.remoteOnly') || 'Remote Only'}</label>
+                            <label htmlFor="remote" className="ml-2  font-medium">{t('jobFeed.filters.remoteOnly') || 'Remote Only'}</label>
                         </div>
                         
                         <Dropdown 
@@ -222,13 +189,13 @@ const JobFeedPage = () => {
                         
                         <Button
                             icon="pi pi-refresh"
-                            className="bg-white-alpha-20 text-white hover:bg-white-alpha-30 border-round-lg px-3 py-2 border-none"
+                            className="bg-white-alpha-20 hover:bg-white-alpha-30 border-round-lg px-3 py-2 border-none"
                             onClick={refresh}
                             loading={loading}
                             tooltip={t('common.refresh') || 'Refresh'}
                         />
                         
-                        <DataViewLayoutOptions layout={layout} onChange={(e) => setLayout(e.value)} />
+                        <DataViewLayoutOptions layout={layout} onChange={(e) => setLayout(e.value)} style={{ display: 'none' }} />
                     </div>
                 </div>
             </div>
