@@ -5,6 +5,8 @@ import { FiArrowRight, FiShield } from 'react-icons/fi';
 import styles from '../styles/HeroSection.module.css';
 import { useRouter } from 'next/navigation';
 import { useTranslation } from '../../../../hooks/useTranslation'; // Add translation hook
+import HeroGallery from './HeroGallery';
+
 
 // Animation Variants (unchanged)
 const staggerContainer = (staggerChildren, delayChildren) => ({
@@ -95,21 +97,8 @@ const HeroSection = () => {
                         </motion.button>
                     </motion.div>
                 </motion.div>
-                <motion.div
-                    className={styles.heroImageContainer}
-                    initial={{ opacity: 0, scale: 0.9, x: isRTL ? -50 : 50 }}
-                    animate={{ opacity: 1, scale: 1, x: 0 }}
-                    transition={{ duration: 0.7, delay: 0.4, ease: 'easeOut' }}
-                >
-                    <img
-                        src="https://images.unsplash.com/photo-1551434678-e076c223a692?q=80&w=1740&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
-                        alt={t('hero.imageAlt')}
-                        loading="eager"
-                        width="1740"
-                        height="1160"
-                        className={styles.heroImage}
-                    />
-                </motion.div>
+
+                    <HeroGallery />
             </div>
         </section>
     );
