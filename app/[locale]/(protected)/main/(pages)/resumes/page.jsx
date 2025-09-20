@@ -276,9 +276,10 @@ const ResumeListPage = () => {
                 <div className="p-4 surface-card shadow-2 border-1 surface-border border-round-2xl h-full flex flex-column justify-content-between hover:shadow-4 transition-all transition-duration-300">
                     <div onClick={() => handleViewEditResume(resume)} className="cursor-pointer">
                         <div className="flex justify-content-between align-items-start mb-3">
-                            <div className="flex-shrink-0 flex justify-content-center align-items-center bg-primary-50 border-round" style={{ width: '50px', height: '50px' }}>
+                            {/*                          <div className="flex-shrink-0 flex justify-content-center align-items-center bg-primary-50 border-round" style={{ width: '50px', height: '50px' }}>
                                 {renderResumeIcon(resume)}
                             </div>
+*/}
                         </div>
                         <div className="flex flex-column align-items-center gap-2">
                             {editingResumeId === resume.id ? (
@@ -331,7 +332,7 @@ const ResumeListPage = () => {
                         <Button
                             label={t('common.edit')}
                             icon={<FiEdit className={isRTL ? 'ml-2' : 'mr-2'} />}
-                            className="p-button-sm p-button-info w-full"
+                            className="p-button-sm p-button-info p-button-outlined  w-full"
                             onClick={(e) => {
                                 e.stopPropagation();
                                 handleViewEditResume(resume);
@@ -341,7 +342,7 @@ const ResumeListPage = () => {
                             <Button
                                 label={t('resumes.setAsDefault')}
                                 icon={<FiStar className={isRTL ? 'ml-2' : 'mr-2'} />}
-                                className="p-button-sm p-button-secondary p-button-outlined w-full"
+                                className="p-button-sm p-button-primary  w-full"
                                 onClick={(e) => {
                                     e.stopPropagation();
                                     confirmSetDefault(resume);
@@ -380,8 +381,8 @@ const ResumeListPage = () => {
     const renderDataViewHeader = () => {
         return (
             <div className="bg-primary-gradient p-4 border-round-top-2xl">
-                <div className={`flex flex-column md:flex-row md:justify-content-between md:align-items-center gap-4 ${isRTL ? 'md:flex-row-reverse' : ''}`}>
-                    <div className={`flex align-items-center ${isRTL ? 'flex-row-reverse' : ''}`}>
+                <div className={`flex flex-column md:flex-row md:justify-content-between md:align-items-center gap-4 ${isRTL ? '' : 'md:flex-row'}`}>
+                    <div className={`flex align-items-center gap-3 ${isRTL ? '' : 'flex-row'}`}>
                         <h1 className="m-0 text-2xl font-bold">{t('resumes.title')}</h1>
                         <Button
                             icon={<FiPlusSquare className={isRTL ? 'ml-2' : 'mr-2'} />}
@@ -390,10 +391,18 @@ const ResumeListPage = () => {
                             onClick={() => setIsCreateDialogVisible(true)}
                         />
                     </div>
-                    <div className="flex align-items-center gap-2">
-                        <div className="p-input-icon-left">
+                    <div className={`flex align-items-center gap-2 ${isRTL ? 'flex-row-reverse' : 'flex-row'}`}>
+                        <div className={`p-input-icon-left ${isRTL ? 'p-input-icon-right' : ''}`}>
                             <i className="pi pi-search" />
-                            <InputText value={globalFilter} onChange={(e) => setGlobalFilter(e.target.value)} placeholder={t('resumes.searchPlaceholder')} className="border-round-lg border-none p-3 pl-5" style={{ minWidth: '200px' }} />
+                            <InputText
+                                value={globalFilter}
+                                onChange={(e) => setGlobalFilter(e.target.value)}
+                                placeholder={t('resumes.searchPlaceholder')}
+                                className={`border-round-lg border-none p-3 ${isRTL ? 'pr-6' : 'pl-6'}`}
+                                style={{
+                                    minWidth: '200px'
+                                }}
+                            />
                         </div>
                         <DataViewLayoutOptions layout={layout} onChange={(e) => setLayout(e.value)} style={{ display: 'none' }} />
                     </div>

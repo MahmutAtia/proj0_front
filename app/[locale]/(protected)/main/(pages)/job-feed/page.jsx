@@ -21,7 +21,7 @@ import styles from './JobFeed.module.css';
 const JobFeedPage = () => {
     const router = useRouter();
     const toast = useRef(null);
-    const { t } = useTranslation();
+    const { t, isRTL } = useTranslation();
 
     const { jobs: allJobs, loading, refresh, isWaitingForKeywords, hasActiveCycle } = useJobService(); // No longer need getFilteredJobs
 
@@ -87,17 +87,19 @@ const JobFeedPage = () => {
                         )}
                         {job.site && (
                             <div className="text-center mb-3">
-                                <span className="bg-gray-100 text-gray-800 px-2 py-1 border-round-lg text-xs font-semibold">{job.site.toUpperCase()}</span>
+                                <span className="bg-gray-100 text-primary px-2 py-1 border-round-lg text-xs font-semibold">{job.site.toUpperCase()}</span>
                             </div>
                         )}
                         <div className="mt-auto flex flex-column gap-2">
+                            {/*
                             <a href={job.job_url} target="_blank" rel="noopener noreferrer" className="bg-primary-100 text-primary-700 hover:bg-primary-200 transition-colors px-3 py-2 border-round-lg text-sm font-semibold no-underline text-center">
                                 {t('jobFeed.job.viewOn') || 'View on'} {job.site || t('common.source') || 'Source'}
                             </a>
+                           */}
                             <Button
                                 label={t('jobFeed.job.applyNow') || 'Apply Now'}
                                 icon="pi pi-send"
-                                className="bg-primary hover:bg-primary-600 border-round-xl px-3 py-2 border-none font-semibold w-full"
+                                className="p-button-outlined   border-2  border-round-3xl  px-3 py-2 border-none font-semibold w-full hover:bg-primary-500 hover:text-white transition-colors"
                                 onClick={() => window.open(job.job_url, '_blank')}
                             />
                         </div>
@@ -171,9 +173,17 @@ const JobFeedPage = () => {
 
                     <div className="flex flex-column sm:flex-row align-items-stretch sm:align-items-center gap-3">
                         <div className="flex align-items-center bg-white-alpha-20 px-3 py-2 border-round-lg">
-                            <Checkbox inputId="remote" onChange={(e) => setIsRemote(e.checked ?? false)} checked={isRemote} />
+                            <Checkbox
+                                style={{
+                                    marginLeft: isRTL ? '0.5rem' : 0,
+                                    marginRight: !isRTL ? '0.5rem' : 0
+                                }}
+                                inputId="remote"
+                                onChange={(e) => setIsRemote(e.checked ?? false)}
+                                checked={isRemote}
+                            />
 
-                            <label htmlFor="remote" className="ml-2  font-medium" style={{ whiteSpace: 'nowrap', marginRight: '0.5rem' }}>
+                            <label htmlFor="remote" className="ml-2  font-medium" style={{ whiteSpace: 'nowrap' }}>
                                 {' '}
                                 {t('jobFeed.filters.remoteOnly') || 'Remote Only'}
                             </label>

@@ -42,8 +42,22 @@ const JobPostings = ({ router }) => {
                     {hasActiveCycle && (
                         <Badge
                             value={
-                                <span className="flex align-items-center">
-                                    <i className="pi pi-spin pi-spinner mr-1" style={{ fontSize: '0.7rem' }}></i>
+                                <span
+                                    className="flex align-items-center"
+                                    style={{
+                                        marginInlineEnd: isRTL ? '1.5rem' : 0,
+                                        marginInlineEnd: !isRTL ? '1rem' : 0
+                                    }}
+                                >
+                                    <i
+                                        className="pi pi-spin pi-spinner"
+                                        style={{
+                                            fontSize: '0.6rem',
+                                            marginInlineEnd: '0.5rem',
+                                            marginRight: isRTL ? '0.5rem' : 0,
+                                            marginRight: !isRTL ? '0.5rem' : 0
+                                        }}
+                                    ></i>
                                     LIVE
                                 </span>
                             }
