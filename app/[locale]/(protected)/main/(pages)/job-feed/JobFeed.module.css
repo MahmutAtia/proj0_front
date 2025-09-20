@@ -1,25 +1,52 @@
 .jobFeedContainer {
-    padding: 1rem;
+    padding: 2.5rem;
     background-color: var(--surface-b); /* Use theme variables */
-    min-height: calc(100vh - 70px); /* Adjust if you have a fixed top navbar */
+    min-height: calc(100vh - 80px); /* Adjust if you have a fixed top navbar */
 }
 
 .pageCard {
-    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border-radius: 24px;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    overflow: hidden;
 }
 
 .header {
     border-bottom: 1px solid var(--surface-d);
     background-color: var(--surface-a); /* Slightly different background for header */
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
 }
 
 .jobListItem {
     transition: transform 0.2s ease-out, box-shadow 0.2s ease-out;
     border-radius: var(--border-radius);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border-radius: 20px;
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    overflow: hidden;
+    position: relative;
 }
 .jobListItem:hover {
-    transform: translateY(-3px);
+    transform: translateY(-8px);
     box-shadow: 0 4px 15px rgba(0,0,0,0.12);
+    border-color: rgba(59, 130, 246, 0.2);
+}
+.jobListItem::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: linear-gradient(90deg, #3b82f6 0%, #8b5cf6 100%);
+    opacity: 0;
+    transition: opacity 0.3s;
+}
+.jobListItem:hover::before {
+    opacity: 1;
 }
 .jobListItem .p-card-body {
     padding: 1rem; /* Adjust padding for list items */
@@ -31,10 +58,31 @@
     flex-direction: column;
     height: 100%;
     transition: transform 0.2s ease-out, box-shadow 0.2s ease-out;
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border-radius: 20px;
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    overflow: hidden;
+    position: relative;
 }
 .jobGridItem .p-card:hover {
-    transform: translateY(-5px);
+    transform: translateY(-8px);
     box-shadow: 0 6px 20px rgba(0,0,0,0.15);
+    border-color: rgba(59, 130, 246, 0.2);
+}
+.jobGridItem::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: linear-gradient(90deg, #3b82f6 0%, #8b5cf6 100%);
+    opacity: 0;
+    transition: opacity 0.3s;
+}
+.jobGridItem:hover::before {
+    opacity: 1;
 }
 
 .jobGridItem .p-card-body {
@@ -56,43 +104,75 @@
 
 /* Responsive adjustments for filter bar */
 @media screen and (max-width: 991px) { /* md breakpoint for PrimeFlex */
+    .jobFeedContainer {
+        padding: 1.5rem;
+    }
+    
     .header {
         flex-direction: column;
         align-items: stretch;
+        gap: 1rem;
     }
+    
     .header .p-inputgroup {
+        flex-direction: column;
         width: 100%;
-        margin-bottom: 1rem; /* Space between input group and controls */
     }
+    
     .header .p-inputgroup .p-inputtext {
-        margin-bottom: 0.5rem; /* Space between inputs in the group on mobile */
+        width: 100%;
+        margin-bottom: 0.5rem;
+        border-radius: 16px !important;
     }
+    
     .header .p-inputgroup .p-button {
-        width: 100%; /* Full width search button */
+        width: 100%;
+        border-radius: 16px !important;
     }
-    .header > div:last-child { /* Targeting the controls container */
-        flex-direction: column; /* Stack controls vertically */
-        gap: 0.75rem; /* Adjust gap for stacked controls */
-    }
-    .header .p-dropdown,
-    .header .p-dataview-layout-options {
+    
+    .header > div:last-child {
+        flex-direction: column;
+        gap: 1rem;
         width: 100%;
     }
-    .header .flex.align-items-center { /* Remote checkbox container */
-        justify-content: flex-start; /* Align checkbox to the left */
+    
+    .header .p-dropdown {
+        width: 100%;
+    }
+    
+    .header .flex.align-items-center {
+        justify-content: center;
         width: 100%;
     }
 }
 
 @media screen and (max-width: 767px) { /* sm breakpoint */
-    .jobGridItem {
-        /* On smaller screens, grid items might take full width or 2 per row */
-        /* This is handled by col-12 sm:col-6 in JSX, CSS can refine appearance */
+    .jobFeedContainer {
+        padding: 1rem;
     }
-    .jobListItem .p-card-body {
+    
+    .jobListItem .p-card-body,
+    .jobGridItem .p-card-body {
+        padding: 1rem;
+    }
+    
+    .jobGridItem {
+        margin-bottom: 1rem;
+    }
+}
+
+@media screen and (max-width: 575px) {
+    .jobFeedContainer {
         padding: 0.75rem;
     }
+    
+    .header {
+        padding: 1rem;
+    }
+    
+    .jobListItem .p-card-body,
     .jobGridItem .p-card-body {
         padding: 0.75rem;
     }
 }
+

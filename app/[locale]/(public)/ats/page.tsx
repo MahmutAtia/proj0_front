@@ -511,7 +511,7 @@ const ATSCheckerPageContent = () => {
         if (taskIdToRetry) {
             setStatusError(null);
             setPollingAttempts(0);
-            if (postAuthTaskIdToRetry) {
+        if (taskIdToRetry) {
                 setPostAuthCheckComplete(false);
                 checkStatus(taskIdToRetry, true);
             } else {
@@ -521,7 +521,7 @@ const ATSCheckerPageContent = () => {
             toast.current?.show({ severity: 'error', summary: 'Error', detail: 'Cannot retry, task ID is missing.' });
         }
     };
-
+    
     // This function is now simplified. The state is already saved in `handleSubmit`.
     const handleSignInAndRedirect = () => {
         const locale = window.location.pathname.split('/')[1] || 'en';

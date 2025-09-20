@@ -10,7 +10,7 @@ import './styles.css';
 
 const Skills = ({ sectionKey }) => {
     const toast = useRef(null);
-    const { data, setData, toggleEditMode, editMode, removeSectionItem } = useResume();
+    const { data, setData, toggleEditMode, editMode, removeSectionItem, addSectionItem, moveSectionItem } = useResume();
     const skills = data[sectionKey] || [];
     const historyRef = useRef([]);
     const firstItemRef = useRef(null);
@@ -144,7 +144,7 @@ const Skills = ({ sectionKey }) => {
         >
             {skills.map((skill, index) => (
                 <ItemWrapper
-                    key={index}
+                    key={skill.id || index}
                     itemRef={index === 0
                         ? firstItemRef
                         : index === skills.length - 1
@@ -159,9 +159,11 @@ const Skills = ({ sectionKey }) => {
                     canUndo={historyRef.current.length > 0}
                     onAIUpdate={(updatedData) => handleAIUpdate(index, updatedData)}
                     sectionData={skill}
-                    sectionTitle={sectionKey.split('_').map(word =>
-                        word.charAt(0).toUpperCase() + word.slice(1)
-                    ).join(' ')}
+                    sectionTitle="Skills"
+                    onMoveUp={() => moveSectionItem(sectionKey, index, 'up')}
+                    onMoveDown={() => moveSectionItem(sectionKey, index, 'down')}
+                    isFirst={index === 0}
+                    isLast={index === skills.length - 1}
                     editContent={
                         <div className="flex flex-column gap-3">
                             <InputText

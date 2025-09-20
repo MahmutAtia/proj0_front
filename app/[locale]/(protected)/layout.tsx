@@ -15,7 +15,8 @@ export const metadata: Metadata = {
 
 export default function ProtectedLayout({ children }: ProtectedLayoutProps) {
     return (
-        <Providers>
+        <Providers >
+            <AppConfig />
             {children}
         </Providers>
     );

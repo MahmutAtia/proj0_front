@@ -7,9 +7,13 @@ import { Toast } from 'primereact/toast';
 import { ProgressSpinner } from 'primereact/progressspinner';
 import { Divider } from 'primereact/divider';
 import { Dialog } from 'primereact/dialog';
+import { Dropdown } from 'primereact/dropdown';
+import { InputTextarea } from 'primereact/inputtextarea';
 import { useSession } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
 import api from '@/lib/axios';
+import { PolarEmbedCheckout } from '@polar-sh/checkout/embed';
+
 
 const PlansPage = () => {
     const { data: session } = useSession();
@@ -22,9 +26,30 @@ const PlansPage = () => {
     const [cancelDialog, setCancelDialog] = useState(false);
     const [canceling, setCanceling] = useState(false);
     const [mounted, setMounted] = useState(false);
+    const [reactivating, setReactivating] = useState(false);
+    
+    // States for plan change confirmation dialog
+    const [planChangeDialog, setPlanChangeDialog] = useState(false);
+    const [targetPlan, setTargetPlan] = useState(null);
+    
+    // New states for the cancellation flow
+    const [cancelStep, setCancelStep] = useState(1);
+    const [cancelReason, setCancelReason] = useState(null);
+    const [cancelComment, setCancelComment] = useState('');
+
+    const cancellationReasons = [
+        { label: 'It\'s too expensive', value: 'too_expensive' },
+        { label: 'I\'m missing some features', value: 'missing_features' },
+        { label: 'I switched to another service', value: 'switched_service' },
+        { label: 'I\'m not using it enough', value: 'unused' },
+        { label: 'I\'m not happy with the quality', value: 'low_quality' },
+        { label: 'It\'s too complicated to use', value: 'too_complex' },
+        { label: 'Other', value: 'other' },
+    ];
 
     useEffect(() => {
         setMounted(true);
+        PolarEmbedCheckout.init();
         fetchPlans();
         if (session?.accessToken) {
             fetchCurrentSubscription();
@@ -75,44 +100,77 @@ const PlansPage = () => {
         }
     };
 
-    const handleSubscribe = async (planId) => {
+    const performPlanAction = async (planId) => {
         if (!session?.accessToken) {
-            showToast('warn', 'Authentication Required', 'Please log in to subscribe to a plan');
+            showToast('warn', 'Authentication Required', 'Please log in to manage plans');
             return;
         }
-
+    
         setSubscribing(planId);
-
+    
         try {
-            const response = await api.post(`/api/subscribe/`, {
-                plan_id: planId,
-                variant: 'dummy'
-            });
+            const isCurrentlyOnPaidPlan = currentSubscription?.has_subscription && !currentSubscription?.plan?.is_free;
 
-            if (response.data.success) {
-                let severity = 'success';
-                let summary = 'Success';
-                let detail = response.data.message;
-
-                if (response.data.already_subscribed) {
-                    severity = 'info';
-                    summary = 'Already Subscribed';
-                } else if (response.data.reactivated) {
-                    severity = 'success';
-                    summary = 'Reactivated';
-                    detail = 'Your subscription has been reactivated without additional charge!';
-                }
-
-                showToast(severity, summary, detail);
+            // Case 1: User is on a PAID plan and is changing to a DIFFERENT plan
+            if (isCurrentlyOnPaidPlan && !isCurrentPlan(planId)) {
+                const response = await api.post(`/api/update-plan/`, { new_plan_id: planId });
+                showToast('success', 'Plan Updated', response.data.message);
                 fetchCurrentSubscription();
-            } else {
-                showToast('error', 'Subscription Failed', response.data.error || 'An error occurred');
+            }
+            // Case 2: User has a canceling PAID subscription and is reactivating it
+            else if (currentSubscription?.is_canceling && isCurrentPlan(planId)) {
+                await handleReactivateSubscription();
+            }
+            // Case 3: User has no subscription OR is on a free plan. Go to checkout.
+            else {
+                const response = await api.post(`/api/polar/create-checkout/`, { plan_id: planId });
+    
+                if (response.data.checkout_url) {
+                    const checkout = await PolarEmbedCheckout.create(response.data.checkout_url, 'light');
+                    checkout.addEventListener('success', () => {
+                        showToast('success', 'Purchase Successful', 'Your subscription is now active!');
+                        fetchCurrentSubscription();
+                    });
+                } else {
+                    showToast('error', 'Subscription Failed', response.data.error || 'Could not process subscription.');
+                }
             }
         } catch (error) {
-            console.error('Error subscribing:', error);
-            showToast('error', 'Subscription Failed', error.response?.data?.error || 'Network error occurred');
+            console.error('Error performing plan action:', error);
+            showToast('error', 'Action Failed', error.response?.data?.error || 'A network error occurred.');
         } finally {
             setSubscribing(null);
+        }
+    };
+
+    const handlePlanAction = (planId, planName) => {
+        const isCurrentlyOnPaidPlan = currentSubscription?.has_subscription && !currentSubscription?.plan?.is_free;
+
+        // Only show confirmation if user is on a PAID plan and switching to another plan.
+        if (isCurrentlyOnPaidPlan && !isCurrentPlan(planId)) {
+            setTargetPlan({ id: planId, name: planName });
+            setPlanChangeDialog(true);
+        } else {
+            // For new subscriptions or upgrades from free, proceed immediately to checkout.
+            performPlanAction(planId);
+        }
+    };
+
+    const handleReactivateSubscription = async () => {
+        if (!session?.accessToken) return;
+
+        setReactivating(true);
+        try {
+            const response = await api.post(`/api/reactivate/`);
+            if (response.data.success) {
+                showToast('success', 'Subscription Reactivated', 'Your subscription will now auto-renew.');
+                fetchCurrentSubscription(); // Refresh subscription state
+            }
+        } catch (error) {
+            console.error('Error reactivating subscription:', error);
+            showToast('error', 'Reactivation Failed', error.response?.data?.error || 'Failed to reactivate subscription');
+        } finally {
+            setReactivating(false);
         }
     };
 
@@ -123,17 +181,15 @@ const PlansPage = () => {
 
         try {
             const response = await api.post(`/api/cancel/`, {
-                immediate: immediate
+                immediate: immediate,
+                reason: cancelReason,
+                comment: cancelComment,
             });
 
             if (response.data.success) {
-                const message = immediate
-                    ? 'Subscription canceled immediately'
-                    : 'Subscription will end at the current billing period';
-
-                showToast('success', 'Subscription Canceled', message);
+                showToast('success', 'Subscription Canceled', response.data.message);
                 fetchCurrentSubscription();
-                setCancelDialog(false);
+                closeCancelDialog();
             }
         } catch (error) {
             console.error('Error canceling subscription:', error);
@@ -141,6 +197,16 @@ const PlansPage = () => {
         } finally {
             setCanceling(false);
         }
+    };
+
+    const closeCancelDialog = () => {
+        setCancelDialog(false);
+        // Reset state for next time
+        setTimeout(() => {
+            setCancelStep(1);
+            setCancelReason(null);
+            setCancelComment('');
+        }, 300);
     };
 
     const isCurrentPlan = (planId) => {
@@ -208,11 +274,13 @@ const PlansPage = () => {
             return 'Feature details unavailable';
         });
     };
-
     if (loading) {
         return (
-            <div className="flex justify-content-center align-items-center" style={{ minHeight: '400px' }}>
-                <ProgressSpinner style={{ width: '50px', height: '50px' }} />
+            <div className="flex justify-content-center align-items-center min-h-screen">
+                <div className="text-center">
+                    <ProgressSpinner style={{ width: '60px', height: '60px' }} strokeWidth="3" />
+                    <p className="mt-3 text-600">Loading subscription plans...</p>
+                </div>
             </div>
         );
     }
@@ -220,162 +288,205 @@ const PlansPage = () => {
     return (
         <div className="card">
             <Toast ref={toast} />
-
-            {/* Header */}
-            <div className="flex justify-content-between align-items-center mb-6">
-                <div>
-                    <h1 className="text-3xl font-bold text-900 mb-2">Subscription Plans</h1>
-                    <p className="text-600 text-lg">Choose the perfect plan for your career journey</p>
+            
+            <div className="max-w-7xl mx-auto">
+                {/* Hero Section */}
+                <div className="text-center mb-8">
+                    <div className="inline-flex align-items-center gap-2 bg-primary-50 text-primary border-round-3xl px-4 py-2 mb-4">
+                        <i className="pi pi-star-fill text-xs"></i>
+                        <span className="text-sm font-medium">Choose Your Career Path</span>
+                    </div>
+                    <h1 className="text-5xl font-bold text-900 mb-3 bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
+                        Subscription Plans
+                    </h1>
+                    <p className="text-xl text-600 max-w-2xl mx-auto leading-relaxed">
+                        Unlock your potential with our carefully crafted plans designed to accelerate your career growth
+                    </p>
                 </div>
-                <Button
-                    label="Back to Dashboard"
-                    icon="pi pi-arrow-left"
-                    outlined
-                    onClick={() => router.push('/main')}
-                />
-            </div>
 
-            {/* Current Subscription Info */}
-            {currentSubscription?.has_subscription && (
-                <div className="mb-6">
-                    <Card className={`${currentSubscription.is_canceling ? 'surface-200' : 'surface-100'} border-left-3 ${currentSubscription.is_canceling ? 'border-orange-500' : 'border-green-500'}`}>
-                        <div className="flex flex-column md:flex-row align-items-start md:align-items-center justify-content-between gap-3">
-                            <div className="flex-1">
-                                <h3 className="text-xl font-semibold mb-2 text-900">
-                                    {currentSubscription.is_canceling ? 'Subscription Ending' : 'Current Subscription'}
-                                </h3>
-                                <p className="mb-2 text-700">
-                                    <strong>{currentSubscription.plan?.name}</strong> - ${currentSubscription.plan?.price}/{currentSubscription.plan?.billing_period}
-                                </p>
-                                {getSubscriptionMessage()}
-                            </div>
-                            <div className="flex align-items-center gap-3">
-                                {getSubscriptionStatusBadge()}
-                                {currentSubscription.is_canceling ? (
-                                    <Button
-                                        label="Reactivate"
-                                        severity="success"
-                                        size="small"
-                                        onClick={() => handleSubscribe(currentSubscription.plan.id)}
-                                    />
-                                ) : (
-                                    <Button
-                                        label="Cancel"
-                                        severity="danger"
-                                        size="small"
-                                        outlined
-                                        onClick={() => setCancelDialog(true)}
-                                    />
-                                )}
-                            </div>
-                        </div>
-                    </Card>
-                </div>
-            )}
-
-            {/* No subscription message for logged in users */}
-            {session?.accessToken && !currentSubscription?.has_subscription && (
-                <div className="mb-6">
-                    <Card className="surface-100 border-left-3 border-blue-500">
-                        <div className="text-center">
-                            <i className="pi pi-info-circle text-blue-500 text-4xl mb-3"></i>
-                            <h3 className="text-blue-800 mb-2">No Active Subscription</h3>
-                            <p className="text-600">
-                                Choose a plan below to unlock premium features and boost your career
-                            </p>
-                        </div>
-                    </Card>
-                </div>
-            )}
-
-            {/* Plans Grid */}
-            <div className="grid">
-                {plans.map((plan) => {
-                    const planFeatures = getPlanFeatures(plan);
-                    const isPopular = plan.name.toLowerCase().includes('pro') || plan.name.toLowerCase().includes('premium');
-                    const isFree = plan.is_free || parseFloat(plan.price) === 0;
-
-                    return (
-                        <div key={plan.id} className="col-12 lg:col-4 md:col-6">
-                            <Card
-                                className={`h-full relative ${
-                                    isPopular ? 'border-primary border-2' : ''
-                                } ${
-                                    isCurrentPlan(plan.id) ? 'surface-100 border-primary border-2' : ''
-                                } hover:shadow-3 transition-all transition-duration-300`}
-                            >
-                                {isPopular && (
-                                    <div className="absolute -top-2 left-50 transform -translate-x-50 z-1">
-                                        <Badge value="MOST POPULAR" severity="info" />
-                                    </div>
-                                )}
-
-                                {isFree && (
-                                    <div className="absolute -top-2 right-3 z-1">
-                                        <Badge value="FREE" severity="success" />
-                                    </div>
-                                )}
-
-                                <div className="text-center mb-4">
-                                    <h3 className="text-2xl font-bold mb-2 text-primary">{plan.name}</h3>
-                                    <p className="text-600 mb-4">{plan.description}</p>
-
-                                    <div className="mb-4">
-                                        <div className="flex align-items-baseline justify-content-center gap-1 mb-2">
-                                            <span className="text-4xl font-bold text-900">${plan.price}</span>
-                                            <span className="text-600">/{plan.billing_period}</span>
+                {/* Current Subscription Status */}
+                {currentSubscription?.has_subscription && (
+                    <div className="mb-8">
+                        <div className={`relative overflow-hidden border-round-2xl p-6 ${
+                            currentSubscription.is_canceling 
+                                ? 'bg-gradient-to-r from-orange-50 to-red-50 border-2 border-orange-200' 
+                                : 'bg-gradient-to-r from-green-50 to-emerald-50 border-2 border-green-200'
+                        }`}>
+                            <div className="absolute top-0 right-0 w-32 h-32 bg-white opacity-10 border-circle transform translate-x-16 -translate-y-16"></div>
+                            <div className="relative z-1">
+                                <div className="flex flex-column md:flex-row align-items-start md:align-items-center justify-content-between gap-4">
+                                    <div className="flex-1">
+                                        <div className="flex align-items-center gap-3 mb-3">
+                                            <div className={`w-3rem h-3rem border-circle flex align-items-center justify-content-center ${
+                                                currentSubscription.is_canceling ? 'bg-orange-100' : 'bg-green-100'
+                                            }`}>
+                                                <i className={`pi ${currentSubscription.is_canceling ? 'pi-clock' : 'pi-check'} text-xl ${
+                                                    currentSubscription.is_canceling ? 'text-orange-600' : 'text-green-600'
+                                                }`}></i>
+                                            </div>
+                                            <div>
+                                                <h3 className="text-2xl font-bold mb-1 text-900">
+                                                    {currentSubscription.is_canceling ? 'Subscription Ending' : 'Active Subscription'}
+                                                </h3>
+                                                {getSubscriptionStatusBadge()}
+                                            </div>
+                                        </div>
+                                        <div className="bg-white bg-opacity-70 border-round-xl p-4">
+                                            <p className="text-lg font-semibold mb-2 text-900">
+                                                {currentSubscription.plan?.name} Plan
+                                            </p>
+                                            <p className="text-600 mb-2">
+                                                ${currentSubscription.plan?.price}/{currentSubscription.plan?.billing_period}
+                                            </p>
+                                            {getSubscriptionMessage()}
                                         </div>
                                     </div>
+                                    <div className="flex align-items-center gap-3">
+                                        {currentSubscription.is_canceling ? (
+                                            <Button
+                                                label="Reactivate Subscription"
+                                                icon="pi pi-refresh"
+                                                className="bg-green-500 hover:bg-green-600 border-none px-6 py-3"
+                                                loading={reactivating}
+                                                onClick={handleReactivateSubscription}
+                                            />
+                                        ) : (
+                                            <Button
+                                                label="Manage Subscription"
+                                                icon="pi pi-cog"
+                                                severity="secondary"
+                                                outlined
+                                                className="px-6 py-3"
+                                                onClick={() => setCancelDialog(true)}
+                                            />
+                                        )}
+                                    </div>
                                 </div>
+                            </div>
+                        </div>
+                    </div>
+                )}
 
-                                <Divider />
-
-                                <div className="mb-4" style={{ minHeight: '200px' }}>
-                                    <h4 className="font-semibold mb-3 text-center text-900">Features Included:</h4>
-                                    <ul className="list-none p-0 m-0">
-                                        {planFeatures.map((feature, index) => (
-                                            <li key={index} className="flex align-items-start mb-2">
-                                                <i className="pi pi-check text-green-500 mr-2 mt-1 text-sm"></i>
-                                                <span className="text-700 text-sm line-height-3">{feature}</span>
-                                            </li>
-                                        ))}
-                                    </ul>
+                {/* No Subscription CTA */}
+                {session?.accessToken && !currentSubscription?.has_subscription && (
+                    <div className="mb-8">
+                        <div className="relative overflow-hidden bg-gradient-to-r from-blue-500 to-purple-600 border-round-2xl p-8 text-center text-white">
+                            <div className="absolute top-0 left-0 w-full h-full opacity-10">
+                                <div className="absolute top-4 left-4 w-16 h-16 border-circle bg-white"></div>
+                                <div className="absolute bottom-4 right-4 w-24 h-24 border-circle bg-white"></div>
+                                <div className="absolute top-1/2 right-8 w-8 h-8 border-circle bg-white"></div>
+                            </div>
+                            <div className="relative z-1">
+                                <i className="pi pi-star text-6xl mb-4 opacity-90"></i>
+                                <h3 className="text-3xl font-bold mb-3">Ready to Elevate Your Career?</h3>
+                                <p className="text-xl opacity-90 mb-6 max-w-2xl mx-auto">
+                                    Join thousands of professionals who have transformed their careers with our premium features
+                                </p>
+                                <div className="flex justify-content-center gap-3">
+                                    <div className="flex align-items-center gap-2 bg-white bg-opacity-20 border-round-xl px-4 py-2">
+                                        <i className="pi pi-check text-sm"></i>
+                                        <span>AI-Powered Tools</span>
+                                    </div>
+                                    <div className="flex align-items-center gap-2 bg-white bg-opacity-20 border-round-xl px-4 py-2">
+                                        <i className="pi pi-check text-sm"></i>
+                                        <span>Expert Guidance</span>
+                                    </div>
+                                    <div className="flex align-items-center gap-2 bg-white bg-opacity-20 border-round-xl px-4 py-2">
+                                        <i className="pi pi-check text-sm"></i>
+                                        <span>Career Analytics</span>
+                                    </div>
                                 </div>
+                            </div>
+                        </div>
+                    </div>
+                )}
+            </div>
 
-                                <div className="mt-auto">
-                                    {isCurrentPlan(plan.id) && !currentSubscription?.is_canceling ? (
-                                        <Button
-                                            label="Current Plan"
-                                            icon="pi pi-check"
-                                            className="w-full"
-                                            severity="success"
-                                            disabled
-                                        />
-                                    ) : !session?.accessToken ? (
-                                        <Button
-                                            label="Login to Subscribe"
-                                            icon="pi pi-sign-in"
-                                            className="w-full"
-                                            severity="secondary"
-                                            onClick={() => router.push('/login')}
-                                        />
-                                    ) : (
-                                        <Button
-                                            label={
-                                                subscribing === plan.id ? 'Processing...' :
-                                                (isCurrentPlan(plan.id) && currentSubscription?.is_canceling ? 'Reactivate Plan' :
-                                                 isFree ? 'Get Started Free' : 'Subscribe Now')
-                                            }
-                                            icon={subscribing === plan.id ? 'pi pi-spin pi-spinner' :
-                                                  (isFree ? 'pi pi-play' : 'pi pi-credit-card')}
-                                            className="w-full"
-                                            severity={isPopular ? 'info' : (isFree ? 'success' : 'primary')}
-                                            loading={subscribing === plan.id}
-                                            onClick={() => handleSubscribe(plan.id)}
-                                        />
-                                    )}
+
+
+            {/* Plans Grid */}
+            <div className="grid -mt-3">
+                {plans.map((plan) => {
+                    const planFeatures = getPlanFeatures(plan);
+                    const isPopular = plan.is_popular;
+                    const isFree = plan.is_free || parseFloat(plan.price) === 0;
+                    const isCurrent = isCurrentPlan(plan.id);
+
+                    return (
+                        <div key={plan.id} className="col-12 md:col-6 lg:col-4 p-3">
+                            <div
+                                className={`h-full flex flex-column border-round-xl shadow-1 transition-all transition-duration-300 hover:shadow-3 ${
+                                    isCurrent ? 'border-2 border-primary' : 'surface-card'
+                                } ${isPopular && !isCurrent ? 'border-2 border-primary-500' : ''}`}
+                            >
+                                {isPopular && (
+                                    <div className="bg-primary text-center p-2 border-round-top-lg">
+                                        <h5 className="font-bold text-white m-0">MOST POPULAR</h5>
+                                    </div>
+                                )}
+
+                                <div className="p-4 flex flex-column flex-grow-1">
+                                    <div className="text-center mb-4">
+                                        <h3 className="text-2xl font-bold mb-2 text-900">{plan.name}</h3>
+                                        <p className="text-600 mb-4 h-3rem">{plan.description}</p>
+                                        <div className="flex align-items-baseline justify-content-center gap-2">
+                                            {isFree ? (
+                                                <span className="text-5xl font-bold text-green-500">Free</span>
+                                            ) : (
+                                                <>
+                                                    <span className="text-5xl font-bold text-900">${plan.price}</span>
+                                                    <span className="text-600 text-lg">/ {plan.billing_period}</span>
+                                                </>
+                                            )}
+                                        </div>
+                                    </div>
+
+                                    <Divider className="my-4" />
+
+                                    <div className="mb-5 flex-grow-1">
+                                        <h4 className="font-semibold mb-4 text-center text-800">What&apos;s Included:</h4>
+                                        <ul className="list-none p-0 m-0">
+                                            {planFeatures.map((feature, index) => (
+                                                <li key={index} className="flex align-items-start mb-3">
+                                                    <i className="pi pi-check-circle text-green-500 mr-3 mt-1 text-lg"></i>
+                                                    <span className="text-700 line-height-3">{feature}</span>
+                                                </li>
+                                            ))}
+                                        </ul>
+                                    </div>
+
+                                    <div className="mt-auto pt-3">
+                                        {isCurrent && !currentSubscription?.is_canceling ? (
+                                            <Button
+                                                label="Your Current Plan"
+                                                icon="pi pi-check-circle"
+                                                className="w-full p-button-success"
+                                                disabled
+                                            />
+                                        ) : !session?.accessToken ? (
+                                            <Button
+                                                label="Login to Subscribe"
+                                                icon="pi pi-sign-in"
+                                                className="w-full p-button-secondary"
+                                                onClick={() => router.push('/login')}
+                                            />
+                                        ) : (
+                                            <Button
+                                                label={
+                                                    subscribing === plan.id ? 'Processing...' :
+                                                    (isCurrent && currentSubscription?.is_canceling ? 'Reactivate Plan' :
+                                                     isFree ? 'Get Started for Free' : 'Choose Plan')
+                                                }
+                                                icon={subscribing === plan.id ? 'pi pi-spin pi-spinner' : 'pi pi-arrow-right'}
+                                                iconPos="right"
+                                                className={`w-full ${isPopular ? 'p-button-primary' : 'p-button-outlined p-button-primary'}`}
+                                                loading={subscribing === plan.id}
+                                                onClick={() => handlePlanAction(plan.id, plan.name)}
+                                            />
+                                        )}
+                                    </div>
                                 </div>
-                            </Card>
+                            </div>
                         </div>
                     );
                 })}
@@ -384,131 +495,162 @@ const PlansPage = () => {
             {/* Management Actions */}
             {session?.accessToken && currentSubscription?.has_subscription && (
                 <div className="mt-6">
-                    <Card>
-                        <h4 className="text-900 mb-4">
-                            <i className="pi pi-cog mr-2 text-primary"></i>
-                            Manage Your Subscription
-                        </h4>
-                        <div className="flex flex-wrap gap-2">
-                            <Button
-                                label="Usage Statistics"
-                                icon="pi pi-chart-bar"
-                                size="small"
-                                outlined
-                                onClick={() => router.push('/main/plans/usage')}
-                            />
-                            <Button
-                                label="Payment History"
-                                icon="pi pi-history"
-                                size="small"
-                                outlined
-                                onClick={() => router.push('/main/plans/payments')}
-                            />
-                            <Button
-                                label="Account Settings"
-                                icon="pi pi-user"
-                                size="small"
-                                outlined
-                                onClick={() => router.push('/main/settings')}
-                            />
-                            <Button
-                                label="Download Invoice"
-                                icon="pi pi-download"
-                                size="small"
-                                outlined
-                                onClick={() => showToast('info', 'Coming Soon', 'Invoice download will be available soon')}
-                            />
+                    <Card className="border-round-xl">
+                        <div className="flex flex-column md:flex-row align-items-start md:align-items-center justify-content-between">
+                            <div className="mb-4 md:mb-0">
+                                <h4 className="text-xl font-bold text-900 m-0 mb-1">Manage Your Subscription</h4>
+                                <p className="text-600 m-0">Access usage, history, and account settings.</p>
+                            </div>
+                            <div className="flex flex-wrap gap-2">
+                                <Button
+                                    label="Usage"
+                                    icon="pi pi-chart-bar"
+                                    className="p-button-secondary p-button-outlined"
+                                    onClick={() => router.push('/main/plans/usage')}
+                                />
+                                <Button
+                                    label="Settings"
+                                    icon="pi pi-user"
+                                    className="p-button-secondary p-button-outlined"
+                                    onClick={() => router.push('/main/settings')}
+                                />
+                            </div>
                         </div>
                     </Card>
                 </div>
             )}
 
             {/* Empty state */}
-            {plans.length === 0 && (
-                <div className="text-center py-8">
-                    <Card>
+            {plans.length === 0 && !loading && (
+                <div className="text-center py-8 mt-6">
+                    <div className="surface-card p-5 border-round-xl border-1 border-dashed surface-border">
                         <i className="pi pi-inbox text-6xl text-400 mb-4"></i>
-                        <h3 className="text-600 mb-2">No Plans Available</h3>
-                        <p className="text-500">
-                            Plans are currently being configured. Please check back later.
+                        <h3 className="text-xl font-bold text-800 mb-2">No Plans Available Right Now</h3>
+                        <p className="text-600 max-w-30rem mx-auto">
+                            We are currently updating our subscription plans. Please check back in a little while.
                         </p>
-                    </Card>
+                    </div>
                 </div>
             )}
 
-            {/* Features Comparison */}
-            {plans.length > 0 && (
-                <div className="mt-6">
-                    <Card>
-                        <h3 className="text-center text-2xl font-bold mb-4 text-900">Why Choose Our Plans?</h3>
-                        <div className="grid">
-                            <div className="col-12 md:col-4 text-center p-4">
-                                <i className="pi pi-shield text-4xl text-blue-500 mb-3"></i>
-                                <h4 className="font-semibold mb-2 text-900">Secure & Reliable</h4>
-                                <p className="text-600">Your data is encrypted and backed up securely</p>
-                            </div>
-                            <div className="col-12 md:col-4 text-center p-4">
-                                <i className="pi pi-mobile text-4xl text-green-500 mb-3"></i>
-                                <h4 className="font-semibold mb-2 text-900">Mobile Friendly</h4>
-                                <p className="text-600">Access your account from anywhere, anytime</p>
-                            </div>
-                            <div className="col-12 md:col-4 text-center p-4">
-                                <i className="pi pi-headphones text-4xl text-purple-500 mb-3"></i>
-                                <h4 className="font-semibold mb-2 text-900">24/7 Support</h4>
-                                <p className="text-600">Get help whenever you need it from our support team</p>
-                            </div>
-                        </div>
-                    </Card>
-                </div>
-            )}
 
             {/* Cancel Subscription Dialog */}
             <Dialog
                 header="Cancel Subscription"
                 visible={cancelDialog}
-                onHide={() => setCancelDialog(false)}
+                onHide={closeCancelDialog}
                 style={{ width: '500px' }}
                 modal
+                footer={
+                    cancelStep === 2 ? (
+                        <div>
+                            <Button label="Back" icon="pi pi-arrow-left" text onClick={() => setCancelStep(1)} />
+                            <Button 
+                                label="Confirm Cancellation" 
+                                icon="pi pi-check" 
+                                severity="warning" 
+                                loading={canceling}
+                                onClick={() => handleCancelSubscription(false)} 
+                                disabled={!cancelReason}
+                            />
+                        </div>
+                    ) : null
+                }
             >
-                <div className="text-center mb-4">
-                    <i className="pi pi-exclamation-triangle text-orange-500 text-6xl mb-4"></i>
-                    <h4 className="text-xl mb-3">Cancel Your Subscription?</h4>
-                    <p className="text-600 line-height-3">
-                        Choose how you&apos;d like to cancel your subscription. You can always reactivate it later.
-                    </p>
-                </div>
+                {cancelStep === 1 && (
+                    <div>
+                        <div className="text-center mb-4">
+                            <i className="pi pi-exclamation-triangle text-orange-500 text-6xl mb-4"></i>
+                            <h4 className="text-xl mb-3">Are you sure?</h4>
+                            <p className="text-600 line-height-3">
+                                How would you like to proceed with your cancellation?
+                            </p>
+                        </div>
+                        <div className="flex flex-column gap-3">
+                            <Button
+                                label="Cancel at Period End"
+                                tooltip="We'll ask for brief feedback on the next step."
+                                tooltipOptions={{ position: 'bottom' }}
+                                icon="pi pi-calendar"
+                                className="w-full"
+                                severity="warning"
+                                onClick={() => setCancelStep(2)}
+                            />
+                            <Button
+                                label="Nevermind, Keep My Plan"
+                                icon="pi pi-heart"
+                                className="w-full"
+                                severity="secondary"
+                                outlined
+                                onClick={closeCancelDialog}
+                            />
+                        </div>
+                    </div>
+                )}
 
-                <div className="flex flex-column gap-3">
-                    <Button
-                        label="Cancel at Period End"
-                        icon="pi pi-calendar"
-                        className="w-full"
-                        severity="warning"
-                        loading={canceling}
-                        onClick={() => handleCancelSubscription(false)}
-                    />
-                    <Button
-                        label="Cancel Immediately"
-                        icon="pi pi-times"
-                        className="w-full"
-                        severity="danger"
-                        loading={canceling}
-                        onClick={() => handleCancelSubscription(true)}
-                    />
-                    <Button
-                        label="Keep My Subscription"
-                        icon="pi pi-heart"
-                        className="w-full"
-                        severity="secondary"
-                        outlined
-                        onClick={() => setCancelDialog(false)}
-                    />
-                </div>
+                {cancelStep === 2 && (
+                    <div>
+                        <div className="text-center mb-4">
+                            <i className="pi pi-comment text-blue-500 text-5xl mb-4"></i>
+                            <h4 className="text-xl mb-3">We&apos;re sad to see you go!</h4>
+                            <p className="text-600 line-height-3">
+                                Please share why you&apos;re canceling. Your feedback is vital for us to improve.
+                            </p>
+                        </div>
+                        <div className="flex flex-column gap-4">
+                            <div className="flex flex-column gap-2">
+                                <label htmlFor="cancelReason">Primary reason for canceling</label>
+                                <Dropdown
+                                    id="cancelReason"
+                                    value={cancelReason}
+                                    options={cancellationReasons}
+                                    onChange={(e) => setCancelReason(e.value)}
+                                    placeholder="Select a reason"
+                                    className="w-full"
+                                />
+                            </div>
+                            <div className="flex flex-column gap-2">
+                                <label htmlFor="cancelComment">Any other feedback? (Optional)</label>
+                                <InputTextarea
+                                    id="cancelComment"
+                                    value={cancelComment}
+                                    onChange={(e) => setCancelComment(e.target.value)}
+                                    rows={3}
+                                    className="w-full"
+                                    autoResize
+                                />
+                            </div>
+                        </div>
+                    </div>
+                )}
+            </Dialog>
 
-                <div className="text-center mt-4">
-                    <small className="text-600">
-                        💡 You can reactivate your subscription anytime before it expires without any additional charges.
-                    </small>
+            {/* Plan Change Confirmation Dialog */}
+            <Dialog
+                header="Confirm Plan Change"
+                visible={planChangeDialog}
+                style={{ width: '450px' }}
+                modal
+                onHide={() => setPlanChangeDialog(false)}
+                footer={
+                    <div>
+                        <Button label="Cancel" icon="pi pi-times" onClick={() => setPlanChangeDialog(false)} className="p-button-text" />
+                        <Button
+                            label="Confirm Switch"
+                            icon="pi pi-check"
+                            loading={subscribing === targetPlan?.id}
+                            onClick={() => {
+                                performPlanAction(targetPlan.id);
+                                setPlanChangeDialog(false);
+                            }}
+                            autoFocus
+                        />
+                    </div>
+                }
+            >
+                <div className="flex align-items-center">
+                    <i className="pi pi-exclamation-triangle mr-3" style={{ fontSize: '2rem' }} />
+                    <span>Are you sure you want to switch to the <strong>{targetPlan?.name}</strong> plan?</span>
                 </div>
             </Dialog>
         </div>

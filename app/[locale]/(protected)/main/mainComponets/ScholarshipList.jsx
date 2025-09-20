@@ -4,6 +4,7 @@ import { Button } from 'primereact/button';
 import { ProgressSpinner } from 'primereact/progressspinner';
 import styles from '../Dashboard.module.css';
 import useUserLocation from '../../../../hooks/useUserLocation'; // Adjust path as needed
+import { FiAward } from 'react-icons/fi';
 
 const ScholarshipList = ({ router }) => {
     const [scholarships, setScholarships] = useState([]);
@@ -74,32 +75,14 @@ const ScholarshipList = ({ router }) => {
                     iconPos="right"
                     className="p-button-text p-button-sm"
                     onClick={() => router.push('/main/scholarship-feed')}
+                    disabled // Disable button until feature is ready
                 />
             </div>
-            {displayError && <p className="text-sm text-red-500 mb-3">{displayError}</p>}
-            {location.city && location.country && !locationError && (
-                <p className="text-sm text-color-secondary mb-3">
-                    Showing results based on your location: {location.city}, {location.country}.
-                </p>
-            )}
-            {isLoading ? (
-                <div className="flex justify-content-center align-items-center py-5">
-                    <ProgressSpinner style={{ width: '30px', height: '30px' }} />
-                </div>
-            ) : scholarships.length > 0 ? (
-                <ul className="list-none p-0 m-0">
-                    {scholarships.map(scholarship => (
-                        <li key={scholarship.id} className={`${styles.feedItem} p-2 border-round cursor-pointer`}>
-                            <div className={styles.feedItemTitle}>{scholarship.title}</div>
-                            <div className={styles.feedItemSubtitle}>
-                                {scholarship.provider} {scholarship.deadline && `- Deadline: ${scholarship.deadline}`}
-                            </div>
-                        </li>
-                    ))}
-                </ul>
-            ) : (
-                <p className="text-color-secondary">{displayError ? "Could not load scholarships." : "No new scholarship opportunities found."}</p>
-            )}
+            <div className="flex flex-column justify-content-center align-items-center h-full text-center text-color-secondary p-4">
+                <FiAward size="48" className="mb-3" />
+                <h4 className="font-bold">Coming Soon!</h4>
+                <p>We are working hard to bring you scholarship opportunities. Stay tuned!</p>
+            </div>
         </Card>
     );
 };

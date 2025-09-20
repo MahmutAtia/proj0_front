@@ -74,67 +74,34 @@ const JobFeedPage = () => {
     };
 
     const jobItemTemplate = (job, currentLayout) => {
-        if (currentLayout === 'list') {
-            return (
-                <div className="col-12">
-                    <Card className={`${styles.jobListItem} mb-3`}>
-                        <div className="flex flex-column xl:flex-row xl:align-items-start p-4 gap-4">
-                            <div className="flex flex-column sm:flex-row justify-content-between align-items-center xl:align-items-start flex-1 gap-4">
-                                <div className="flex flex-column align-items-center sm:align-items-start gap-3">
-                                    <div className="text-2xl font-bold text-900">{job.title}</div>
-                                    <div className="text-lg text-600">{job.company}</div>
-                                    <div className="flex align-items-center gap-3">
-                                        <span><i className="pi pi-map-marker mr-1"></i>{job.location || t('jobFeed.job.locationNotSpecified') || 'Not specified'}</span>
-                                        {job.is_remote && (<span className="p-tag p-tag-success">{t('common.remote') || 'Remote'}</span>)}
-                                    </div>
-                                    {job.addedAt && (
-                                        <div className="text-sm text-color-secondary">
-                                            {t('jobFeed.job.addedAgo') || 'Added'} {formatTimeAgo(job.addedAt)}
-                                        </div>
-                                    )}
-                                    <a href={job.job_url} target="_blank" rel="noopener noreferrer" className="p-button p-button-sm p-button-text mt-2">
-                                        {t('jobFeed.job.viewOn') || 'View on'} {job.site || t('common.source') || 'Source'} <i className="pi pi-external-link ml-1"></i>
-                                    </a>
-                                </div>
-                                <div className="flex sm:flex-column align-items-center sm:align-items-end gap-3 sm:gap-2">
-                                    {job.site && <Badge value={job.site.toUpperCase()} severity="secondary" />}
-                                    <Button label={t('jobFeed.job.applyNow') || 'Apply Now'} icon="pi pi-send" className="p-button-raised p-button-sm" onClick={() => window.open(job.job_url, '_blank')} />
-                                </div>
-                            </div>
-                        </div>
-                    </Card>
-                </div>
-            );
-        }
-
-        return ( // Grid Layout
+        return ( // Grid Layout only
             <div className="col-12 sm:col-6 lg:col-4 xl:col-3 p-2">
-                <Card className={`${styles.jobGridItem} h-full`}>
-                    <div className="p-3 border-round h-full flex flex-column">
-                        <div className="text-lg font-bold text-center mb-2">{job.title}</div>
+                <div className="surface-card shadow-2 border-1 surface-border border-round-2xl h-full hover:shadow-4 transition-all transition-duration-300">
+                    <div className="p-4 h-full flex flex-column">
+                        <div className="text-lg font-bold text-center mb-2 text-900">{job.title}</div>
                         <div className="text-md text-600 text-center mb-3">{job.company}</div>
                         <div className="text-sm text-500 mb-3">
-                            <i className="pi pi-map-marker mr-1"></i>{job.location || t('jobFeed.job.locationNotSpecified') || 'Not specified'}
-                            {job.is_remote && <span className="p-tag p-tag-info ml-2">{t('common.remote') || 'Remote'}</span>}
+                            <i className="pi pi-map-marker mr-1 text-primary"></i>{job.location || t('jobFeed.job.locationNotSpecified') || 'Not specified'}
+                            {job.is_remote && <span className="bg-green-100 text-green-800 px-2 py-1 border-round-lg text-xs font-semibold ml-2">{t('common.remote') || 'Remote'}</span>}
                         </div>
                         {job.addedAt && (
-                            <div className="text-xs text-color-secondary mb-3 text-center">
+                            <div className="text-xs text-500 mb-3 text-center">
                                 {t('jobFeed.job.addedAgo') || 'Added'} {formatTimeAgo(job.addedAt)}
                             </div>
                         )}
                         {job.site && (
                             <div className="text-center mb-3">
-                                <Badge value={job.site.toUpperCase()} severity="secondary" />
+                                <span className="bg-gray-100 text-gray-800 px-2 py-1 border-round-lg text-xs font-semibold">{job.site.toUpperCase()}</span>
                             </div>
                         )}
                         <div className="mt-auto flex flex-column gap-2">
-                            <a href={job.job_url} target="_blank" rel="noopener noreferrer" className="p-button p-button-sm p-button-outlined w-full">
+                            <a href={job.job_url} target="_blank" rel="noopener noreferrer" className="bg-primary-100 text-primary-700 hover:bg-primary-200 transition-colors px-3 py-2 border-round-lg text-sm font-semibold no-underline text-center">
                                 {t('jobFeed.job.viewOn') || 'View on'} {job.site || t('common.source') || 'Source'}
                             </a>
-                            <Button label={t('jobFeed.job.applyNow') || 'Apply Now'} icon="pi pi-send" className="p-button-sm p-button-raised w-full" onClick={() => window.open(job.job_url, '_blank')} />
+                            <Button label={t('jobFeed.job.applyNow') || 'Apply Now'} icon="pi pi-send" className="bg-primary hover:bg-primary-600 border-round-xl px-3 py-2 border-none font-semibold w-full" onClick={() => window.open(job.job_url, '_blank')} />
                         </div>
                     </div>
-                </Card>
+                </div>
             </div>
         );
     };
@@ -158,79 +125,79 @@ const JobFeedPage = () => {
     };
 
     const dataviewHeader = (
-        <div className={`flex flex-column md:flex-row md:justify-content-between gap-3 p-4 ${styles.header}`}>
-            <div className="flex justify-content-between align-items-center mb-3 md:mb-0">
-                <div className="flex align-items-center gap-2">
-                    <h2 className="text-2xl font-bold m-0">{t('jobFeed.title') || 'Job Feed'}</h2>
-                    {hasActiveCycle && (
-                        <Badge 
-                            value={
-                                <span className="flex align-items-center">
-                                    <i className="pi pi-spin pi-spinner mr-1" style={{fontSize: '0.8rem'}}></i>
-                                    LIVE
-                                </span>
-                            } 
-                            severity="success" 
-                            tooltip={t('jobFeed.autoUpdate.description') || 'Actively searching for new jobs...'}
+        <div className="bg-primary-gradient p-4 border-round-top-2xl">
+            <div className="flex flex-column lg:flex-row lg:justify-content-between gap-4">
+                <div className="flex flex-column sm:flex-row sm:justify-content-between sm:align-items-center gap-3">
+                    <div className="flex align-items-center gap-2">
+                        <h2 className="text-3xl font-bold m-0 ">{t('jobFeed.title') || 'Job Feed'}</h2>
+                        {hasActiveCycle && (
+                            <span className="bg-white-alpha-20  px-3 py-1 border-round-xl text-sm font-semibold flex align-items-center">
+                                <i className="pi pi-spin pi-spinner mr-1" style={{fontSize: '0.8rem'}}></i>
+                                LIVE
+                            </span>
+                        )}
+                    </div>
+                    <p className="text-900 m-0 text-sm">
+                        {t('jobFeed.showingJobs', { filtered: filteredJobs.length, total: allJobs.length })}
+                    </p>
+                </div>
+                
+                <div className="flex flex-column lg:flex-row gap-3 lg:align-items-center">
+                    <div className="flex flex-column sm:flex-row gap-2" style={{ maxWidth: '600px' }}>
+                        <InputText 
+                            placeholder={t('jobFeed.filters.search') || 'Job title, keyword...'} 
+                            value={searchTerm} 
+                            onChange={(e) => setSearchTerm(e.target.value)} 
+                            onKeyPress={(e) => e.key === 'Enter' && handleSearch()}
+                            className="border-round-lg border-none p-3 bg-white"
                         />
-                    )}
+                        <InputText 
+                            placeholder={t('jobFeed.filters.location') || 'City or Country'} 
+                            value={locationFilterInput} 
+                            onChange={(e) => setLocationFilterInput(e.target.value)} 
+                            onKeyPress={(e) => e.key === 'Enter' && handleSearch()}
+                            className="border-round-lg border-none p-3 bg-white"
+                        />
+                        <Button 
+                            icon="pi pi-search" 
+                            onClick={handleSearch} 
+                            loading={loading}
+                            tooltip={t('common.search') || 'Search'} 
+                            tooltipOptions={{position: 'bottom'}}
+                            className="bg-white text-primary hover:bg-gray-100 border-round-lg px-3 py-3 border-none flex-shrink-0"
+                        />
+                    </div>
+                    
+                    <div className="flex flex-column sm:flex-row align-items-stretch sm:align-items-center gap-3">
+                        <div className="flex align-items-center bg-white-alpha-20 px-3 py-2 border-round-lg">
+                            <Checkbox 
+                                inputId="remote" 
+                                onChange={e => setIsRemote(e.checked ?? false)} 
+                                checked={isRemote}
+                            />
+                            <label htmlFor="remote" className="ml-2  font-medium">{t('jobFeed.filters.remoteOnly') || 'Remote Only'}</label>
+                        </div>
+                        
+                        <Dropdown 
+                            options={sortOptions} 
+                            value={sortKey} 
+                            optionLabel="label" 
+                            placeholder={t('common.sortBy') || 'Sort By'} 
+                            onChange={(e) => setSortKey(e.value)} 
+                            className="border-round-lg border-none bg-white"
+                        />
+                        
+                        <Button
+                            icon="pi pi-refresh"
+                            className="bg-white-alpha-20 hover:bg-white-alpha-30 border-round-lg px-3 py-2 border-none"
+                            onClick={refresh}
+                            loading={loading}
+                            tooltip={t('common.refresh') || 'Refresh'}
+                        />
+                        
+                        <DataViewLayoutOptions layout={layout} onChange={(e) => setLayout(e.value)} style={{ display: 'none' }} />
+                    </div>
                 </div>
-                {/* Correctly display the job count */}
-                <p className="text-color-secondary m-0">
-                    {t('jobFeed.showingJobs', { filtered: filteredJobs.length, total: allJobs.length })}
-                </p>
-            </div>
-            
-            <div className="p-inputgroup flex-1 md:flex-initial" style={{ maxWidth: '600px' }}>
-                <InputText 
-                    placeholder={t('jobFeed.filters.search') || 'Job title, keyword...'} 
-                    value={searchTerm} 
-                    onChange={(e) => setSearchTerm(e.target.value)} 
-                    onKeyPress={(e) => e.key === 'Enter' && handleSearch()} 
-                />
-                <InputText 
-                    placeholder={t('jobFeed.filters.location') || 'City or Country'} 
-                    value={locationFilterInput} 
-                    onChange={(e) => setLocationFilterInput(e.target.value)} 
-                    onKeyPress={(e) => e.key === 'Enter' && handleSearch()} 
-                />
-                <Button 
-                    icon="pi pi-search" 
-                    onClick={handleSearch} 
-                    loading={loading}
-                    tooltip={t('common.search') || 'Search'} 
-                    tooltipOptions={{position: 'bottom'}}
-                />
-            </div>
-            
-            <div className="flex align-items-center justify-content-center md:justify-content-end gap-3 mt-3 md:mt-0">
-                <div className="flex align-items-center">
-                    <Checkbox 
-                        inputId="remote" 
-                        onChange={e => setIsRemote(e.checked ?? false)} 
-                        checked={isRemote}
-                    />
-                    <label htmlFor="remote" className="ml-2">{t('jobFeed.filters.remoteOnly') || 'Remote Only'}</label>
-                </div>
-                
-                <Dropdown 
-                    options={sortOptions} 
-                    value={sortKey} 
-                    optionLabel="label" 
-                    placeholder={t('common.sortBy') || 'Sort By'} 
-                    onChange={(e) => setSortKey(e.value)} 
-                    className="w-full sm:w-auto" 
-                />
-                
-                <Button
-                    icon="pi pi-refresh"
-                    className="p-button-outlined p-button-sm"
-                    onClick={refresh}
-                    loading={loading}
-                    tooltip={t('common.refresh') || 'Refresh'}
-                />
-                
-                <DataViewLayoutOptions layout={layout} onChange={(e) => setLayout(e.value)} />
             </div>
         </div>
     );
@@ -298,7 +265,7 @@ const JobFeedPage = () => {
     }
 
     return (
-        <div className={styles.jobFeedContainer}>
+        <div className="min-h-screen">
             <Toast ref={toast} />
             
             {/* INDICATOR: Show when a cycle is running and jobs are already visible */}
@@ -310,21 +277,18 @@ const JobFeedPage = () => {
                 />
             )}
             
-            <Card className={styles.pageCard}>
-                <DataView
-                    value={filteredJobs} // This will now be correctly populated
-                    header={dataviewHeader}
-                    itemTemplate={jobItemTemplate}
-                    layout={layout}
-                    paginator={filteredJobs.length > 12}
-                    rows={12}
-                    alwaysShowPaginator={false}
-                    emptyMessage={t('jobFeed.empty.noMatch') || 'No job postings found matching your current filters.'}
-                    // This condition ensures the overlay only shows when loading AND the view is empty.
-                    loading={loading && filteredJobs.length === 0} 
-                    pt={{ header: { className: 'surface-ground' } }}
-                />
-            </Card>
+            <DataView
+                value={filteredJobs}
+                header={dataviewHeader}
+                itemTemplate={jobItemTemplate}
+                layout={layout}
+                paginator={filteredJobs.length > 12}
+                rows={12}
+                alwaysShowPaginator={false}
+                emptyMessage={t('jobFeed.empty.noMatch') || 'No job postings found matching your current filters.'}
+                loading={loading && filteredJobs.length === 0} 
+                className="m-0"
+            />
         </div>
     );
 };

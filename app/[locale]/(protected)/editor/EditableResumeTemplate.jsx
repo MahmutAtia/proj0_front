@@ -586,34 +586,17 @@ const EditableResumeTemplate = ({
                                 Failed to load resume data. Please try again later.
                             </div>
                         )}
-                        {data && (
+                             {data && (
                             <div className="surface-card p-4 md:p-5 shadow-2 border-round max-w-screen-xl mx-auto">
                                 <div className="flex flex-column gap-5">
                                     <Tooltip target=".section-title-help" />
                                     {sectionOrder.map((sectionKey, index) => {
-                                        if (hiddenSections.includes(sectionKey)) return null;
-                                        const isEmpty = isSectionEmpty(sectionKey);
+                                        if (!sectionKey || hiddenSections.includes(sectionKey)) return null;
+
                                         return (
-                                            <section
-                                                key={sectionKey}
-                                                id={`section-${sectionKey}`}
-                                                className={classNames(
-                                                    activeSection === sectionKey && "outline-1 outline-primary outline-dashed outline-offset-2"
-                                                )}
-                                            >
-                                                {index > 0 && <Divider className="my-4" />}
-                                                <h2 className="text-xl font-semibold mt-0 mb-3">
-                                                    <i className="pi pi-info-circle ml-2 text-sm text-color-secondary section-title-help"
-                                                        data-pr-tooltip={`Enter your professional ${formatSectionName(sectionKey).toLowerCase()} here.`}
-                                                        data-pr-position="right"></i>
-                                                </h2>
+                                            <div key={sectionKey} id={sectionKey} className="scroll-mt-[80px]">
                                                 {renderSectionComponent(sectionKey)}
-                                                {isEmpty && (
-                                                    <div className="mt-3 p-3 border-1 border-dashed surface-border border-round bg-black-alpha-5 text-center text-color-secondary">
-                                                        This section is empty. Add content or hide it using the <i className="pi pi-eye-slash mx-1 vertical-align-middle"></i> icon in the sidebar.
-                                                    </div>
-                                                )}
-                                            </section>
+                                            </div>
                                         );
                                     })}
                                 </div>

@@ -25,8 +25,8 @@ const WelcomeBanner = ({ userName }) => {
     const { t } = useTranslation();
     return (
         <div className="mb-6">
-            <h1 className={styles.pageHeader}>{t('dashboard_main.welcomeBanner.title', { userName: userName || t('dashboard_main.welcomeBanner.userFallback') })}</h1>
-            <p className={styles.pageSubheader}>{t('dashboard_main.welcomeBanner.subtitle')}</p>
+            <h1 className={`${styles.pageHeader} text-900`}>{t('dashboard_main.welcomeBanner.title', { userName: userName || t('dashboard_main.welcomeBanner.userFallback') })}</h1>
+            <p className={`${styles.pageSubheader} text-600`}>{t('dashboard_main.welcomeBanner.subtitle')}</p>
         </div>
     );
 };
@@ -43,22 +43,22 @@ const ActionCard = ({ title, icon, description, onClick, route, buttonLabel }) =
     };
 
     return (
-        <Card className={`${styles.quickActionCard} h-full`}> {/* Ensure h-full for consistent height */}
+        <Card className={`${styles.quickActionCard} h-full surface-card shadow-2 border-1 surface-border`}>
             <div className="flex flex-column justify-content-between h-full text-center">
                 <div className="mb-4 flex align-items-center justify-content-center">
-                    <div className={styles.actionIconWrapper}> {/* Wrapper for better icon styling */}
+                    <div className="bg-primary-100 text-primary-700 p-3 border-round-2xl">
                         {icon}
                     </div>
                 </div>
                 <div>
-                    <h3 className="text-xl font-semibold mb-2">{title}</h3> {/* Reduced margin */}
-                    <p className={`${styles.actionDescription} text-color-secondary mb-4 px-2`}>{description}</p>
+                    <h3 className="text-xl font-semibold mb-2 text-900">{title}</h3>
+                    <p className="text-600 mb-4 px-2">{description}</p>
                 </div>
                 <Button
                     label={buttonLabel || t('dashboard_main.actionCard.explore')}
                     icon="pi pi-arrow-right"
                     iconPos="right"
-                    className="p-button-primary w-full mt-auto" // Changed to p-button-primary
+                    className="p-button-primary w-full mt-auto"
                     onClick={handleClick}
                 />
             </div>
@@ -90,26 +90,26 @@ const DefaultResumeDisplay = ({ resume, onViewAll, router, isLoading }) => {
     }
 
     return (
-        <Card className={`${styles.dashboardCard} ${!resume ? styles.noDefaultResumeCard : ''}`}>
+        <Card className={`${styles.dashboardCard} surface-card shadow-2 border-1 surface-border`}>
             <div className="flex flex-column md:flex-row justify-content-between align-items-start md:align-items-center">
                 <div className="mb-3 md:mb-0">
                     <div className="flex align-items-center mb-1">
-                        <FiStar className={`mr-2 ${resume ? 'text-yellow-500' : 'text-gray-400'}`} style={{ fontSize: '1.3rem' }} />
-                        <h3 className="text-lg font-bold m-0">
+                        <FiStar className={`mr-2 ${resume ? 'text-yellow-500' : 'text-400'}`} style={{ fontSize: '1.3rem' }} />
+                        <h3 className="text-lg font-bold m-0 text-900">
                             {t('dashboard_main.defaultResume.title')}
                         </h3>
                     </div>
                     {resume ? (
                         <>
-                            <p className={`${styles.defaultResumeTitle} text-primary mt-1 mb-0 cursor-pointer hover:underline`} onClick={() => router.push(`/editor/${resume.id}`)}>
+                            <p className="text-primary mt-1 mb-0 cursor-pointer hover:underline" onClick={() => router.push(`/editor/${resume.id}`)}>
                                 {resume.title}
                             </p>
-                            <p className="text-xs text-color-secondary mt-1">
+                            <p className="text-xs text-600 mt-1">
                                 {t('dashboard_main.defaultResume.lastUpdated', { date: resume.updated_at ? new Date(resume.updated_at).toLocaleDateString() : 'N/A' })}
                             </p>
                         </>
                     ) : (
-                        <p className="text-sm text-color-secondary mt-1">{t('dashboard_main.defaultResume.noDefaultSelected')}</p>
+                        <p className="text-sm text-600 mt-1">{t('dashboard_main.defaultResume.noDefaultSelected')}</p>
                     )}
                 </div>
                 <div className="flex flex-wrap gap-2 align-self-start md:align-self-center mt-2 md:mt-0">
@@ -277,19 +277,7 @@ const DashboardPage = () => {
         }
 
         return [
-            {
-                title: t('dashboard_main.quickActions.createDocument.title'),
-                icon: <FiFileText size={28} className={styles.actionIconForeground} />, // Enhanced icon
-                description: t('dashboard_main.quickActions.createDocument.description'),
-                onClick: () => {
-                    if (allResumes.length === 0) {
-                        toast.current?.show({ severity: 'warn', summary: t('dashboard_main.toast.noResumeSummary'), detail: t('dashboard_main.toast.noResumeForDoc'), life: 4000 });
-                        return;
-                    }
-                    setIsGenerateDocDialogVisible(true);
-                },
-                buttonLabel: t('dashboard_main.quickActions.createDocument.button')
-            },
+
             {
                 title: t('dashboard_main.quickActions.newResume.title'),
                 icon: <FiPlusSquare size={28} className={styles.actionIconForeground} />, // Changed icon for consistency
@@ -302,6 +290,19 @@ const DashboardPage = () => {
                     setShowCreateDialog(true);
                 },
                 buttonLabel: t('dashboard_main.quickActions.newResume.button')
+            },
+            {
+                title: t('dashboard_main.quickActions.createDocument.title'),
+                icon: <FiFileText size={28} className={styles.actionIconForeground} />, // Enhanced icon
+                description: t('dashboard_main.quickActions.createDocument.description'),
+                onClick: () => {
+                    if (allResumes.length === 0) {
+                        toast.current?.show({ severity: 'warn', summary: t('dashboard_main.toast.noResumeSummary'), detail: t('dashboard_main.toast.noResumeForDoc'), life: 4000 });
+                        return;
+                    }
+                    setIsGenerateDocDialogVisible(true);
+                },
+                buttonLabel: t('dashboard_main.quickActions.createDocument.button')
             },
             {
                 title: t('dashboard_main.quickActions.myPortfolio.title'),
