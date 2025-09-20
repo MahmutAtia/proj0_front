@@ -2,7 +2,7 @@ import { NextResponse } from 'next/server'
 import type { NextRequest } from 'next/server'
 
 // Supported locales
-const locales = ['en', 'tr', 'ar', 'de', 'es'];
+const locales = ['en', 'tr', 'ar', 'de', 'es', 'fr'];
 const defaultLocale = 'en';
 
 // Define public paths (without locale prefix)
@@ -18,11 +18,23 @@ function getLocaleFromPathname(pathname: string) {
   return locales.includes(maybeLocale) ? maybeLocale : null;
 }
 
-// Helper function to get preferred locale from Accept-Language header
+// Helper function to get preferred locale from cookie or Accept-Language header
 function getPreferredLocale(request: NextRequest) {
+  // 1. Check for locale in cookie
+  const cookieLocale = request.cookies.get('NEXT_LOCALE')?.value;
+  if (cookieLocale && locales.includes(cookieLocale)) {
+    return cookieLocale;
+  }
+
+  // 2. Check the accept-language header
   const acceptLanguage = request.headers.get('accept-language') || '';
-  const preferredLocale = acceptLanguage.split(',')[0].split('-')[0].toLowerCase();
-  return locales.includes(preferredLocale) ? preferredLocale : defaultLocale;
+  const headerLocale = acceptLanguage.split(',')[0].split('-')[0].toLowerCase();
+  if (locales.includes(headerLocale)) {
+    return headerLocale;
+  }
+
+  // 3. Fallback to default locale
+  return defaultLocale;
 }
 
 // Helper function to remove locale from pathname

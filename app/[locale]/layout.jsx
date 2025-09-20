@@ -1,6 +1,4 @@
 import { notFound } from 'next/navigation';
-import { Providers } from '@/contexts/providers';
-
 const locales = ['en', 'tr', 'ar', 'de', 'es', 'fr'];
 
 export default async function LocaleLayout({ children, params }) {

@@ -25,15 +25,19 @@ const LanguageSwitcher = () => {
     const currentLanguage = languages.find((lang) => lang.value === locale) || languages[0];
 
     const handleLanguageChange = (newLocale) => {
-        // Remove current locale from pathname
-        const segments = pathname.split('/');
-        const pathWithoutLocale = segments.slice(2).join('/') || '';
+        // Set a cookie to remember the user's choice
+        document.cookie = `NEXT_LOCALE=${newLocale}; path=/; max-age=31536000; SameSite=Lax`;
 
-        // Navigate to new locale
-        const newPath = `/${newLocale}/${pathWithoutLocale}`;
+        const pathSegments = pathname.split('/');
+        // The first segment is empty, the second is the locale.
+        // e.g., "/en/main" -> ["", "en", "main"]
+        pathSegments[1] = newLocale;
+        const newPath = pathSegments.join('/');
+        
         router.push(newPath);
         setIsOpen(false);
     };
+
 
     const dropdownVariants = {
         hidden: {
