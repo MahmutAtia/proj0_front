@@ -1,0 +1,357 @@
+{
+    "common": {
+        "loading": "Chargement...",
+        "error": "Erreur",
+        "save": "Enregistrer",
+        "cancel": "Annuler",
+        "delete": "Supprimer",
+        "edit": "Modifier",
+        "create": "Créer",
+        "search": "Rechercher...",
+        "tryAgain": "Réessayer",
+        "documents": "Documents",
+        "remote": "À distance",
+        "source": "Source",
+        "day": "jour",
+        "hour": "heure",
+        "ago": "il y a",
+        "justNow": "À l'instant",
+        "sortBy": "Trier par",
+        "refresh": "Actualiser",
+        "viewAll": "Voir tout"
+    },
+    "resumes": {
+        "title": "Mes CVs",
+        "createNew": "Créer un nouveau CV",
+        "searchPlaceholder": "Rechercher des CVs...",
+        "loadingResumes": "Chargement des CVs...",
+        "noResumesFound": "Aucun CV trouvé. Cliquez sur 'Créer un nouveau CV' pour commencer !",
+        "failedToLoad": "Échec du chargement des CVs",
+        "manageResume": "Gérer le CV",
+        "viewDocuments": "Voir les documents ({count})",
+        "addDocuments": "Ajouter des documents",
+        "untitledResume": "CV sans titre",
+        "noDescription": "Aucune description disponible",
+        "defaultTag": "Par défaut",
+        "updated": "Mis à jour le : {date}",
+        "documentsCount": "{count} document(s)"
+    },
+    "errors": {
+        "userNotAuthenticated": "Utilisateur non authentifié.",
+        "backendUrlNotConfigured": "L'URL du backend (NEXT_PUBLIC_BACKEND_URL) n'est pas configurée.",
+        "requestTimeout": "La requête a expiré. Veuillez vérifier votre connexion ou réessayer.",
+        "serverError": "Erreur du serveur : {status} - {message}",
+        "noResponse": "Aucune réponse du serveur. Vérifiez la connexion réseau ou l'état du backend.",
+        "unexpectedError": "Une erreur inattendue s'est produite.",
+        "invalidDataFormat": "Format de données invalide reçu du backend.",
+        "couldNotLoadResumes": "Impossible de charger les CVs. Veuillez réessayer plus tard."
+    },
+    "hero": {
+        "title_part1": "CV ",
+        "rejected": "Rejeté",
+        "title_part2": " ? Encore ?",
+        "title_part3": "Réglons ce problème.",
+        "subtitle_part1": "Échappez à la recherche d'emploi éreintante. Saviez-vous que la plupart des emplois nécessitent un ",
+        "subtitle_styled": "CV personnalisé",
+        "subtitle_part2": " juste pour passer les filtres automatiques ? Nous les créons *avec* vous, en utilisant l'IA.",
+        "description": "Vous êtes brillant, compétent et prêt. Mais votre candidature disparaît dans l'abîme des ATS. Ce n'est pas vous, c'est le système. CareerFlow AI crée des CVs et des portfolios qui vous font remarquer.",
+        "startFreeResume": "Commencer mon CV IA gratuit",
+        "checkScore": "Vérifier mon score ATS",
+        "imageAlt": "Professionnels collaborant et atteignant le succès professionnel grâce à la technologie"
+    },
+    "header": {
+        "logo": "CareerFlow",
+        "theStruggle": "Le Défi",
+        "yourEdge": "Votre Avantage",
+        "howItWorks": "Comment ça marche",
+        "pricing": "Tarifs",
+        "atsCheck": "Analyse ATS ✨",
+        "login": "Connexion",
+        "getStarted": "Commencer",
+        "atsTooltipTitle": "Qu'est-ce qu'un ATS ? 🤔",
+        "atsTooltipText": "ATS = Recruteur Robot 🤖 Analyse les CVs. Mots-clés manquants ? 💨 Ignoré ! 👉 Cliquez ici pour vérifier le vôtre ! ✅"
+    },
+    "struggle": {
+        "title_part1": "Coincé(e) dans l'abîme ",
+        "abyss": "des candidatures ?",
+        "title_part2": "",
+        "subtitle": "Vous êtes qualifié(e), motivé(e) et prêt(e). Pourtant, le cycle se répète : effort, rejet, doute. Libérons-nous de ce qui vous retient.",
+        "painPoints": {
+            "blackHole": {
+                "title": "Le trou noir des CVs",
+                "text": "Des candidatures sans fin, un silence assourdissant. Vous avez l'impression que votre CV disparaît ? C'est une frustration courante."
+            },
+            "timeSink": {
+                "title": "La perte de temps",
+                "text": "Modifier constamment les CVs, rédiger des lettres de motivation... La recherche d'emploi ne devrait pas consumer toute votre vie."
+            },
+            "visibility": {
+                "title": "Le problème de visibilité",
+                "text": "CV générique ? Pas de portfolio ? Vous avez du mal à mettre en valeur vos compétences uniques et à vous démarquer de la foule ?"
+            },
+            "atsGauntlet": {
+                "title": "L'épreuve de l'ATS",
+                "text": "Confus(e) par les mots-clés ? Inquiet(e) pour la mise en forme ? Dépasser les robots ressemble à une bataille perdue d'avance."
+            }
+        },
+        "missingOut": {
+            "title": "Ne laissez pas des tactiques dépassées vous coûter cher",
+            "text": "Une candidature générique ne suffit plus en {year}. Des portfolios remarquables, des CVs ciblés et la mise en valeur de votre valeur unique sont essentiels. Vos documents sont-ils vraiment compétitifs ?"
+        }
+    },
+    "features": {
+        "title": "Votre nouvel avantage : ",
+        "aiAndBrilliance": "IA + Votre Génie",
+        "subtitle": "CareerFlow AI n'est pas juste un autre outil. C'est votre partenaire intelligent, conçu pour amplifier vos forces et naviguer les complexités du marché du travail moderne.",
+        "hyperPersonalized": {
+            "title": "Ébauches IA hyper-personnalisées",
+            "text": "L'IA analyse les descriptions de poste ET votre profil pour créer des CVs et lettres uniques et ciblés en quelques secondes. Dites adieu au générique !"
+        },
+        "conquerAts": {
+            "title": "Conquérez l'ATS",
+            "text": "Un formatage optimisé, une analyse de mots-clés et un vérificateur de score ATS instantané GRATUIT garantissent que vous passez les filtres automatiques."
+        },
+        "ownCorner": {
+            "title": "Votre propre coin du Web",
+            "text": "Générez un site web et un portfolio professionnels et époustouflants à partir de votre CV. Modifiez-les facilement avec l'IA, partagez-les instantanément."
+        },
+        "aiEditing": {
+            "title": "Baguette magique de l'édition par IA",
+            "text": "Besoin de renforcer une section ? De la rendre plus concise ? Demandez simplement à l'IA. Modifiez n'importe quoi en temps réel avec de simples commandes. ✨"
+        }
+    },
+    "howItWorks": {
+        "title": "L'IA est votre copilote, pas le pilote",
+        "subtitle": "Oubliez les modèles robotiques. Nous mélangeons la vitesse de l'IA avec votre voix unique. Vous êtes toujours aux commandes, créant des candidatures à la fois efficaces et authentiquement *vous*.",
+        "steps": {
+            "input": {
+                "title": "Saisie et contexte",
+                "text": "Fournissez vos détails, vos expériences et la description du poste/de la bourse cible. Donnez à l'IA le carburant dont elle a besoin."
+            },
+            "aiMagic": {
+                "title": "Ébauches magiques par l'IA",
+                "text": "Notre IA génère en quelques instants des premières ébauches sur mesure de CVs, lettres et contenu de site web, optimisées pour l'ATS et l'impact."
+            },
+            "refine": {
+                "title": "Affinez et personnalisez",
+                "text": "Utilisez des outils intuitifs et des commandes IA ('Rends ce ton plus confiant') pour peaufiner, ajouter votre touche unique et le rendre parfait."
+            }
+        }
+    },
+    "pricing": {
+        "title": "Des forfaits simples, des résultats puissants",
+        "subtitle": "Choisissez le forfait qui correspond à votre parcours. Commencez gratuitement, mettez à niveau à tout moment. Pas de frais cachés.",
+        "popular": "POPULAIRE",
+        "currentPlan": "Forfait actuel",
+        "reactivate": "Réactiver",
+        "getStartedFree": "Commencer gratuitement",
+        "choosePlan": "Choisir le forfait",
+        "loadingPlans": "Chargement des plans tarifaires...",
+        "errorTitle": "Oups ! Quelque chose s'est mal passé.",
+        "noPlansTitle": "Aucun forfait disponible",
+        "noPlansText": "Les plans tarifaires sont actuellement indisponibles. Veuillez revenir plus tard."
+    },
+    "atsChecker": {
+        "title_part1": "Votre CV est-il ",
+        "ghosted": "ignoré par les robots ?",
+        "title_part2": "",
+        "subtitle": "Ne devinez pas. Téléchargez votre CV maintenant pour une vérification de compatibilité ATS 100% GRATUITE et instantanée. Obtenez des informations exploitables pour vous assurer qu'un humain voie réellement votre candidature.",
+        "scanResume": "Analyser mon CV GRATUITEMENT",
+        "disclaimer": "Pas de pièges, aucune inscription requise pour l'analyse.",
+        "imageAlt": "Représentation visuelle d'une analyse de CV par un ATS"
+    },
+    "footer": {
+        "tagline": "Donner aux chercheurs d'emploi et aux étudiants les moyens de créer des opportunités et de bâtir un avenir plus prometteur grâce à l'IA.",
+        "product": "Produit",
+        "features": "Fonctionnalités",
+        "pricing": "Tarifs",
+        "atsChecker": "Analyse ATS",
+        "templates": "Modèles",
+        "resources": "Ressources",
+        "blog": "Blog",
+        "guides": "Guides",
+        "faq": "FAQ",
+        "support": "Support",
+        "company": "Entreprise",
+        "aboutUs": "À propos de nous",
+        "careers": "Carrières",
+        "contact": "Contact",
+        "legal": "Légal",
+        "privacyPolicy": "Politique de confidentialité",
+        "termsOfService": "Conditions d'utilisation",
+        "copyright": "©  CareerFlow AI. Tous droits réservés."
+    },
+    "dashboard": {
+        "welcome": "Bon retour",
+        "overview": "Aperçu",
+        "recentActivity": "Activité récente",
+        "quickActions": "Actions rapides"
+    },
+    "navigation": {
+        "home": "Accueil",
+        "dashboard": "Tableau de bord",
+        "resumes": "CVs",
+        "profile": "Profil",
+        "settings": "Paramètres",
+        "logout": "Déconnexion"
+    },
+    "dashboard_main": {
+        "jobPostings": {
+            "title": "Dernières offres d'emploi",
+            "subtitle": "Affichage de {count} offres ({status})",
+            "noJobs": "Aucune offre d'emploi trouvée pour le moment. Le système recherchera automatiquement des emplois en fonction des mots-clés de votre CV par défaut.",
+            "startScraping": "Lancer la recherche d'emploi",
+            "viewMore": "Voir {count} offres supplémentaires"
+        },
+        "welcomeBanner": {
+            "title": "Bon retour, {userName} !",
+            "userFallback": "Utilisateur",
+            "subtitle": "Voici un aperçu de votre tableau de bord carrière."
+        },
+        "actionCard": {
+            "explore": "Explorer"
+        },
+        "quickActions": {
+            "createDocument": {
+                "title": "Créer un nouveau document",
+                "description": "Générez une lettre de motivation, une recommandation ou tout autre document professionnel.",
+                "button": "Générer maintenant"
+            },
+            "newResume": {
+                "title": "Nouveau CV",
+                "description": "Créez un nouveau CV remarquable à partir de zéro ou d'un modèle.",
+                "button": "Créer un CV"
+            },
+            "myPortfolio": {
+                "title": "Mon Portfolio",
+                "description": "Gérez et publiez votre site web de carrière personnel.",
+                "button": "Modifier le site"
+            },
+            "jobSearch": {
+                "title": "Recherche d'emploi",
+                "description": "Découvrez et suivez les opportunités d'emploi pertinentes.",
+                "button": "Trouver des emplois"
+            }
+        },
+        "defaultResume": {
+            "title": "CV par défaut",
+            "loading": "Chargement du CV par défaut...",
+            "lastUpdated": "Dernière mise à jour : {date}",
+            "noDefaultSelected": "Aucun CV par défaut sélectionné. Choisissez-en un pour personnaliser votre tableau de bord.",
+            "changeDefault": "Changer le CV par défaut",
+            "selectDefault": "Sélectionner par défaut",
+            "buttonChooseDefault": "Choisissez votre CV par défaut",
+            "tooltipEdit": "Modifier le CV par défaut",
+            "tooltipViewAll": "Voir tous les CVs pour sélectionner ou changer le CV par défaut"
+        },
+        "relatedDocuments": {
+            "title": "Documents liés",
+            "loading": "Chargement des documents...",
+            "selectDefaultPrompt": "Sélectionnez un CV par défaut pour voir ses documents liés ici.",
+            "documentsFor": "Documents pour \"{resumeTitle}\"",
+            "manageAll": "Tout gérer",
+            "viewMore": "Voir {count} de plus...",
+            "noDocuments": "Aucun document lié à ce CV pour le moment.",
+            "addDocument": "Ajouter un document",
+            "tooltipManageAll": "Aller à la page des documents"
+        },
+        "toast": {
+            "loadError": "Impossible de charger les données du CV.",
+            "actionRequiredSummary": "Action requise",
+            "actionRequiredDetail": "Veuillez sélectionner un CV à définir par défaut depuis la page \"Tous les CVs\".",
+            "noResumeSummary": "Aucun CV",
+            "noResumeDetail": "Aucun CV sélectionné pour changer le statut par défaut.",
+            "noResumeForDoc": "Veuillez d'abord créer un CV avant de générer des documents.",
+            "updateSuccess": "Statut du CV principal mis à jour.",
+            "updateError": "Impossible de mettre à jour le statut du CV principal.",
+            "generationStartedSummary": "Génération de document lancée",
+            "generationStartedDetail": "Votre document est en cours de génération."
+        },
+        "dialog": {
+            "resumeIdLabel": "ID du CV : {id}"
+        }
+    },
+    "dashboard_layout": {
+        "logo": "CareerFlow",
+        "sidebar": {
+            "settings": "Paramètres",
+            "overview": "Aperçu",
+            "resumes": "CVs",
+            "myWebsite": "Mon Site Web",
+            "atsChecker": "Analyse ATS",
+            "jobFeed": "Flux d'emplois",
+            "scholarships": "Bourses"
+        },
+        "topbar": {
+            "expandSidebar": "Agrandir la barre latérale",
+            "collapseSidebar": "Réduire la barre latérale",
+            "searchPlaceholder": "Rechercher dans le tableau de bord...",
+            "userFallback": "Utilisateur"
+        },
+        "userMenu": {
+            "profile": "Profil",
+            "settings": "Paramètres",
+            "logout": "Déconnexion"
+        },
+        "toast": {
+            "setDefault": "CV défini par défaut.",
+            "unsetDefault": "CV n'est plus défini par défaut."
+        }
+    },
+    "login": {
+        "errorSummary": "Erreur",
+        "errorDetail": "Échec de la connexion avec {{provider}}",
+        "welcomeBack": "Bon retour, {{name}} !",
+        "signInWithGoogle": "Se connecter avec Google",
+        "signInWithLinkedIn": "Se connecter avec LinkedIn"
+    },
+    "accessDenied": {
+        "title": "Accès refusé",
+        "message": "Vous n'avez pas les autorisations nécessaires.",
+        "imageAlt": "Image d'accès refusé",
+        "goToDashboard": "Aller au tableau de bord"
+    },
+    "errorPage": {
+        "title": "Une erreur s'est produite",
+        "message": "Quelque chose s'est mal passé.",
+        "imageAlt": "Image d'erreur",
+        "goToDashboard": "Aller au tableau de bord"
+    },
+    "jobFeed": {
+        "title": "Flux d'emplois",
+        "subtitle": "Affichage de {filtered} offres sur {count} trouvées",
+        "loading": "Chargement des opportunités d'emploi...",
+        "loadingInitial": "Chargement du flux d'emplois...",
+        "fetching": "Récupération des offres...",
+        "searchStarted": "Recherche lancée",
+        "searchStartedDetail": "Actualisation des offres en fonction de vos critères...",
+        "autoUpdate": {
+            "status": "État de la mise à jour auto",
+            "active": "Actif",
+            "inactive": "Inactif",
+            "description": "Les offres sont automatiquement mises à jour toutes les 5 minutes en fonction des mots-clés de votre CV par défaut",
+            "inactiveDescription": "Les mises à jour automatiques des offres ne sont pas en cours d'exécution"
+        },
+        "filters": {
+            "search": "Titre du poste, mot-clé...",
+            "location": "Ville ou Pays",
+            "remoteOnly": "À distance uniquement"
+        },
+        "sorting": {
+            "relevance": "Pertinence",
+            "recent": "Le plus récent",
+            "company": "Entreprise A-Z",
+            "title": "Titre A-Z"
+        },
+        "job": {
+            "locationNotSpecified": "Non spécifié",
+            "addedAgo": "Ajouté",
+            "viewOn": "Voir sur",
+            "applyNow": "Postuler maintenant"
+        },
+        "empty": {
+            "title": "Aucune offre d'emploi trouvée",
+            "description": "Aucune offre d'emploi correspondant à vos critères n'a été trouvée. Essayez d'élargir votre recherche !"
+        }
+    }
+}

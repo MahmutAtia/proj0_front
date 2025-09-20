@@ -1,213 +1,357 @@
 {
-  "common": {
-    "loading": "Yükleniyor...",
-    "error": "Hata",
-    "save": "Kaydet",
-    "cancel": "İptal",
-    "delete": "Sil",
-    "edit": "Düzenle",
-    "create": "Oluştur",
-    "search": "Ara...",
-    "tryAgain": "Tekrar Dene",
-    "documents": "Belgeler",
-    "remote": "Uzaktan",
-    "source": "Kaynak",
-    "day": "gün",
-    "hour": "saat",
-    "ago": "önce",
-    "justNow": "Şimdi",
-    "sortBy": "Şuna göre sırala",
-    "refresh": "Yenile",
-    "viewAll": "Tümünü görüntüle"
-  },
-  "resumes": {
-    "title": "Özgeçmişlerim",
-    "createNew": "Yeni Özgeçmiş Oluştur",
-    "searchPlaceholder": "Özgeçmiş Ara...",
-    "loadingResumes": "Özgeçmişler yükleniyor...",
-    "noResumesFound": "Özgeçmiş bulunamadı. Başlamak için 'Yeni Özgeçmiş Oluştur'a tıklayın!",
-    "failedToLoad": "Özgeçmişler Yüklenemedi",
-    "manageResume": "Özgeçmişi Yönet",
-    "viewDocuments": "Belgeleri Görüntüle ({count})",
-    "addDocuments": "Belge Ekle",
-    "untitledResume": "Başlıksız Özgeçmiş",
-    "noDescription": "Açıklama mevcut değil",
-    "defaultTag": "Varsayılan",
-    "updated": "Güncellendi: {date}",
-    "documentsCount": "{count} belge"
-  },
-  "hero": {
-      "title_part1": "Özgeçmiş ",
-    "rejected": "Reddedildi",
-    "title_part2": "? Yine mi?",
-    "title_part3": "Hadi Düzeltelim.",
-    "subtitle_part1": "Ruh çöküşe uğratan iş arayışından kaç. Çoğu işin botları geçmek için sadece ",
- "subtitle_styled": "özelleştirilmiş bir özgeçmiş",
-    "subtitle_part2": " gerektirdiğini biliyor muydun? Onları seninle birlikte, AI kullanarak inşa ediyoruz.",
-    "description": "Sen parlaksın, yeteneklisin ve hazırsın. Ama başvurun ATS uçurumunda yok oluyor. Sorun sende değil, sistemde. CareerFlow AI fark edilmeni sağlayan özgeçmişler ve portföyler yaratıyor.",
-  "startFreeResume": "Ücretsiz AI Özgeçmişimi Başlat",
-  "checkScore": "ATS Puanımı Kontrol Et",
-  "imageAlt": "Teknoloji ile kariyer başarısı yakalayan profesyoneller"
-},"header": {
-  "logo": "CareerFlow",
-  "theStruggle": "Zorluk",
-  "yourEdge": "Avantajınız",
-  "howItWorks": "Nasıl Çalışır",
-  "pricing": "Fiyatlandırma",
-  "atsCheck": "ATS Kontrolü ✨",
-  "login": "Giriş",
-  "getStarted": "Başlayın",
-  "atsTooltipTitle": "ATS Nedir? 🤔",
-  "atsTooltipText": "ATS = Robot İşveren 🤖 Özgeçmişleri tarar. Anahtar kelime kaçırırsanız? 💨 Görmezden gelinir! 👉 Sizinkini kontrol etmek için tıklayın! ✅"
-},
-"atsChecker": {
-  "title_part1": "Özgeçmişiniz Robotlar Tarafından ",
-  "ghosted": "Görmezden Geliniyor mu?",
-  "title_part2": "",
-  "subtitle": "Tahmin etmeyin. Özgeçmişinizi şimdi yükleyin ve %100 ÜCRETSİZ, anında ATS uyumluluk kontrolü alın. Bir insanın başvurunuzu gerçekten görmesini sağlamak için eyleme geçirilebilir içgörüler edinin.",
-  "scanResume": "Özgeçmişimi ÜCRETSİZ Tara",
-  "disclaimer": "Numara yok, tarama için kayıt gerekmez.",
-  "imageAlt": "ATS özgeçmiş taramasının görsel temsili"
-},
-"struggle": {
-  "title_part1": "Başvuru ",
-  "abyss": "Uçurumunda",
-  "title_part2": " Sıkıştınız mı?",
-  "subtitle": "Niteliklisiniz, kararlısınız ve hazırsınız. Yine de döngü tekrar ediyor: çaba, ret, şüphe. Sizi geri tutan şeylerden kurtulalım.",
-  "painPoints": {
-    "blackHole": {
-      "title": "Özgeçmiş Kara Deliği",
-      "text": "Sonsuz başvurular, sağır edici sessizlik. Özgeçmişinizin kaybolduğunu mu hissediyorsunuz? Bu yaygın bir hayal kırıklığı."
+    "common": {
+        "loading": "Yükleniyor...",
+        "error": "Hata",
+        "save": "Kaydet",
+        "cancel": "İptal",
+        "delete": "Sil",
+        "edit": "Düzenle",
+        "create": "Oluştur",
+        "search": "Ara...",
+        "tryAgain": "Tekrar Dene",
+        "documents": "Belgeler",
+        "remote": "Uzaktan",
+        "source": "Kaynak",
+        "day": "gün",
+        "hour": "saat",
+        "ago": "önce",
+        "justNow": "Az önce",
+        "sortBy": "Sırala",
+        "refresh": "Yenile",
+        "viewAll": "Tümünü Gör"
     },
-    "timeSink": {
-      "title": "Zaman Batağı",
-      "text": "Sürekli özgeçmiş düzenlemek, ön yazı yazmak... İş arama tüm hayatınızı tüketmemeli."
+    "resumes": {
+        "title": "Özgeçmişlerim",
+        "createNew": "Yeni Özgeçmiş Oluştur",
+        "searchPlaceholder": "Özgeçmişlerde Ara...",
+        "loadingResumes": "Özgeçmişler yükleniyor...",
+        "noResumesFound": "Hiç özgeçmiş bulunamadı. Başlamak için 'Yeni Özgeçmiş Oluştur'a tıklayın!",
+        "failedToLoad": "Özgeçmişler Yüklenemedi",
+        "manageResume": "Özgeçmişi Yönet",
+        "viewDocuments": "Belgeleri Görüntüle ({count})",
+        "addDocuments": "Belge Ekle",
+        "untitledResume": "Başlıksız Özgeçmiş",
+        "noDescription": "Açıklama mevcut değil",
+        "defaultTag": "Varsayılan",
+        "updated": "Güncellendi: {date}",
+        "documentsCount": "{count} belge"
     },
-    "visibility": {
-      "title": "Görünürlük Sorunu",
-      "text": "Genel özgeçmiş mi? Portföy yok mu? Benzersiz yeteneklerinizi sergilemek ve kalabalıktan sıyrılmak için mücadele mi ediyorsunuz?"
+    "errors": {
+        "userNotAuthenticated": "Kullanıcı doğrulanmadı.",
+        "backendUrlNotConfigured": "Arka uç URL'si (NEXT_PUBLIC_BACKEND_URL) yapılandırılmamış.",
+        "requestTimeout": "İstek zaman aşımına uğradı. Lütfen bağlantınızı kontrol edin veya tekrar deneyin.",
+        "serverError": "Sunucu Hatası: {status} - {message}",
+        "noResponse": "Sunucudan yanıt alınamadı. Ağ bağlantısını veya arka uç durumunu kontrol edin.",
+        "unexpectedError": "Beklenmedik bir hata oluştu.",
+        "invalidDataFormat": "Arka uçtan geçersiz veri formatı alındı.",
+        "couldNotLoadResumes": "Özgeçmişler yüklenemedi. Lütfen daha sonra tekrar deneyin."
     },
-    "atsGauntlet": {
-      "title": "ATS Engelkursu",
-      "text": "Anahtar kelimeler konusunda kafanız mı karışık? Biçimlendirme konusunda endişeli misiniz? Botları geçmek kayıp bir savaş gibi geliyor?"
+    "hero": {
+        "title_part1": "Özgeçmişiniz ",
+        "rejected": "Reddedildi",
+        "title_part2": " mi? Yine mi?",
+        "title_part3": "Hadi Bunu Düzeltelim.",
+        "subtitle_part1": "Ruh emen iş arayışından kurtulun. Çoğu işin, sırf robotları geçmek için bile ",
+        "subtitle_styled": "özel hazırlanmış bir özgeçmişe",
+        "subtitle_part2": " ihtiyacı olduğunu biliyor muydunuz? Onları yapay zeka kullanarak *sizinle birlikte* oluşturuyoruz.",
+        "description": "Zekisiniz, yeteneklisiniz ve hazırsınız. Ama başvurunuz ATS girdabında kayboluyor. Sorun sizde değil, sistemde. CareerFlow AI, fark edilmenizi sağlayan özgeçmişler ve portfolyolar hazırlar.",
+        "startFreeResume": "Ücretsiz YZ Özgeçmişimi Başlat",
+        "checkScore": "ATS Puanımı Kontrol Et",
+        "imageAlt": "Teknoloji ile kariyer başarısı elde eden ve işbirliği yapan profesyoneller"
+    },
+    "header": {
+        "logo": "CareerFlow",
+        "theStruggle": "Zorluklar",
+        "yourEdge": "Avantajınız",
+        "howItWorks": "Nasıl Çalışır?",
+        "pricing": "Fiyatlandırma",
+        "atsCheck": "ATS Kontrolü ✨",
+        "login": "Giriş Yap",
+        "getStarted": "Başlayın",
+        "atsTooltipTitle": "ATS Nedir? 🤔",
+        "atsTooltipText": "ATS = Robot İşe Alımcı 🤖 Özgeçmişleri tarar. Anahtar kelimeleri kaçırdın mı? 💨 Göz ardı edilirsin! 👉 Kendininkini kontrol etmek için tıkla! ✅"
+    },
+    "struggle": {
+        "title_part1": "Başvuru ",
+        "abyss": "Çıkmazında mı Kaldınız?",
+        "title_part2": "",
+        "subtitle": "Niteliklisiniz, azimlisiniz ve hazırsınız. Yine de döngü kendini tekrar ediyor: çaba, ret, şüphe. Sizi geride tutan engelleri aşalım.",
+        "painPoints": {
+            "blackHole": {
+                "title": "Özgeçmiş Kara Deliği",
+                "text": "Bitmek bilmeyen başvurular, sağır edici bir sessizlik. Özgeçmişiniz sanki hiçliğe karışıyor gibi mi hissediyorsunuz? Bu yaygın bir hayal kırıklığıdır."
+            },
+            "timeSink": {
+                "title": "Zaman Tuzağı",
+                "text": "Sürekli özgeçmişleri düzenlemek, kapak mektupları yazmak... İş aramak bütün hayatınızı tüketmemeli."
+            },
+            "visibility": {
+                "title": "Görünürlük Sorunu",
+                "text": "Sıradan bir özgeçmiş mi? Portfolyonuz yok mu? Eşsiz yeteneklerinizi sergilemekte ve kalabalığın arasından sıyrılmakta zorlanıyor musunuz?"
+            },
+            "atsGauntlet": {
+                "title": "ATS Engeli",
+                "text": "Anahtar kelimeler kafanızı mı karıştırıyor? Biçimlendirme konusunda endişeli misiniz? Robotları aşmak, kaybedilmiş bir savaş gibi hissettiriyor."
+            }
+        },
+        "missingOut": {
+            "title": "Eski Taktiklerin Size Fırsat Kaybettirmesine İzin Vermeyin",
+            "text": "{year} yılında sıradan bir başvuru yeterli değil. Dikkat çeken portfolyolar, hedefe yönelik özgeçmişler ve eşsiz değerinizi sergilemek çok önemli. Peki, sizin materyalleriniz gerçekten rekabetçi mi?"
+        }
+    },
+    "features": {
+        "title": "Yeni Avantajınız: ",
+        "aiAndBrilliance": "Yapay Zeka + Sizin Zekanız",
+        "subtitle": "CareerFlow AI sadece bir araç değil. Güçlü yönlerinizi öne çıkarmak ve modern iş piyasasının karmaşıklığında yolunuzu bulmak için tasarlanmış akıllı ortağınızdır.",
+        "hyperPersonalized": {
+            "title": "Hiper-Kişiselleştirilmiş YZ Taslakları",
+            "text": "Yapay zeka, iş tanımlarını VE profilinizi analiz ederek saniyeler içinde benzersiz, hedefe yönelik özgeçmişler ve mektuplar oluşturur. Sıradanlığa veda edin!"
+        },
+        "conquerAts": {
+            "title": "ATS'yi Fethedin",
+            "text": "Optimize edilmiş formatlama, anahtar kelime analizi ve ÜCRETSİZ anlık ATS puan denetleyicisi, robotları geçmenizi sağlar."
+        },
+        "ownCorner": {
+            "title": "İnternette Size Ait Bir Köşe",
+            "text": "Özgeçmişinizden göz alıcı, profesyonel bir web sitesi ve portfolyo oluşturun. Yapay zeka ile kolayca düzenleyin, anında paylaşın."
+        },
+        "aiEditing": {
+            "title": "Sihirli YZ Düzenleme Değneği",
+            "text": "Bir bölümü daha güçlü mü yapmak istiyorsunuz? Daha mı öz? Sadece yapay zekaya sorun. Basit komutlarla her şeyi gerçek zamanlı olarak düzenleyin. ✨"
+        }
+    },
+    "howItWorks": {
+        "title": "Yapay Zeka Pilot Değil, Yardımcı Pilotunuzdur",
+        "subtitle": "Robotik şablonları unutun. Yapay zekanın hızını sizin eşsiz sesinizle birleştiriyoruz. Kontrol her zaman sizde; hem etkili hem de gerçekten *sizi* yansıtan başvurular hazırlayın.",
+        "steps": {
+            "input": {
+                "title": "Girdi ve Bağlam",
+                "text": "Bilgilerinizi, deneyimlerinizi ve hedeflediğiniz iş/burs tanımını sağlayın. Yapay zekaya ihtiyaç duyduğu yakıtı verin."
+            },
+            "aiMagic": {
+                "title": "Sihirli YZ Taslakları",
+                "text": "Yapay zekamız, ATS ve etki için optimize edilmiş, kişiye özel ilk özgeçmiş, mektup ve web sitesi içeriği taslaklarını anında oluşturur."
+            },
+            "refine": {
+                "title": "Geliştirin ve Kişiselleştirin",
+                "text": "Sezgisel araçları ve YZ komutlarını ('Bunu daha özgüvenli bir dille yaz') kullanarak metni parlatın, kendi dokunuşunuzu ekleyin ve mükemmelleştirin."
+            }
+        }
+    },
+    "pricing": {
+        "title": "Basit Planlar, Güçlü Sonuçlar",
+        "subtitle": "Yolculuğunuza uygun planı seçin. Ücretsiz başlayın, dilediğiniz zaman yükseltin. Gizli ücretler yok.",
+        "popular": "POPÜLER",
+        "currentPlan": "Mevcut Plan",
+        "reactivate": "Yeniden Aktive Et",
+        "getStartedFree": "Ücretsiz Başla",
+        "choosePlan": "Planı Seç",
+        "loadingPlans": "Fiyatlandırma planları yükleniyor...",
+        "errorTitle": "Oops! Bir şeyler ters gitti.",
+        "noPlansTitle": "Mevcut Plan Yok",
+        "noPlansText": "Fiyatlandırma planları şu anda mevcut değil. Lütfen daha sonra tekrar kontrol edin."
+    },
+    "atsChecker": {
+        "title_part1": "Özgeçmişiniz Robotlar Tarafından ",
+        "ghosted": "Görmezden mi Geliniyor?",
+        "title_part2": "",
+        "subtitle": "Tahmin yürütmeyin. %100 ÜCRETSİZ, anlık ATS uyumluluk kontrolü için özgeçmişinizi şimdi yükleyin. Başvurunuzu gerçekten bir insanın görmesini sağlamak için uygulanabilir içgörüler edinin.",
+        "scanResume": "Özgeçmişimi ÜCRETSİZ Tara",
+        "disclaimer": "Hile yok, tarama için kayıt gerekmez.",
+        "imageAlt": "Bir ATS özgeçmiş taramasının görsel temsili"
+    },
+    "footer": {
+        "tagline": "İş arayanları ve öğrencileri, fırsatlar yaratmaları ve daha parlak bir gelecek inşa etmeleri için yapay zeka ile güçlendiriyoruz.",
+        "product": "Ürün",
+        "features": "Özellikler",
+        "pricing": "Fiyatlandırma",
+        "atsChecker": "ATS Denetleyicisi",
+        "templates": "Şablonlar",
+        "resources": "Kaynaklar",
+        "blog": "Blog",
+        "guides": "Rehberler",
+        "faq": "SSS",
+        "support": "Destek",
+        "company": "Şirket",
+        "aboutUs": "Hakkımızda",
+        "careers": "Kariyer",
+        "contact": "İletişim",
+        "legal": "Yasal",
+        "privacyPolicy": "Gizlilik Politikası",
+        "termsOfService": "Hizmet Şartları",
+        "copyright": "©  CareerFlow AI. Tüm hakları saklıdır."
+    },
+    "dashboard": {
+        "welcome": "Tekrar hoş geldiniz",
+        "overview": "Genel Bakış",
+        "recentActivity": "Son Etkinlikler",
+        "quickActions": "Hızlı İşlemler"
+    },
+    "navigation": {
+        "home": "Ana Sayfa",
+        "dashboard": "Kontrol Paneli",
+        "resumes": "Özgeçmişler",
+        "profile": "Profil",
+        "settings": "Ayarlar",
+        "logout": "Çıkış Yap"
+    },
+    "dashboard_main": {
+        "jobPostings": {
+            "title": "Son İş İlanları",
+            "subtitle": "{count} iş ilanı gösteriliyor ({status})",
+            "noJobs": "Henüz iş ilanı bulunamadı. Sistem, varsayılan özgeçmişinizdeki anahtar kelimelere göre otomatik olarak iş arayacaktır.",
+            "startScraping": "İş Aramayı Başlat",
+            "viewMore": "{count} ilanı daha gör"
+        },
+        "welcomeBanner": {
+            "title": "Tekrar hoş geldin, {userName}!",
+            "userFallback": "Kullanıcı",
+            "subtitle": "İşte kariyer paneline genel bir bakış."
+        },
+        "actionCard": {
+            "explore": "Keşfet"
+        },
+        "quickActions": {
+            "createDocument": {
+                "title": "Yeni Belge Oluştur",
+                "description": "Bir kapak mektubu, tavsiye mektubu veya başka bir profesyonel belge oluşturun.",
+                "button": "Şimdi Oluştur"
+            },
+            "newResume": {
+                "title": "Yeni Özgeçmiş",
+                "description": "Sıfırdan veya bir şablondan yeni ve dikkat çekici bir özgeçmiş hazırlayın.",
+                "button": "Özgeçmiş Oluştur"
+            },
+            "myPortfolio": {
+                "title": "Portfolyom",
+                "description": "Kişisel kariyer web sitenizi yönetin ve yayınlayın.",
+                "button": "Siteyi Düzenle"
+            },
+            "jobSearch": {
+                "title": "İş Arama",
+                "description": "İlgili iş fırsatlarını keşfedin ve takip edin.",
+                "button": "İş Bul"
+            }
+        },
+        "defaultResume": {
+            "title": "Varsayılan Özgeçmiş",
+            "loading": "Varsayılan Özgeçmiş Yükleniyor...",
+            "lastUpdated": "Son güncelleme: {date}",
+            "noDefaultSelected": "Varsayılan özgeçmiş seçilmedi. Panelinizi kişiselleştirmek için bir tane seçin.",
+            "changeDefault": "Varsayılanı Değiştir",
+            "selectDefault": "Varsayılan Olarak Seç",
+            "buttonChooseDefault": "Varsayılan Özgeçmişinizi Seçin",
+            "tooltipEdit": "Varsayılan Özgeçmişi Düzenle",
+            "tooltipViewAll": "Varsayılanı seçmek veya değiştirmek için tüm özgeçmişleri görüntüle"
+        },
+        "relatedDocuments": {
+            "title": "Bağlantılı Belgeler",
+            "loading": "Belgeler yükleniyor...",
+            "selectDefaultPrompt": "Bağlantılı belgelerini burada görmek için bir varsayılan özgeçmiş seçin.",
+            "documentsFor": "\"{resumeTitle}\" için belgeler",
+            "manageAll": "Tümünü Yönet",
+            "viewMore": "{count} tane daha göster...",
+            "noDocuments": "Bu özgeçmişe henüz bağlı bir belge yok.",
+            "addDocument": "Belge Ekle",
+            "tooltipManageAll": "Belgeler Sayfasına Git"
+        },
+        "toast": {
+            "loadError": "Özgeçmiş verileri yüklenemedi.",
+            "actionRequiredSummary": "Eylem Gerekli",
+            "actionRequiredDetail": "Lütfen \"Tüm Özgeçmişler\" sayfasından varsayılan olarak ayarlamak için bir özgeçmiş seçin.",
+            "noResumeSummary": "Özgeçmiş Yok",
+            "noResumeDetail": "Varsayılan durumu değiştirmek için özgeçmiş seçilmedi.",
+            "noResumeForDoc": "Lütfen belge oluşturmadan önce bir özgeçmiş oluşturun.",
+            "updateSuccess": "Ana özgeçmiş durumu güncellendi.",
+            "updateError": "Ana özgeçmiş durumu güncellenemedi.",
+            "generationStartedSummary": "Belge Oluşturma Başladı",
+            "generationStartedDetail": "Belgeniz oluşturuluyor."
+        },
+        "dialog": {
+            "resumeIdLabel": "Özgeçmiş ID: {id}"
+        }
+    },
+    "dashboard_layout": {
+        "logo": "CareerFlow",
+        "sidebar": {
+            "settings": "Ayarlar",
+            "overview": "Genel Bakış",
+            "resumes": "Özgeçmişler",
+            "myWebsite": "Web Sitem",
+            "atsChecker": "ATS Denetleyici",
+            "jobFeed": "İş Akışı",
+            "scholarships": "Burslar"
+        },
+        "topbar": {
+            "expandSidebar": "Kenar Çubuğunu Genişlet",
+            "collapseSidebar": "Kenar Çubuğunu Daralt",
+            "searchPlaceholder": "Panelde ara...",
+            "userFallback": "Kullanıcı"
+        },
+        "userMenu": {
+            "profile": "Profil",
+            "settings": "Ayarlar",
+            "logout": "Çıkış Yap"
+        },
+        "toast": {
+            "setDefault": "Özgeçmiş varsayılan olarak ayarlandı.",
+            "unsetDefault": "Özgeçmişin varsayılan ayarı kaldırıldı."
+        }
+    },
+    "login": {
+        "errorSummary": "Hata",
+        "errorDetail": "{{provider}} ile giriş yapılamadı",
+        "welcomeBack": "Tekrar hoş geldin, {{name}}!",
+        "signInWithGoogle": "Google ile Giriş Yap",
+        "signInWithLinkedIn": "LinkedIn ile Giriş Yap"
+    },
+    "accessDenied": {
+        "title": "Erişim Engellendi",
+        "message": "Gerekli izinlere sahip değilsiniz.",
+        "imageAlt": "Erişim Engellendi Resmi",
+        "goToDashboard": "Kontrol Paneline Git"
+    },
+    "errorPage": {
+        "title": "Bir Hata Oluştu",
+        "message": "Bir şeyler ters gitti.",
+        "imageAlt": "Hata Resmi",
+        "goToDashboard": "Kontrol Paneline Git"
+    },
+    "jobFeed": {
+        "title": "İş Akışı",
+        "subtitle": "Bulunan {count} işten {filtered} tanesi gösteriliyor",
+        "loading": "İş fırsatları yükleniyor...",
+        "loadingInitial": "İş akışı yükleniyor...",
+        "fetching": "İşler getiriliyor...",
+        "searchStarted": "Arama Başlatıldı",
+        "searchStartedDetail": "İşler kriterlerinize göre yenileniyor...",
+        "autoUpdate": {
+            "status": "Otomatik Güncelleme Durumu",
+            "active": "Aktif",
+            "inactive": "Pasif",
+            "description": "İşler, varsayılan özgeçmişinizdeki anahtar kelimelere göre her 5 dakikada bir otomatik olarak güncellenir",
+            "inactiveDescription": "Otomatik iş güncellemeleri çalışmıyor"
+        },
+        "filters": {
+            "search": "İş unvanı, anahtar kelime...",
+            "location": "Şehir veya Ülke",
+            "remoteOnly": "Sadece Uzaktan"
+        },
+        "sorting": {
+            "relevance": "İlgi Düzeyi",
+            "recent": "En Yeni",
+            "company": "Şirket A-Z",
+            "title": "Unvan A-Z"
+        },
+        "job": {
+            "locationNotSpecified": "Belirtilmemiş",
+            "addedAgo": "Eklendi",
+            "viewOn": "Şurada görüntüle:",
+            "applyNow": "Şimdi Başvur"
+        },
+        "empty": {
+            "title": "İş bulunamadı",
+            "description": "Kriterlerinize uygun iş ilanı bulunamadı. Aramanızı genişletmeyi deneyin!"
+        }
     }
-  },
-  "missingOut": {
-    "title": "Eski Taktiklerin Size Mal Olmasına İzin Vermeyin",
-    "text": "{year} yılında genel bir başvuru yeterli değil. Göze çarpan portföyler, hedeflenmiş özgeçmişler ve benzersiz değerinizi sergilemek esastır. Materyalleriniz gerçekten rekabetçi mi?"
-  }
-},
-  "dashboard_main": {
-    "jobPostings": {
-      "title": "Son İş İlanları",
-      "subtitle": "{count} iş gösteriliyor ({status})",
-      "noJobs": "Henüz iş bulunamadı. Sistem otomatik olarak varsayılan özgeçmişinizin anahtar kelimelerine göre iş arayacak.",
-      "startScraping": "İş Aramayı Başlat",
-      "viewMore": "{count} iş daha görüntüle"
-    },
-    "welcomeBanner": {
-      "title": "Tekrar hoş geldin, {userName}!",
-      "userFallback": "Kullanıcı",
-      "subtitle": "İşte kariyer kontrol panelinizin genel görünümü."
-    },
-    "actionCard": {
-      "explore": "Keşfet"
-    },
-    "quickActions": {
-      "createDocument": {
-        "title": "Yeni Belge Oluştur",
-        "description": "Bir kapak mektubu, tavsiye veya diğer profesyonel belgeleri oluşturun.",
-        "button": "Şimdi Oluştur"
-      },
-      "newResume": {
-        "title": "Yeni Özgeçmiş",
-        "description": "Sıfırdan veya şablondan yeni bir öne çıkan özgeçmiş oluşturun.",
-        "button": "Özgeçmiş Oluştur"
-      },
-      "myPortfolio": {
-        "title": "Portföyüm",
-        "description": "Kişisel kariyer web sitenizi yönetin ve yayınlayın.",
-        "button": "Siteyi Düzenle"
-      },
-      "jobSearch": {
-        "title": "İş Arama",
-        "description": "İlgili iş fırsatlarını keşfedin ve takip edin.",
-        "button": "İş Bul"
-      }
-    },
-    "defaultResume": {
-      "title": "Varsayılan Özgeçmiş",
-      "loading": "Varsayılan Özgeçmiş Yükleniyor...",
-      "lastUpdated": "Son güncelleme: {date}",
-      "noDefaultSelected": "Varsayılan özgeçmiş seçilmedi. Kontrol panelinizi kişiselleştirmek için bir tane seçin.",
-      "changeDefault": "Varsayılanı Değiştir",
-      "selectDefault": "Varsayılan Seç",
-      "buttonChooseDefault": "Varsayılan Özgeçmişinizi Seçin",
-      "tooltipEdit": "Varsayılan Özgeçmişi Düzenle",
-      "tooltipViewAll": "Varsayılan seçmek veya değiştirmek için tüm özgeçmişleri görüntüle"
-    },
-    "relatedDocuments": {
-      "title": "Bağlı Belgeler",
-      "loading": "Belgeler yükleniyor...",
-      "selectDefaultPrompt": "Bağlı belgeleri burada görmek için varsayılan özgeçmiş seçin.",
-      "documentsFor": "\"{resumeTitle}\" için belgeler",
-      "manageAll": "Tümünü Yönet",
-      "viewMore": "{count} tane daha görüntüle...",
-      "noDocuments": "Bu özgeçmişe henüz bağlı belge yok.",
-      "addDocument": "Belge Ekle",
-      "tooltipManageAll": "Belgeler Sayfasına Git"
-    },
-    "toast": {
-      "loadError": "Özgeçmiş verileri yüklenemedi.",
-      "actionRequiredSummary": "Eylem Gerekli",
-      "actionRequiredDetail": "Lütfen \"Tüm Özgeçmişler\" sayfasından varsayılan olarak ayarlamak için bir özgeçmiş seçin.",
-      "noResumeSummary": "Özgeçmiş Yok",
-      "noResumeDetail": "Varsayılan durumu değiştirmek için seçili özgeçmiş yok.",
-      "noResumeForDoc": "Belge oluşturmadan önce lütfen önce bir özgeçmiş oluşturun.",
-      "updateSuccess": "Ana özgeçmiş durumu güncellendi.",
-      "updateError": "Ana özgeçmiş durumu güncellenemedi.",
-      "generationStartedSummary": "Belge Oluşturma Başladı",
-      "generationStartedDetail": "Belgeniz oluşturuluyor."
-    },
-    "dialog": {
-      "resumeIdLabel": "Özgeçmiş ID: {id}"
-    }
-  },
-  "jobFeed": {
-    "title": "İş Akışı",
-    "subtitle": "{count} işten {filtered} tanesi gösteriliyor",
-    "loading": "İş fırsatları yükleniyor...",
-    "loadingInitial": "İş akışı yükleniyor...",
-    "fetching": "İşler aranıyor...",
-    "searchStarted": "Arama Başladı",
-    "searchStartedDetail": "İşler kriterlerinize göre güncelleniyor...",
-    "autoUpdate": {
-      "status": "Otomatik Güncelleme Durumu",
-      "active": "Aktif",
-      "inactive": "Aktif Değil",
-      "description": "İşler varsayılan özgeçmişinizin anahtar kelimelerine göre her 5 dakikada otomatik olarak güncellenir",
-      "inactiveDescription": "Otomatik iş güncellemeleri çalışmıyor"
-    },
-    "filters": {
-      "search": "İş başlığı, anahtar kelime...",
-      "location": "Şehir veya Ülke",
-      "remoteOnly": "Sadece Uzaktan"
-    },
-    "sorting": {
-      "relevance": "İlgililik",
-      "recent": "En Son",
-      "company": "Şirket A-Z",
-      "title": "Başlık A-Z"
-    },
-    "job": {
-      "locationNotSpecified": "Belirtilmedi",
-      "addedAgo": "Eklendi",
-      "viewOn": "Şurada görüntüle",
-      "applyNow": "Şimdi Başvur"
-    },
-    "empty": {
-      "title": "İş bulunamadı",
-      "description": "Kriterlerinizle eşleşen iş ilanı bulunamadı. Aramanızı genişletmeyi deneyin!"
-    }
-  }
 }

@@ -1,364 +1,360 @@
 {
-  "common": {
-    "loading": "Loading...",
-    "error": "Error",
-    "save": "Save",
-    "cancel": "Cancel",
-    "delete": "Delete",
-    "edit": "Edit",
-    "create": "Create",
-    "search": "Search...",
-    "tryAgain": "Try Again",
-    "documents": "Documents",
-    "remote": "Remote",
-    "source": "Source",
-    "day": "day",
-    "hour": "hour",
-    "ago": "ago",
-    "justNow": "Just now",
-    "sortBy": "Sort By",
-    "refresh": "Refresh",
-    "viewAll": "View All"
-  },
+    "common": {
+        "loading": "Loading...",
+        "error": "Error",
+        "save": "Save",
+        "cancel": "Cancel",
+        "delete": "Delete",
+        "edit": "Edit",
+        "create": "Create",
+        "search": "Search...",
+        "tryAgain": "Try Again",
+        "documents": "Documents",
+        "remote": "Remote",
+        "source": "Source",
+        "day": "day",
+        "hour": "hour",
+        "ago": "ago",
+        "justNow": "Just now",
+        "sortBy": "Sort By",
+        "refresh": "Refresh",
+        "viewAll": "View All"
+    },
 
-  "resumes": {
-    "title": "My Resumes",
-    "createNew": "Create New Resume",
-    "searchPlaceholder": "Search Resumes...",
-    "loadingResumes": "Loading resumes...",
-    "noResumesFound": "No resumes found. Click 'Create New Resume' to start!",
-    "failedToLoad": "Failed to Load Resumes",
-    "manageResume": "Manage Resume",
-    "viewDocuments": "View Documents ({count})",
-    "addDocuments": "Add Documents",
-    "untitledResume": "Untitled Resume",
-    "noDescription": "No description available",
-    "defaultTag": "Default",
-    "updated": "Updated: {date}",
-    "documentsCount": "{count} document(s)"
-  },
-  "errors": {
-    "userNotAuthenticated": "User not authenticated.",
-    "backendUrlNotConfigured": "Backend URL (NEXT_PUBLIC_BACKEND_URL) is not configured.",
-    "requestTimeout": "The request timed out. Please check your connection or try again.",
-    "serverError": "Server Error: {status} - {message}",
-    "noResponse": "No response from server. Check network connection or backend status.",
-    "unexpectedError": "An unexpected error occurred.",
-    "invalidDataFormat": "Invalid data format received from backend.",
-    "couldNotLoadResumes": "Could not load resumes. Please try again later."
-  },
-"hero": {
-  "title_part1": "Resume ",
-  "rejected": "Rejected",
-  "title_part2": "? Again?",
-  "title_part3": "Let's Fix That.",
-  "subtitle_part1": "Escape the soul-crushing job hunt. Did you know most jobs need a ",
-  "subtitle_styled": "tailored resume",
-  "subtitle_part2": " just to pass the bots? We build them *with* you, using AI.",
-  "description": "You're brilliant, skilled, and ready. But your application vanishes into the ATS abyss. It's not you, it's the system. CareerFlow AI crafts resumes & portfolios that get you noticed.",
-  "startFreeResume": "Start My Free AI Resume",
-  "checkScore": "Check My ATS Score",
-  "imageAlt": "Professionals collaborating and achieving career success with technology"
-},
-"header": {
-  "logo": "CareerFlow",
-  "theStruggle": "The Struggle",
-  "yourEdge": "Your Edge",
-  "howItWorks": "How It Works",
-  "pricing": "Pricing",
-  "atsCheck": "ATS Check ✨",
-  "login": "Login",
-  "getStarted": "Get Started",
-  "atsTooltipTitle": "What's an ATS? 🤔",
-  "atsTooltipText": "ATS = Robot Recruiter 🤖 Scans resumes. Miss keywords? 💨 Ignored! 👉 Click me to check yours! ✅"
-},
+    "resumes": {
+        "title": "My Resumes",
+        "createNew": "Create New Resume",
+        "searchPlaceholder": "Search Resumes...",
+        "loadingResumes": "Loading resumes...",
+        "noResumesFound": "No resumes found. Click 'Create New Resume' to start!",
+        "failedToLoad": "Failed to Load Resumes",
+        "manageResume": "Manage Resume",
+        "viewDocuments": "View Documents ({count})",
+        "addDocuments": "Add Documents",
+        "untitledResume": "Untitled Resume",
+        "noDescription": "No description available",
+        "defaultTag": "Default",
+        "updated": "Updated: {date}",
+        "documentsCount": "{count} document(s)"
+    },
+    "errors": {
+        "userNotAuthenticated": "User not authenticated.",
+        "backendUrlNotConfigured": "Backend URL (NEXT_PUBLIC_BACKEND_URL) is not configured.",
+        "requestTimeout": "The request timed out. Please check your connection or try again.",
+        "serverError": "Server Error: {status} - {message}",
+        "noResponse": "No response from server. Check network connection or backend status.",
+        "unexpectedError": "An unexpected error occurred.",
+        "invalidDataFormat": "Invalid data format received from backend.",
+        "couldNotLoadResumes": "Could not load resumes. Please try again later."
+    },
+    "hero": {
+        "title_part1": "Resume ",
+        "rejected": "Rejected",
+        "title_part2": "? Again?",
+        "title_part3": "Let's Fix That.",
+        "subtitle_part1": "Escape the soul-crushing job hunt. Did you know most jobs need a ",
+        "subtitle_styled": "tailored resume",
+        "subtitle_part2": " just to pass the bots? We build them *with* you, using AI.",
+        "description": "You're brilliant, skilled, and ready. But your application vanishes into the ATS abyss. It's not you, it's the system. CareerFlow AI crafts resumes & portfolios that get you noticed.",
+        "startFreeResume": "Start My Free AI Resume",
+        "checkScore": "Check My ATS Score",
+        "imageAlt": "Professionals collaborating and achieving career success with technology"
+    },
+    "header": {
+        "logo": "CareerFlow",
+        "theStruggle": "The Struggle",
+        "yourEdge": "Your Edge",
+        "howItWorks": "How It Works",
+        "pricing": "Pricing",
+        "atsCheck": "ATS Check ✨",
+        "login": "Login",
+        "getStarted": "Get Started",
+        "atsTooltipTitle": "What's an ATS? 🤔",
+        "atsTooltipText": "ATS = Robot Recruiter 🤖 Scans resumes. Miss keywords? 💨 Ignored! 👉 Click me to check yours! ✅"
+    },
 
-"struggle": {
-  "title_part1": "Stuck in the Application ",
-  "abyss": "Abyss?",
-  "title_part2": "",
-  "subtitle": "You're qualified, driven, and ready. Yet, the cycle repeats: effort, rejection, doubt. Let's break free from what's holding you back.",
-  "painPoints": {
-    "blackHole": {
-      "title": "The Resume Black Hole",
-      "text": "Endless applications, deafening silence. Feel like your resume vanishes? It's a common frustration."
+    "struggle": {
+        "title_part1": "Stuck in the Application ",
+        "abyss": "Abyss?",
+        "title_part2": "",
+        "subtitle": "You're qualified, driven, and ready. Yet, the cycle repeats: effort, rejection, doubt. Let's break free from what's holding you back.",
+        "painPoints": {
+            "blackHole": {
+                "title": "The Resume Black Hole",
+                "text": "Endless applications, deafening silence. Feel like your resume vanishes? It's a common frustration."
+            },
+            "timeSink": {
+                "title": "The Time Sink",
+                "text": "Constantly tweaking resumes, writing cover letters... Job searching shouldn't consume your entire life."
+            },
+            "visibility": {
+                "title": "The Visibility Problem",
+                "text": "Generic resume? No portfolio? Struggling to showcase your unique skills and stand out from the crowd?"
+            },
+            "atsGauntlet": {
+                "title": "The ATS Gauntlet",
+                "text": "Confused by keywords? Worried about formatting? Getting past the bots feels like a losing battle."
+            }
+        },
+        "missingOut": {
+            "title": "Don't Let Outdated Tactics Cost You",
+            "text": "A generic application isn't enough in {year}. Standout portfolios, targeted resumes, and showcasing your unique value are essential. Are your materials truly competitive?"
+        }
     },
-    "timeSink": {
-      "title": "The Time Sink",
-      "text": "Constantly tweaking resumes, writing cover letters... Job searching shouldn't consume your entire life."
+    "features": {
+        "title": "Your New Edge: ",
+        "aiAndBrilliance": "AI + Your Brilliance",
+        "subtitle": "CareerFlow AI isn't just another tool. It's your intelligent partner, designed to amplify your strengths and navigate the complexities of the modern job market.",
+        "hyperPersonalized": {
+            "title": "Hyper-Personalized AI Drafts",
+            "text": "AI analyzes job descriptions AND your profile to craft unique, targeted resumes & letters in seconds. Say goodbye to generic!"
+        },
+        "conquerAts": {
+            "title": "Conquer the ATS",
+            "text": "Optimized formatting, keyword analysis, and a FREE instant ATS score checker ensure you pass the bots."
+        },
+        "ownCorner": {
+            "title": "Your Own Corner of the Web",
+            "text": "Generate a stunning, professional website & portfolio from your resume. Easily edit with AI, share instantly."
+        },
+        "aiEditing": {
+            "title": "AI Editing Magic Wand",
+            "text": "Need a section stronger? More concise? Just ask the AI. Edit anything in real-time with simple prompts. ✨"
+        }
     },
-    "visibility": {
-      "title": "The Visibility Problem",
-      "text": "Generic resume? No portfolio? Struggling to showcase your unique skills and stand out from the crowd?"
+    "howItWorks": {
+        "title": "AI Is Your Co-Pilot, Not the Pilot",
+        "subtitle": "Forget robotic templates. We blend AI's speed with your unique voice. You're always in control, crafting applications that are both effective and authentically *you*.",
+        "steps": {
+            "input": {
+                "title": "Input & Context",
+                "text": "Provide your details, experiences, and the target job/scholarship description. Give the AI the fuel it needs."
+            },
+            "aiMagic": {
+                "title": "AI Magic Drafts",
+                "text": "Our AI generates tailored first drafts of resumes, letters, and website content in moments, optimized for ATS and impact."
+            },
+            "refine": {
+                "title": "Refine & Personalize",
+                "text": "Use intuitive tools and AI prompts ('Make this sound more confident') to polish, add your unique flair, and make it perfect."
+            }
+        }
     },
-    "atsGauntlet": {
-      "title": "The ATS Gauntlet",
-      "text": "Confused by keywords? Worried about formatting? Getting past the bots feels like a losing battle."
+    "pricing": {
+        "title": "Simple Plans, Powerful Results",
+        "subtitle": "Choose the plan that fits your journey. Start free, upgrade anytime. No hidden fees.",
+        "popular": "POPULAR",
+        "currentPlan": "Current Plan",
+        "reactivate": "Reactivate",
+        "getStartedFree": "Get Started Free",
+        "choosePlan": "Choose Plan",
+        "loadingPlans": "Loading pricing plans...",
+        "errorTitle": "Oops! Something went wrong.",
+        "noPlansTitle": "No Plans Available",
+        "noPlansText": "Pricing plans are currently unavailable. Please check back later."
+    },
+    "atsChecker": {
+        "title_part1": "Is Your Resume Getting ",
+        "ghosted": "Ghosted by Robots?",
+        "title_part2": "",
+        "subtitle": "Don't guess. Upload your resume now for a 100% FREE, instant ATS compatibility check. Get actionable insights to ensure a human actually sees your application.",
+        "scanResume": "Scan My Resume FREE",
+        "disclaimer": "No tricks, no sign-up required for the scan.",
+        "imageAlt": "Visual representation of an ATS resume scan"
+    },
+    "footer": {
+        "tagline": "Empowering job seekers and students with AI to create opportunities and build brighter futures.",
+        "product": "Product",
+        "features": "Features",
+        "pricing": "Pricing",
+        "atsChecker": "ATS Checker",
+        "templates": "Templates",
+        "resources": "Resources",
+        "blog": "Blog",
+        "guides": "Guides",
+        "faq": "FAQ",
+        "support": "Support",
+        "company": "Company",
+        "aboutUs": "About Us",
+        "careers": "Careers",
+        "contact": "Contact",
+        "legal": "Legal",
+        "privacyPolicy": "Privacy Policy",
+        "termsOfService": "Terms of Service",
+        "copyright": "©  CareerFlow AI. All rights reserved."
+    },
+    "dashboard": {
+        "welcome": "Welcome back",
+        "overview": "Overview",
+        "recentActivity": "Recent Activity",
+        "quickActions": "Quick Actions"
+    },
+    "navigation": {
+        "home": "Home",
+        "dashboard": "Dashboard",
+        "resumes": "Resumes",
+        "profile": "Profile",
+        "settings": "Settings",
+        "logout": "Logout"
+    },
+    "dashboard_main": {
+        "jobPostings": {
+            "title": "Latest Job Postings",
+            "subtitle": "Showing {count} jobs ({status})",
+            "noJobs": "No jobs found yet. The system will automatically search for jobs based on your default resume's keywords.",
+            "startScraping": "Start Job Search",
+            "viewMore": "View {count} more jobs"
+        },
+        "welcomeBanner": {
+            "title": "Welcome back, {userName}!",
+            "userFallback": "User",
+            "subtitle": "Here's your career dashboard overview."
+        },
+        "actionCard": {
+            "explore": "Explore"
+        },
+        "quickActions": {
+            "createDocument": {
+                "title": "Create New Document",
+                "description": "Generate a cover letter, recommendation, or other professional document.",
+                "button": "Generate Now"
+            },
+            "newResume": {
+                "title": "New Resume",
+                "description": "Craft a new standout resume from scratch or a template.",
+                "button": "Create Resume"
+            },
+            "myPortfolio": {
+                "title": "My Portfolio",
+                "description": "Manage and publish your personal career website.",
+                "button": "Edit Site"
+            },
+            "jobSearch": {
+                "title": "Job Search",
+                "description": "Discover and track relevant job opportunities.",
+                "button": "Find Jobs"
+            }
+        },
+        "defaultResume": {
+            "title": "Default Resume",
+            "loading": "Loading Default Resume...",
+            "lastUpdated": "Last updated: {date}",
+            "noDefaultSelected": "No default resume selected. Choose one to personalize your dashboard.",
+            "changeDefault": "Change Default",
+            "selectDefault": "Select Default",
+            "buttonChooseDefault": "Choose Your Default Resume",
+            "tooltipEdit": "Edit Default Resume",
+            "tooltipViewAll": "View all resumes to select or change default"
+        },
+        "relatedDocuments": {
+            "title": "Linked Documents",
+            "loading": "Loading documents...",
+            "selectDefaultPrompt": "Select a default resume to see its linked documents here.",
+            "documentsFor": "Documents for \"{resumeTitle}\"",
+            "manageAll": "Manage All",
+            "viewMore": "View {count} more...",
+            "noDocuments": "No documents linked to this resume yet.",
+            "addDocument": "Add Document",
+            "tooltipManageAll": "Go to Documents Page"
+        },
+        "toast": {
+            "loadError": "Could not load resume data.",
+            "actionRequiredSummary": "Action Required",
+            "actionRequiredDetail": "Please select a resume to set as default from the \"All Resumes\" page.",
+            "noResumeSummary": "No Resume",
+            "noResumeDetail": "No resume selected to change default status.",
+            "noResumeForDoc": "Please create a resume first before generating documents.",
+            "updateSuccess": "Master resume status updated.",
+            "updateError": "Could not update master resume status.",
+            "generationStartedSummary": "Document Generation Started",
+            "generationStartedDetail": "Your document is being generated."
+        },
+        "dialog": {
+            "resumeIdLabel": "Resume ID: {id}"
+        }
+    },
+    "dashboard_layout": {
+        "logo": "CareerFlow",
+        "sidebar": {
+            "settings": "Settings",
+            "overview": "Overview",
+            "resumes": "Resumes",
+            "myWebsite": "My Website",
+            "atsChecker": "ATS Checker",
+            "jobFeed": "Job Feed",
+            "scholarships": "Scholarships"
+        },
+        "topbar": {
+            "expandSidebar": "Expand Sidebar",
+            "collapseSidebar": "Collapse Sidebar",
+            "searchPlaceholder": "Search dashboard...",
+            "userFallback": "User"
+        },
+        "userMenu": {
+            "profile": "Profile",
+            "settings": "Settings",
+            "logout": "Logout"
+        },
+        "toast": {
+            "setDefault": "Resume set as default.",
+            "unsetDefault": "Resume unset as default."
+        }
+    },
+    "login": {
+        "errorSummary": "Error",
+        "errorDetail": "Failed to sign in with {{provider}}",
+        "welcomeBack": "Welcome back, {{name}}!",
+        "signInWithGoogle": "Sign in with Google",
+        "signInWithLinkedIn": "Sign in with LinkedIn"
+    },
+    "accessDenied": {
+        "title": "Access Denied",
+        "message": "You do not have the necessary permissions.",
+        "imageAlt": "Access Denied Image",
+        "goToDashboard": "Go to Dashboard"
+    },
+    "errorPage": {
+        "title": "Error Occurred",
+        "message": "Something went wrong.",
+        "imageAlt": "Error Image",
+        "goToDashboard": "Go to Dashboard"
+    },
+
+    "jobFeed": {
+        "title": "Job Feed",
+        "subtitle": "Showing {filtered} of {count} jobs found",
+        "loading": "Loading job opportunities...",
+        "loadingInitial": "Loading job feed...",
+        "fetching": "Fetching jobs...",
+        "searchStarted": "Search Started",
+        "searchStartedDetail": "Refreshing jobs based on your criteria...",
+        "autoUpdate": {
+            "status": "Auto-Update Status",
+            "active": "Active",
+            "inactive": "Inactive",
+            "description": "Jobs are automatically updated every 5 minutes based on your default resume keywords",
+            "inactiveDescription": "Automatic job updates are not running"
+        },
+        "filters": {
+            "search": "Job title, keyword...",
+            "location": "City or Country",
+            "remoteOnly": "Remote Only"
+        },
+        "sorting": {
+            "relevance": "Relevance",
+            "recent": "Most Recent",
+            "company": "Company A-Z",
+            "title": "Title A-Z"
+        },
+        "job": {
+            "locationNotSpecified": "Not specified",
+            "addedAgo": "Added",
+            "viewOn": "View on",
+            "applyNow": "Apply Now"
+        },
+        "empty": {
+            "title": "No jobs found",
+            "description": "No job postings found matching your criteria. Try broadening your search!"
+        }
     }
-  },
-  "missingOut": {
-    "title": "Don't Let Outdated Tactics Cost You",
-    "text": "A generic application isn't enough in {year}. Standout portfolios, targeted resumes, and showcasing your unique value are essential. Are your materials truly competitive?"
-  }
-},
-  "features": {
-    "title": "Your New Edge: {aiAndBrilliance}",
-    "aiAndBrilliance": "AI + Your Brilliance",
-    "subtitle": "CareerFlow AI isn't just another tool. It's your intelligent partner, designed to amplify your strengths and navigate the complexities of the modern job market.",
-    "hyperPersonalized": {
-      "title": "Hyper-Personalized AI Drafts",
-      "text": "AI analyzes job descriptions AND your profile to craft unique, targeted resumes & letters in seconds. Say goodbye to generic!"
-    },
-    "conquerAts": {
-      "title": "Conquer the ATS",
-      "text": "Optimized formatting, keyword analysis, and a FREE instant ATS score checker ensure you pass the bots."
-    },
-    "ownCorner": {
-      "title": "Your Own Corner of the Web",
-      "text": "Generate a stunning, professional website & portfolio from your resume. Easily edit with AI, share instantly."
-    },
-    "aiEditing": {
-      "title": "AI Editing Magic Wand",
-      "text": "Need a section stronger? More concise? Just ask the AI. Edit anything in real-time with simple prompts. ✨"
-    }
-  },
-  "howItWorks": {
-    "title": "AI Is Your Co-Pilot, Not the Pilot",
-    "subtitle": "Forget robotic templates. We blend AI's speed with your unique voice. You're always in control, crafting applications that are both effective and authentically *you*.",
-    "steps": {
-      "input": {
-        "title": "Input & Context",
-        "text": "Provide your details, experiences, and the target job/scholarship description. Give the AI the fuel it needs."
-      },
-      "aiMagic": {
-        "title": "AI Magic Drafts",
-        "text": "Our AI generates tailored first drafts of resumes, letters, and website content in moments, optimized for ATS and impact."
-      },
-      "refine": {
-        "title": "Refine & Personalize",
-        "text": "Use intuitive tools and AI prompts ('Make this sound more confident') to polish, add your unique flair, and make it perfect."
-      }
-    }
-  },
-  "pricing": {
-    "title": "Simple Plans, Powerful Results",
-    "subtitle": "Choose the plan that fits your journey. Start free, upgrade anytime. No hidden fees.",
-    "popular": "POPULAR",
-    "currentPlan": "Current Plan",
-    "reactivate": "Reactivate",
-    "getStartedFree": "Get Started Free",
-    "choosePlan": "Choose Plan",
-    "loadingPlans": "Loading pricing plans...",
-    "errorTitle": "Oops! Something went wrong.",
-    "noPlansTitle": "No Plans Available",
-    "noPlansText": "Pricing plans are currently unavailable. Please check back later."
-  },
-"atsChecker": {
-  "title_part1": "Is Your Resume Getting ",
-  "ghosted": "Ghosted by Robots?",
-  "title_part2": "",
-  "subtitle": "Don't guess. Upload your resume now for a 100% FREE, instant ATS compatibility check. Get actionable insights to ensure a human actually sees your application.",
-  "scanResume": "Scan My Resume FREE",
-  "disclaimer": "No tricks, no sign-up required for the scan.",
-  "imageAlt": "Visual representation of an ATS resume scan"
-},
-  "footer": {
-    "tagline": "Empowering job seekers and students with AI to create opportunities and build brighter futures.",
-    "product": "Product",
-    "features": "Features",
-    "pricing": "Pricing",
-    "atsChecker": "ATS Checker",
-    "templates": "Templates",
-    "resources": "Resources",
-    "blog": "Blog",
-    "guides": "Guides",
-    "faq": "FAQ",
-    "support": "Support",
-    "company": "Company",
-    "aboutUs": "About Us",
-    "careers": "Careers",
-    "contact": "Contact",
-    "legal": "Legal",
-    "privacyPolicy": "Privacy Policy",
-    "termsOfService": "Terms of Service",
-    "copyright": "© {year} CareerFlow AI. All rights reserved."
-  },
-  "dashboard": {
-    "welcome": "Welcome back",
-    "overview": "Overview",
-    "recentActivity": "Recent Activity",
-    "quickActions": "Quick Actions"
-  },
-  "navigation": {
-    "home": "Home",
-    "dashboard": "Dashboard",
-    "resumes": "Resumes",
-    "profile": "Profile",
-    "settings": "Settings",
-    "logout": "Logout"
-  },
-  "dashboard_main": {
-          "jobPostings": {
-      "title": "Latest Job Postings",
-      "subtitle": "Showing {count} jobs ({status})",
-      "noJobs": "No jobs found yet. The system will automatically search for jobs based on your default resume's keywords.",
-      "startScraping": "Start Job Search",
-      "viewMore": "View {count} more jobs"
-    },
-    "welcomeBanner": {
-      "title": "Welcome back, {userName}!",
-      "userFallback": "User",
-      "subtitle": "Here's your career dashboard overview."
-    },
-    "actionCard": {
-      "explore": "Explore"
-    },
-    "quickActions": {
-      "createDocument": {
-        "title": "Create New Document",
-        "description": "Generate a cover letter, recommendation, or other professional document.",
-        "button": "Generate Now"
-      },
-      "newResume": {
-        "title": "New Resume",
-        "description": "Craft a new standout resume from scratch or a template.",
-        "button": "Create Resume"
-      },
-      "myPortfolio": {
-        "title": "My Portfolio",
-        "description": "Manage and publish your personal career website.",
-        "button": "Edit Site"
-      },
-      "jobSearch": {
-        "title": "Job Search",
-        "description": "Discover and track relevant job opportunities.",
-        "button": "Find Jobs"
-      }
-    },
-    "defaultResume": {
-      "title": "Default Resume",
-      "loading": "Loading Default Resume...",
-      "lastUpdated": "Last updated: {date}",
-      "noDefaultSelected": "No default resume selected. Choose one to personalize your dashboard.",
-      "changeDefault": "Change Default",
-      "selectDefault": "Select Default",
-      "buttonChooseDefault": "Choose Your Default Resume",
-      "tooltipEdit": "Edit Default Resume",
-      "tooltipViewAll": "View all resumes to select or change default"
-    },
-    "relatedDocuments": {
-      "title": "Linked Documents",
-      "loading": "Loading documents...",
-      "selectDefaultPrompt": "Select a default resume to see its linked documents here.",
-      "documentsFor": "Documents for \"{resumeTitle}\"",
-      "manageAll": "Manage All",
-      "viewMore": "View {count} more...",
-      "noDocuments": "No documents linked to this resume yet.",
-      "addDocument": "Add Document",
-      "tooltipManageAll": "Go to Documents Page"
-    },
-    "toast": {
-      "loadError": "Could not load resume data.",
-      "actionRequiredSummary": "Action Required",
-      "actionRequiredDetail": "Please select a resume to set as default from the \"All Resumes\" page.",
-      "noResumeSummary": "No Resume",
-      "noResumeDetail": "No resume selected to change default status.",
-      "noResumeForDoc": "Please create a resume first before generating documents.",
-      "updateSuccess": "Master resume status updated.",
-      "updateError": "Could not update master resume status.",
-      "generationStartedSummary": "Document Generation Started",
-      "generationStartedDetail": "Your document is being generated."
-    },
-    "dialog": {
-      "resumeIdLabel": "Resume ID: {id}"
-    }
-  },
-  "dashboard_layout": {
-    "logo": "CareerFlow",
-    "sidebar": {
-      "settings": "Settings",
-      "overview": "Overview",
-      "resumes": "Resumes",
-      "myWebsite": "My Website",
-      "atsChecker": "ATS Checker",
-      "jobFeed": "Job Feed",
-      "scholarships": "Scholarships"
-    },
-    "topbar": {
-      "expandSidebar": "Expand Sidebar",
-      "collapseSidebar": "Collapse Sidebar",
-      "searchPlaceholder": "Search dashboard...",
-      "userFallback": "User"
-    },
-    "userMenu": {
-      "profile": "Profile",
-      "settings": "Settings",
-      "logout": "Logout"
-    },
-    "toast": {
-      "setDefault": "Resume set as default.",
-      "unsetDefault": "Resume unset as default."
-    }
-  },
-  "login": {
-    "errorSummary": "Error",
-    "errorDetail": "Failed to sign in with {{provider}}",
-    "welcomeBack": "Welcome back, {{name}}!",
-    "signInWithGoogle": "Sign in with Google",
-    "signInWithLinkedIn": "Sign in with LinkedIn"
-  },
-  "accessDenied": {
-    "title": "Access Denied",
-    "message": "You do not have the necessary permissions.",
-    "imageAlt": "Access Denied Image",
-    "goToDashboard": "Go to Dashboard"
-  },
-  "errorPage": {
-    "title": "Error Occurred",
-    "message": "Something went wrong.",
-    "imageAlt": "Error Image",
-    "goToDashboard": "Go to Dashboard"
-  },
-
-
-"jobFeed": {
-    "title": "Job Feed",
-    "subtitle": "Showing {filtered} of {count} jobs found",
-    "loading": "Loading job opportunities...",
-    "loadingInitial": "Loading job feed...",
-    "fetching": "Fetching jobs...",
-    "searchStarted": "Search Started",
-    "searchStartedDetail": "Refreshing jobs based on your criteria...",
-    "autoUpdate": {
-        "status": "Auto-Update Status",
-        "active": "Active",
-        "inactive": "Inactive",
-        "description": "Jobs are automatically updated every 5 minutes based on your default resume keywords",
-        "inactiveDescription": "Automatic job updates are not running"
-    },
-    "filters": {
-        "search": "Job title, keyword...",
-        "location": "City or Country",
-        "remoteOnly": "Remote Only"
-    },
-    "sorting": {
-        "relevance": "Relevance",
-        "recent": "Most Recent",
-        "company": "Company A-Z",
-        "title": "Title A-Z"
-    },
-    "job": {
-        "locationNotSpecified": "Not specified",
-        "addedAgo": "Added",
-        "viewOn": "View on",
-        "applyNow": "Apply Now"
-    },
-    "empty": {
-        "title": "No jobs found",
-        "description": "No job postings found matching your criteria. Try broadening your search!"
-    }
-}
-
-
-
 }

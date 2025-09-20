@@ -1,227 +1,357 @@
 {
-  "common": {
-    "loading": "Wird geladen...",
-    "error": "Fehler",
-    "save": "Speichern",
-    "cancel": "Abbrechen",
-    "delete": "Löschen",
-    "edit": "Bearbeiten",
-    "create": "Erstellen",
-    "search": "Suchen...",
-    "tryAgain": "Erneut versuchen",
-    "documents": "Dokumente",
-    "remote": "Remote",
-    "source": "Quelle",
-    "day": "Tag",
-    "hour": "Stunde",
-    "ago": "vor",
-    "justNow": "Gerade jetzt",
-    "sortBy": "Sortieren nach",
-    "refresh": "Aktualisieren",
-    "viewAll": "Alle anzeigen"
-  },
-  "resumes": {
-    "title": "Meine Lebensläufe",
-    "createNew": "Neuen Lebenslauf erstellen",
-    "searchPlaceholder": "Lebensläufe durchsuchen...",
-    "loadingResumes": "Lebensläufe werden geladen...",
-    "noResumesFound": "Keine Lebensläufe gefunden. Klicken Sie auf 'Neuen Lebenslauf erstellen', um zu beginnen!",
-    "failedToLoad": "Laden der Lebensläufe fehlgeschlagen",
-    "manageResume": "Lebenslauf verwalten",
-    "viewDocuments": "Dokumente anzeigen ({count})",
-    "addDocuments": "Dokumente hinzufügen",
-    "untitledResume": "Unbenannter Lebenslauf",
-    "noDescription": "Keine Beschreibung verfügbar",
-    "defaultTag": "Standard",
-    "updated": "Aktualisiert: {date}",
-    "documentsCount": "{count} Dokument(e)"
-  },
-"hero": {
-  "title_part1": "Lebenslauf ",
-  "rejected": "Abgelehnt",
-  "title_part2": "? Schon wieder?",
-  "title_part3": "Lass uns das beheben.",
-  "subtitle_part1": "Entkommen Sie der zermürbenden Jobsuche. Wussten Sie, dass die meisten Jobs nur einen ",
-  "subtitle_styled": "maßgeschneiderten Lebenslauf",
-  "subtitle_part2": " brauchen, um die Bots zu überwinden? Wir erstellen sie mit Ihnen, mit KI.",
-  "description": "Sie sind brillant, qualifiziert und bereit. Aber Ihre Bewerbung verschwindet im ATS-Abgrund. Das Problem sind nicht Sie, sondern das System. CareerFlow AI erstellt Lebensläufe und Portfolios, die Sie bemerkenswert machen.",
-  "startFreeResume": "Meinen kostenlosen KI-Lebenslauf starten",
-  "checkScore": "Meine ATS-Punktzahl prüfen",
-  "imageAlt": "Professionelles Team, das mit Technologie Karriereerfolg erreicht"
-},
-"header": {
-  "logo": "CareerFlow",
-  "theStruggle": "Die Herausforderung",
-  "yourEdge": "Ihr Vorteil",
-  "howItWorks": "Wie es funktioniert",
-  "pricing": "Preise",
-  "atsCheck": "ATS-Prüfung ✨",
-  "login": "Anmelden",
-  "getStarted": "Loslegen",
-  "atsTooltipTitle": "Was ist ein ATS? 🤔",
-  "atsTooltipText": "ATS = Roboter-Personalvermittler 🤖 Scannt Lebensläufe. Schlüsselwörter verpasst? 💨 Ignoriert! 👉 Klicken Sie hier, um Ihren zu überprüfen! ✅"
-},"atsChecker": {
-  "title_part1": "Wird Ihr Lebenslauf von ",
-  "ghosted": "Robotern Ignoriert?",
-  "title_part2": "",
-  "subtitle": "Raten Sie nicht. Laden Sie Ihren Lebenslauf jetzt hoch für eine 100% KOSTENLOSE, sofortige ATS-Kompatibilitätsprüfung. Erhalten Sie umsetzbare Einblicke, um sicherzustellen, dass ein Mensch Ihre Bewerbung tatsächlich sieht.",
-  "scanResume": "Meinen Lebenslauf KOSTENLOS Scannen",
-  "disclaimer": "Keine Tricks, keine Anmeldung für den Scan erforderlich.",
-  "imageAlt": "Visuelle Darstellung eines ATS-Lebenslauf-Scans"
-},
-"struggle": {
-  "title_part1": "Başvuru ",
-  "abyss": "Uçurumunda",
-  "title_part2": " Sıkıştınız mı?",
-  "subtitle": "Niteliklisiniz, kararlısınız ve hazırsınız. Yine de döngü tekrar ediyor: çaba, ret, şüphe. Sizi geri tutan şeylerden kurtulalım.",
-  "painPoints": {
-    "blackHole": {
-      "title": "Özgeçmiş Kara Deliği",
-      "text": "Sonsuz başvurular, sağır edici sessizlik. Özgeçmişinizin kaybolduğunu mu hissediyorsunuz? Bu yaygın bir hayal kırıklığı."
+    "common": {
+        "loading": "Wird geladen...",
+        "error": "Fehler",
+        "save": "Speichern",
+        "cancel": "Abbrechen",
+        "delete": "Löschen",
+        "edit": "Bearbeiten",
+        "create": "Erstellen",
+        "search": "Suchen...",
+        "tryAgain": "Erneut versuchen",
+        "documents": "Dokumente",
+        "remote": "Remote",
+        "source": "Quelle",
+        "day": "Tag",
+        "hour": "Stunde",
+        "ago": "vor",
+        "justNow": "Gerade eben",
+        "sortBy": "Sortieren nach",
+        "refresh": "Aktualisieren",
+        "viewAll": "Alle anzeigen"
     },
-    "timeSink": {
-      "title": "Zaman Batağı",
-      "text": "Sürekli özgeçmiş düzenlemek, ön yazı yazmak... İş arama tüm hayatınızı tüketmemeli."
+    "resumes": {
+        "title": "Meine Lebensläufe",
+        "createNew": "Neuen Lebenslauf erstellen",
+        "searchPlaceholder": "Lebensläufe durchsuchen...",
+        "loadingResumes": "Lebensläufe werden geladen...",
+        "noResumesFound": "Keine Lebensläufe gefunden. Klicken Sie auf 'Neuen Lebenslauf erstellen', um zu beginnen!",
+        "failedToLoad": "Laden der Lebensläufe fehlgeschlagen",
+        "manageResume": "Lebenslauf verwalten",
+        "viewDocuments": "Dokumente anzeigen ({count})",
+        "addDocuments": "Dokumente hinzufügen",
+        "untitledResume": "Unbenannter Lebenslauf",
+        "noDescription": "Keine Beschreibung verfügbar",
+        "defaultTag": "Standard",
+        "updated": "Aktualisiert: {date}",
+        "documentsCount": "{count} Dokument(e)"
     },
-    "visibility": {
-      "title": "Görünürlük Sorunu",
-      "text": "Genel özgeçmiş mi? Portföy yok mu? Benzersiz yeteneklerinizi sergilemek ve kalabalıktan sıyrılmak için mücadele mi ediyorsunuz?"
+    "errors": {
+        "userNotAuthenticated": "Benutzer nicht authentifiziert.",
+        "backendUrlNotConfigured": "Backend-URL (NEXT_PUBLIC_BACKEND_URL) ist nicht konfiguriert.",
+        "requestTimeout": "Die Anfrage ist abgelaufen. Bitte überprüfen Sie Ihre Verbindung oder versuchen Sie es erneut.",
+        "serverError": "Server-Fehler: {status} - {message}",
+        "noResponse": "Keine Antwort vom Server. Überprüfen Sie die Netzwerkverbindung oder den Backend-Status.",
+        "unexpectedError": "Ein unerwarteter Fehler ist aufgetreten.",
+        "invalidDataFormat": "Ungültiges Datenformat vom Backend erhalten.",
+        "couldNotLoadResumes": "Lebensläufe konnten nicht geladen werden. Bitte versuchen Sie es später erneut."
     },
-    "atsGauntlet": {
-      "title": "ATS Engelkursu",
-      "text": "Anahtar kelimeler konusunda kafanız mı karışık? Biçimlendirme konusunda endişeli misiniz? Botları geçmek kayıp bir savaş gibi geliyor?"
+    "hero": {
+        "title_part1": "Lebenslauf ",
+        "rejected": "abgelehnt",
+        "title_part2": "? Schon wieder?",
+        "title_part3": "Das kriegen wir hin.",
+        "subtitle_part1": "Entfliehen Sie der zermürbenden Jobsuche. Wussten Sie, dass die meisten Jobs einen ",
+        "subtitle_styled": "maßgeschneiderten Lebenslauf",
+        "subtitle_part2": " benötigen, nur um die Bots zu bestehen? Wir erstellen ihn *mit* Ihnen, mithilfe von KI.",
+        "description": "Sie sind brillant, qualifiziert und bereit. Aber Ihre Bewerbung verschwindet im ATS-Abgrund. Es liegt nicht an Ihnen, es liegt am System. CareerFlow AI erstellt Lebensläufe & Portfolios, die Ihnen Aufmerksamkeit verschaffen.",
+        "startFreeResume": "Meinen kostenlosen KI-Lebenslauf starten",
+        "checkScore": "Meinen ATS-Score prüfen",
+        "imageAlt": "Fachleute, die zusammenarbeiten und mit Technologie beruflichen Erfolg erzielen"
+    },
+    "header": {
+        "logo": "CareerFlow",
+        "theStruggle": "Die Hürden",
+        "yourEdge": "Ihr Vorteil",
+        "howItWorks": "Wie es funktioniert",
+        "pricing": "Preise",
+        "atsCheck": "ATS-Check ✨",
+        "login": "Anmelden",
+        "getStarted": "Jetzt starten",
+        "atsTooltipTitle": "Was ist ein ATS? 🤔",
+        "atsTooltipText": "ATS = Roboter-Recruiter 🤖 Scannt Lebensläufe. Schlüsselwörter verfehlt? 💨 Ignoriert! 👉 Klicken Sie hier, um Ihren zu prüfen! ✅"
+    },
+    "struggle": {
+        "title_part1": "Im Bewerbungs-",
+        "abyss": "Abgrund gefangen?",
+        "title_part2": "",
+        "subtitle": "Sie sind qualifiziert, motiviert und bereit. Doch der Kreislauf wiederholt sich: Anstrengung, Ablehnung, Zweifel. Lassen Sie uns ausbrechen aus dem, was Sie zurückhält.",
+        "painPoints": {
+            "blackHole": {
+                "title": "Das schwarze Loch der Lebensläufe",
+                "text": "Endlose Bewerbungen, ohrenbetäubende Stille. Fühlt es sich an, als würde Ihr Lebenslauf einfach verschwinden? Das ist eine häufige Frustration."
+            },
+            "timeSink": {
+                "title": "Der Zeitfresser",
+                "text": "Ständig Lebensläufe anpassen, Anschreiben verfassen... Die Jobsuche sollte nicht Ihr ganzes Leben in Anspruch nehmen."
+            },
+            "visibility": {
+                "title": "Das Sichtbarkeitsproblem",
+                "text": "Allgemeiner Lebenslauf? Kein Portfolio? Schwierigkeiten, Ihre einzigartigen Fähigkeiten zu präsentieren und sich von der Masse abzuheben?"
+            },
+            "atsGauntlet": {
+                "title": "Der ATS-Spießrutenlauf",
+                "text": "Verwirrt von Schlüsselwörtern? Besorgt über die Formatierung? An den Bots vorbeizukommen fühlt sich wie ein aussichtsloser Kampf an."
+            }
+        },
+        "missingOut": {
+            "title": "Lassen Sie sich von veralteten Taktiken nicht ausbremsen",
+            "text": "Eine allgemeine Bewerbung reicht im Jahr {year} nicht aus. Herausragende Portfolios, gezielte Lebensläufe und die Präsentation Ihres einzigartigen Wertes sind unerlässlich. Sind Ihre Unterlagen wirklich wettbewerbsfähig?"
+        }
+    },
+    "features": {
+        "title": "Ihr neuer Vorteil: ",
+        "aiAndBrilliance": "KI + Ihre Brillanz",
+        "subtitle": "CareerFlow AI ist nicht nur ein weiteres Werkzeug. Es ist Ihr intelligenter Partner, der entwickelt wurde, um Ihre Stärken zu verstärken und die Komplexität des modernen Arbeitsmarktes zu meistern.",
+        "hyperPersonalized": {
+            "title": "Hyper-personalisierte KI-Entwürfe",
+            "text": "Die KI analysiert Stellenbeschreibungen UND Ihr Profil, um in Sekunden einzigartige, zielgerichtete Lebensläufe & Anschreiben zu erstellen. Sagen Sie Tschüss zu allgemeinen Floskeln!"
+        },
+        "conquerAts": {
+            "title": "Bezwingen Sie das ATS",
+            "text": "Optimierte Formatierung, Schlüsselwortanalyse und ein KOSTENLOSER sofortiger ATS-Score-Checker stellen sicher, dass Sie die Bots passieren."
+        },
+        "ownCorner": {
+            "title": "Ihre eigene Ecke im Web",
+            "text": "Erstellen Sie aus Ihrem Lebenslauf eine beeindruckende, professionelle Webseite & ein Portfolio. Einfach mit KI bearbeiten, sofort teilen."
+        },
+        "aiEditing": {
+            "title": "Magische KI-Bearbeitung",
+            "text": "Muss ein Abschnitt stärker oder prägnanter sein? Fragen Sie einfach die KI. Bearbeiten Sie alles in Echtzeit mit einfachen Anweisungen. ✨"
+        }
+    },
+    "howItWorks": {
+        "title": "KI ist Ihr Co-Pilot, nicht der Pilot",
+        "subtitle": "Vergessen Sie roboterhafte Vorlagen. Wir verbinden die Geschwindigkeit der KI mit Ihrer einzigartigen Stimme. Sie haben immer die Kontrolle und erstellen Bewerbungen, die sowohl effektiv als auch authentisch *Sie* sind.",
+        "steps": {
+            "input": {
+                "title": "Eingabe & Kontext",
+                "text": "Geben Sie Ihre Details, Erfahrungen und die Ziel-Stellen-/Stipendienbeschreibung an. Geben Sie der KI den nötigen Treibstoff."
+            },
+            "aiMagic": {
+                "title": "Magische KI-Entwürfe",
+                "text": "Unsere KI generiert in wenigen Augenblicken maßgeschneiderte Erstentwürfe von Lebensläufen, Anschreiben und Webseiten-Inhalten, optimiert für ATS und Wirkung."
+            },
+            "refine": {
+                "title": "Verfeinern & Personalisieren",
+                "text": "Nutzen Sie intuitive Werkzeuge und KI-Anweisungen ('Lass das selbstbewusster klingen'), um den Feinschliff zu machen, Ihre einzigartige Note hinzuzufügen und es perfekt zu machen."
+            }
+        }
+    },
+    "pricing": {
+        "title": "Einfache Pläne, starke Ergebnisse",
+        "subtitle": "Wählen Sie den Plan, der zu Ihrem Weg passt. Starten Sie kostenlos, upgraden Sie jederzeit. Keine versteckten Gebühren.",
+        "popular": "BELIEBT",
+        "currentPlan": "Aktueller Plan",
+        "reactivate": "Reaktivieren",
+        "getStartedFree": "Kostenlos starten",
+        "choosePlan": "Plan wählen",
+        "loadingPlans": "Preismodelle werden geladen...",
+        "errorTitle": "Ups! Etwas ist schiefgegangen.",
+        "noPlansTitle": "Keine Pläne verfügbar",
+        "noPlansText": "Preismodelle sind derzeit nicht verfügbar. Bitte schauen Sie später wieder vorbei."
+    },
+    "atsChecker": {
+        "title_part1": "Wird Ihr Lebenslauf von ",
+        "ghosted": "Robotern ignoriert?",
+        "title_part2": "",
+        "subtitle": "Raten Sie nicht. Laden Sie Ihren Lebenslauf jetzt hoch für eine 100% KOSTENLOSE, sofortige ATS-Kompatibilitätsprüfung. Erhalten Sie umsetzbare Einblicke, um sicherzustellen, dass ein Mensch Ihre Bewerbung tatsächlich sieht.",
+        "scanResume": "Meinen Lebenslauf KOSTENLOS scannen",
+        "disclaimer": "Keine Tricks, keine Anmeldung für den Scan erforderlich.",
+        "imageAlt": "Visuelle Darstellung eines ATS-Lebenslauf-Scans"
+    },
+    "footer": {
+        "tagline": "Wir befähigen Arbeitssuchende und Studierende mit KI, um Chancen zu schaffen und eine bessere Zukunft zu gestalten.",
+        "product": "Produkt",
+        "features": "Funktionen",
+        "pricing": "Preise",
+        "atsChecker": "ATS-Checker",
+        "templates": "Vorlagen",
+        "resources": "Ressourcen",
+        "blog": "Blog",
+        "guides": "Leitfäden",
+        "faq": "FAQ",
+        "support": "Support",
+        "company": "Unternehmen",
+        "aboutUs": "Über uns",
+        "careers": "Karriere",
+        "contact": "Kontakt",
+        "legal": "Rechtliches",
+        "privacyPolicy": "Datenschutzrichtlinie",
+        "termsOfService": "Nutzungsbedingungen",
+        "copyright": "©  CareerFlow AI. Alle Rechte vorbehalten."
+    },
+    "dashboard": {
+        "welcome": "Willkommen zurück",
+        "overview": "Übersicht",
+        "recentActivity": "Letzte Aktivitäten",
+        "quickActions": "Schnellaktionen"
+    },
+    "navigation": {
+        "home": "Startseite",
+        "dashboard": "Dashboard",
+        "resumes": "Lebensläufe",
+        "profile": "Profil",
+        "settings": "Einstellungen",
+        "logout": "Abmelden"
+    },
+    "dashboard_main": {
+        "jobPostings": {
+            "title": "Neueste Stellenangebote",
+            "subtitle": "{count} Jobs werden angezeigt ({status})",
+            "noJobs": "Noch keine Jobs gefunden. Das System sucht automatisch nach Jobs basierend auf den Schlüsselwörtern Ihres Standard-Lebenslaufs.",
+            "startScraping": "Jobsuche starten",
+            "viewMore": "{count} weitere Jobs anzeigen"
+        },
+        "welcomeBanner": {
+            "title": "Willkommen zurück, {userName}!",
+            "userFallback": "Benutzer",
+            "subtitle": "Hier ist Ihre Karriere-Dashboard-Übersicht."
+        },
+        "actionCard": {
+            "explore": "Entdecken"
+        },
+        "quickActions": {
+            "createDocument": {
+                "title": "Neues Dokument erstellen",
+                "description": "Erstellen Sie ein Anschreiben, eine Empfehlung oder ein anderes professionelles Dokument.",
+                "button": "Jetzt erstellen"
+            },
+            "newResume": {
+                "title": "Neuer Lebenslauf",
+                "description": "Erstellen Sie einen neuen, herausragenden Lebenslauf von Grund auf oder mit einer Vorlage.",
+                "button": "Lebenslauf erstellen"
+            },
+            "myPortfolio": {
+                "title": "Mein Portfolio",
+                "description": "Verwalten und veröffentlichen Sie Ihre persönliche Karriere-Website.",
+                "button": "Seite bearbeiten"
+            },
+            "jobSearch": {
+                "title": "Jobsuche",
+                "description": "Entdecken und verfolgen Sie relevante Stellenangebote.",
+                "button": "Jobs finden"
+            }
+        },
+        "defaultResume": {
+            "title": "Standard-Lebenslauf",
+            "loading": "Standard-Lebenslauf wird geladen...",
+            "lastUpdated": "Zuletzt aktualisiert: {date}",
+            "noDefaultSelected": "Kein Standard-Lebenslauf ausgewählt. Wählen Sie einen aus, um Ihr Dashboard zu personalisieren.",
+            "changeDefault": "Standard ändern",
+            "selectDefault": "Als Standard festlegen",
+            "buttonChooseDefault": "Wählen Sie Ihren Standard-Lebenslauf",
+            "tooltipEdit": "Standard-Lebenslauf bearbeiten",
+            "tooltipViewAll": "Alle Lebensläufe anzeigen, um Standard auszuwählen oder zu ändern"
+        },
+        "relatedDocuments": {
+            "title": "Verknüpfte Dokumente",
+            "loading": "Dokumente werden geladen...",
+            "selectDefaultPrompt": "Wählen Sie einen Standard-Lebenslauf aus, um die zugehörigen Dokumente hier zu sehen.",
+            "documentsFor": "Dokumente für \"{resumeTitle}\"",
+            "manageAll": "Alle verwalten",
+            "viewMore": "{count} weitere anzeigen...",
+            "noDocuments": "Noch keine Dokumente mit diesem Lebenslauf verknüpft.",
+            "addDocument": "Dokument hinzufügen",
+            "tooltipManageAll": "Zur Dokumentenseite gehen"
+        },
+        "toast": {
+            "loadError": "Lebenslauf-Daten konnten nicht geladen werden.",
+            "actionRequiredSummary": "Aktion erforderlich",
+            "actionRequiredDetail": "Bitte wählen Sie auf der Seite \"Alle Lebensläufe\" einen Lebenslauf aus, um ihn als Standard festzulegen.",
+            "noResumeSummary": "Kein Lebenslauf",
+            "noResumeDetail": "Kein Lebenslauf ausgewählt, um den Standard-Status zu ändern.",
+            "noResumeForDoc": "Bitte erstellen Sie zuerst einen Lebenslauf, bevor Sie Dokumente generieren.",
+            "updateSuccess": "Master-Lebenslauf-Status aktualisiert.",
+            "updateError": "Master-Lebenslauf-Status konnte nicht aktualisiert werden.",
+            "generationStartedSummary": "Dokumentenerstellung gestartet",
+            "generationStartedDetail": "Ihr Dokument wird generiert."
+        },
+        "dialog": {
+            "resumeIdLabel": "Lebenslauf-ID: {id}"
+        }
+    },
+    "dashboard_layout": {
+        "logo": "CareerFlow",
+        "sidebar": {
+            "settings": "Einstellungen",
+            "overview": "Übersicht",
+            "resumes": "Lebensläufe",
+            "myWebsite": "Meine Website",
+            "atsChecker": "ATS-Checker",
+            "jobFeed": "Job-Feed",
+            "scholarships": "Stipendien"
+        },
+        "topbar": {
+            "expandSidebar": "Seitenleiste erweitern",
+            "collapseSidebar": "Seitenleiste einklappen",
+            "searchPlaceholder": "Dashboard durchsuchen...",
+            "userFallback": "Benutzer"
+        },
+        "userMenu": {
+            "profile": "Profil",
+            "settings": "Einstellungen",
+            "logout": "Abmelden"
+        },
+        "toast": {
+            "setDefault": "Lebenslauf als Standard festgelegt.",
+            "unsetDefault": "Standard-Lebenslauf entfernt."
+        }
+    },
+    "login": {
+        "errorSummary": "Fehler",
+        "errorDetail": "Anmeldung mit {{provider}} fehlgeschlagen",
+        "welcomeBack": "Willkommen zurück, {{name}}!",
+        "signInWithGoogle": "Mit Google anmelden",
+        "signInWithLinkedIn": "Mit LinkedIn anmelden"
+    },
+    "accessDenied": {
+        "title": "Zugriff verweigert",
+        "message": "Sie haben nicht die erforderlichen Berechtigungen.",
+        "imageAlt": "Bild für Zugriff verweigert",
+        "goToDashboard": "Zum Dashboard"
+    },
+    "errorPage": {
+        "title": "Ein Fehler ist aufgetreten",
+        "message": "Etwas ist schiefgegangen.",
+        "imageAlt": "Fehlerbild",
+        "goToDashboard": "Zum Dashboard"
+    },
+    "jobFeed": {
+        "title": "Job-Feed",
+        "subtitle": "Zeige {filtered} von {count} gefundenen Jobs",
+        "loading": "Jobangebote werden geladen...",
+        "loadingInitial": "Job-Feed wird geladen...",
+        "fetching": "Jobs werden abgerufen...",
+        "searchStarted": "Suche gestartet",
+        "searchStartedDetail": "Jobs werden basierend auf Ihren Kriterien aktualisiert...",
+        "autoUpdate": {
+            "status": "Auto-Update-Status",
+            "active": "Aktiv",
+            "inactive": "Inaktiv",
+            "description": "Jobs werden alle 5 Minuten automatisch basierend auf den Schlüsselwörtern Ihres Standard-Lebenslaufs aktualisiert",
+            "inactiveDescription": "Automatische Job-Updates sind nicht aktiv"
+        },
+        "filters": {
+            "search": "Jobtitel, Schlüsselwort...",
+            "location": "Stadt oder Land",
+            "remoteOnly": "Nur Remote"
+        },
+        "sorting": {
+            "relevance": "Relevanz",
+            "recent": "Neueste",
+            "company": "Firma A-Z",
+            "title": "Titel A-Z"
+        },
+        "job": {
+            "locationNotSpecified": "Nicht angegeben",
+            "addedAgo": "Hinzugefügt",
+            "viewOn": "Ansehen auf",
+            "applyNow": "Jetzt bewerben"
+        },
+        "empty": {
+            "title": "Keine Jobs gefunden",
+            "description": "Keine Stellenangebote gefunden, die Ihren Kriterien entsprechen. Versuchen Sie, Ihre Suche zu erweitern!"
+        }
     }
-  },
-  "missingOut": {
-    "title": "Eski Taktiklerin Size Mal Olmasına İzin Vermeyin",
-    "text": "{year} yılında genel bir başvuru yeterli değil. Göze çarpan portföyler, hedeflenmiş özgeçmişler ve benzersiz değerinizi sergilemek esastır. Materyalleriniz gerçekten rekabetçi mi?"
-  }
-}
-,
-  "errors": {
-    "userNotAuthenticated": "Benutzer nicht authentifiziert.",
-    "backendUrlNotConfigured": "Backend-URL (NEXT_PUBLIC_BACKEND_URL) ist nicht konfiguriert.",
-    "requestTimeout": "Die Anfrage ist abgelaufen. Bitte überprüfen Sie Ihre Verbindung oder versuchen Sie es erneut.",
-    "serverError": "Server-Fehler: {status} - {message}",
-    "noResponse": "Keine Antwort vom Server. Überprüfen Sie die Netzwerkverbindung oder den Backend-Status.",
-    "unexpectedError": "Ein unerwarteter Fehler ist aufgetreten.",
-    "invalidDataFormat": "Ungültiges Datenformat vom Backend erhalten.",
-    "couldNotLoadResumes": "Lebensläufe konnten nicht geladen werden. Bitte versuchen Sie es später erneut."
-  },
-  "dashboard_main": {
-    "jobPostings": {
-      "title": "Neueste Stellenausschreibungen",
-      "subtitle": "Zeige {count} Jobs ({status})",
-      "noJobs": "Noch keine Jobs gefunden. Das System wird automatisch nach Jobs basierend auf den Schlüsselwörtern Ihres Standard-Lebenslaufs suchen.",
-      "startScraping": "Jobsuche starten",
-      "viewMore": "{count} weitere Jobs anzeigen"
-    },
-    "welcomeBanner": {
-      "title": "Willkommen zurück, {userName}!",
-      "userFallback": "Benutzer",
-      "subtitle": "Hier ist Ihre Karriere-Dashboard-Übersicht."
-    },
-    "actionCard": {
-      "explore": "Erkunden"
-    },
-    "quickActions": {
-      "createDocument": {
-        "title": "Neues Dokument erstellen",
-        "description": "Erstellen Sie ein Anschreiben, eine Empfehlung oder ein anderes professionelles Dokument.",
-        "button": "Jetzt generieren"
-      },
-      "newResume": {
-        "title": "Neuer Lebenslauf",
-        "description": "Erstellen Sie einen neuen herausragenden Lebenslauf von Grund auf oder mit einer Vorlage.",
-        "button": "Lebenslauf erstellen"
-      },
-      "myPortfolio": {
-        "title": "Mein Portfolio",
-        "description": "Verwalten und veröffentlichen Sie Ihre persönliche Karriere-Website.",
-        "button": "Website bearbeiten"
-      },
-      "jobSearch": {
-        "title": "Jobsuche",
-        "description": "Entdecken und verfolgen Sie relevante Stellenmöglichkeiten.",
-        "button": "Jobs finden"
-      }
-    },
-    "defaultResume": {
-      "title": "Standard-Lebenslauf",
-      "loading": "Standard-Lebenslauf wird geladen...",
-      "lastUpdated": "Zuletzt aktualisiert: {date}",
-      "noDefaultSelected": "Kein Standard-Lebenslauf ausgewählt. Wählen Sie einen aus, um Ihr Dashboard zu personalisieren.",
-      "changeDefault": "Standard ändern",
-      "selectDefault": "Standard auswählen",
-      "buttonChooseDefault": "Wählen Sie Ihren Standard-Lebenslauf",
-      "tooltipEdit": "Standard-Lebenslauf bearbeiten",
-      "tooltipViewAll": "Alle Lebensläufe anzeigen, um Standard auszuwählen oder zu ändern"
-    },
-    "relatedDocuments": {
-      "title": "Verknüpfte Dokumente",
-      "loading": "Dokumente werden geladen...",
-      "selectDefaultPrompt": "Wählen Sie einen Standard-Lebenslauf aus, um die verknüpften Dokumente hier zu sehen.",
-      "documentsFor": "Dokumente für \"{resumeTitle}\"",
-      "manageAll": "Alle verwalten",
-      "viewMore": "{count} weitere anzeigen...",
-      "noDocuments": "Noch keine Dokumente mit diesem Lebenslauf verknüpft.",
-      "addDocument": "Dokument hinzufügen",
-      "tooltipManageAll": "Zur Dokumentenseite gehen"
-    },
-    "toast": {
-      "loadError": "Lebenslauf-Daten konnten nicht geladen werden.",
-      "actionRequiredSummary": "Aktion erforderlich",
-      "actionRequiredDetail": "Bitte wählen Sie einen Lebenslauf aus, um ihn als Standard auf der Seite \"Alle Lebensläufe\" festzulegen.",
-      "noResumeSummary": "Kein Lebenslauf",
-      "noResumeDetail": "Kein Lebenslauf ausgewählt, um den Standard-Status zu ändern.",
-      "noResumeForDoc": "Bitte erstellen Sie zuerst einen Lebenslauf, bevor Sie Dokumente generieren.",
-      "updateSuccess": "Master-Lebenslauf-Status aktualisiert.",
-      "updateError": "Master-Lebenslauf-Status konnte nicht aktualisiert werden.",
-      "generationStartedSummary": "Dokumentgenerierung gestartet",
-      "generationStartedDetail": "Ihr Dokument wird erstellt."
-    },
-    "dialog": {
-      "resumeIdLabel": "Lebenslauf-ID: {id}"
-    }
-  },
-  "dashboard_layout": {
-    "logo": "CareerFlow",
-    "sidebar": {
-      "settings": "Einstellungen",
-      "overview": "Übersicht",
-      "resumes": "Lebensläufe",
-      "myWebsite": "Meine Webseite",
-      "atsChecker": "ATS-Prüfer",
-      "jobFeed": "Job-Feed",
-      "scholarships": "Stipendien"
-    },
-    "topbar": {
-      "expandSidebar": "Seitenleiste erweitern",
-      "collapseSidebar": "Seitenleiste einklappen",
-      "searchPlaceholder": "Dashboard durchsuchen...",
-      "userFallback": "Benutzer"
-    },
-    "userMenu": {
-      "profile": "Profil",
-      "settings": "Einstellungen",
-      "logout": "Abmelden"
-    },
-    "toast": {
-      "setDefault": "Lebenslauf als Standard festgelegt.",
-      "unsetDefault": "Lebenslauf als Standard entfernt."
-    }
-  },
-  "login": {
-    "errorSummary": "Fehler",
-    "errorDetail": "Anmeldung mit {{provider}} fehlgeschlagen",
-    "welcomeBack": "Willkommen zurück, {{name}}!",
-    "signInWithGoogle": "Mit Google anmelden",
-    "signInWithLinkedIn": "Mit LinkedIn anmelden"
-  },
-  "accessDenied": {
-    "title": "Zugriff verweigert",
-    "message": "Sie haben nicht die erforderlichen Berechtigungen.",
-    "imageAlt": "Zugriff verweigert Bild",
-    "goToDashboard": "Zum Dashboard gehen"
-  }
 }

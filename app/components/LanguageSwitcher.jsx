@@ -4,7 +4,7 @@ import { useRouter, usePathname } from 'next/navigation';
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { FiChevronDown, FiGlobe } from 'react-icons/fi';
-import { useTranslation } from '../../hooks/useTranslation';
+import { useTranslation } from '../hooks/useTranslation';
 import styles from './styles/LanguageSwitcher.module.css';
 
 const LanguageSwitcher = () => {
@@ -18,10 +18,11 @@ const LanguageSwitcher = () => {
         { label: 'Türkçe', value: 'tr', flag: '🇹🇷', nativeName: 'Türkçe' },
         { label: 'العربية', value: 'ar', flag: '🇸🇦', nativeName: 'العربية' },
         { label: 'Deutsch', value: 'de', flag: '🇩🇪', nativeName: 'Deutsch' },
-        { label: 'Español', value: 'es', flag: '🇪🇸', nativeName: 'Español' }
+        { label: 'Español', value: 'es', flag: '🇪🇸', nativeName: 'Español' },
+        { label: 'Français', value: 'fr', flag: '🇫🇷', nativeName: 'Français' }
     ];
 
-    const currentLanguage = languages.find(lang => lang.value === locale) || languages[0];
+    const currentLanguage = languages.find((lang) => lang.value === locale) || languages[0];
 
     const handleLanguageChange = (newLocale) => {
         // Remove current locale from pathname
@@ -51,19 +52,11 @@ const LanguageSwitcher = () => {
 
     return (
         <div className={styles.languageSwitcher}>
-            <motion.button
-                className={styles.trigger}
-                onClick={() => setIsOpen(!isOpen)}
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
-            >
+            <motion.button className={styles.trigger} onClick={() => setIsOpen(!isOpen)} whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
                 <FiGlobe size={16} />
                 <span className={styles.currentFlag}>{currentLanguage.flag}</span>
                 <span className={styles.currentLabel}>{currentLanguage.nativeName}</span>
-                <motion.div
-                    animate={{ rotate: isOpen ? 180 : 0 }}
-                    transition={{ duration: 0.2 }}
-                >
+                <motion.div animate={{ rotate: isOpen ? 180 : 0 }} transition={{ duration: 0.2 }}>
                     <FiChevronDown size={14} />
                 </motion.div>
             </motion.button>
@@ -71,20 +64,8 @@ const LanguageSwitcher = () => {
             <AnimatePresence>
                 {isOpen && (
                     <>
-                        <motion.div
-                            className={styles.backdrop}
-                            initial={{ opacity: 0 }}
-                            animate={{ opacity: 1 }}
-                            exit={{ opacity: 0 }}
-                            onClick={() => setIsOpen(false)}
-                        />
-                        <motion.div
-                            className={styles.dropdown}
-                            variants={dropdownVariants}
-                            initial="hidden"
-                            animate="visible"
-                            exit="hidden"
-                        >
+                        <motion.div className={styles.backdrop} initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} onClick={() => setIsOpen(false)} />
+                        <motion.div className={styles.dropdown} variants={dropdownVariants} initial="hidden" animate="visible" exit="hidden">
                             {languages.map((language) => (
                                 <motion.button
                                     key={language.value}
@@ -96,12 +77,7 @@ const LanguageSwitcher = () => {
                                     <span className={styles.flag}>{language.flag}</span>
                                     <span className={styles.name}>{language.nativeName}</span>
                                     {locale === language.value && (
-                                        <motion.div
-                                            className={styles.checkmark}
-                                            initial={{ scale: 0 }}
-                                            animate={{ scale: 1 }}
-                                            transition={{ type: "spring", stiffness: 500 }}
-                                        >
+                                        <motion.div className={styles.checkmark} initial={{ scale: 0 }} animate={{ scale: 1 }} transition={{ type: 'spring', stiffness: 500 }}>
                                             ✓
                                         </motion.div>
                                     )}
