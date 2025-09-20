@@ -735,7 +735,7 @@
                     <div className="bg-orange-50 border-round p-3 mb-4">
                         <p className="text-orange-700 text-sm mb-0">
                             <i className="pi pi-info-circle mr-2"></i>
-                            The export may take a few moments to prepare. Please don't close this window.
+                            The export may take a few moments to prepare. Please don&apos;t close this window.
                         </p>
                     </div>
 
@@ -847,7 +847,7 @@
 
                     <div className="field mb-4">
                         <label htmlFor="deleteConfirmText" className="font-medium text-900">
-                            Type "delete my account" to confirm:
+                            Type &ldquo;delete my account&rdquo; to confirm:
                         </label>
                         <InputText
                             id="deleteConfirmText"
