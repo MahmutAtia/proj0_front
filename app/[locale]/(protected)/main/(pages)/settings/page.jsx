@@ -58,9 +58,18 @@
             confirmPassword: '',
             twoFactorEnabled: false
         });
-
+        // Add new states for deletion
         const [deleteDialog, setDeleteDialog] = useState(false);
+        const [deleteConfirmDialog, setDeleteConfirmDialog] = useState(false);
+        const [deleteLoading, setDeleteLoading] = useState(false);
+        const [deleteForm, setDeleteForm] = useState({
+            password: '',
+            confirmationText: ''
+        });
+
+        // Add missing state for export loading
         const [exportDialog, setExportDialog] = useState(false);
+        const [exportLoading, setExportLoading] = useState(false);
 
         const timezones = [
             { label: 'UTC', value: 'UTC' },
@@ -99,7 +108,7 @@
                         headers: { Authorization: `Bearer ${session.accessToken}` }
                     }).catch(err => ({ data: null })),
 
-                    axios.get(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/usage/`, {
+                    axios.get(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/profile/`, {
                         headers: { Authorization: `Bearer ${session.accessToken}` }
                     }).catch(err => ({ data: null })),
 
@@ -154,7 +163,7 @@
             setIsUpdatingProfile(true);
             try {
                 const response = await axios.put(
-                    `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/user/profile/update/`,
+                    `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/user/profile/`,
                     userProfile,
                     {
                         headers: { Authorization: `Bearer ${session.accessToken}` }
@@ -218,6 +227,96 @@
                 return `${userProfile.first_name} ${userProfile.last_name}`;
             }
             return session?.user?.name || session?.user?.email || 'User';
+        };
+
+        const handleDeleteAccount = async () => {
+            // Validate form
+            if (!deleteForm.password) {
+                showToast('error', 'Error', 'Please enter your password');
+                return;
+            }
+            
+            if (deleteForm.confirmationText.toLowerCase() !== 'delete my account') {
+                showToast('error', 'Error', 'Please type "delete my account" to confirm');
+                return;
+            }
+
+            setDeleteLoading(true);
+            try {
+                const response = await axios.post(
+                    `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/user/delete/request/`,
+                    {
+                        password: deleteForm.password,
+                        confirmation_text: deleteForm.confirmationText
+                    },
+                    {
+                        headers: { Authorization: `Bearer ${session.accessToken}` }
+                    }
+                );
+
+                showToast('success', 'Confirmation Email Sent', response.data.detail);
+                setDeleteDialog(false);
+                setDeleteConfirmDialog(false);
+                
+                // Reset form
+                setDeleteForm({
+                    password: '',
+                    confirmationText: ''
+                });
+            } catch (error) {
+                const errorMessage = error.response?.data?.message || 'Failed to process deletion request';
+                showToast('error', 'Error', errorMessage);
+            } finally {
+                setDeleteLoading(false);
+            }
+        };
+
+        const proceedToConfirmation = () => {
+            setDeleteDialog(false);
+            setDeleteConfirmDialog(true);
+        };
+
+        const handleExportData = async () => {
+            setExportLoading(true);
+            try {
+                const response = await axios.post(
+                    `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/user/export/`,
+                    {},
+                    {
+                        headers: { 
+                            Authorization: `Bearer ${session.accessToken}`,
+                        },
+                        responseType: 'blob', // Important for file download
+                    }
+                );
+
+                // Create download link
+                const url = window.URL.createObjectURL(new Blob([response.data]));
+                const link = document.createElement('a');
+                link.href = url;
+                
+                // Extract filename from response headers or use default
+                const contentDisposition = response.headers['content-disposition'];
+                let filename = 'carerflow_data_export.zip';
+                if (contentDisposition) {
+                    const match = contentDisposition.match(/filename="(.+)"/);
+                    if (match) filename = match[1];
+                }
+                
+                link.setAttribute('download', filename);
+                document.body.appendChild(link);
+                link.click();
+                link.remove();
+                window.URL.revokeObjectURL(url);
+
+                showToast('success', 'Export Complete', 'Your data has been downloaded successfully');
+                setExportDialog(false);
+            } catch (error) {
+                console.error('Export error:', error);
+                showToast('error', 'Export Failed', 'Failed to export your data. Please try again.');
+            } finally {
+                setExportLoading(false);
+            }
         };
 
         if (!mounted) {
@@ -478,12 +577,7 @@
                                                                 outlined
                                                                 onClick={() => router.push('/main/plans/usage')}
                                                             />
-                                                            <Button
-                                                                label="Payment History"
-                                                                icon="pi pi-history"
-                                                                outlined
-                                                                onClick={() => router.push('/main/plans/payments')}
-                                                            />
+
                                                         </div>
                                                     </div>
                                                 ) : (
@@ -630,10 +724,19 @@
                     <div className="bg-blue-50 border-round p-3 mb-4">
                         <ul className="list-none p-0 m-0">
                             <li className="mb-2"><i className="pi pi-check text-green-500 mr-2"></i>Profile information</li>
+                            <li className="mb-2"><i className="pi pi-check text-green-500 mr-2"></i>Resume data</li>
+                            <li className="mb-2"><i className="pi pi-check text-green-500 mr-2"></i>Generated documents</li>
                             <li className="mb-2"><i className="pi pi-check text-green-500 mr-2"></i>Subscription history</li>
                             <li className="mb-2"><i className="pi pi-check text-green-500 mr-2"></i>Payment records</li>
                             <li className="mb-2"><i className="pi pi-check text-green-500 mr-2"></i>Usage statistics</li>
                         </ul>
+                    </div>
+
+                    <div className="bg-orange-50 border-round p-3 mb-4">
+                        <p className="text-orange-700 text-sm mb-0">
+                            <i className="pi pi-info-circle mr-2"></i>
+                            The export may take a few moments to prepare. Please don't close this window.
+                        </p>
                     </div>
 
                     <div className="flex justify-content-end gap-2">
@@ -641,19 +744,18 @@
                             label="Cancel"
                             outlined
                             onClick={() => setExportDialog(false)}
+                            disabled={exportLoading}
                         />
                         <Button
-                            label="Download"
-                            icon="pi pi-download"
-                            onClick={() => {
-                                showToast('info', 'Coming Soon', 'Data export functionality will be available soon');
-                                setExportDialog(false);
-                            }}
+                            label={exportLoading ? "Preparing..." : "Download"}
+                            icon={exportLoading ? "pi pi-spin pi-spinner" : "pi pi-download"}
+                            onClick={handleExportData}
+                            loading={exportLoading}
                         />
                     </div>
                 </Dialog>
 
-                {/* Delete Account Dialog */}
+                {/* Delete Account Dialog - Step 1 */}
                 <Dialog
                     header="Delete Account"
                     visible={deleteDialog}
@@ -671,9 +773,20 @@
                     </div>
 
                     <div className="bg-red-50 border-round p-3 mb-4">
-                        <p className="text-red-700 text-sm mb-0">
-                            <i className="pi pi-exclamation-triangle mr-2"></i>
-                            All your subscription data, payment history, and personal information will be permanently lost.
+                        <h5 className="text-red-700 mb-2">This will permanently delete:</h5>
+                        <ul className="list-none p-0 m-0 text-red-600">
+                            <li className="mb-1"><i className="pi pi-times mr-2"></i>Your profile and account</li>
+                            <li className="mb-1"><i className="pi pi-times mr-2"></i>All your resumes and documents</li>
+                            <li className="mb-1"><i className="pi pi-times mr-2"></i>Subscription and payment history</li>
+                            <li className="mb-1"><i className="pi pi-times mr-2"></i>Generated websites and documents</li>
+                            <li className="mb-1"><i className="pi pi-times mr-2"></i>All usage data and preferences</li>
+                        </ul>
+                    </div>
+
+                    <div className="bg-blue-50 border-round p-3 mb-4">
+                        <p className="text-blue-700 text-sm mb-0">
+                            <i className="pi pi-lightbulb mr-2"></i>
+                            Consider exporting your data first if you want to keep a copy.
                         </p>
                     </div>
 
@@ -684,16 +797,90 @@
                             onClick={() => setDeleteDialog(false)}
                         />
                         <Button
-                            label="Delete Account"
-                            severity="danger"
-                            icon="pi pi-trash"
+                            label="I Want to Export Data First"
+                            icon="pi pi-download"
+                            outlined
                             onClick={() => {
-                                showToast('info', 'Coming Soon', 'Account deletion will be available soon');
                                 setDeleteDialog(false);
+                                setExportDialog(true);
                             }}
                         />
+                        <Button
+                            label="Continue to Delete"
+                            severity="danger"
+                            icon="pi pi-arrow-right"
+                            onClick={proceedToConfirmation}
+                        />
                     </div>
-                    </Dialog>
+                </Dialog>
+
+                {/* Delete Account Dialog - Step 2 (Confirmation) */}
+                <Dialog
+                    header="Confirm Account Deletion"
+                    visible={deleteConfirmDialog}
+                    onHide={() => setDeleteConfirmDialog(false)}
+                    style={{ width: '500px' }}
+                    modal
+                >
+                    <div className="text-center mb-4">
+                        <i className="pi pi-shield text-red-500 text-4xl mb-3"></i>
+                        <h4 className="text-red-600 mb-3">Final Confirmation Required</h4>
+                        <p className="text-600 mb-4">
+                            Please confirm your identity and intention to delete your account.
+                        </p>
+                    </div>
+
+                    <div className="field mb-4">
+                        <label htmlFor="deletePassword" className="font-medium text-900">
+                            Enter your password to confirm:
+                        </label>
+                        <Password
+                            id="deletePassword"
+                            value={deleteForm.password}
+                            onChange={(e) => setDeleteForm(prev => ({ ...prev, password: e.target.value }))}
+                            className="w-full"
+                            placeholder="Enter your current password"
+                            feedback={false}
+                            toggleMask
+                        />
+                    </div>
+
+                    <div className="field mb-4">
+                        <label htmlFor="deleteConfirmText" className="font-medium text-900">
+                            Type "delete my account" to confirm:
+                        </label>
+                        <InputText
+                            id="deleteConfirmText"
+                            value={deleteForm.confirmationText}
+                            onChange={(e) => setDeleteForm(prev => ({ ...prev, confirmationText: e.target.value }))}
+                            className="w-full"
+                            placeholder="delete my account"
+                        />
+                    </div>
+
+                    <div className="bg-orange-50 border-round p-3 mb-4">
+                        <p className="text-orange-700 text-sm mb-0">
+                            <i className="pi pi-info-circle mr-2"></i>
+                            We will send a confirmation email to <strong>{session?.user?.email}</strong> to complete the deletion process.
+                        </p>
+                    </div>
+
+                    <div className="flex justify-content-end gap-2">
+                        <Button
+                            label="Cancel"
+                            outlined
+                            onClick={() => setDeleteConfirmDialog(false)}
+                            disabled={deleteLoading}
+                        />
+                        <Button
+                            label={deleteLoading ? "Processing..." : "Send Confirmation Email"}
+                            severity="danger"
+                            icon={deleteLoading ? "pi pi-spin pi-spinner" : "pi pi-send"}
+                            onClick={handleDeleteAccount}
+                            loading={deleteLoading}
+                        />
+                    </div>
+                </Dialog>
             </div>
         );
     };
