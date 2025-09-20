@@ -1,21 +1,18 @@
-"use client";
+'use client';
 import React, { useState, useRef, useMemo } from 'react';
 import { useSession } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
 import { Button } from 'primereact/button';
 import { Card } from 'primereact/card';
 import { ProgressSpinner } from 'primereact/progressspinner';
-import {
-    FiFileText, FiPlusSquare, FiBriefcase, FiGlobe, FiStar, FiEdit,
-    FiList, FiFolder, FiArchive
-} from 'react-icons/fi';
+import { FiFileText, FiPlusSquare, FiBriefcase, FiGlobe, FiStar, FiEdit, FiList, FiFolder, FiArchive } from 'react-icons/fi';
 import styles from './Dashboard.module.css';
 import JobPostings from './mainComponets/JobPostings';
 import ScholarshipList from './mainComponets/ScholarshipList';
-import api from '@/lib/axios'; 
+import api from '@/lib/axios';
 
 import GenerateDocumentDialog from '../editor/components/GenerateDocumentDialog';
-import  CreateResumeFromExistingDialog  from '../editor/components/CreateResumeFromExistingDialog';
+import CreateResumeFromExistingDialog from '../editor/components/CreateResumeFromExistingDialog';
 import { useTranslation } from '../../../../hooks/useTranslation';
 import { useDashboard } from './DashboardContext'; // Import the context hook
 
@@ -33,7 +30,7 @@ const WelcomeBanner = ({ userName }) => {
 
 const ActionCard = ({ title, icon, description, onClick, route, buttonLabel }) => {
     const router = useRouter();
-    const { t } = useTranslation();
+    const { t, isRTL } = useTranslation();
     const handleClick = () => {
         if (onClick) {
             onClick();
@@ -46,30 +43,28 @@ const ActionCard = ({ title, icon, description, onClick, route, buttonLabel }) =
         <Card className={`${styles.quickActionCard} h-full surface-card shadow-2 border-1 surface-border`}>
             <div className="flex flex-column justify-content-between h-full text-center">
                 <div className="mb-4 flex align-items-center justify-content-center">
-                    <div className="bg-primary-100 text-primary-700 p-3 border-round-2xl">
-                        {icon}
-                    </div>
+                    <div className="bg-primary-100 text-primary-700 p-3 border-round-2xl">{icon}</div>
                 </div>
                 <div>
                     <h3 className="text-xl font-semibold mb-2 text-900">{title}</h3>
-                    <p className="text-600 mb-4 px-2">{description}</p>
+                    <p className="text-600 mb-4 px-2 " style={{ height: '5.0rem' }}>
+                        {description}
+                    </p>
                 </div>
-                <Button
-                    label={buttonLabel || t('dashboard_main.actionCard.explore')}
-                    icon="pi pi-arrow-right"
-                    iconPos="right"
-                    className="p-button-primary w-full mt-auto"
-                    onClick={handleClick}
-                />
+                <Button label={buttonLabel || t('dashboard_main.actionCard.explore')} icon={isRTL ? 'pi pi-arrow-left' : 'pi pi-arrow-right'} iconPos={isRTL ? 'right' : 'right'} className="p-button-primary w-full mt-auto" onClick={handleClick} />
             </div>
         </Card>
     );
 };
 
-const QuickActionsGrid = ({ actions }) => ( // Removed router prop as ActionCard handles its own routing/onClick
+const QuickActionsGrid = (
+    { actions } // Removed router prop as ActionCard handles its own routing/onClick
+) => (
     <div className="grid mb-5">
-        {actions.map(action => (
-            <div key={action.title} className="col-12 md:col-6 lg:col-3 p-2"> {/* Adjusted padding */}
+        {actions.map((action) => (
+            <div key={action.title} className="col-12 md:col-6 lg:col-3 p-2">
+                {' '}
+                {/* Adjusted padding */}
                 <ActionCard {...action} />
             </div>
         ))}
@@ -77,7 +72,7 @@ const QuickActionsGrid = ({ actions }) => ( // Removed router prop as ActionCard
 );
 
 const DefaultResumeDisplay = ({ resume, onViewAll, router, isLoading }) => {
-    const { t } = useTranslation();
+    const { t, isRTL } = useTranslation();
     if (isLoading) {
         return (
             <Card className={`${styles.dashboardCardCompact}`}>
@@ -94,20 +89,36 @@ const DefaultResumeDisplay = ({ resume, onViewAll, router, isLoading }) => {
             <div className="flex flex-column md:flex-row justify-content-between align-items-start md:align-items-center">
                 <div className="mb-3 md:mb-0">
                     <div className="flex align-items-center mb-1">
-                        <FiStar className={`mr-2 ${resume ? 'text-yellow-500' : 'text-400'}`} style={{ fontSize: '1.3rem' }} />
-                        <h3 className="text-lg font-bold m-0 text-900">
-                            {t('dashboard_main.defaultResume.title')}
-                        </h3>
+                        <FiStar className={`mr-2 ${resume ? 'text-yellow-500' : 'text-400'}`} style={{ fontSize: '1.3rem', marginLeft: isRTL ? '0.5rem' : 0, marginRight: !isRTL ? '0.5rem' : 0 }} />
+                        <h3 className="text-lg font-bold m-0 text-900">{t('dashboard_main.defaultResume.title')}</h3>
                     </div>
                     {resume ? (
-                        <>
-                            <p className="text-primary mt-1 mb-0 cursor-pointer hover:underline" onClick={() => router.push(`/editor/${resume.id}`)}>
+                        <div
+                            style={{
+                                marginLeft: isRTL ? '0.5rem' : 0,
+                                marginRight: !isRTL ? '0.5rem' : 0
+                            }}
+                        >
+                            <p
+                                className="text-primary mt-1 mb-0 cursor-pointer hover:underline"
+                                style={{
+                                    marginRight: isRTL ? '0.5rem' : 0,
+                                    marginLeft: !isRTL ? 0 : 0
+                                }}
+                                onClick={() => router.push(`/editor/${resume.id}`)}
+                            >
                                 {resume.title}
                             </p>
-                            <p className="text-xs text-600 mt-1">
+                            <p
+                                className="text-xs text-600 mt-1"
+                                style={{
+                                    marginRight: isRTL ? '0.5rem' : 0,
+                                    marginLeft: !isRTL ? 0 : 0
+                                }}
+                            >
                                 {t('dashboard_main.defaultResume.lastUpdated', { date: resume.updated_at ? new Date(resume.updated_at).toLocaleDateString() : 'N/A' })}
                             </p>
-                        </>
+                        </div>
                     ) : (
                         <p className="text-sm text-600 mt-1">{t('dashboard_main.defaultResume.noDefaultSelected')}</p>
                     )}
@@ -115,7 +126,15 @@ const DefaultResumeDisplay = ({ resume, onViewAll, router, isLoading }) => {
                 <div className="flex flex-wrap gap-2 align-self-start md:align-self-center mt-2 md:mt-0">
                     {resume && (
                         <Button
-                            icon={<FiEdit />}
+                            icon={
+                                <FiEdit
+                                    style={{
+                                        fontSize: '1rem',
+                                        marginLeft: isRTL ? '0.5rem' : undefined,
+                                        marginRight: !isRTL ? '0.5rem' : undefined
+                                    }}
+                                />
+                            }
                             label={t('common.edit')}
                             className="p-button-sm p-button-outlined"
                             onClick={() => router.push(`/editor/${resume.id}`)}
@@ -125,7 +144,15 @@ const DefaultResumeDisplay = ({ resume, onViewAll, router, isLoading }) => {
                     )}
                     <Button
                         label={resume ? t('dashboard_main.defaultResume.changeDefault') : t('dashboard_main.defaultResume.selectDefault')}
-                        icon={<FiList />}
+                        icon={
+                            <FiList
+                                style={{
+                                    fontSize: '1rem',
+                                    marginLeft: isRTL ? '0.5rem' : undefined,
+                                    marginRight: !isRTL ? '0.5rem' : undefined
+                                }}
+                            />
+                        }
                         className="p-button-sm p-button-secondary"
                         onClick={onViewAll} // Navigates to resumes list page
                         tooltip={t('dashboard_main.defaultResume.tooltipViewAll')}
@@ -135,11 +162,7 @@ const DefaultResumeDisplay = ({ resume, onViewAll, router, isLoading }) => {
             </div>
             {!resume && !isLoading && (
                 <div className="mt-4 pt-3 border-top-1 surface-border text-center">
-                    <Button
-                        label={t('dashboard_main.defaultResume.buttonChooseDefault')}
-                        className="p-button-primary"
-                        onClick={onViewAll}
-                    />
+                    <Button label={t('dashboard_main.defaultResume.buttonChooseDefault')} className="p-button-primary" onClick={onViewAll} />
                 </div>
             )}
         </Card>
@@ -147,7 +170,7 @@ const DefaultResumeDisplay = ({ resume, onViewAll, router, isLoading }) => {
 };
 
 const RelatedDocumentsList = ({ documents, resumeTitle, onManageDocuments, isLoading, router }) => {
-    const { t } = useTranslation();
+    const { t, isRTL } = useTranslation();
     if (isLoading) {
         return (
             <div className="mt-4">
@@ -165,9 +188,7 @@ const RelatedDocumentsList = ({ documents, resumeTitle, onManageDocuments, isLoa
                 <div className="flex justify-content-between align-items-center mb-2">
                     <h4 className={`${styles.sectionTitle} m-0`}>{t('dashboard_main.relatedDocuments.title')}</h4>
                 </div>
-                <p className="text-sm text-color-secondary p-3 border-round surface-50 text-center">
-                    {t('dashboard_main.relatedDocuments.selectDefaultPrompt')}
-                </p>
+                <p className="text-sm text-color-secondary p-3 border-round surface-50 text-center">{t('dashboard_main.relatedDocuments.selectDefaultPrompt')}</p>
             </div>
         );
     }
@@ -175,13 +196,19 @@ const RelatedDocumentsList = ({ documents, resumeTitle, onManageDocuments, isLoa
     return (
         <div className={`mt-4 ${styles.relatedDocsSection}`}>
             <div className="flex justify-content-between align-items-center mb-3">
-                <h4 className={`${styles.sectionTitle} m-0`}>
-                    {t('dashboard_main.relatedDocuments.documentsFor', { resumeTitle })}
-                </h4>
+                <h4 className={`${styles.sectionTitle} m-0`}>{t('dashboard_main.relatedDocuments.documentsFor', { resumeTitle })}</h4>
                 <Button
                     label={t('dashboard_main.relatedDocuments.manageAll')}
-                    icon={<FiFolder />}
-                    className="p-button-text p-button-sm p-button-secondary"
+                    icon={
+                        <FiFolder
+                            style={{
+                                fontSize: '1rem',
+                                marginLeft: isRTL ? '0.5rem' : undefined,
+                                marginRight: !isRTL ? '0.5rem' : undefined
+                            }}
+                        />
+                    }
+                    className="p-button-text p-button-sm p-button-outlined"
                     onClick={onManageDocuments}
                     tooltip={t('dashboard_main.relatedDocuments.tooltipManageAll')}
                     tooltipOptions={{ position: 'top' }}
@@ -189,7 +216,7 @@ const RelatedDocumentsList = ({ documents, resumeTitle, onManageDocuments, isLoa
             </div>
             {documents && documents.length > 0 ? (
                 <ul className="list-none p-0 m-0">
-                    {documents.slice(0, 3).map(doc => (
+                    {documents.slice(0, 3).map((doc) => (
                         <li
                             key={doc.unique_id || doc.id}
                             className={`${styles.documentItem} p-3 mb-2 border-round surface-card border-1 surface-border flex align-items-center justify-content-between cursor-pointer hover:shadow-2 transition-shadow`}
@@ -198,10 +225,9 @@ const RelatedDocumentsList = ({ documents, resumeTitle, onManageDocuments, isLoa
                         >
                             <div className="flex align-items-center">
                                 <FiFileText className="text-primary mr-3" style={{ fontSize: '1.2rem' }} />
-                                <span className="text-sm font-medium text-color">{doc.document_type.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase())}</span>
+                                <span className="text-sm font-medium text-color">{doc.document_type.replace(/_/g, ' ').replace(/\b\w/g, (l) => l.toUpperCase())}</span>
                             </div>
-                            <span className="text-xs text-color-secondary">
-                                {new Date(doc.created_at).toISOString().split('T')[0]}                             </span>
+                            <span className="text-xs text-color-secondary">{new Date(doc.created_at).toISOString().split('T')[0]} </span>
                         </li>
                     ))}
                     {documents.length > 3 && (
@@ -213,27 +239,31 @@ const RelatedDocumentsList = ({ documents, resumeTitle, onManageDocuments, isLoa
             ) : (
                 <div className={`${styles.emptyDocsContent} text-center p-4 border-1 border-dashed surface-border border-round`}>
                     <FiArchive className="text-4xl text-color-secondary mb-2" />
-                    <p className="text-sm text-color-secondary m-0">
-                        {t('dashboard_main.relatedDocuments.noDocuments')}
-                    </p>
-                    <Button label={t('dashboard_main.relatedDocuments.addDocument')} icon={<FiPlusSquare />} className="p-button-sm p-button-text mt-2" onClick={() => router.push(`/editor/${defaultResume?.id}`)} />
+                    <p className="text-sm text-color-secondary m-0">{t('dashboard_main.relatedDocuments.noDocuments')}</p>
+                    <Button
+                        label={t('dashboard_main.relatedDocuments.addDocument')}
+                        icon={
+                            <FiPlusSquare
+                                style={{
+                                    fontSize: '1.2rem',
+                                    marginLeft: isRTL ? '0.5rem' : undefined,
+                                    marginRight: !isRTL ? '0.5rem' : undefined
+                                }}
+                            />
+                        }
+                        className="p-button-primary p-button-sm mt-2"
+                        onClick={() => router.push(`/editor/${defaultResume?.id}`)}
+                    />
                 </div>
             )}
         </div>
     );
 };
 
-
 // --- Main Dashboard Page Component (Updated) ---
 const DashboardPage = () => {
     // Get all data from the context provided by layout.jsx
-    const {
-        allResumes,
-        defaultResume,
-        relatedDocuments,
-        loadingResumes,
-        toast
-    } = useDashboard();
+    const { allResumes, defaultResume, relatedDocuments, loadingResumes, toast } = useDashboard();
 
     const { data: session, status: sessionStatus } = useSession();
     const router = useRouter();
@@ -243,10 +273,10 @@ const DashboardPage = () => {
     const [showCreateDialog, setShowCreateDialog] = useState(false);
 
     const transformedResumesForDialog = useMemo(() => {
-        return (allResumes || []).map(resume => {
+        return (allResumes || []).map((resume) => {
             const docTypesObject = {};
             if (resume.generated_documents_data && Array.isArray(resume.generated_documents_data)) {
-                resume.generated_documents_data.forEach(doc => {
+                resume.generated_documents_data.forEach((doc) => {
                     if (doc.document_type) {
                         docTypesObject[doc.document_type] = true;
                     }
@@ -255,12 +285,11 @@ const DashboardPage = () => {
             return {
                 id: resume.id,
                 json_content: docTypesObject,
-                resume: resume.resume,         // <-- Add this line
-                about: resume.about || "",     // <-- And this line
+                resume: resume.resume, // <-- Add this line
+                about: resume.about || '' // <-- And this line
             };
         });
     }, [allResumes]);
-
 
     const getQuickActions = (currentDefaultResume) => {
         let portfolioRoute = '/site-editor'; // Fallback route
@@ -277,7 +306,6 @@ const DashboardPage = () => {
         }
 
         return [
-
             {
                 title: t('dashboard_main.quickActions.newResume.title'),
                 icon: <FiPlusSquare size={28} className={styles.actionIconForeground} />, // Changed icon for consistency
@@ -317,7 +345,7 @@ const DashboardPage = () => {
                 description: t('dashboard_main.quickActions.jobSearch.description'),
                 route: '/main/job-feed',
                 buttonLabel: t('dashboard_main.quickActions.jobSearch.button')
-            },
+            }
         ];
     };
 
@@ -326,10 +354,9 @@ const DashboardPage = () => {
     const handleCreationSuccess = (newResumeId) => {
         // To refresh data, we might need to reload or use a more advanced state management
         setShowCreateDialog(false);
-
     };
 
-    if (sessionStatus === "unauthenticated") {
+    if (sessionStatus === 'unauthenticated') {
         router.push('/login');
         return null;
     }
@@ -344,21 +371,9 @@ const DashboardPage = () => {
             <div className="grid mt-5">
                 <div className="col-12 lg:col-7 xl:col-8 p-3">
                     {/* Master Resume Section */}
-                    <DefaultResumeDisplay
-                        resume={defaultResume}
-                        onViewAll={() => router.push('/main/resumes')}
-                        router={router}
-                        isLoading={loadingResumes}
-                    />
+                    <DefaultResumeDisplay resume={defaultResume} onViewAll={() => router.push('/main/resumes')} router={router} isLoading={loadingResumes} />
                     {/* Related Documents for Master Resume */}
-                    {!loadingResumes && defaultResume && (
-                        <RelatedDocumentsList
-                            documents={relatedDocuments}
-                            resumeTitle={defaultResume.title}
-                            onManageDocuments={() => router.push('/main/documents')}
-                            isLoading={loadingResumes}
-                        />
-                    )}
+                    {!loadingResumes && defaultResume && <RelatedDocumentsList documents={relatedDocuments} resumeTitle={defaultResume.title} onManageDocuments={() => router.push('/main/documents')} isLoading={loadingResumes} />}
                 </div>
 
                 <div className="col-12 lg:col-5 xl:col-4 p-3">
@@ -372,7 +387,7 @@ const DashboardPage = () => {
                 visible={isGenerateDocDialogVisible}
                 onHide={() => setIsGenerateDocDialogVisible(false)}
                 initialResumeId={null}
-                availableResumes={allResumes.map(r => ({ label: r.title || t('dashboard_main.dialog.resumeIdLabel', { id: r.id }), value: r.id }))}
+                availableResumes={allResumes.map((r) => ({ label: r.title || t('dashboard_main.dialog.resumeIdLabel', { id: r.id }), value: r.id }))}
                 allResumesListCache={transformedResumesForDialog} // Pass the transformed data
                 onGenerationSuccess={(genDetails) => {
                     toast.current?.show({
@@ -393,9 +408,9 @@ const DashboardPage = () => {
             <CreateResumeFromExistingDialog
                 visible={showCreateDialog}
                 onHide={() => setShowCreateDialog(false)}
-                availableResumes={allResumes.map(r => ({ label: r.title || t('dashboard_main.dialog.resumeIdLabel', { id: r.id }), value: r.id }))}
+                availableResumes={allResumes.map((r) => ({ label: r.title || t('dashboard_main.dialog.resumeIdLabel', { id: r.id }), value: r.id }))}
                 onSuccess={handleCreationSuccess}
-            // initialResumeId can be passed if a specific resume is pre-selected
+                // initialResumeId can be passed if a specific resume is pre-selected
             />
         </>
     );

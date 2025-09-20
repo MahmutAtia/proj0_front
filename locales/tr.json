@@ -34,7 +34,8 @@
         "noDescription": "Açıklama mevcut değil",
         "defaultTag": "Varsayılan",
         "updated": "Güncellendi: {date}",
-        "documentsCount": "{count} belge"
+        "documentsCount": "{count} belge",
+        "setAsDefault": "Varsayılan Olarak Ayarla"
     },
     "errors": {
         "userNotAuthenticated": "Kullanıcı doğrulanmadı.",
@@ -269,6 +270,10 @@
         },
         "dialog": {
             "resumeIdLabel": "Özgeçmiş ID: {id}"
+        },
+        "scholarships": {
+            "title": "Burs Fırsatları",
+            "description": "Size burs fırsatları sunmak için yoğun bir şekilde çalışıyoruz. Takipte kalın!"
         }
     },
     "dashboard_layout": {
@@ -296,6 +301,19 @@
         "toast": {
             "setDefault": "Özgeçmiş varsayılan olarak ayarlandı.",
             "unsetDefault": "Özgeçmişin varsayılan ayarı kaldırıldı."
+        },
+        "notifications": {
+            "title": "Bildirimler",
+            "noNotifications": "Şu anda bildirim yok",
+            "empty": "Her şey güncel!",
+            "active": "Aktif",
+            "completed": "Tamamlandı",
+            "tooltipTitle": "Bildirimleri göster",
+            "clearAll": "Hepsini Temizle",
+            "processing": "İşleniyor...",
+            "recent": "Son",
+            "viewResult": "Sonucu Görüntüle",
+            "opening": "Açılıyor..."
         }
     },
     "login": {
@@ -325,6 +343,7 @@
         "fetching": "İşler getiriliyor...",
         "searchStarted": "Arama Başlatıldı",
         "searchStartedDetail": "İşler kriterlerinize göre yenileniyor...",
+        "showingJobs": "{filtered} / {total} toplam",
         "autoUpdate": {
             "status": "Otomatik Güncelleme Durumu",
             "active": "Aktif",

@@ -48,6 +48,10 @@
     opacity: 0.8;
 }
 
+[dir='ltr'] .sidebar::before {
+    left: auto;
+    right: 0;
+}
 .sidebarCollapsed {
     width: 80px !important;
     overflow-x: hidden;
@@ -141,11 +145,7 @@
 }
 
 .sidebarItemActive:hover {
-    background: linear-gradient(
-        90deg,
-        rgba(var(--primary-color-rgb), 0.15) 0%, /* Stronger gradient on hover */
-        rgba(var(--primary-color-rgb), 0.25) 100%
-    ) !important;
+    background: linear-gradient(90deg, rgba(var(--primary-color-rgb), 0.15) 0%, /* Stronger gradient on hover */ rgba(var(--primary-color-rgb), 0.25) 100%) !important;
 }
 
 /* Logo styling improvements */
@@ -162,13 +162,18 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    margin-right: 0.75rem;
+    margin-right: 0;
+    margin-left: 0;
     transition: all 0.3s;
     width: 48px;
     height: 48px;
     background: linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%);
     border-radius: 16px;
     box-shadow: 0 10px 25px -5px rgba(59, 130, 246, 0.3);
+}
+[dir='rtl'] .logoIconContainer {
+    margin-left: 1.5rem;
+    margin-right: 3.5rem;
 }
 
 .logoIcon {
@@ -378,18 +383,17 @@
     .mainScrollArea {
         padding: 1.5rem;
     }
-    
+
     .pageHeader {
         font-size: 2.25rem;
     }
-    
+
     .quickActionCard .p-card-content {
         padding: 1.5rem;
     }
-    
+
     .quickActionCard .actionIcon {
         font-size: 2.5rem;
         padding: 1rem;
     }
 }
-

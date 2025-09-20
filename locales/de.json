@@ -34,7 +34,8 @@
         "noDescription": "Keine Beschreibung verfügbar",
         "defaultTag": "Standard",
         "updated": "Aktualisiert: {date}",
-        "documentsCount": "{count} Dokument(e)"
+        "documentsCount": "{count} Dokument(e)",
+        "setAsDefault": "Als Standard festlegen"
     },
     "errors": {
         "userNotAuthenticated": "Benutzer nicht authentifiziert.",
@@ -269,6 +270,10 @@
         },
         "dialog": {
             "resumeIdLabel": "Lebenslauf-ID: {id}"
+        },
+        "scholarships": {
+            "title": "Stipendienmöglichkeiten",
+            "description": "Wir arbeiten hart daran, Ihnen Stipendienmöglichkeiten zu bieten. Bleiben Sie dran!"
         }
     },
     "dashboard_layout": {
@@ -296,6 +301,19 @@
         "toast": {
             "setDefault": "Lebenslauf als Standard festgelegt.",
             "unsetDefault": "Standard-Lebenslauf entfernt."
+        },
+        "notifications": {
+            "title": "Benachrichtigungen",
+            "noNotifications": "Momentan keine Benachrichtigungen",
+            "empty": "Alles erledigt!",
+            "active": "Aktiv",
+            "completed": "Abgeschlossen",
+            "tooltipTitle": "Benachrichtigungen anzeigen",
+            "clearAll": "Alle löschen",
+            "processing": "Verarbeite...",
+            "recent": "Neueste",
+            "viewResult": "Ergebnis anzeigen",
+            "opening": "Öffne..."
         }
     },
     "login": {
@@ -325,6 +343,7 @@
         "fetching": "Jobs werden abgerufen...",
         "searchStarted": "Suche gestartet",
         "searchStartedDetail": "Jobs werden basierend auf Ihren Kriterien aktualisiert...",
+        "showingJobs": "{filtered} / {total} insgesamt",
         "autoUpdate": {
             "status": "Auto-Update-Status",
             "active": "Aktiv",

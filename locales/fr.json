@@ -34,7 +34,8 @@
         "noDescription": "Aucune description disponible",
         "defaultTag": "Par défaut",
         "updated": "Mis à jour le : {date}",
-        "documentsCount": "{count} document(s)"
+        "documentsCount": "{count} document(s)",
+        "setAsDefault": "Définir comme par défaut"
     },
     "errors": {
         "userNotAuthenticated": "Utilisateur non authentifié.",
@@ -269,6 +270,10 @@
         },
         "dialog": {
             "resumeIdLabel": "ID du CV : {id}"
+        },
+        "scholarships": {
+            "title": "Opportunités de bourses",
+            "description": "Nous travaillons dur pour vous proposer des opportunités de bourses. Restez à l'écoute !"
         }
     },
     "dashboard_layout": {
@@ -296,6 +301,19 @@
         "toast": {
             "setDefault": "CV défini par défaut.",
             "unsetDefault": "CV n'est plus défini par défaut."
+        },
+        "notifications": {
+            "title": "Notifications",
+            "noNotifications": "Aucune notification pour le moment",
+            "empty": "Tout est à jour !",
+            "active": "Actif",
+            "completed": "Terminé",
+            "tooltipTitle": "Afficher les notifications",
+            "clearAll": "Tout effacer",
+            "processing": "Traitement...",
+            "recent": "Récentes",
+            "viewResult": "Voir le résultat",
+            "opening": "Ouverture..."
         }
     },
     "login": {
@@ -325,6 +343,7 @@
         "fetching": "Récupération des offres...",
         "searchStarted": "Recherche lancée",
         "searchStartedDetail": "Actualisation des offres en fonction de vos critères...",
+        "showingJobs": "{filtered}/ {total} total",
         "autoUpdate": {
             "status": "État de la mise à jour auto",
             "active": "Actif",
