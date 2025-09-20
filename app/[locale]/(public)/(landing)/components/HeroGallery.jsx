@@ -32,7 +32,7 @@ const portfolios = [
     },
         { 
         // New: Placeholder for a static PNG image with custom text.
-        src: 'https://placehold.co/600x400/3498db/FFFFFF/png?text=Sleek+Portfolio', 
+        src: '/images/image.png', 
         alt: 'Sleek portfolio design',
         type: 'iframe',
         // New: A safe, publicly-accessible URL designed for iframe testing.

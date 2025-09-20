@@ -1,4 +1,4 @@
-    'use client';
+'use client';
     import React, { useState, useEffect, useRef } from 'react';
     import { Card } from 'primereact/card';
     import { TabView, TabPanel } from 'primereact/tabview';
@@ -25,6 +25,7 @@
         const [saving, setSaving] = useState(false);
         const [activeTab, setActiveTab] = useState(0);
         const [mounted, setMounted] = useState(false);
+        const [isUpdatingProfile, setIsUpdatingProfile] = useState(false);
 
         // Real data states
         const [currentSubscription, setCurrentSubscription] = useState(null);
@@ -93,7 +94,7 @@
 
         const fetchAllData = async () => {
             try {
-                const [subscriptionResponse, usageResponse, paymentsResponse] = await Promise.all([
+                const [subscriptionResponse, usageResponse, paymentsResponse, userProfileResponse] = await Promise.all([
                     axios.get(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/subscription/`, {
                         headers: { Authorization: `Bearer ${session.accessToken}` }
                     }).catch(err => ({ data: null })),
@@ -104,15 +105,30 @@
 
                     axios.get(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/payments/`, {
                         headers: { Authorization: `Bearer ${session.accessToken}` }
-                    }).catch(err => ({ data: [] }))
+                    }).catch(err => ({ data: [] })),
+
+                    axios.get(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/user/profile/`, {
+                        headers: { Authorization: `Bearer ${session.accessToken}` }
+                    }).catch(err => ({ data: null }))
                 ]);
 
                 setCurrentSubscription(subscriptionResponse.data);
                 setUsageData(usageResponse.data);
                 setPaymentHistory(paymentsResponse.data);
 
-                // Initialize user profile with session data if available
-                if (session?.user) {
+                // Initialize user profile with backend data if available
+                if (userProfileResponse.data) {
+                    setUserProfile({
+                        first_name: userProfileResponse.data.user?.first_name || '',
+                        last_name: userProfileResponse.data.user?.last_name || '',
+                        email: userProfileResponse.data.user?.email || '',
+                        phone: userProfileResponse.data.phone || '',
+                        company: userProfileResponse.data.company || '',
+                        job_title: userProfileResponse.data.job_title || '',
+                        timezone: userProfileResponse.data.timezone || 'UTC',
+                        language: userProfileResponse.data.language || 'en'
+                    });
+                } else if (session?.user) {
                     setUserProfile(prev => ({
                         ...prev,
                         first_name: session.user.name?.split(' ')[0] || '',
@@ -135,15 +151,21 @@
         };
 
         const handleSaveProfile = async () => {
-            setSaving(true);
+            setIsUpdatingProfile(true);
             try {
-                // Simulate API call - replace with actual endpoint when available
-                await new Promise(resolve => setTimeout(resolve, 1000));
+                const response = await axios.put(
+                    `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/user/profile/update/`,
+                    userProfile,
+                    {
+                        headers: { Authorization: `Bearer ${session.accessToken}` }
+                    }
+                );
+                
                 showToast('success', 'Success', 'Profile updated successfully');
             } catch (error) {
                 showToast('error', 'Error', 'Failed to update profile');
             } finally {
-                setSaving(false);
+                setIsUpdatingProfile(false);
             }
         };
 
@@ -371,7 +393,7 @@
                                                 <Button
                                                     label="Save Changes"
                                                     icon="pi pi-save"
-                                                    loading={saving}
+                                                    loading={isUpdatingProfile}
                                                     onClick={handleSaveProfile}
                                                     className="mt-3"
                                                 />
@@ -505,168 +527,24 @@
                                         </div>
                                     </TabPanel>
 
-                                    {/* Notifications Tab */}
-                                    <TabPanel header="Notifications" leftIcon="pi pi-bell mr-2">
-                                        <div className="grid">
-                                            <div className="col-12 lg:col-8">
-                                                <h3 className="text-xl font-semibold mb-4">Email Preferences</h3>
-                                                <p className="text-600 mb-6">Choose what notifications you&apos;d like to receive via email</p>
-
-                                                <div className="flex flex-column gap-4">
-                                                    {[
-                                                        {
-                                                            key: 'emailUpdates',
-                                                            title: 'Product Updates & News',
-                                                            description: 'Get notified about new features and product announcements'
-                                                        },
-                                                        {
-                                                            key: 'planExpiry',
-                                                            title: 'Plan Expiry Notifications',
-                                                            description: 'Receive alerts before your subscription expires'
-                                                        },
-                                                        {
-                                                            key: 'usageAlerts',
-                                                            title: 'Usage Alerts',
-                                                            description: 'Get notified when you\'re approaching feature limits'
-                                                        },
-                                                        {
-                                                            key: 'promotions',
-                                                            title: 'Promotions & Offers',
-                                                            description: 'Receive special offers and promotional content'
-                                                        },
-                                                        {
-                                                            key: 'weeklyReports',
-                                                            title: 'Weekly Reports',
-                                                            description: 'Get weekly summaries of your account activity'
-                                                        }
-                                                    ].map((item) => (
-                                                        <div key={item.key} className="flex align-items-center justify-content-between p-3 border-1 border-200 border-round">
-                                                            <div className="flex-1">
-                                                                <h5 className="font-semibold mb-1">{item.title}</h5>
-                                                                <p className="text-600 text-sm">{item.description}</p>
-                                                            </div>
-                                                            <InputSwitch
-                                                                checked={notifications[item.key]}
-                                                                onChange={(e) => setNotifications(prev => ({ ...prev, [item.key]: e.value }))}
-                                                            />
-                                                        </div>
-                                                    ))}
-                                                </div>
-
-                                                <Button
-                                                    label="Save Preferences"
-                                                    icon="pi pi-save"
-                                                    loading={saving}
-                                                    onClick={() => {
-                                                        setSaving(true);
-                                                        setTimeout(() => {
-                                                            setSaving(false);
-                                                            showToast('success', 'Success', 'Notification preferences updated');
-                                                        }, 1000);
-                                                    }}
-                                                    className="mt-4"
-                                                />
-                                            </div>
-
-                                            <div className="col-12 lg:col-4">
-                                                <div className="bg-green-50 border-round p-4">
-                                                    <h4 className="text-green-800 mb-3">Why Enable Notifications?</h4>
-                                                    <ul className="list-none p-0 text-green-700">
-                                                        <li className="mb-2"><i className="pi pi-check mr-2"></i>Stay updated on new features</li>
-                                                        <li className="mb-2"><i className="pi pi-check mr-2"></i>Never miss plan renewals</li>
-                                                        <li className="mb-2"><i className="pi pi-check mr-2"></i>Track your usage effectively</li>
-                                                        <li className="mb-2"><i className="pi pi-check mr-2"></i>Get exclusive offers</li>
-                                                    </ul>
-                                                </div>
+                                    {/* Security Tab */}
+                                    <TabPanel header="Security" leftIcon="pi pi-shield mr-2">
+                                        <div className="p-4">
+                                            <div className="text-center py-8">
+                                                <i className="pi pi-clock text-6xl text-primary mb-4"></i>
+                                                <h3 className="text-xl font-semibold mb-2 text-900">Coming Soon</h3>
+                                                <p className="text-600">Security settings will be available in a future update.</p>
                                             </div>
                                         </div>
                                     </TabPanel>
-
-                                    {/* Security Tab */}
-                                    <TabPanel header="Security" leftIcon="pi pi-shield mr-2">
-                                        <div className="grid">
-                                            <div className="col-12 lg:col-8">
-                                                <h3 className="text-xl font-semibold mb-4">Password & Security</h3>
-
-                                                <Card className="mb-4">
-                                                    <h4 className="text-lg font-semibold mb-3">Change Password</h4>
-                                                    <div className="grid">
-                                                        <div className="col-12">
-                                                            <div className="field">
-                                                                <label htmlFor="currentPassword" className="font-medium">Current Password</label>
-                                                                <Password
-                                                                    id="currentPassword"
-                                                                    value={security.currentPassword}
-                                                                    onChange={(e) => setSecurity(prev => ({ ...prev, currentPassword: e.target.value }))}
-                                                                    className="w-full"
-                                                                    feedback={false}
-                                                                    placeholder="Enter current password"
-                                                                />
-                                                            </div>
-                                                        </div>
-                                                        <div className="col-12 md:col-6">
-                                                            <div className="field">
-                                                                <label htmlFor="newPassword" className="font-medium">New Password</label>
-                                                                <Password
-                                                                    id="newPassword"
-                                                                    value={security.newPassword}
-                                                                    onChange={(e) => setSecurity(prev => ({ ...prev, newPassword: e.target.value }))}
-                                                                    className="w-full"
-                                                                    placeholder="Enter new password"
-                                                                />
-                                                            </div>
-                                                        </div>
-                                                        <div className="col-12 md:col-6">
-                                                            <div className="field">
-                                                                <label htmlFor="confirmPassword" className="font-medium">Confirm Password</label>
-                                                                <Password
-                                                                    id="confirmPassword"
-                                                                    value={security.confirmPassword}
-                                                                    onChange={(e) => setSecurity(prev => ({ ...prev, confirmPassword: e.target.value }))}
-                                                                    className="w-full"
-                                                                    feedback={false}
-                                                                    placeholder="Confirm new password"
-                                                                />
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                    <Button
-                                                        label="Change Password"
-                                                        icon="pi pi-key"
-                                                        loading={saving}
-                                                        onClick={handleChangePassword}
-                                                        disabled={!security.currentPassword || !security.newPassword || !security.confirmPassword}
-                                                    />
-                                                </Card>
-
-                                                <Card>
-                                                    <h4 className="text-lg font-semibold mb-3">Two-Factor Authentication</h4>
-                                                    <div className="flex align-items-center justify-content-between p-3 border-1 border-200 border-round">
-                                                        <div className="flex-1">
-                                                            <h5 className="font-semibold mb-1">Enable 2FA</h5>
-                                                            <p className="text-600 text-sm">Add an extra layer of security to your account</p>
-                                                        </div>
-                                                        <InputSwitch
-                                                            checked={security.twoFactorEnabled}
-                                                            onChange={(e) => {
-                                                                setSecurity(prev => ({ ...prev, twoFactorEnabled: e.value }));
-                                                                showToast('info', 'Coming Soon', 'Two-factor authentication will be available soon');
-                                                            }}
-                                                        />
-                                                    </div>
-                                                </Card>
-                                            </div>
-
-                                            <div className="col-12 lg:col-4">
-                                                <div className="bg-red-50 border-round p-4">
-                                                    <h4 className="text-red-800 mb-3">Security Best Practices</h4>
-                                                    <ul className="list-none p-0 text-red-700">
-                                                        <li className="mb-2"><i className="pi pi-shield mr-2"></i>Use a strong, unique password</li>
-                                                        <li className="mb-2"><i className="pi pi-shield mr-2"></i>Enable two-factor authentication</li>
-                                                        <li className="mb-2"><i className="pi pi-shield mr-2"></i>Review login activity regularly</li>
-                                                        <li className="mb-2"><i className="pi pi-shield mr-2"></i>Don&apos;t share your credentials</li>
-                                                    </ul>
-                                                </div>
+                                    
+                                    {/* Notifications Tab */}
+                                    <TabPanel header="Notifications" leftIcon="pi pi-bell mr-2">
+                                        <div className="p-4">
+                                            <div className="text-center py-8">
+                                                <i className="pi pi-clock text-6xl text-primary mb-4"></i>
+                                                <h3 className="text-xl font-semibold mb-2 text-900">Coming Soon</h3>
+                                                <p className="text-600">Notification settings will be available in a future update.</p>
                                             </div>
                                         </div>
                                     </TabPanel>
