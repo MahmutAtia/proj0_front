@@ -8,45 +8,44 @@ import PreviewModal from './PreviewModal'; // Import the new modal
 const portfolios = [
     { 
         // New: Placeholder that supports GIF format with custom text.
-        src: 'https://placehold.co/600x400/000000/FFFFFF/gif?text=Animated+Portfolio', 
+        src: '/images/john-1-high.gif',
         alt: 'Animated portfolio preview', 
         type: 'iframe', 
         // New: A safe, publicly-accessible URL designed for iframe testing.
-        url: 'https://practice.expandtesting.com/iframe' 
+        url: '/site/mohamed-attia/'
     },
     { 
         // New: Placeholder for a static PNG image with custom text.
-        src: 'https://placehold.co/600x400/3498db/FFFFFF/png?text=Sleek+Portfolio', 
-        alt: 'Sleek portfolio design',
+        src: '/images/john-2-high.gif',
+        alt: 'Animated portfolio preview',
         type: 'iframe',
         // New: A safe, publicly-accessible URL designed for iframe testing.
-        url: 'https://practice.expandtesting.com/iframe' 
+        url: '/site/mohamed-attia-20/'
     },
         { 
         // New: Placeholder for a static PNG image with custom text.
-        src: 'https://placehold.co/600x400/3498db/FFFFFF/png?text=Sleek+Portfolio', 
-        alt: 'Sleek portfolio design',
+        src: '/images/john-3-high.gif',
+        alt: 'Animated portfolio preview',
         type: 'iframe',
         // New: A safe, publicly-accessible URL designed for iframe testing.
-        url: 'https://practice.expandtesting.com/iframe' 
+        url: '/site/mohamed-attia-21/'
     },
         { 
         // New: Placeholder for a static PNG image with custom text.
-        src: '/images/image.png', 
-        alt: 'Sleek portfolio design',
+        src: '/images/john-4-high.gif',
+        alt: 'Animated portfolio preview 4',
         type: 'iframe',
         // New: A safe, publicly-accessible URL designed for iframe testing.
-        url: 'https://practice.expandtesting.com/iframe' 
+        url: '/site/mohamed-attia-22/'
     },
         { 
         // New: Placeholder for a static PNG image with custom text.
-        src: '/images/image.png', 
-        alt: 'Sleek portfolio design',
+        src: '/images/john-5-high.gif',
+        alt: 'Animated portfolio preview 5',
         type: 'iframe',
         // New: A safe, publicly-accessible URL designed for iframe testing.
-        url: 'https://practice.expandtesting.com/iframe' 
+        url: '/site/mohamed-attia-23/'
     },
-    // ... add more portfolios
 ];
 
 const resumes = [
