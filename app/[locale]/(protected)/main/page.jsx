@@ -17,7 +17,7 @@ import api from '@/lib/axios';
 
 import GenerateDocumentDialog from '../editor/components/GenerateDocumentDialog';
 import  CreateResumeFromExistingDialog  from '../editor/components/CreateResumeFromExistingDialog';
-import { useTranslation } from '../../../../hooks/useTranslation';
+import { useTranslation } from '@/hooks/useTranslation';
 import { useDashboard } from './DashboardContext'; // Import the context hook
 
 // Removed cache constants and related logic from here

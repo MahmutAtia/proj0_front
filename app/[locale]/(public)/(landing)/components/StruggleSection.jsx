@@ -5,7 +5,7 @@ import { motion, useScroll, useTransform } from 'framer-motion';
 // Import different / more relevant icons
 import { FiXCircle, FiClock, FiEyeOff, FiAlertTriangle, FiTarget, FiThumbsDown } from 'react-icons/fi'; // Added FiEyeOff, FiAlertTriangle, FiTarget
 import styles from '../styles/StruggleSection.module.css'; // Import the CSS Module
-import { useTranslation } from '../../../../hooks/useTranslation'; // Add translation hook
+import { useTranslation } from '@/hooks/useTranslation'; // Add translation hook
 
 // Animation Variants (can be moved to a shared file)
 const staggerContainer = (staggerChildren) => ({

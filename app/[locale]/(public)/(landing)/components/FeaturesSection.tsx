@@ -4,7 +4,7 @@ import React from 'react';
 import { motion } from 'framer-motion';
 import { FiCpu, FiShield, FiGlobe, FiEdit, FiZap } from 'react-icons/fi';
 import styles from '../styles/FeaturesSection.module.css'; // Import the CSS module
-import { useTranslation } from '../../../../hooks/useTranslation'; // Add translation hook
+import { useTranslation } from '@/hooks/useTranslation'; // Add translation hook
 
 // --- Framer Motion Variants (assuming these are defined elsewhere or pass as props) ---
 const fadeInUp = {

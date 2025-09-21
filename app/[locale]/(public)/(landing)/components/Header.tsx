@@ -10,7 +10,7 @@ import styles from '../styles/Header.module.css';
 // from app /components/LanguageSwitcher.tsx
 
 import LanguageSwitcher from '@/app/components/LanguageSwitcher';
-import { useTranslation } from '@/app/hooks/useTranslation';
+import { useTranslation } from '@/hooks/useTranslation';
 
 // Animation Variants
 const buttonHoverTap = {

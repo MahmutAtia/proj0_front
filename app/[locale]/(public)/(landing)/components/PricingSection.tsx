@@ -5,7 +5,7 @@ import { motion } from 'framer-motion';
 import { FiGift, FiZap, FiUsers, FiCheckCircle, FiLoader, FiAlertTriangle, FiShoppingCart, FiBriefcase, FiStar } from 'react-icons/fi'; // Added more icons for variety
 import api from '@/lib/axios'; // Adjust the import path as necessary
 import styles from '../styles/PricingSection.module.css';
-import { useTranslation } from '../../../../hooks/useTranslation'; // Add translation hook
+import { useTranslation } from '@/hooks/useTranslation'; // Add translation hook
 
 // --- Framer Motion Variants ---
 const fadeInUp = {

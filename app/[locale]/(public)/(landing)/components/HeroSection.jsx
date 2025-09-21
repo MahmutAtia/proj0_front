@@ -4,7 +4,7 @@ import { motion } from 'framer-motion';
 import { FiArrowRight, FiShield } from 'react-icons/fi';
 import styles from '../styles/HeroSection.module.css';
 import { useRouter } from 'next/navigation';
-import { useTranslation } from '../../../../hooks/useTranslation'; // Add translation hook
+import { useTranslation } from '@/hooks/useTranslation'; // Add translation hook
 import HeroGallery from './HeroGallery';
 
 

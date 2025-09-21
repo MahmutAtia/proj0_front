@@ -23,7 +23,7 @@ import { FaQuestionCircle } from "react-icons/fa"; // Import tour icon
 import { driver } from "driver.js";
 import "driver.js/dist/driver.css";
 import styles from './Dashboard.module.css';
-import { useTranslation } from '../../../../hooks/useTranslation';
+import { useTranslation } from '@/hooks/useTranslation';
 import LanguageSwitcher from '../../../components/LanguageSwitcher';
 import TaskNotificationBell from './mainComponets/TaskNotificationBell';
 import DashboardContext from './DashboardContext'; // Import the context

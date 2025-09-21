@@ -6,7 +6,7 @@ import { motion } from 'framer-motion';
 import { FaLinkedin, FaTwitter, FaGithub } from 'react-icons/fa';
 import { IoSparkles } from 'react-icons/io5';
 import styles from '../styles/Footer.module.css'; // Import the CSS module
-import { useTranslation } from '../../../../hooks/useTranslation'; // Add translation hook
+import { useTranslation } from '@/hooks/useTranslation'; // Add translation hook
 
 // --- Framer Motion Variants ---
 const buttonHover = {

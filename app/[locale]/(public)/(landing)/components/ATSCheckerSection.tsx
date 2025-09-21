@@ -4,7 +4,7 @@ import { motion } from 'framer-motion';
 import { FiShield, FiUploadCloud } from 'react-icons/fi';
 import styles from '../styles/ATSCheckerSection.module.css';
 import { useRouter } from 'next/navigation';
-import { useTranslation } from '../../../../hooks/useTranslation'; // Add translation hook
+import { useTranslation } from '@/hooks/useTranslation'; // Add translation hook
 
 // --- Framer Motion Variants ---
 const fadeInUp = {

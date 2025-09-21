@@ -5,7 +5,7 @@ import { motion, useScroll, useTransform } from 'framer-motion';
 import { FiUploadCloud, FiCpu, FiEdit } from 'react-icons/fi';
 import { IoSparkles } from 'react-icons/io5';
 
-import { useTranslation } from '../../../../hooks/useTranslation'; // Add translation hook
+import { useTranslation } from '@/hooks/useTranslation'; // Add translation hook
 import styles from '../styles/HowItWorksSection.module.css'; // Import the CSS module
 
 // --- Framer Motion Variants (assuming these are defined elsewhere or pass as props) ---
