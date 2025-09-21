@@ -16,7 +16,6 @@ const protectedPaths = [
   'site-editor*',
   'document-editor*',
 ];
-  
 // Helper function to get locale from pathname
 function getLocaleFromPathname(pathname: string) {
   const segments = pathname.split('/');

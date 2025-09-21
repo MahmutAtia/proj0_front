@@ -4,7 +4,7 @@ import { useRouter, usePathname } from 'next/navigation';
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { FiChevronDown, FiGlobe } from 'react-icons/fi';
-import { useTranslation } from '../hooks/useTranslation';
+import { useTranslation } from '@/hooks/useTranslation';
 import styles from './styles/LanguageSwitcher.module.css';
 
 const LanguageSwitcher = () => {
