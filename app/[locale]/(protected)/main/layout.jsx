@@ -117,7 +117,7 @@ const TopBar = ({ session, userMenuRef, userMenuItems, onToggleSidebar, onToggle
             <div className="flex align-items-center gap-3">
                 <Button 
                     icon={<FaQuestionCircle />} 
-                    className="p-button-rounded p-button-text p-button-plain" 
+                    className={`p-button-rounded p-button-text p-button-plain ${styles.tourButton}`} 
                     onClick={onStartTour} 
                     tooltip={t('dashboard_layout.topbar.startTour')}
                     tooltipOptions={{ position: 'bottom' }}

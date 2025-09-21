@@ -205,6 +205,7 @@
     height: 100%;
     overflow: hidden;
     position: relative;
+    
 }
 
 .quickActionCard::before {
@@ -393,3 +394,19 @@
     }
 }
 
+.tourButton {
+    /* The animation will apply a glowing drop-shadow to the icon */
+    animation: tour-glow 5.5s ease-in-out infinite;
+    /* Ensure the icon color is set for the glow to be visible */
+    color: var(--primary-color);
+}
+
+@keyframes tour-glow {
+    0%, 100% {
+        /* Using drop-shadow to apply the glow to the icon's shape */
+        filter: drop-shadow(0 0 2px rgba(139, 92, 246, 0.5));
+    }
+    50% {
+        filter: drop-shadow(0 0 5px rgba(139, 92, 246, 0.8));
+    }
+}
