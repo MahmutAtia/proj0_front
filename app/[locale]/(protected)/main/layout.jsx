@@ -19,6 +19,7 @@ import {
     FiLogOut, FiBell, FiSearch, FiChevronDown, FiUser, FiStar, FiEdit,
     FiList, FiFolder, FiInfo, FiMenu, FiChevronLeft, FiChevronRight
 } from 'react-icons/fi';
+import Joyride, { STATUS, Step } from 'react-joyride'; // Import Joyride
 import styles from './Dashboard.module.css';
 import { useTranslation } from '../../../../hooks/useTranslation';
 import LanguageSwitcher from '../../../components/LanguageSwitcher';
@@ -102,6 +103,7 @@ const TopBar = ({ session, userMenuRef, userMenuItems, onToggleSidebar, onToggle
                     onClick={onToggleMobileSidebar}
                 />
                 <Button
+                    id="tour-step-2-sidebar-toggle" // ID for Joyride step 2
                     icon={sidebarCollapsed ? <FiChevronRight size={18} /> : <FiChevronLeft size={18} />}
                     className={`${styles.toggleButton} p-button-text hidden lg:inline-flex`}
                     onClick={onToggleSidebar}
@@ -147,6 +149,10 @@ export default function Layout({ children }) {
     const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
     const [mobileSidebarVisible, setMobileSidebarVisible] = useState(false); // State for mobile sidebar
     const { t } = useTranslation(); // Use translation hook
+
+    // --- Joyride State ---
+    const [runTour, setRunTour] = useState(false);
+    const [tourSteps, setTourSteps] = useState([]);
 
         // --- State moved from page.jsx to layout.jsx ---
     const [allResumes, setAllResumes] = useState([]);
@@ -219,6 +225,64 @@ export default function Layout({ children }) {
 
         loadInitialData();
     }, [session, status, t, router]); // Added router to dependency array
+
+
+    // --- Joyride Effects and Handlers ---
+    useEffect(() => {
+        // Define steps inside useEffect to use the 't' function for translation
+        const steps = [
+            {
+                target: 'body',
+                content: t('onboarding.step1_welcome'),
+                placement: 'center',
+                title: t('onboarding.welcome_title'),
+            },
+            {
+                target: '#tour-step-2-sidebar-toggle',
+                content: t('onboarding.step2_sidebar'),
+                placement: 'bottom',
+                title: t('onboarding.sidebar_title'),
+            },
+            {
+                target: '#tour-step-3-topbar-actions',
+                content: t('onboarding.step3_topbar'),
+                placement: 'bottom',
+                title: t('onboarding.quick_actions_title'),
+            },
+            {
+                target: '#tour-step-4-main-nav',
+                content: t('onboarding.step4_navigation'),
+                placement: 'right',
+                title: t('onboarding.navigation_title'),
+            },
+            {
+                target: '#tour-step-5-main-content',
+                content: t('onboarding.step5_main_content'),
+                placement: 'top',
+                title: t('onboarding.main_content_title'),
+            },
+        ];
+        setTourSteps(steps);
+
+        // Check if the tour has been completed before
+        const tourCompleted = localStorage.getItem('onboardingTourCompleted');
+        if (tourCompleted !== 'true') {
+            // Use a timeout to ensure the UI has rendered before starting the tour
+            setTimeout(() => {
+                setRunTour(true);
+            }, 1500);
+        }
+    }, [t]);
+
+    const handleJoyrideCallback = (data) => {
+        const { status } = data;
+        const finishedStatuses = [STATUS.FINISHED, STATUS.SKIPPED];
+
+        if (finishedStatuses.includes(status)) {
+            setRunTour(false);
+            localStorage.setItem('onboardingTourCompleted', 'true');
+        }
+    };
 
 
     // Effect to handle clicks outside the mobile sidebar to close it
@@ -352,6 +416,33 @@ export default function Layout({ children }) {
 
     return (
         <DashboardContext.Provider value={contextValue}>
+            <Joyride
+                callback={handleJoyrideCallback}
+                continuous
+                run={runTour}
+                scrollToFirstStep
+                showProgress
+                showSkipButton
+                steps={tourSteps}
+                styles={{
+                    options: {
+                        arrowColor: '#fff',
+                        backgroundColor: '#fff',
+                        primaryColor: '#8B5CF6', // A purple that matches your theme
+                        textColor: '#333',
+                        zIndex: 10000,
+                    },
+                    tooltip: {
+                        borderRadius: '8px',
+                    },
+                    buttonNext: {
+                        borderRadius: '6px',
+                    },
+                    buttonBack: {
+                        marginRight: 'auto',
+                    }
+                }}
+            />
             <div className={`${styles.dashboardLayout} bg-primary-50`}>
                 <Toast ref={toast} />
 
@@ -367,7 +458,7 @@ export default function Layout({ children }) {
                     <SidebarLogo collapsed={sidebarCollapsed} />
 
                     {/* Scrollable sidebar nav area */}
-                    <div className={`${styles.sidebarNavContainer} ${styles.sidebarScrollbar}`}>
+                    <div id="tour-step-4-main-nav" className={`${styles.sidebarNavContainer} ${styles.sidebarScrollbar}`}>
                         <SidebarNav
                             items={getSidebarNavItems(defaultResume)}
                             currentPath={router.pathname}
@@ -393,7 +484,7 @@ export default function Layout({ children }) {
                         mobileToggleButtonRef={mobileToggleButtonRef}
                     />
 
-                    <div className={`${styles.mainScrollArea} bg-gray-50`}>
+                    <div id="tour-step-5-main-content" className={`${styles.mainScrollArea} bg-gray-50`}>
                         {loadingResumes || !isDataValid ? (
                              <div className="flex justify-content-center align-items-center h-full">
                                 <ProgressSpinner style={{ width: '50px', height: '50px' }} strokeWidth="4" />
