@@ -176,7 +176,11 @@ export default function Layout({ children }) {
                 { element: '#tour-profile-menu', popover: { title: t('tour.profile.title'), description: t('tour.profile.description'), side: "bottom", align: 'end' } },
                 { element: '#tour-main-content', popover: { title: t('tour.mainContent.title'), description: t('tour.mainContent.description'), side: "top", align: 'center' } },
                 { element: '#tour-quick-actions', popover: { title: t('tour.actionButtons.title'), description: t('tour.actionButtons.description'), side: "top", align: 'center' } }
-            ]
+            ],
+            onDestroyed: () => {
+                // When the tour is closed (finished or escaped), mark it as seen.
+                localStorage.setItem('hasSeenDashboardTour', 'true');
+            }
         });
 
         driverObj.drive();
@@ -188,6 +192,21 @@ export default function Layout({ children }) {
     const [relatedDocuments, setRelatedDocuments] = useState([]);
     const [loadingResumes, setLoadingResumes] = useState(true);
     const [isDataValid, setIsDataValid] = useState(false);
+
+    // Effect to run the tour on first visit
+    useEffect(() => {
+        // Ensure data is loaded and valid before starting the tour
+        if (!loadingResumes && isDataValid) {
+            const hasSeenTour = localStorage.getItem('hasSeenDashboardTour');
+            if (!hasSeenTour) {
+                // Use a small timeout to ensure all DOM elements are painted
+                setTimeout(() => {
+                    startTour();
+                }, 500);
+            }
+        }
+    }, [loadingResumes, isDataValid]); // Reruns when loading state changes
+
     useEffect(() => {
         console.log("NEXT_PUBLIC_BACKEND_URL:", process.env.NEXT_PUBLIC_BACKEND_URL);
         console.log("NEXT_PUBLIC_AI_API_URL:", process.env.NEXT_PUBLIC_AI_API_URL);
