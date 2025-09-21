@@ -95,7 +95,7 @@ const SidebarFooter = ({ router, collapsed }) => {
     );
 };
 
-const TopBar = ({ session, userMenuRef, userMenuItems, onToggleSidebar, onToggleMobileSidebar, sidebarCollapsed, mobileToggleButtonRef }) => {
+const TopBar = ({ session, userMenuRef, userMenuItems, onToggleSidebar, onToggleMobileSidebar, sidebarCollapsed, mobileToggleButtonRef, onStartTour }) => {
     const { t, isRTL } = useTranslation();
     return (
         <div className={`${styles.topbar} flex justify-content-between align-items-center sticky top-0 z-5`}>

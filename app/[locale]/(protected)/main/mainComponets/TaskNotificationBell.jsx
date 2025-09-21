@@ -9,7 +9,7 @@ import { ProgressBar } from 'primereact/progressbar';
 import { useRouter } from 'next/navigation';
 import { Divider } from 'primereact/divider';
 import { Card } from 'primereact/card';
-import { useTranslation } from '../../../../hooks/useTranslation';
+import { useTranslation } from '@/hooks/useTranslation';
 
 const TaskNotificationBell = () => {
     const { tasks, clearCompleted, removeTask, handleSaveAndRedirect, isSaving } = useTasks();

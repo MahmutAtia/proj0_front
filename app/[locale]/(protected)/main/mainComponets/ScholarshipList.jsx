@@ -5,7 +5,7 @@ import { ProgressSpinner } from 'primereact/progressspinner';
 import styles from '../Dashboard.module.css';
 import useUserLocation from '../../../../hooks/useUserLocation'; // Adjust path as needed
 import { FiAward } from 'react-icons/fi';
-import { useTranslation } from '../../../../hooks/useTranslation';
+import { useTranslation } from '@/hooks/useTranslation';
 
 const ScholarshipList = ({ router }) => {
     const { t, isRTL } = useTranslation();
