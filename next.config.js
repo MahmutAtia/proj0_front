@@ -29,64 +29,79 @@ const nextConfig = {
   trailingSlash: false,
 
   // Security headers
-  async headers() {
-    return [
-      {
-        source: '/(.*)',
-        headers: [
-          {
-            key: 'X-Frame-Options',
-            value: 'DENY',
-          },
-          {
-            key: 'X-Content-Type-Options',
-            value: 'nosniff',
-          },
-          {
-            key: 'Referrer-Policy',
-            value: 'origin-when-cross-origin',
-          },
-        ],
-      },
-      // Prevent caching of auth-related routes
-      {
-        source: '/api/auth/(.*)',
-        headers: [
-          {
-            key: 'Cache-Control',
-            value: 'no-store, no-cache, must-revalidate, proxy-revalidate',
-          },
-          {
-            key: 'Pragma',
-            value: 'no-cache',
-          },
-          {
-            key: 'Expires',
-            value: '0',
-          },
-        ],
-      },
-      {
-        source: '/login',
-        headers: [
-          {
-            key: 'Cache-Control',
-            value: 'no-store, no-cache, must-revalidate, proxy-revalidate',
-          },
-        ],
-      },
-      {
-        source: '/logout',
-        headers: [
-          {
-            key: 'Cache-Control',
-            value: 'no-store, no-cache, must-revalidate, proxy-revalidate',
-          },
-        ],
-      },
-    ];
-  },
-
+async headers() {
+  return [
+    {
+      // Allow framing for site routes - remove X-Frame-Options header
+      source: '/:locale/site/:path*',
+      headers: [
+        {
+          key: 'X-Content-Type-Options',
+          value: 'nosniff',
+        },
+        {
+          key: 'Referrer-Policy',
+          value: 'origin-when-cross-origin',
+        },
+        // Note: X-Frame-Options is intentionally omitted for site routes
+      ],
+    },
+    {
+      // Deny framing for all other routes
+      source: '/((?!.*site).*)',
+      headers: [
+        {
+          key: 'X-Frame-Options',
+          value: 'DENY',
+        },
+        {
+          key: 'X-Content-Type-Options',
+          value: 'nosniff',
+        },
+        {
+          key: 'Referrer-Policy',
+          value: 'origin-when-cross-origin',
+        },
+      ],
+    },
+    // Prevent caching of auth-related routes
+    {
+      source: '/api/auth/(.*)',
+      headers: [
+        {
+          key: 'Cache-Control',
+          value: 'no-store, no-cache, must-revalidate, proxy-revalidate',
+        },
+        {
+          key: 'Pragma',
+          value: 'no-cache',
+        },
+        {
+          key: 'Expires',
+          value: '0',
+        },
+      ],
+    },
+    {
+      source: '/login',
+      headers: [
+        {
+          key: 'Cache-Control',
+          value: 'no-store, no-cache, must-revalidate, proxy-revalidate',
+        },
+      ],
+    },
+    {
+      source: '/logout',
+      headers: [
+        {
+          key: 'Cache-Control',
+          value: 'no-store, no-cache, must-revalidate, proxy-revalidate',
+        },
+      ],
+    },
+  ];
+},
   // Environment variables
   env: {
     CUSTOM_KEY: process.env.CUSTOM_KEY,
