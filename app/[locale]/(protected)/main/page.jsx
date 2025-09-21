@@ -1,5 +1,6 @@
 "use client";
 import React, { useState, useRef, useMemo } from 'react';
+import Link from 'next/link';
 import { useSession } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
 import { Button } from 'primereact/button';
@@ -191,18 +192,24 @@ const RelatedDocumentsList = ({ documents, resumeTitle, onManageDocuments, isLoa
                 <ul className="list-none p-0 m-0">
                     {documents.slice(0, 3).map(doc => (
                         <li
-                            key={doc.unique_id || doc.id}
-                            className={`${styles.documentItem} p-3 mb-2 border-round surface-card border-1 surface-border flex align-items-center justify-content-between cursor-pointer hover:shadow-2 transition-shadow`}
-                            onClick={() => router.push(`/document_editor/${doc.unique_id}`)}
-                            title={`Edit ${doc.document_type.replace(/_/g, ' ')}`}
-                        >
-                            <div className="flex align-items-center">
-                                <FiFileText className="text-primary mr-3" style={{ fontSize: '1.2rem' }} />
-                                <span className="text-sm font-medium text-color">{doc.document_type.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase())}</span>
-                            </div>
-                            <span className="text-xs text-color-secondary">
-                                {new Date(doc.created_at).toISOString().split('T')[0]}                             </span>
-                        </li>
+  key={doc.unique_id || doc.id}
+  className={`${styles.documentItem} p-3 mb-2 border-round surface-card border-1 surface-border flex align-items-center justify-content-between cursor-pointer hover:shadow-2 transition-shadow`}
+  title={`Edit ${doc.document_type.replace(/_/g, ' ')}`}
+>
+  <Link href={`/document_editor/${doc.unique_id}`} className="flex justify-between w-full items-center">
+    <div className="flex items-center">
+      <FiFileText className="text-primary mr-3" style={{ fontSize: "1.2rem" }} />
+      <span className="text-sm font-medium text-color">
+        {doc.document_type
+          .replace(/_/g, " ")
+          .replace(/\b\w/g, (l) => l.toUpperCase())}
+      </span>
+    </div>
+    <span className="text-xs text-color-secondary">
+      {new Date(doc.created_at).toISOString().split("T")[0]}
+    </span>
+  </Link>
+</li>
                     ))}
                     {documents.length > 3 && (
                         <li className="text-center mt-2">
@@ -355,7 +362,7 @@ const DashboardPage = () => {
                         <RelatedDocumentsList
                             documents={relatedDocuments}
                             resumeTitle={defaultResume.title}
-                            onManageDocuments={() => router.push('/main/documents')}
+                            onManageDocuments={() => router.push('/main/resumes')}
                             isLoading={loadingResumes}
                         />
                     )}
