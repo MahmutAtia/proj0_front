@@ -19,7 +19,9 @@ import {
     FiLogOut, FiBell, FiSearch, FiChevronDown, FiUser, FiStar, FiEdit,
     FiList, FiFolder, FiInfo, FiMenu, FiChevronLeft, FiChevronRight
 } from 'react-icons/fi';
-// import Joyride, { STATUS, Step } from 'react-joyride'; // Import Joyride
+import { FaQuestionCircle } from "react-icons/fa"; // Import tour icon
+import { driver } from "driver.js";
+import "driver.js/dist/driver.css";
 import styles from './Dashboard.module.css';
 import { useTranslation } from '../../../../hooks/useTranslation';
 import LanguageSwitcher from '../../../components/LanguageSwitcher';
@@ -91,7 +93,7 @@ const SidebarFooter = ({ router, collapsed }) => {
     );
 };
 
-const TopBar = ({ session, userMenuRef, userMenuItems, onToggleSidebar, onToggleMobileSidebar, sidebarCollapsed, mobileToggleButtonRef }) => {
+const TopBar = ({ session, userMenuRef, userMenuItems, onToggleSidebar, onToggleMobileSidebar, sidebarCollapsed, mobileToggleButtonRef, onStartTour }) => {
     const { t } = useTranslation();
     return (
         <div className={`${styles.topbar} flex justify-content-between align-items-center sticky top-0 z-5`}>
@@ -103,7 +105,7 @@ const TopBar = ({ session, userMenuRef, userMenuItems, onToggleSidebar, onToggle
                     onClick={onToggleMobileSidebar}
                 />
                 <Button
-                    id="tour-step-2-sidebar-toggle" // ID for Joyride step 2
+                    id="tour-toggle-sidebar"
                     icon={sidebarCollapsed ? <FiChevronRight size={18} /> : <FiChevronLeft size={18} />}
                     className={`${styles.toggleButton} p-button-text hidden lg:inline-flex`}
                     onClick={onToggleSidebar}
@@ -113,9 +115,21 @@ const TopBar = ({ session, userMenuRef, userMenuItems, onToggleSidebar, onToggle
             </div>
 
             <div className="flex align-items-center gap-3">
-                <LanguageSwitcher />
-                <TaskNotificationBell /> 
+                <Button 
+                    icon={<FaQuestionCircle />} 
+                    className="p-button-rounded p-button-text p-button-plain" 
+                    onClick={onStartTour} 
+                    tooltip={t('dashboard_layout.topbar.startTour')}
+                    tooltipOptions={{ position: 'bottom' }}
+                />
+                <div id="tour-language-switcher">
+                    <LanguageSwitcher />
+                </div>
+                <div id="tour-notifications">
+                    <TaskNotificationBell /> 
+                </div>
                 <div
+                    id="tour-profile-menu"
                     className={`${styles.profileButton} flex align-items-center gap-2 cursor-pointer`}
                     onClick={(event) => userMenuRef.current.toggle(event)}
                     aria-controls="popup_menu_right"
@@ -150,9 +164,23 @@ export default function Layout({ children }) {
     const [mobileSidebarVisible, setMobileSidebarVisible] = useState(false); // State for mobile sidebar
     const { t } = useTranslation(); // Use translation hook
 
-    // --- Joyride State ---
-    const [runTour, setRunTour] = useState(false);
-    const [tourSteps, setTourSteps] = useState([]);
+    const startTour = () => {
+        const driverObj = driver({
+            showProgress: true,
+            popoverClass: 'driverjs-theme',
+            steps: [
+                { element: '#tour-sidebar', popover: { title: t('tour.sidebar.title'), description: t('tour.sidebar.description'), side: "right", align: 'start' } },
+                { element: '#tour-toggle-sidebar', popover: { title: t('tour.toggleSidebar.title'), description: t('tour.toggleSidebar.description'), side: "bottom", align: 'center' } },
+                { element: '#tour-language-switcher', popover: { title: t('tour.language.title'), description: t('tour.language.description'), side: "bottom", align: 'end' } },
+                { element: '#tour-notifications', popover: { title: t('tour.notifications.title'), description: t('tour.notifications.description'), side: "bottom", align: 'end' } },
+                { element: '#tour-profile-menu', popover: { title: t('tour.profile.title'), description: t('tour.profile.description'), side: "bottom", align: 'end' } },
+                { element: '#tour-main-content', popover: { title: t('tour.mainContent.title'), description: t('tour.mainContent.description'), side: "top", align: 'center' } },
+                { element: '#tour-quick-actions', popover: { title: t('tour.actionButtons.title'), description: t('tour.actionButtons.description'), side: "top", align: 'center' } }
+            ]
+        });
+
+        driverObj.drive();
+    };
 
         // --- State moved from page.jsx to layout.jsx ---
     const [allResumes, setAllResumes] = useState([]);
@@ -225,64 +253,6 @@ export default function Layout({ children }) {
 
         loadInitialData();
     }, [session, status, t, router]); // Added router to dependency array
-
-
-    // --- Joyride Effects and Handlers ---
-    useEffect(() => {
-        // Define steps inside useEffect to use the 't' function for translation
-        const steps = [
-            {
-                target: 'body',
-                content: t('onboarding.step1_welcome'),
-                placement: 'center',
-                title: t('onboarding.welcome_title'),
-            },
-            {
-                target: '#tour-step-2-sidebar-toggle',
-                content: t('onboarding.step2_sidebar'),
-                placement: 'bottom',
-                title: t('onboarding.sidebar_title'),
-            },
-            {
-                target: '#tour-step-3-topbar-actions',
-                content: t('onboarding.step3_topbar'),
-                placement: 'bottom',
-                title: t('onboarding.quick_actions_title'),
-            },
-            {
-                target: '#tour-step-4-main-nav',
-                content: t('onboarding.step4_navigation'),
-                placement: 'right',
-                title: t('onboarding.navigation_title'),
-            },
-            {
-                target: '#tour-step-5-main-content',
-                content: t('onboarding.step5_main_content'),
-                placement: 'top',
-                title: t('onboarding.main_content_title'),
-            },
-        ];
-        setTourSteps(steps);
-
-        // Check if the tour has been completed before
-        const tourCompleted = localStorage.getItem('onboardingTourCompleted');
-        if (tourCompleted !== 'true') {
-            // Use a timeout to ensure the UI has rendered before starting the tour
-            setTimeout(() => {
-                setRunTour(true);
-            }, 1500);
-        }
-    }, [t]);
-
-    // const handleJoyrideCallback = (data) => {
-    //     const { status } = data;
-    //     const finishedStatuses = [STATUS.FINISHED, STATUS.SKIPPED];
-
-    //     if (finishedStatuses.includes(status)) {
-    //         setRunTour(false);
-    //         localStorage.setItem('onboardingTourCompleted', 'true');
-    //     }
-    // };
 
 
     // Effect to handle clicks outside the mobile sidebar to close it
@@ -416,38 +386,12 @@ export default function Layout({ children }) {
 
     return (
         <DashboardContext.Provider value={contextValue}>
-            {/* <Joyride
-                callback={handleJoyrideCallback}
-                continuous
-                run={runTour}
-                scrollToFirstStep
-                showProgress
-                showSkipButton
-                steps={tourSteps}
-                styles={{
-                    options: {
-                        arrowColor: '#fff',
-                        backgroundColor: '#fff',
-                        primaryColor: '#8B5CF6', // A purple that matches your theme
-                        textColor: '#333',
-                        zIndex: 10000,
-                    },
-                    tooltip: {
-                        borderRadius: '8px',
-                    },
-                    buttonNext: {
-                        borderRadius: '6px',
-                    },
-                    buttonBack: {
-                        marginRight: 'auto',
-                    }
-                }}
-            /> */}
             <div className={`${styles.dashboardLayout} bg-primary-50`}>
                 <Toast ref={toast} />
 
                 {/* Sidebar */}
                 <div
+                    id="tour-sidebar"
                     ref={sidebarRef}
                     className={`${styles.sidebar} surface-card shadow-3 border-right-1 surface-border ${sidebarCollapsed ? styles.sidebarCollapsed : ''} flex-shrink-0 lg:flex lg:flex-column ${mobileSidebarVisible ? styles.sidebarMobileOverlay : 'hidden'}`}
                     style={{ 
@@ -458,7 +402,7 @@ export default function Layout({ children }) {
                     <SidebarLogo collapsed={sidebarCollapsed} />
 
                     {/* Scrollable sidebar nav area */}
-                    <div id="tour-step-4-main-nav" className={`${styles.sidebarNavContainer} ${styles.sidebarScrollbar}`}>
+                    <div className={`${styles.sidebarNavContainer} ${styles.sidebarScrollbar}`}>
                         <SidebarNav
                             items={getSidebarNavItems(defaultResume)}
                             currentPath={router.pathname}
@@ -482,9 +426,10 @@ export default function Layout({ children }) {
                         onToggleMobileSidebar={toggleMobileSidebar}
                         sidebarCollapsed={sidebarCollapsed}
                         mobileToggleButtonRef={mobileToggleButtonRef}
+                        onStartTour={startTour}
                     />
 
-                    <div id="tour-step-5-main-content" className={`${styles.mainScrollArea} bg-gray-50`}>
+                    <div id="tour-main-content" className={`${styles.mainScrollArea} bg-gray-50`}>
                         {loadingResumes || !isDataValid ? (
                              <div className="flex justify-content-center align-items-center h-full">
                                 <ProgressSpinner style={{ width: '50px', height: '50px' }} strokeWidth="4" />
