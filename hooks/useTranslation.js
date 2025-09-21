@@ -8,16 +8,16 @@ const translations = {
     en: require('../locales/en.json'),
     tr: require('../locales/tr.json'),
     ar: require('../locales/ar.json'),
-    // Add these when you create the files
-    fr: require('../locales/fr.json')
-    // es: require('../locales/es.json'),
+    fr: require('../locales/fr.json'),
+    es: require('../locales/es.json'),
+    de: require('../locales/de.json'),
 };
 
 // RTL languages
 const rtlLanguages = ['ar', 'he', 'fa', 'ur'];
 
 // Supported locales (match what you have in translations)
-const supportedLocales = ['en', 'tr', 'ar', 'fr'];
+const supportedLocales = ['en', 'tr', 'ar', 'fr', 'es', 'de'];
 
 export function useTranslation() {
     const pathname = usePathname();
