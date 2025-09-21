@@ -98,7 +98,8 @@ const HeroSection = () => {
                     </motion.div>
                 </motion.div>
 
-                    <HeroGallery />
+                {/* The HeroGallery should be a direct child of the container, alongside heroContent */}
+                <HeroGallery isRTL={isRTL} />
             </div>
         </section>
     );

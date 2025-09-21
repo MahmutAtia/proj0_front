@@ -1,122 +1,97 @@
 "use client";
-import React, { useState } from 'react'; // Import useState
-import { motion, AnimatePresence } from 'framer-motion'; // Import AnimatePresence
+import React, { useState } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
 import styles from '../styles/HeroGallery.module.css';
-import PreviewModal from './PreviewModal'; // Import the new modal
+import PreviewModal from './PreviewModal';
 
-// --- Enhanced Data for our gallery items ---
+// Data remains the same
 const portfolios = [
-    { 
-        // New: Placeholder that supports GIF format with custom text.
-        src: '/images/john-1-high.gif',
-        alt: 'Animated portfolio preview', 
-        type: 'iframe', 
-        // New: A safe, publicly-accessible URL designed for iframe testing.
-        url: '/site/mohamed-attia/'
-    },
-    { 
-        // New: Placeholder for a static PNG image with custom text.
-        src: '/images/john-2-high.gif',
-        alt: 'Animated portfolio preview',
-        type: 'iframe',
-        // New: A safe, publicly-accessible URL designed for iframe testing.
-        url: '/site/mohamed-attia-20/'
-    },
-        { 
-        // New: Placeholder for a static PNG image with custom text.
-        src: '/images/john-3-high.gif',
-        alt: 'Animated portfolio preview',
-        type: 'iframe',
-        // New: A safe, publicly-accessible URL designed for iframe testing.
-        url: '/site/mohamed-attia-21/'
-    },
-        { 
-        // New: Placeholder for a static PNG image with custom text.
-        src: '/images/john-4-high.gif',
-        alt: 'Animated portfolio preview 4',
-        type: 'iframe',
-        // New: A safe, publicly-accessible URL designed for iframe testing.
-        url: '/site/mohamed-attia-22/'
-    },
-        { 
-        // New: Placeholder for a static PNG image with custom text.
-        src: '/images/john-5-high.gif',
-        alt: 'Animated portfolio preview 5',
-        type: 'iframe',
-        // New: A safe, publicly-accessible URL designed for iframe testing.
-        url: '/site/mohamed-attia-23/'
-    },
+    { src: '/images/john-1-high.gif', alt: 'Animated portfolio preview', type: 'iframe', url: '/site/mohamed-attia/' },
+    { src: '/images/john-2-high.gif', alt: 'Animated portfolio preview', type: 'iframe', url: '/site/mohamed-attia-20/' },
+    { src: '/images/john-3-high.gif', alt: 'Animated portfolio preview', type: 'iframe', url: '/site/mohamed-attia-21/' },
+    { src: '/images/john-4-high.gif', alt: 'Animated portfolio preview 4', type: 'iframe', url: '/site/mohamed-attia-22/' },
+    { src: '/images/john-5-high.gif', alt: 'Animated portfolio preview 5', type: 'iframe', url: '/site/mohamed-attia-23/' },
 ];
-
 const resumes = [
-    // New: Using Picsum with new 'seeds' and dimensions (600x800) for consistent, portrait-style resume mockups.
     { src: 'https://picsum.photos/seed/new-resume-1/600/800', alt: 'ATS-friendly resume template', type: 'image' },
     { src: 'https://picsum.photos/seed/new-resume-2/600/800', alt: 'Modern resume design', type: 'image' },
     { src: 'https://picsum.photos/seed/new-resume-3/600/800', alt: 'Creative resume layout', type: 'image' },
 ];
-
 const documents = [
-    // Updated: Using Picsum with new 'seeds' to ensure unique images for documents (600x850 ratio retained).
     { src: 'https://picsum.photos/seed/new-doc-1/600/850', alt: 'Professional cover letter', type: 'image' },
     { src: 'https://picsum.photos/seed/new-doc-2/600/850', alt: 'Recommendation letter format', type: 'image' },
     { src: 'https://picsum.photos/seed/new-doc-3/600/850', alt: 'Clean cover letter example', type: 'image' },
 ];
-// --- UPDATE GalleryCard Component ---
-// It now needs an onClick prop
+
 const GalleryCard = ({ src, alt, onClick, type }) => (
     <div className={`${styles.card} ${styles[type]}`} onClick={onClick}>
         <img src={src} alt={alt} loading="lazy" className={styles.cardImage} />
     </div>
 );
 
-// --- UPDATE GalleryColumn Component ---
-// It needs to pass down the onClick handler
-const GalleryColumn = ({ items, animationDuration, onCardClick }) => (
-    <div className={styles.column}>
-        <div className={styles.scrollWrapper} style={{ '--duration': `${animationDuration}s` }}>
+// --- UPDATED: Now accepts a className prop ---
+const GalleryRow = ({ items, animationDuration, onCardClick, className = '', isRTL }) => (
+    <div className={`${styles.galleryRow} ${className}`}>
+        <div 
+            className={`${styles.scrollWrapper} ${isRTL ? styles.scrollWrapperRTL : ''}`} 
+            style={{ '--duration': `${animationDuration}s` }}
+        >
             {[...items, ...items].map((item, index) => (
-    <GalleryCard 
-        key={index} 
-        src={item.src} 
-        alt={item.alt} 
-        type={item.type} // <-- ADD THIS PROP
-        onClick={() => onCardClick(item)} 
-    />
+                <GalleryCard
+                    key={`item-${index}`}
+                    src={item.src}
+                    alt={item.alt}
+                    type={item.type}
+                    onClick={() => onCardClick(item)}
+                />
             ))}
         </div>
     </div>
 );
 
-// --- UPDATE THE MAIN HeroGallery COMPONENT ---
-const HeroGallery = () => {
+const HeroGallery = ({ isRTL }) => {
     const [selectedItem, setSelectedItem] = useState(null);
 
-    const handleCardClick = (item) => {
-        setSelectedItem(item);
-    };
-
-    const handleCloseModal = () => {
-        setSelectedItem(null);
-    };
+    const handleCardClick = (item) => setSelectedItem(item);
+    const handleCloseModal = () => setSelectedItem(null);
 
     return (
         <>
-            <motion.div 
+            <motion.div
                 className={styles.galleryContainer}
-                initial={{ opacity: 0, scale: 0.95 }}
-                animate={{ opacity: 1, scale: 1 }}
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.7, delay: 0.4, ease: 'easeOut' }}
             >
-                <GalleryColumn items={portfolios} animationDuration={40} onCardClick={handleCardClick} />
-                <GalleryColumn items={resumes} animationDuration={60} onCardClick={handleCardClick} />
-                <GalleryColumn items={documents} animationDuration={45} onCardClick={handleCardClick} />
-                <div className={styles.overlay}></div>
+                {/* --- UPDATED: Faster animation durations --- */}
+                <GalleryRow 
+                    items={portfolios} 
+                    /* CHANGED: Faster duration */
+                    animationDuration={40} 
+                    onCardClick={handleCardClick}
+                    className={styles.portfolioRow} 
+                    isRTL={isRTL}
+                />
+                <GalleryRow 
+                    items={resumes} 
+                    /* CHANGED: Faster duration */
+                    animationDuration={65} 
+                    onCardClick={handleCardClick}
+                    className={styles.documentRow} 
+                    isRTL={isRTL}
+                />
+                <GalleryRow 
+                    items={documents} 
+                    /* CHANGED: Faster duration */
+                    animationDuration={50} 
+                    onCardClick={handleCardClick}
+                    className={styles.documentRow} 
+                    isRTL={isRTL}
+                />
             </motion.div>
 
             <AnimatePresence>
-                {selectedItem && (
-                    <PreviewModal item={selectedItem} onClose={handleCloseModal} />
-                )}
+                {selectedItem && <PreviewModal item={selectedItem} onClose={handleCloseModal} />}
             </AnimatePresence>
         </>
     );

@@ -186,3 +186,26 @@
     margin-left: 0;
     margin-right: 0.5em;
 }
+@media (min-width: 1024px) {
+    .heroContainer {
+        /* CHANGED: Flipped the ratio to give the right column more space */
+        grid-template-columns: 0.9fr 1.1fr; 
+        gap: 4rem;
+    }
+    .heroContent {
+        text-align: left;
+    }
+    .heroSubtitle,
+    .heroParagraph {
+        margin-left: 0;
+        margin-right: 0;
+    }
+    .heroActions {
+        justify-content: flex-start;
+    }
+   .heroImageContainer {
+       display: flex;
+       justify-content: center;
+       align-items: center;
+    }
+}
