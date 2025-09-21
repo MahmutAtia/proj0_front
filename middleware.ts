@@ -9,8 +9,14 @@ const defaultLocale = 'en';
 const publicPaths = ['/login', '/api/auth'];
 
 // Protected paths that need authentication
-const protectedPaths = ['/main', '/editor', '/test', '/resume', '/(protected)'];
-
+const protectedPaths = [
+  '/main',
+  '/editor',
+  '/resume',
+  'site-editor*',
+  'document-editor*',
+];
+  
 // Helper function to get locale from pathname
 function getLocaleFromPathname(pathname: string) {
   const segments = pathname.split('/');
