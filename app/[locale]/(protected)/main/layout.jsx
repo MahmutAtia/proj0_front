@@ -402,7 +402,7 @@ export default function Layout({ children }) {
                     <SidebarLogo collapsed={sidebarCollapsed} />
 
                     {/* Scrollable sidebar nav area */}
-                    <div id="tour-step-4-main-nav" className={`${styles.sidebarNavContainer} ${styles.sidebarScrollbar}`}>
+                    <div className={`${styles.sidebarNavContainer} ${styles.sidebarScrollbar}`}>
                         <SidebarNav
                             items={getSidebarNavItems(defaultResume)}
                             currentPath={router.pathname}
