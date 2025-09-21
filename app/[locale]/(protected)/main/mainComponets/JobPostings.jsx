@@ -8,7 +8,7 @@ import styles from '../Dashboard.module.css';
 // The hook now comes from the context, and the utility function from the hook file.
 import { useJobService } from '@/contexts/JobServiceContext';
 import { filterJobs } from '@/hooks/useJobService';
-import { useTranslation } from '../../../../hooks/useTranslation';
+import { useTranslation } from '@/hooks/useTranslation';
 
 const JobPostings = ({ router }) => {
     const { t } = useTranslation();
