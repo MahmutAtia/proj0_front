@@ -255,64 +255,6 @@ export default function Layout({ children }) {
     }, [session, status, t, router]); // Added router to dependency array
 
 
-    // --- Joyride Effects and Handlers ---
-    useEffect(() => {
-        // Define steps inside useEffect to use the 't' function for translation
-        const steps = [
-            {
-                target: 'body',
-                content: t('onboarding.step1_welcome'),
-                placement: 'center',
-                title: t('onboarding.welcome_title'),
-            },
-            {
-                target: '#tour-step-2-sidebar-toggle',
-                content: t('onboarding.step2_sidebar'),
-                placement: 'bottom',
-                title: t('onboarding.sidebar_title'),
-            },
-            {
-                target: '#tour-step-3-topbar-actions',
-                content: t('onboarding.step3_topbar'),
-                placement: 'bottom',
-                title: t('onboarding.quick_actions_title'),
-            },
-            {
-                target: '#tour-step-4-main-nav',
-                content: t('onboarding.step4_navigation'),
-                placement: 'right',
-                title: t('onboarding.navigation_title'),
-            },
-            {
-                target: '#tour-step-5-main-content',
-                content: t('onboarding.step5_main_content'),
-                placement: 'top',
-                title: t('onboarding.main_content_title'),
-            },
-        ];
-        setTourSteps(steps);
-
-        // Check if the tour has been completed before
-        const tourCompleted = localStorage.getItem('onboardingTourCompleted');
-        if (tourCompleted !== 'true') {
-            // Use a timeout to ensure the UI has rendered before starting the tour
-            setTimeout(() => {
-                setRunTour(true);
-            }, 1500);
-        }
-    }, [t]);
-
-    // const handleJoyrideCallback = (data) => {
-    //     const { status } = data;
-    //     const finishedStatuses = [STATUS.FINISHED, STATUS.SKIPPED];
-
-    //     if (finishedStatuses.includes(status)) {
-    //         setRunTour(false);
-    //         localStorage.setItem('onboardingTourCompleted', 'true');
-    //     }
-    // };
-
-
     // Effect to handle clicks outside the mobile sidebar to close it
     useEffect(() => {
         const handleClickOutside = (event) => {
@@ -444,33 +386,6 @@ export default function Layout({ children }) {
 
     return (
         <DashboardContext.Provider value={contextValue}>
-            {/* <Joyride
-                callback={handleJoyrideCallback}
-                continuous
-                run={runTour}
-                scrollToFirstStep
-                showProgress
-                showSkipButton
-                steps={tourSteps}
-                styles={{
-                    options: {
-                        arrowColor: '#fff',
-                        backgroundColor: '#fff',
-                        primaryColor: '#8B5CF6', // A purple that matches your theme
-                        textColor: '#333',
-                        zIndex: 10000,
-                    },
-                    tooltip: {
-                        borderRadius: '8px',
-                    },
-                    buttonNext: {
-                        borderRadius: '6px',
-                    },
-                    buttonBack: {
-                        marginRight: 'auto',
-                    }
-                }}
-            /> */}
             <div className={`${styles.dashboardLayout} bg-primary-50`}>
                 <Toast ref={toast} />
 
