@@ -67,7 +67,7 @@ const ActionCard = ({ title, icon, description, onClick, route, buttonLabel }) =
 };
 
 const QuickActionsGrid = ({ actions }) => ( // Removed router prop as ActionCard handles its own routing/onClick
-    <div className="grid mb-5">
+    <div id="tour-quick-actions" className="grid mb-5">
         {actions.map(action => (
             <div key={action.title} className="col-12 md:col-6 lg:col-3 p-2"> {/* Adjusted padding */}
                 <ActionCard {...action} />

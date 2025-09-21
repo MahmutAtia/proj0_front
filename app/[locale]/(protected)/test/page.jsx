@@ -1,92 +1,90 @@
 'use client';
-import { Button } from 'primereact/button';
-import { Card } from 'primereact/card';
-// import { Chart } from 'primereact/chart';
-import { DataTable } from 'primereact/datatable';
-import { Column } from 'primereact/column';
-import { useState, useEffect } from 'react';
+import { driver } from "driver.js";
+import "driver.js/dist/driver.css";
 
-export default function TestPage() {
-    const [chartData, setChartData] = useState({});
-    const [products] = useState([
-        { id: 1, name: 'Product A', price: 100, status: 'In Stock' },
-        { id: 2, name: 'Product B', price: 200, status: 'Low Stock' },
-        { id: 3, name: 'Product C', price: 300, status: 'Out of Stock' }
-    ]);
+export default function Page() {
+  const startTour = () => {
+    const driverObj = driver({
+      showProgress: true,
+      steps: [
+        {
+          element: '#tour-example',
+          popover: {
+            title: 'Animated Tour Example',
+            description: 'Here is the code example showing animated tour. Let\'s walk you through it.',
+            side: "left",
+            align: 'start'
+          }
+        },
+        {
+          element: 'code .line:nth-child(1)',
+          popover: {
+            title: 'Import the Library',
+            description: 'It works the same in vanilla JavaScript as well as frameworks.',
+            side: "bottom",
+            align: 'start'
+          }
+        },
+        {
+          element: 'code .line:nth-child(2)',
+          popover: {
+            title: 'Importing CSS',
+            description: 'Import the CSS which gives you the default styling for popover and overlay.',
+            side: "bottom",
+            align: 'start'
+          }
+        },
+        {
+          element: 'code .line:nth-child(4) span:nth-child(7)',
+          popover: {
+            title: 'Create Driver',
+            description: 'Simply call the driver function to create a driver.js instance',
+            side: "left",
+            align: 'start'
+          }
+        },
+        {
+          element: 'code .line:nth-child(18)',
+          popover: {
+            title: 'Start Tour',
+            description: 'Call the drive method to start the tour and your tour will be started.',
+            side: "top",
+            align: 'start'
+          }
+        },
+        {
+          element: 'a[href="/docs/configuration"]',
+          popover: {
+            title: 'More Configuration',
+            description: 'Look at this page for all the configuration options you can pass.',
+            side: "right",
+            align: 'start'
+          }
+        },
+        {
+          popover: {
+            title: 'Happy Coding',
+            description: 'And that is all, go ahead and start adding tours to your applications.'
+          }
+        }
+      ]
+    });
 
-    useEffect(() => {
-        setChartData({
-            labels: ['January', 'February', 'March'],
-            datasets: [
-                {
-                    label: 'Sales',
-                    data: [65, 59, 80],
-                    fill: false,
-                    borderColor: '#4B0082',
-                    tension: 0.4
-                }
-            ]
-        });
-    }, []);
+    driverObj.drive();
+  };
 
-    return (
-        <div className="min-h-screen">
-            <div className="grid">
-                {/* Header Section */}
-                <div className="col-12 mb-4">
-                    <Card className="shadow-4 transform transition-all hover:scale-[1.01]">
-                        <h1 className="text-4xl font-bold text-primary mb-4">Dashboard Overview</h1>
-                        <p className="text-lg text-700">Welcome to your awesome test component!</p>
-                    </Card>
-                </div>
-
-                {/* Stats Cards */}
-                <div className="col-12 md:col-6 lg:col-3 mb-4">
-                    <Card className="bg-blue-50 shadow-4 transform transition-all hover:scale-[1.02]">
-                        <div className="flex align-items-center">
-                            <i className="pi pi-shopping-cart text-4xl text-blue-500 mr-3"></i>
-                            <div>
-                                <span className="block text-900 font-medium mb-1">Orders</span>
-                                <span className="text-2xl font-bold">152</span>
-                            </div>
-                        </div>
-                    </Card>
-                </div>
-
-                {/* Chart Section */}
-                <div className="col-12 md:col-6 mb-4">
-                    <Card className="shadow-4">
-                        <h3 className="text-xl font-semibold mb-3">Sales Overview</h3>
-                        {/* {chartData.datasets && <Chart type="line" data={chartData} />} */}
-                    </Card>
-                </div>
-
-                {/* Table Section */}
-                <div className="col-12 mb-4">
-                    <Card className="shadow-4">
-                        <DataTable
-                            value={products}
-                            paginator
-                            rows={5}
-                            className="p-datatable-gridlines"
-                            showGridlines
-                            stripedRows
-                        >
-                            <Column field="id" header="ID" sortable></Column>
-                            <Column field="name" header="Name" sortable></Column>
-                            <Column field="price" header="Price" sortable body={(rowData) => `$${rowData.price}`}></Column>
-                            <Column field="status" header="Status" sortable></Column>
-                        </DataTable>
-                    </Card>
-                </div>
-
-                {/* Action Buttons */}
-                <div className="col-12 flex gap-3 justify-content-center">
-                    <Button label="Add New" icon="pi pi-plus" className="p-button-raised p-button-success" />
-                    <Button label="Export" icon="pi pi-download" className="p-button-raised p-button-info" />
-                    <Button label="Delete" icon="pi pi-trash" className="p-button-raised p-button-danger" />
-                </div>
-            </div>
-        </div>
-    );
+  return (
+    <div id="tour-example" className="p-4 border border-dashed rounded-lg">
+      <h1 className="text-2xl font-bold mb-4">Driver.js Tour Example</h1>
+      <p className="mb-4">
+        This is an example of how to use Driver.js in a React application.
+      </p>
+      <button
+        onClick={startTour}
+        className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition"
+      >
+        Start Tour
+      </button>
+    </div>
+  );
 }
