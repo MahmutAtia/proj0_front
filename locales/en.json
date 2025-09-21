@@ -35,7 +35,8 @@
         "noDescription": "No description available",
         "defaultTag": "Default",
         "updated": "Updated: {date}",
-        "documentsCount": "{count} document(s)"
+        "documentsCount": "{count} document(s)",
+        "setAsDefault": "Set as Default"
     },
     "errors": {
         "userNotAuthenticated": "User not authenticated.",
@@ -271,6 +272,10 @@
         },
         "dialog": {
             "resumeIdLabel": "Resume ID: {id}"
+        },
+        "scholarships": {
+            "title": "Scholarship Opportunities",
+            "description": "We are working hard to bring you scholarship opportunities. Stay tuned!"
         }
     },
     "dashboard_layout": {
@@ -298,6 +303,19 @@
         "toast": {
             "setDefault": "Resume set as default.",
             "unsetDefault": "Resume unset as default."
+        },
+        "notifications": {
+            "title": "Notifications",
+            "noNotifications": "No notifications at the moment",
+            "empty": "All caught up!",
+            "active": "Active",
+            "completed": "Completed",
+            "tooltipTitle": "Show notifications",
+            "clearAll": "Clear All",
+            "processing": "Processing...",
+            "recent": "Recent",
+            "viewResult": "View Result",
+            "opening": "Opening..."
         }
     },
     "login": {
@@ -328,6 +346,7 @@
         "fetching": "Fetching jobs...",
         "searchStarted": "Search Started",
         "searchStartedDetail": "Refreshing jobs based on your criteria...",
+        "showingJobs": "{filtered} / {total} total",
         "autoUpdate": {
             "status": "Auto-Update Status",
             "active": "Active",

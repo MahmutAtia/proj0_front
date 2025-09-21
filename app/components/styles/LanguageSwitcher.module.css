@@ -131,3 +131,18 @@
     font-size: 1.2em;
     vertical-align: middle;
 }
+
+/* spacing logic */
+.flagLTR {
+  margin-right: 0.5rem;
+}
+.flagRTL {
+  margin-left: 0.5rem;
+}
+
+.nameLTR {
+  text-align: left;
+}
+.nameRTL {
+  text-align: right;
+}

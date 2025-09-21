@@ -5,8 +5,10 @@ import { ProgressSpinner } from 'primereact/progressspinner';
 import styles from '../Dashboard.module.css';
 import useUserLocation from '../../../../hooks/useUserLocation'; // Adjust path as needed
 import { FiAward } from 'react-icons/fi';
+import { useTranslation } from '../../../../hooks/useTranslation';
 
 const ScholarshipList = ({ router }) => {
+    const { t, isRTL } = useTranslation();
     const [scholarships, setScholarships] = useState([]);
     const [loadingScholarships, setLoadingScholarships] = useState(true); // Renamed for clarity
     const [scholarshipsError, setScholarshipsError] = useState(null); // Renamed for clarity
@@ -14,40 +16,44 @@ const ScholarshipList = ({ router }) => {
     // Use the custom hook for location
     const { location, loadingLocation, locationError, refetchLocation } = useUserLocation();
 
-    const fetchScholarships = useCallback(async (loc) => {
-        setLoadingScholarships(true);
-        setScholarshipsError(null); // Clear previous scholarship-specific errors
+    const fetchScholarships = useCallback(
+        async (loc) => {
+            setLoadingScholarships(true);
+            setScholarshipsError(null); // Clear previous scholarship-specific errors
 
-        const targetCountry = loc?.country;
-        const targetCity = loc?.city;
+            const targetCountry = loc?.country;
+            const targetCity = loc?.city;
 
-        // Simulate API call
-        console.log(`Simulating fetchScholarships for: ${targetCity}, ${targetCountry}`);
-        setTimeout(() => {
-            // Replace this with your actual API call
-            const mockScholarships = [
-                { id: 1, title: "Future Leaders Scholarship", provider: "Education Foundation", deadline: "2025-08-01" },
-                { id: 2, title: "Tech Innovators Grant", provider: "Science & Tech Fund", deadline: "2025-09-15" },
-            ];
+            // Simulate API call
+            console.log(`Simulating fetchScholarships for: ${targetCity}, ${targetCountry}`);
+            setTimeout(() => {
+                // Replace this with your actual API call
+                const mockScholarships = [
+                    { id: 1, title: 'Future Leaders Scholarship', provider: 'Education Foundation', deadline: '2025-08-01' },
+                    { id: 2, title: 'Tech Innovators Grant', provider: 'Science & Tech Fund', deadline: '2025-09-15' }
+                ];
 
-            if (targetCountry && targetCity) {
-                console.log(`Fetching scholarships for location: ${targetCountry}, ${targetCity}`);
-                // You can send country and city to your API here
-            } else if (locationError) {
-                console.log("Location could not be determined. Fetching default scholarships.");
-            } else {
-                console.log("Fetching default scholarships (location data might still be loading or unavailable).");
-            }
+                if (targetCountry && targetCity) {
+                    console.log(`Fetching scholarships for location: ${targetCountry}, ${targetCity}`);
+                    // You can send country and city to your API here
+                } else if (locationError) {
+                    console.log('Location could not be determined. Fetching default scholarships.');
+                } else {
+                    console.log('Fetching default scholarships (location data might still be loading or unavailable).');
+                }
 
-            setScholarships(mockScholarships);
-            setLoadingScholarships(false);
-        }, 1000); // Reduced timeout
-    }, [locationError]); // locationError is a dependency if your fallback logic depends on it.
+                setScholarships(mockScholarships);
+                setLoadingScholarships(false);
+            }, 1000); // Reduced timeout
+        },
+        [locationError]
+    ); // locationError is a dependency if your fallback logic depends on it.
 
     useEffect(() => {
         // Location is fetched by the useUserLocation hook automatically on mount.
         // We wait for the location data (or error) before fetching scholarships.
-        if (!loadingLocation) { // Only proceed if location fetching is complete
+        if (!loadingLocation) {
+            // Only proceed if location fetching is complete
             if (location && location.country && !locationError) {
                 fetchScholarships(location);
             } else {
@@ -66,22 +72,32 @@ const ScholarshipList = ({ router }) => {
     return (
         <Card className={`${styles.dashboardCard} h-full`}>
             <div className="flex justify-content-between align-items-center mb-3">
-                <h3 className="text-xl font-bold m-0">Scholarship Opportunities</h3>
+                <h3 className="text-xl font-bold m-0">{t('dashboard_main.scholarships.title')}</h3>
                 {/* Optional: Add a button to refetch location if needed */}
                 {/* {locationError && <Button label="Retry Location" onClick={refetchLocation} className="p-button-sm p-button-warning" />} */}
                 <Button
-                    label="View All"
-                    icon="pi pi-arrow-right"
-                    iconPos="right"
+                    label={
+                        <span
+                            style={{
+                                marginLeft: isRTL ? '0.5rem' : 0,
+                                marginRight: !isRTL ? '0.5rem' : 0
+                            }}
+                        >
+                            {t('common.viewAll')}
+                        </span>
+                    }
+                    icon={isRTL ? 'pi pi-arrow-left' : 'pi pi-arrow-right'}
+                    iconPos={isRTL ? 'right' : 'right'}
                     className="p-button-text p-button-sm"
                     onClick={() => router.push('/main/scholarship-feed')}
                     disabled // Disable button until feature is ready
+                    style={{ whiteSpace: 'nowrap' }}
                 />
             </div>
             <div className="flex flex-column justify-content-center align-items-center h-full text-center text-color-secondary p-4">
                 <FiAward size="48" className="mb-3" />
                 <h4 className="font-bold">Coming Soon!</h4>
-                <p>We are working hard to bring you scholarship opportunities. Stay tuned!</p>
+                <p>{t('dashboard_main.scholarships.description')}</p>
             </div>
         </Card>
     );

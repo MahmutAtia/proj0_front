@@ -1,4 +1,4 @@
-"use client";
+'use client';
 
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
@@ -21,7 +21,7 @@ import { useTranslation } from '@/hooks/useTranslation';
 
 async function fetchAndCacheResumes(session) {
     if (!process.env.NEXT_PUBLIC_BACKEND_URL) {
-        throw new Error("Backend URL (NEXT_PUBLIC_BACKEND_URL) is not configured.");
+        throw new Error('Backend URL (NEXT_PUBLIC_BACKEND_URL) is not configured.');
     }
     const headers = { 'Content-Type': 'application/json' };
     if (session?.accessToken) {
@@ -34,8 +34,8 @@ async function fetchAndCacheResumes(session) {
         setResumesCache(response.data);
         return response.data;
     } else {
-        console.error("Invalid data format received from backend. Expected an array.", response.data);
-        throw new Error("Invalid data format received from backend.");
+        console.error('Invalid data format received from backend. Expected an array.', response.data);
+        throw new Error('Invalid data format received from backend.');
     }
 }
 
@@ -56,55 +56,58 @@ const ResumeListPage = () => {
     const router = useRouter();
     const { data: session, status: sessionStatus } = useSession();
 
-    const loadResumes = useCallback(async (forceRefresh = false) => {
-        if (sessionStatus === 'loading') return;
-        if (!session) {
-            setError(t('errors.userNotAuthenticated'));
-            setLoading(false);
-            router.push('/login');
-            return;
-        }
-
-        setLoading(true);
-        setError(null);
-
-        try {
-            let data = forceRefresh ? null : await getResumesFromCache();
-            if (!data) {
-                data = await fetchAndCacheResumes(session);
+    const loadResumes = useCallback(
+        async (forceRefresh = false) => {
+            if (sessionStatus === 'loading') return;
+            if (!session) {
+                setError(t('errors.userNotAuthenticated'));
+                setLoading(false);
+                router.push('/login');
+                return;
             }
-            setResumes(data || []);
-        } catch (err) {
-            console.error("Failed to fetch resumes:", err);
-            let detail = t('errors.couldNotLoadResumes');
 
-            if (err.message === "Backend URL (NEXT_PUBLIC_BACKEND_URL) is not configured.") {
-                detail = t('errors.backendUrlNotConfigured');
-            } else if (err.code === 'ECONNABORTED') {
-                detail = t('errors.requestTimeout');
-            } else if (err.response) {
-                detail = t('errors.serverError', {
-                    status: err.response.status,
-                    message: err.response.data?.message || err.response.statusText || t('errors.unexpectedError')
+            setLoading(true);
+            setError(null);
+
+            try {
+                let data = forceRefresh ? null : await getResumesFromCache();
+                if (!data) {
+                    data = await fetchAndCacheResumes(session);
+                }
+                setResumes(data || []);
+            } catch (err) {
+                console.error('Failed to fetch resumes:', err);
+                let detail = t('errors.couldNotLoadResumes');
+
+                if (err.message === 'Backend URL (NEXT_PUBLIC_BACKEND_URL) is not configured.') {
+                    detail = t('errors.backendUrlNotConfigured');
+                } else if (err.code === 'ECONNABORTED') {
+                    detail = t('errors.requestTimeout');
+                } else if (err.response) {
+                    detail = t('errors.serverError', {
+                        status: err.response.status,
+                        message: err.response.data?.message || err.response.statusText || t('errors.unexpectedError')
+                    });
+                } else if (err.request) {
+                    detail = t('errors.noResponse');
+                } else {
+                    detail = err.message || t('errors.unexpectedError');
+                }
+
+                setError(detail);
+                toast.current?.show({
+                    severity: 'error',
+                    summary: t('resumes.failedToLoad'),
+                    detail: detail,
+                    life: 7000
                 });
-            } else if (err.request) {
-                detail = t('errors.noResponse');
-            } else {
-                detail = err.message || t('errors.unexpectedError');
+                setResumes([]);
+            } finally {
+                setLoading(false);
             }
-
-            setError(detail);
-            toast.current?.show({
-                severity: 'error',
-                summary: t('resumes.failedToLoad'),
-                detail: detail,
-                life: 7000
-            });
-            setResumes([]);
-        } finally {
-            setLoading(false);
-        }
-    }, [session, sessionStatus, router, t]);
+        },
+        [session, sessionStatus, router, t]
+    );
 
     useEffect(() => {
         loadResumes();
@@ -115,13 +118,13 @@ const ResumeListPage = () => {
             const response = await api.patch(`/api/resumes/${resumeId}/`, data);
             const updatedResume = response.data;
 
-            setResumes(prevResumes => {
+            setResumes((prevResumes) => {
                 const newResumes = [...prevResumes];
-                const updatedIndex = newResumes.findIndex(r => r.id === updatedResume.id);
+                const updatedIndex = newResumes.findIndex((r) => r.id === updatedResume.id);
 
                 // If setting a new default, find the old one and update it.
                 if (updatedResume.is_default) {
-                    const oldDefaultIndex = newResumes.findIndex(r => r.is_default && r.id !== updatedResume.id);
+                    const oldDefaultIndex = newResumes.findIndex((r) => r.is_default && r.id !== updatedResume.id);
                     if (oldDefaultIndex > -1) {
                         newResumes[oldDefaultIndex] = { ...newResumes[oldDefaultIndex], is_default: false };
                     }
@@ -143,7 +146,7 @@ const ResumeListPage = () => {
             toast.current.show({ severity: 'success', summary: t('common.success'), detail: t('resumes.resumeUpdatedSuccessfully'), life: 3000 });
             return true;
         } catch (err) {
-            console.error("Failed to update resume:", err);
+            console.error('Failed to update resume:', err);
             toast.current.show({ severity: 'error', summary: t('common.error'), detail: t('errors.failedToUpdateResume'), life: 5000 });
             return false;
         }
@@ -162,19 +165,19 @@ const ResumeListPage = () => {
             acceptClassName: 'p-button-danger',
             acceptLabel: t('common.delete'),
             rejectLabel: t('common.cancel'),
-            accept: () => handleDeleteResume(resume.id),
+            accept: () => handleDeleteResume(resume.id)
         });
     };
 
     const handleDeleteResume = async (resumeId) => {
         try {
             await api.delete(`/api/resumes/${resumeId}/`);
-            const updatedResumes = resumes.filter(r => r.id !== resumeId);
+            const updatedResumes = resumes.filter((r) => r.id !== resumeId);
             setResumes(updatedResumes);
             setResumesCache(updatedResumes); // Update the cache
             toast.current.show({ severity: 'success', summary: t('common.success'), detail: t('resumes.resumeDeletedSuccessfully'), life: 3000 });
         } catch (err) {
-            console.error("Failed to delete resume:", err);
+            console.error('Failed to delete resume:', err);
             toast.current.show({ severity: 'error', summary: t('common.error'), detail: t('errors.failedToDeleteResume'), life: 5000 });
         }
     };
@@ -187,7 +190,7 @@ const ResumeListPage = () => {
             acceptClassName: 'p-button-primary',
             acceptLabel: t('common.yes'),
             rejectLabel: t('common.no'),
-            accept: () => handleSetDefault(resume),
+            accept: () => handleSetDefault(resume)
         });
     };
 
@@ -214,7 +217,6 @@ const ResumeListPage = () => {
         }
     };
 
-
     const handleViewEditResume = (resume) => {
         router.push(`/editor/${resume.id}`);
     };
@@ -225,7 +227,7 @@ const ResumeListPage = () => {
     };
 
     const documentTypeDisplay = (type) => {
-        return type.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
+        return type.replace(/_/g, ' ').replace(/\b\w/g, (l) => l.toUpperCase());
     };
 
     const openDocumentsDialog = (resume) => {
@@ -255,125 +257,151 @@ const ResumeListPage = () => {
         const displayDate = resume.updated_at || resume.created_at;
         const documents = resume.generated_documents_data || [];
 
-
         const renderResumeIcon = (resumeData) => {
             // This function now expects `resumeData.icon` to be a PrimeIcon class string (e.g., "pi pi-user").
             // If the string is missing or empty, it falls back to a default React Icon component.
-            const iconClass = resumeData.icon && resumeData.icon.trim() !== "" ? resumeData.icon : null;
+            const iconClass = resumeData.icon && resumeData.icon.trim() !== '' ? resumeData.icon : null;
 
             if (iconClass) {
                 // This will correctly render a PrimeIcon.
                 return <i className={`${iconClass} text-3xl text-primary-600`}></i>;
             }
-            
+
             // Default fallback icon using React Icons
             return <FiFileText className="text-3xl text-primary-600" />;
         };
 
-            return (
-                <div className="col-12 sm:col-6 md:col-4 xl:col-3 p-2">
-                    <div className="p-4 surface-card shadow-2 border-1 surface-border border-round-2xl h-full flex flex-column justify-content-between hover:shadow-4 transition-all transition-duration-300">
-                        <div onClick={() => handleViewEditResume(resume)} className="cursor-pointer">
-                            <div className="flex justify-content-between align-items-start mb-3">
-                                <div className="flex-shrink-0 flex justify-content-center align-items-center bg-primary-50 border-round" style={{ width: '50px', height: '50px' }}>
-                                    {renderResumeIcon(resume)}
-                                </div>
-
+        return (
+            <div className="col-12 sm:col-6 md:col-4 xl:col-3 p-2">
+                <div className="p-4 surface-card shadow-2 border-1 surface-border border-round-2xl h-full flex flex-column justify-content-between hover:shadow-4 transition-all transition-duration-300">
+                    <div onClick={() => handleViewEditResume(resume)} className="cursor-pointer">
+                        <div className="flex justify-content-between align-items-start mb-3">
+                            {/*                          <div className="flex-shrink-0 flex justify-content-center align-items-center bg-primary-50 border-round" style={{ width: '50px', height: '50px' }}>
+                                {renderResumeIcon(resume)}
                             </div>
-                            <div className="flex flex-column align-items-center gap-2">
-                                {editingResumeId === resume.id ? (
-                                    <div className="flex align-items-center w-full">
-                                        <InputText value={editingTitle} onChange={(e) => setEditingTitle(e.target.value)} autoFocus onClick={e => e.stopPropagation()} className="p-inputtext-sm w-full" />
-                                        <Button icon={<FiCheck />} className="p-button-text p-button-success ml-1" onClick={(e) => { e.stopPropagation(); saveTitle(resume.id); }} />
-                                        <Button icon={<FiX />} className="p-button-text p-button-danger" onClick={(e) => { e.stopPropagation(); cancelEditingTitle(); }} />
-                                    </div>
-                                ) : (
-                                    <div className="flex items-center justify-center gap-2">
-                                        <h4 className="font-semibold text-md mb-0 text-center line-clamp-2" style={{ minHeight: '2.4em' }}>
-                                            {resume.title || t('resumes.untitledResume')}
-                                        </h4>
-                                        <FiEdit2 className="cursor-pointer text-gray-500 hover:text-primary-600 flex-shrink-0" onClick={(e) => startEditingTitle(resume, e)} />
-                                    </div>
-                                )}
-                                {resume.is_default && <Tag severity="contrast" value={t('resumes.defaultTag')} className="mt-1 text-xs p-tag-rounded" icon={<FiStar className={isRTL ? 'ml-1' : 'mr-1'}/>}></Tag>}
-                                <p className="text-xs text-color-secondary mt-1 text-center line-clamp-2" style={{ minHeight: '2.4em' }}>
-                                    {resume.about || t('resumes.noDescription')}
-                                </p>
-                            </div>
-                            <div className="flex flex-column gap-1 text-xs text-center text-color-secondary mt-3">
-                                <div>
-                                    <i className={`pi pi-calendar ${isRTL ? 'ml-1' : 'mr-1'}`}></i>
-                                    {displayDate ? new Date(displayDate).toLocaleDateString() : 'N/A'}
-                                </div>
-                                {documents.length > 0 && (
-                                    <div>
-                                        <FiFileText className={`${isRTL ? 'ml-1' : 'mr-1'} vertical-align-middle`} />
-                                        {t('resumes.documentsCount', { count: documents.length })}
-                                    </div>
-                                )}
-                            </div>
+*/}
                         </div>
-                        <div className="mt-3 flex flex-column gap-2">
-                             <Button
-                                label={t('common.edit')}
-                                icon={<FiEdit className={isRTL ? 'ml-2' : 'mr-2'}/>}
-                                className="p-button-sm p-button-info w-full"
-                                onClick={(e) => { e.stopPropagation(); handleViewEditResume(resume); }}
-                            />
-                            {!resume.is_default && (
-                                <Button
-                                    label={t('resumes.setAsDefault')}
-                                    icon={<FiStar className={isRTL ? 'ml-2' : 'mr-2'}/>}
-                                    className="p-button-sm p-button-secondary p-button-outlined w-full"
-                                    onClick={(e) => { e.stopPropagation(); confirmSetDefault(resume); }}
-                                />
+                        <div className="flex flex-column align-items-center gap-2">
+                            {editingResumeId === resume.id ? (
+                                <div className="flex align-items-center w-full">
+                                    <InputText value={editingTitle} onChange={(e) => setEditingTitle(e.target.value)} autoFocus onClick={(e) => e.stopPropagation()} className="p-inputtext-sm w-full" />
+                                    <Button
+                                        icon={<FiCheck />}
+                                        className="p-button-text p-button-success ml-1"
+                                        onClick={(e) => {
+                                            e.stopPropagation();
+                                            saveTitle(resume.id);
+                                        }}
+                                    />
+                                    <Button
+                                        icon={<FiX />}
+                                        className="p-button-text p-button-danger"
+                                        onClick={(e) => {
+                                            e.stopPropagation();
+                                            cancelEditingTitle();
+                                        }}
+                                    />
+                                </div>
+                            ) : (
+                                <div className="flex items-center justify-center gap-2">
+                                    <h4 className="font-semibold text-md mb-0 text-center line-clamp-2" style={{ minHeight: '2.4em' }}>
+                                        {resume.title || t('resumes.untitledResume')}
+                                    </h4>
+                                    <FiEdit2 className="cursor-pointer text-gray-500 hover:text-primary-600 flex-shrink-0" onClick={(e) => startEditingTitle(resume, e)} />
+                                </div>
                             )}
-                            {resumes.length > 1 && (
-                                <Button
-                                    label={t('common.delete')}
-                                    icon="pi pi-trash"
-                                    className="p-button-sm p-button-danger p-button-outlined w-full"
-                                    onClick={(e) => { e.stopPropagation(); confirmDelete(resume); }}
-                                />
-                            )}
+                            {resume.is_default && <Tag severity="contrast" value={t('resumes.defaultTag')} className="mt-1 text-xs p-tag-rounded" icon={<FiStar className={isRTL ? 'ml-1' : 'mr-1'} />}></Tag>}
+                            <p className="text-xs text-color-secondary mt-1 text-center line-clamp-2" style={{ minHeight: '2.4em' }}>
+                                {resume.about || t('resumes.noDescription')}
+                            </p>
+                        </div>
+                        <div className="flex flex-column gap-1 text-xs text-center text-color-secondary mt-3">
+                            <div>
+                                <i className={`pi pi-calendar ${isRTL ? 'ml-1' : 'mr-1'}`}></i>
+                                {displayDate ? new Date(displayDate).toLocaleDateString() : 'N/A'}
+                            </div>
                             {documents.length > 0 && (
-                                <Button
-                                    label={t('common.documents')}
-                                    icon={<FiFileText />}
-                                    className="p-button-sm p-button-outlined p-button-secondary w-full"
-                                    onClick={(e) => { e.stopPropagation(); openDocumentsDialog(resume); }}
-                                    tooltip={t('resumes.viewDocuments', { count: documents.length })}
-                                />
+                                <div>
+                                    <FiFileText className={`${isRTL ? 'ml-1' : 'mr-1'} vertical-align-middle`} />
+                                    {t('resumes.documentsCount', { count: documents.length })}
+                                </div>
                             )}
                         </div>
                     </div>
+                    <div className="mt-3 flex flex-column gap-2">
+                        <Button
+                            label={t('common.edit')}
+                            icon={<FiEdit className={isRTL ? 'ml-2' : 'mr-2'} />}
+                            className="p-button-sm p-button-info p-button-outlined  w-full"
+                            onClick={(e) => {
+                                e.stopPropagation();
+                                handleViewEditResume(resume);
+                            }}
+                        />
+                        {!resume.is_default && (
+                            <Button
+                                label={t('resumes.setAsDefault')}
+                                icon={<FiStar className={isRTL ? 'ml-2' : 'mr-2'} />}
+                                className="p-button-sm p-button-primary  w-full"
+                                onClick={(e) => {
+                                    e.stopPropagation();
+                                    confirmSetDefault(resume);
+                                }}
+                            />
+                        )}
+                        {resumes.length > 1 && (
+                            <Button
+                                label={t('common.delete')}
+                                icon="pi pi-trash"
+                                className="p-button-sm p-button-danger p-button-outlined w-full"
+                                onClick={(e) => {
+                                    e.stopPropagation();
+                                    confirmDelete(resume);
+                                }}
+                            />
+                        )}
+                        {documents.length > 0 && (
+                            <Button
+                                label={t('common.documents')}
+                                icon={<FiFileText />}
+                                className="p-button-sm p-button-outlined p-button-secondary w-full"
+                                onClick={(e) => {
+                                    e.stopPropagation();
+                                    openDocumentsDialog(resume);
+                                }}
+                                tooltip={t('resumes.viewDocuments', { count: documents.length })}
+                            />
+                        )}
+                    </div>
                 </div>
-            );
-        
+            </div>
+        );
     };
 
     const renderDataViewHeader = () => {
         return (
             <div className="bg-primary-gradient p-4 border-round-top-2xl">
-                <div className={`flex flex-column md:flex-row md:justify-content-between md:align-items-center gap-4 ${isRTL ? 'md:flex-row-reverse' : ''}`}>
-                    <div className={`flex align-items-center ${isRTL ? 'flex-row-reverse' : ''}`}>
+                <div className={`flex flex-column md:flex-row md:justify-content-between md:align-items-center gap-4 ${isRTL ? '' : 'md:flex-row'}`}>
+                    <div className={`flex align-items-center gap-3 ${isRTL ? '' : 'flex-row'}`}>
                         <h1 className="m-0 text-2xl font-bold">{t('resumes.title')}</h1>
                         <Button
-                            icon={<FiPlusSquare className={isRTL ? 'ml-2' : 'mr-2'}/>}
+                            icon={<FiPlusSquare className={isRTL ? 'ml-2' : 'mr-2'} />}
                             label={t('resumes.createNew')}
                             className={`bg-primary text-primary hover:bg-primary-100 border-round-lg px-4 py-2 border-none font-semibold ${isRTL ? 'mr-3' : 'ml-3'}`}
                             onClick={() => setIsCreateDialogVisible(true)}
                         />
                     </div>
-                    <div className="flex align-items-center gap-2">
-                        <div className="p-input-icon-left">
+                    <div className={`flex align-items-center gap-2 ${isRTL ? 'flex-row-reverse' : 'flex-row'}`}>
+                        <div className={`p-input-icon-left ${isRTL ? 'p-input-icon-right' : ''}`}>
                             <i className="pi pi-search" />
                             <InputText
                                 value={globalFilter}
                                 onChange={(e) => setGlobalFilter(e.target.value)}
                                 placeholder={t('resumes.searchPlaceholder')}
-                                className="border-round-lg border-none p-3 pl-5"
-                                style={{minWidth: '200px'}}
+                                className={`border-round-lg border-none p-3 ${isRTL ? 'pr-6' : 'pl-6'}`}
+                                style={{
+                                    minWidth: '200px'
+                                }}
                             />
                         </div>
                         <DataViewLayoutOptions layout={layout} onChange={(e) => setLayout(e.value)} style={{ display: 'none' }} />
@@ -398,7 +426,7 @@ const ResumeListPage = () => {
         return (
             <div className="flex justify-content-center align-items-center" style={{ height: 'calc(100vh - 200px)' }}>
                 <div className="text-center p-5 surface-card border-round shadow-2">
-                    <FiAlertCircle className="text-red-500 text-5xl mb-3"/>
+                    <FiAlertCircle className="text-red-500 text-5xl mb-3" />
                     <h3 className="text-lg font-semibold mb-2">{t('resumes.failedToLoad')}</h3>
                     <p className="text-color-secondary mb-4 text-sm">{error}</p>
                     <Button
@@ -415,13 +443,10 @@ const ResumeListPage = () => {
         );
     }
 
-    const filteredResumes = resumes.filter(resume => {
+    const filteredResumes = resumes.filter((resume) => {
         if (!globalFilter) return true;
         const filter = globalFilter.toLowerCase();
-        return (resume.title?.toLowerCase().includes(filter) ||
-            resume.about?.toLowerCase().includes(filter) ||
-            resume.id?.toString().toLowerCase().includes(filter)
-        );
+        return resume.title?.toLowerCase().includes(filter) || resume.about?.toLowerCase().includes(filter) || resume.id?.toString().toLowerCase().includes(filter);
     });
 
     return (
@@ -459,7 +484,7 @@ const ResumeListPage = () => {
             <CreateResumeFromExistingDialog
                 visible={isCreateDialogVisible}
                 onHide={() => setIsCreateDialogVisible(false)}
-                availableResumes={resumes.map(r => ({ label: r.title || `Resume ID: ${r.id}`, value: r.id }))}
+                availableResumes={resumes.map((r) => ({ label: r.title || `Resume ID: ${r.id}`, value: r.id }))}
                 onSuccess={(newResumeId) => {
                     setIsCreateDialogVisible(false);
                     loadResumes(true);
@@ -485,53 +510,53 @@ const ResumeListPage = () => {
                 }
 
                 /* RTL-specific styles */
-                html[dir="rtl"] .md:flex-row-reverse {
+                html[dir='rtl'] .md:flex-row-reverse {
                     flex-direction: row-reverse;
                 }
 
-                html[dir="rtl"] .flex-row-reverse {
+                html[dir='rtl'] .flex-row-reverse {
                     flex-direction: row-reverse;
                 }
 
-                html[dir="rtl"] .xl:flex-row-reverse {
+                html[dir='rtl'] .xl:flex-row-reverse {
                     flex-direction: row-reverse;
                 }
 
-                html[dir="rtl"] .ml-1 {
+                html[dir='rtl'] .ml-1 {
                     margin-left: 0;
                     margin-right: 0.25rem;
                 }
 
-                html[dir="rtl"] .mr-1 {
+                html[dir='rtl'] .mr-1 {
                     margin-right: 0;
                     margin-left: 0.25rem;
                 }
 
-                html[dir="rtl"] .ml-2 {
+                html[dir='rtl'] .ml-2 {
                     margin-left: 0;
                     margin-right: 0.5rem;
                 }
 
-                html[dir="rtl"] .mr-2 {
+                html[dir='rtl'] .mr-2 {
                     margin-right: 0;
                     margin-left: 0.5rem;
                 }
 
-                html[dir="rtl"] .mr-3 {
+                html[dir='rtl'] .mr-3 {
                     margin-right: 0;
                     margin-left: 1rem;
                 }
 
-                html[dir="rtl"] .ml-3 {
+                html[dir='rtl'] .ml-3 {
                     margin-left: 0;
                     margin-right: 1rem;
                 }
 
-                html[dir="rtl"] .text-right {
+                html[dir='rtl'] .text-right {
                     text-align: right;
                 }
 
-                html[dir="rtl"] .align-items-end {
+                html[dir='rtl'] .align-items-end {
                     align-items: flex-end;
                 }
             `}</style>

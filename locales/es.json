@@ -34,7 +34,8 @@
         "noDescription": "No hay descripción disponible",
         "defaultTag": "Predeterminado",
         "updated": "Actualizado: {date}",
-        "documentsCount": "{count} documento(s)"
+        "documentsCount": "{count} documento(s)",
+        "setAsDefault": "Establecer como Predeterminado"
     },
     "errors": {
         "userNotAuthenticated": "Usuario no autenticado.",
@@ -269,6 +270,10 @@
         },
         "dialog": {
             "resumeIdLabel": "ID del Currículum: {id}"
+        },
+        "scholarships": {
+            "title": "Oportunidades de becas",
+            "description": "Estamos trabajando arduamente para ofrecerte oportunidades de becas. ¡Mantente atento!"
         }
     },
     "dashboard_layout": {
@@ -296,6 +301,19 @@
         "toast": {
             "setDefault": "Currículum establecido como predeterminado.",
             "unsetDefault": "Se ha quitado el currículum como predeterminado."
+        },
+        "notifications": {
+            "title": "Notificaciones",
+            "noNotifications": "No hay notificaciones por el momento",
+            "empty": "¡Todo al día!",
+            "active": "Activo",
+            "completed": "Completado",
+            "tooltipTitle": "Mostrar notificaciones",
+            "clearAll": "Borrar todo",
+            "processing": "Procesando...",
+            "recent": "Recientes",
+            "viewResult": "Ver resultado",
+            "opening": "Abriendo..."
         }
     },
     "login": {
@@ -325,6 +343,7 @@
         "fetching": "Obteniendo empleos...",
         "searchStarted": "Búsqueda Iniciada",
         "searchStartedDetail": "Actualizando empleos según tus criterios...",
+        "showingJobs": "{filtered} / {total} totales",
         "autoUpdate": {
             "status": "Estado de Auto-Actualización",
             "active": "Activo",

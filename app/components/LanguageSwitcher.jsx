@@ -8,6 +8,7 @@ import { useTranslation } from '@/hooks/useTranslation';
 import styles from './styles/LanguageSwitcher.module.css';
 
 const LanguageSwitcher = () => {
+    const { t, isRTL } = useTranslation();
     const router = useRouter();
     const pathname = usePathname();
     const { locale } = useTranslation();
@@ -78,8 +79,8 @@ const LanguageSwitcher = () => {
                                     whileHover={{ backgroundColor: 'rgba(88, 28, 135, 0.05)' }}
                                     whileTap={{ scale: 0.98 }}
                                 >
-                                    <span className={styles.flag}>{language.flag}</span>
-                                    <span className={styles.name}>{language.nativeName}</span>
+                                    <span className={`${styles.flag} ${isRTL ? styles.flagRTL : styles.flagLTR}`}>{language.flag}</span>
+                                    <span className={`${styles.name} ${isRTL ? styles.nameRTL : styles.nameLTR}`}>{language.nativeName}</span>
                                     {locale === language.value && (
                                         <motion.div className={styles.checkmark} initial={{ scale: 0 }} animate={{ scale: 1 }} transition={{ type: 'spring', stiffness: 500 }}>
                                             ✓

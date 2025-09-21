@@ -10,7 +10,7 @@
         "search": "بحث...",
         "tryAgain": "حاول مرة أخرى",
         "documents": "المستندات",
-        "remote": "عن بُعد",
+        "remote": " عن بُعد",
         "source": "المصدر",
         "day": "يوم",
         "hour": "ساعة",
@@ -18,7 +18,7 @@
         "justNow": "الآن",
         "sortBy": "ترتيب حسب",
         "refresh": "تحديث",
-        "viewAll": "عرض الكل"
+        "viewAll": "  عرض الكل  "
     },
     "resumes": {
         "title": "سيرتي الذاتية",
@@ -34,7 +34,8 @@
         "noDescription": "لا يوجد وصف متاح",
         "defaultTag": "افتراضي",
         "updated": "تم التحديث: {date}",
-        "documentsCount": "{count} مستند(ات)"
+        "documentsCount": "{count} مستند(ات)",
+        "setAsDefault": "تعيين كافتراضي"
     },
     "errors": {
         "userNotAuthenticated": "المستخدم غير مصادق عليه.",
@@ -269,6 +270,10 @@
         },
         "dialog": {
             "resumeIdLabel": "معرف السيرة الذاتية: {id}"
+        },
+        "scholarships": {
+            "title": "فرص المنح الدراسية",
+            "description": "نعمل جاهدين لتقديم فرص المنح الدراسية لك. تابعنا!"
         }
     },
     "dashboard_layout": {
@@ -296,6 +301,19 @@
         "toast": {
             "setDefault": "تم تعيين السيرة الذاتية كافتراضية.",
             "unsetDefault": "تم إلغاء تعيين السيرة الذاتية كافتراضية."
+        },
+        "notifications": {
+            "title": "الإشعارات",
+            "noNotifications": "لا توجد إشعارات في الوقت الحالي",
+            "empty": "لقد اطلعت على كل شيء!",
+            "active": "نشط",
+            "completed": "مكتمل",
+            "tooltipTitle": "عرض الإشعارات",
+            "clearAll": "مسح جميع الإشعارات",
+            "processing": "جاري المعالجة...",
+            "recent": "الأحدث",
+            "viewResult": "عرض النتيجة",
+            "opening": "جاري الفتح..."
         }
     },
     "login": {
@@ -325,6 +343,7 @@
         "fetching": "جاري جلب الوظائف...",
         "searchStarted": "بدأ البحث",
         "searchStartedDetail": "جاري تحديث الوظائف بناءً على معاييرك...",
+        "showingJobs": "{filtered} / {total} إجمالي",
         "autoUpdate": {
             "status": "حالة التحديث التلقائي",
             "active": "نشط",
@@ -335,7 +354,7 @@
         "filters": {
             "search": "المسمى الوظيفي، كلمة رئيسية...",
             "location": "المدينة أو البلد",
-            "remoteOnly": "عن بعد فقط"
+            "remoteOnly": " عن بعد فقط"
         },
         "sorting": {
             "relevance": "الأهمية",

@@ -11,26 +11,20 @@ import { filterJobs } from '@/hooks/useJobService';
 import { useTranslation } from '@/hooks/useTranslation';
 
 const JobPostings = ({ router }) => {
-    const { t } = useTranslation();
-    const { 
-        jobs, 
-        loading, 
-        refresh, 
-        isWaitingForKeywords, 
-        hasActiveCycle 
-    } = useJobService(); // Removed getFilteredJobs from here
+    const { t, isRTL } = useTranslation();
+    const { jobs, loading, refresh, isWaitingForKeywords, hasActiveCycle } = useJobService(); // Removed getFilteredJobs from here
 
     // Use the pure utility function directly on the jobs state
     const latestJobs = filterJobs(jobs, { limit: 3, sortKey: 'recent' });
 
     const formatTimeAgo = (timestamp) => {
         if (!timestamp) return '';
-        
+
         const now = Date.now();
         const diff = now - timestamp;
         const hours = Math.floor(diff / (1000 * 60 * 60));
         const days = Math.floor(hours / 24);
-        
+
         if (days > 0) {
             return `${days} day${days > 1 ? 's' : ''} ago`;
         } else if (hours > 0) {
@@ -46,40 +40,58 @@ const JobPostings = ({ router }) => {
                 <div className="flex align-items-center gap-2">
                     <h3 className="text-xl font-bold m-0">{t('dashboard_main.jobPostings.title')}</h3>
                     {hasActiveCycle && (
-                        <Badge 
+                        <Badge
                             value={
-                                <span className="flex align-items-center">
-                                    <i className="pi pi-spin pi-spinner mr-1" style={{fontSize: '0.7rem'}}></i>
+                                <span
+                                    className="flex align-items-center"
+                                    style={{
+                                        marginInlineEnd: isRTL ? '1.5rem' : 0,
+                                        marginInlineEnd: !isRTL ? '1rem' : 0
+                                    }}
+                                >
+                                    <i
+                                        className="pi pi-spin pi-spinner"
+                                        style={{
+                                            fontSize: '0.6rem',
+                                            marginInlineEnd: '0.5rem',
+                                            marginRight: isRTL ? '0.5rem' : 0,
+                                            marginRight: !isRTL ? '0.5rem' : 0
+                                        }}
+                                    ></i>
                                     LIVE
                                 </span>
-                            } 
-                            severity="success" 
-                            className="text-xs" 
+                            }
+                            severity="success"
+                            className="text-xs"
                             tooltip="Actively searching for new jobs"
                         />
                     )}
                 </div>
                 <div className="flex gap-2">
+                    <Button icon="pi pi-refresh" className="p-button-text p-button-sm" onClick={refresh} loading={loading} tooltip="Refresh jobs now" />
                     <Button
-                        icon="pi pi-refresh"
-                        className="p-button-text p-button-sm"
-                        onClick={refresh}
-                        loading={loading}
-                        tooltip="Refresh jobs now"
-                    />
-                    <Button
-                        label={t('common.viewAll')}
-                        icon="pi pi-arrow-right"
-                        iconPos="right"
-                        className="p-button-text p-button-sm"
+                        label={
+                            <span
+                                style={{
+                                    marginLeft: isRTL ? '0.5rem' : 0,
+                                    marginRight: !isRTL ? '0.5rem' : 0
+                                }}
+                            >
+                                {t('common.viewAll')}
+                            </span>
+                        }
+                        icon={isRTL ? 'pi pi-arrow-left' : 'pi pi-arrow-right'}
+                        iconPos={isRTL ? 'right' : 'right'}
+                        className="p-button-text p-button-sm "
                         onClick={() => router.push('/main/job-feed')}
+                        style={{ whiteSpace: 'nowrap' }}
                     />
                 </div>
             </div>
 
             <div className="mb-3">
                 <p className="text-sm text-color-secondary m-0">
-                    {t('dashboard_main.jobPostings.subtitle', { 
+                    {t('dashboard_main.jobPostings.subtitle', {
                         count: jobs.length,
                         status: hasActiveCycle ? 'live updates' : 'cached'
                     })}
@@ -97,28 +109,16 @@ const JobPostings = ({ router }) => {
                         <li key={job.id || job.job_url} className={`${styles.feedItem} p-3 border-round cursor-pointer hover:surface-hover transition-colors transition-duration-150`}>
                             <div className="flex justify-content-between align-items-start">
                                 <div className="flex-1">
-                                    <div className={`${styles.feedItemTitle} font-semibold mb-1`}>
-                                        {job.title}
-                                    </div>
+                                    <div className={`${styles.feedItemTitle} font-semibold mb-1`}>{job.title}</div>
                                     <div className={`${styles.feedItemSubtitle} text-sm text-color-secondary mb-1`}>
                                         {job.company}
                                         {job.location && ` • ${job.location}`}
                                         {job.is_remote && <Badge value="Remote" severity="info" className="ml-2" />}
                                     </div>
-                                    {job.addedAt && (
-                                        <div className="text-xs text-color-secondary">
-                                            Added {formatTimeAgo(job.addedAt)}
-                                        </div>
-                                    )}
+                                    {job.addedAt && <div className="text-xs text-color-secondary">Added {formatTimeAgo(job.addedAt)}</div>}
                                 </div>
                                 <div className="flex flex-column align-items-end gap-1">
-                                    {job.site && (
-                                        <Badge 
-                                            value={job.site.toUpperCase()} 
-                                            severity="secondary" 
-                                            className="text-xs"
-                                        />
-                                    )}
+                                    {job.site && <Badge value={job.site.toUpperCase()} severity="primary" className="text-xs" />}
                                     {job.job_url && (
                                         <Button
                                             icon="pi pi-external-link"
@@ -139,28 +139,13 @@ const JobPostings = ({ router }) => {
                 <div className="text-center py-5">
                     {isWaitingForKeywords ? (
                         <>
-                            <p className="text-color-secondary mb-3">
-                                {t('dashboard_main.jobPostings.waitingForKeywords') || 'Set a default resume to start finding jobs.'}
-                            </p>
-                            <Button
-                                label={t('dashboard_main.jobPostings.goToResumes') || 'Go to Resumes'}
-                                icon="pi pi-arrow-right"
-                                className="p-button-sm"
-                                onClick={() => router.push('/main/resumes')}
-                            />
+                            <p className="text-color-secondary mb-3">{t('dashboard_main.jobPostings.waitingForKeywords') || 'Set a default resume to start finding jobs.'}</p>
+                            <Button label={t('dashboard_main.jobPostings.goToResumes') || 'Go to Resumes'} icon="pi pi-arrow-right" className="p-button-sm" onClick={() => router.push('/main/resumes')} />
                         </>
                     ) : (
                         <>
-                            <p className="text-color-secondary mb-3">
-                                {t('dashboard_main.jobPostings.noJobs') || 'No new jobs found yet.'}
-                            </p>
-                            <Button
-                                label={t('common.refresh') || 'Refresh Now'}
-                                icon="pi pi-refresh"
-                                className="p-button-sm"
-                                onClick={refresh}
-                                loading={loading}
-                            />
+                            <p className="text-color-secondary mb-3">{t('dashboard_main.jobPostings.noJobs') || 'No new jobs found yet.'}</p>
+                            <Button label={t('common.refresh') || 'Refresh Now'} icon="pi pi-refresh" className="p-button-sm" onClick={refresh} loading={loading} />
                         </>
                     )}
                 </div>
@@ -168,11 +153,7 @@ const JobPostings = ({ router }) => {
 
             {jobs.length > 3 && (
                 <div className="text-center mt-3 pt-3 border-top-1 surface-border">
-                    <Button
-                        label={t('dashboard_main.jobPostings.viewMore', { count: jobs.length - 3 })}
-                        className="p-button-link p-button-sm"
-                        onClick={() => router.push('/main/job-feed')}
-                    />
+                    <Button label={t('dashboard_main.jobPostings.viewMore', { count: jobs.length - 3 })} className="p-button-link p-button-sm" onClick={() => router.push('/main/job-feed')} />
                 </div>
             )}
         </Card>
