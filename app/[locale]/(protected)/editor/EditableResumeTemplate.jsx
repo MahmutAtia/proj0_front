@@ -54,6 +54,9 @@ const EditableResumeTemplate = ({
     const [showGenerateDialog, setShowGenerateDialog] = useState(false); // <-- Add state for dialog
     const [showDocumentsDialog, setShowDocumentsDialog] = useState(false); // <-- Add state for documents dialog
     const [showCreateDialog, setShowCreateDialog] = useState(false); // <-- Add state for create dialog
+    const [isDirty, setIsDirty] = useState(false); // State to track unsaved changes
+    const [showConfirmDialog, setShowConfirmDialog] = useState(false); // State for the confirmation dialog
+    const [nextAction, setNextAction] = useState(null); // State to hold the navigation URL or action
     const router = useRouter();
     const toast = useRef(null);
     const mainContentRef = useRef(null); // Ref for the main scrollable area
@@ -61,6 +64,9 @@ const EditableResumeTemplate = ({
     const token = session?.accessToken || null; // Get the token from session
     // Initialize local state from props
     const [linkedDocuments, setLinkedDocuments] = useState(initialLinkedDocuments || []);
+    
+    // Store initial state to compare for changes
+    const initialDataRef = useRef(null);
     
     // Get resumes cache for GenerateDocumentDialog
     const allResumesListCache = getResumesFromCache() || [];
@@ -164,51 +170,106 @@ const EditableResumeTemplate = ({
         return () => mediaQuery.removeEventListener('change', handleResize);
     }, [data, initialHiddenSections, sectionOrder]); // Added initialHiddenSections and sectionOrder to dependencies
 
-    // Save resume data with fixed toast notifications
-    const saveResumeData = () => {
-        setLoading(true); // Show loading indicator during save
-
-        // Send data to backend using PATCH request
-        api.patch(
-            `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/resumes/${resumeId}/`,
-            {
-                resume: data,
-                sections_sort: sectionOrder, // Add sectionOrder to payload
-                hidden_sections: hiddenSections // Add hiddenSections to payload
-            },
-            {
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${token}` // Include auth token if using JWT
-                }
+    // Effect to track unsaved changes
+    useEffect(() => {
+        if (data && !loading) {
+            // Store the initial state once data is loaded
+            if (initialDataRef.current === null) {
+                initialDataRef.current = JSON.stringify({
+                    data,
+                    sectionOrder,
+                    hiddenSections,
+                });
+                return; // Don't mark as dirty on initial load
             }
-        )
-            .then(response => {
-                console.log("Save successful:", response.data);
-                setLoading(false);
-                // Show success notification using PrimeReact Toast
-                toast.current?.show({
-                    severity: 'success',
-                    summary: 'Success',
-                    detail: 'Resume saved successfully',
-                    life: 3000
-                });
 
-                // Pass the entire resume item from the backend response to updateResumeCache
-                updateResumeCache(response.data);
-            })
-            .catch(error => {
-                console.error("Error saving resume:", error);
-                setLoading(false);
-                // Show error notification using PrimeReact Toast
-                toast.current?.show({
-                    severity: 'error',
-                    summary: 'Error',
-                    detail: `Failed to save: ${error.response?.data?.error || "Unknown error"}`,
-                    life: 3000
-                });
+            // Compare current state with the initial state
+            const currentState = JSON.stringify({
+                data,
+                sectionOrder,
+                hiddenSections,
             });
 
+            if (currentState !== initialDataRef.current) {
+                setIsDirty(true);
+            } else {
+                setIsDirty(false);
+            }
+        }
+    }, [data, sectionOrder, hiddenSections, loading]);
+
+    // Effect to handle browser navigation (refresh, close tab)
+    useEffect(() => {
+        const handleBeforeUnload = (event) => {
+            if (isDirty) {
+                event.preventDefault();
+                // Most modern browsers show a generic message, but this is required
+                event.returnValue = '';
+            }
+        };
+
+        window.addEventListener('beforeunload', handleBeforeUnload);
+
+        return () => {
+            window.removeEventListener('beforeunload', handleBeforeUnload);
+        };
+    }, [isDirty]);
+
+    // Save resume data with fixed toast notifications
+    const saveResumeData = () => {
+        return new Promise((resolve, reject) => {
+            setLoading(true); // Show loading indicator during save
+
+            // Send data to backend using PATCH request
+            api.patch(
+                `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/resumes/${resumeId}/`,
+                {
+                    resume: data,
+                    sections_sort: sectionOrder, // Add sectionOrder to payload
+                    hidden_sections: hiddenSections // Add hiddenSections to payload
+                },
+                {
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}` // Include auth token if using JWT
+                    }
+                }
+            )
+                .then(response => {
+                    console.log("Save successful:", response.data);
+                    setLoading(false);
+                    // Show success notification using PrimeReact Toast
+                    toast.current?.show({
+                        severity: 'success',
+                        summary: 'Success',
+                        detail: 'Resume saved successfully',
+                        life: 3000
+                    });
+
+                    // Pass the entire resume item from the backend response to updateResumeCache
+                    updateResumeCache(response.data);
+                    // After successful save, reset the dirty state
+                    setIsDirty(false);
+                    initialDataRef.current = JSON.stringify({
+                        data: response.data.resume, // Use the updated data from the response
+                        sectionOrder,
+                        hiddenSections,
+                    });
+                    resolve(true); // Resolve the promise on success
+                })
+                .catch(error => {
+                    console.error("Error saving resume:", error);
+                    setLoading(false);
+                    // Show error notification using PrimeReact Toast
+                    toast.current?.show({
+                        severity: 'error',
+                        summary: 'Error',
+                        detail: `Failed to save: ${error.response?.data?.error || "Unknown error"}`,
+                        life: 3000
+                    });
+                    reject(false); // Reject the promise on failure
+                });
+        });
     };
 
     // Helper to format section keys for display
@@ -219,6 +280,21 @@ const EditableResumeTemplate = ({
     // Combine class names conditionally
     const classNames = (...classes) => classes.filter(Boolean).join(' ');
 
+
+    // Handle navigation or actions that might lose unsaved data
+    const confirmAndProceed = (action) => {
+        if (isDirty) {
+            setNextAction(() => action); // Use a function to ensure the latest action is set
+            setShowConfirmDialog(true);
+        } else {
+            // If not dirty, just execute the action
+            if (typeof action === 'function') {
+                action();
+            } else if (typeof action === 'string') {
+                router.push(action);
+            }
+        }
+    };
 
 
     // Item template for documents in the dialog
@@ -411,7 +487,7 @@ const EditableResumeTemplate = ({
                         className="p-button-text p-button-secondary"
                         tooltip="Back to Dashboard"
                         tooltipOptions={{ position: 'bottom' }}
-                        onClick={() => router.push('/main')}
+                        onClick={() => confirmAndProceed('/main')}
                     />
                    <Button
                         icon="pi pi-bars"
@@ -430,20 +506,21 @@ const EditableResumeTemplate = ({
                         tooltip="Generate Website"
                         tooltipOptions={{ position: 'bottom' }}
                         className="p-button-outlined p-button-secondary"
-               onClick={() => {
+                        onClick={() => confirmAndProceed(() => {
                             if (personalWebsiteUuid) {
                                 router.push(`/site-editor/${personalWebsiteUuid}`);
                             } else {
                                 router.push(`/generate_site_yaml/${resumeId}`);
                             }
-                        }}                        disabled={loading}
+                        })}
+                        disabled={loading}
                     />
                     <Button
                         icon="pi pi-download"
                         tooltip="Export Options"
                         tooltipOptions={{ position: 'bottom' }}
                         className="p-button-outlined p-button-secondary"
-                        onClick={() => router.push(`/export/${resumeId}`)}
+                        onClick={() => confirmAndProceed(`/export/${resumeId}`)}
                         disabled={loading}
                     />
                     {/* // create new resume from this resume */}
@@ -605,6 +682,54 @@ const EditableResumeTemplate = ({
                     </div>
                 </main>
             </div>
+
+            {/* Confirmation Dialog for Unsaved Changes */}
+            <Dialog
+                header="Unsaved Changes"
+                visible={showConfirmDialog}
+                style={{ width: '400px' }}
+                modal
+                footer={
+                    <div>
+                        <Button label="Cancel" icon="pi pi-times" onClick={() => setShowConfirmDialog(false)} className="p-button-text" />
+                        <Button
+                            label="Discard & Continue"
+                            icon="pi pi-trash"
+                            className="p-button-danger p-button-text"
+                            onClick={() => {
+                                setShowConfirmDialog(false);
+                                if (nextAction) {
+                                    if (typeof nextAction === 'function') nextAction();
+                                    else if (typeof nextAction === 'string') router.push(nextAction);
+                                }
+                            }}
+                        />
+                        <Button
+                            label="Save & Continue"
+                            icon="pi pi-check"
+                            onClick={async () => {
+                                try {
+                                    await saveResumeData();
+                                    setShowConfirmDialog(false);
+                                    if (nextAction) {
+                                        if (typeof nextAction === 'function') nextAction();
+                                        else if (typeof nextAction === 'string') router.push(nextAction);
+                                    }
+                                } catch {
+                                    // Error is handled in saveResumeData, do nothing here
+                                }
+                            }}
+                            autoFocus
+                        />
+                    </div>
+                }
+                onHide={() => setShowConfirmDialog(false)}
+            >
+                <div className="flex align-items-center">
+                    <i className="pi pi-exclamation-triangle mr-3" style={{ fontSize: '2rem' }} />
+                    <span>You have unsaved changes. What would you like to do?</span>
+                </div>
+            </Dialog>
 
             {/* Documents Dialog */}
             <Dialog
