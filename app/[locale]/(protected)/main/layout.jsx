@@ -19,7 +19,7 @@ import {
     FiLogOut, FiBell, FiSearch, FiChevronDown, FiUser, FiStar, FiEdit,
     FiList, FiFolder, FiInfo, FiMenu, FiChevronLeft, FiChevronRight
 } from 'react-icons/fi';
-import Joyride, { STATUS, Step } from 'react-joyride'; // Import Joyride
+// import Joyride, { STATUS, Step } from 'react-joyride'; // Import Joyride
 import styles from './Dashboard.module.css';
 import { useTranslation } from '../../../../hooks/useTranslation';
 import LanguageSwitcher from '../../../components/LanguageSwitcher';
@@ -274,15 +274,15 @@ export default function Layout({ children }) {
         }
     }, [t]);
 
-    const handleJoyrideCallback = (data) => {
-        const { status } = data;
-        const finishedStatuses = [STATUS.FINISHED, STATUS.SKIPPED];
+    // const handleJoyrideCallback = (data) => {
+    //     const { status } = data;
+    //     const finishedStatuses = [STATUS.FINISHED, STATUS.SKIPPED];
 
-        if (finishedStatuses.includes(status)) {
-            setRunTour(false);
-            localStorage.setItem('onboardingTourCompleted', 'true');
-        }
-    };
+    //     if (finishedStatuses.includes(status)) {
+    //         setRunTour(false);
+    //         localStorage.setItem('onboardingTourCompleted', 'true');
+    //     }
+    // };
 
 
     // Effect to handle clicks outside the mobile sidebar to close it
@@ -416,7 +416,7 @@ export default function Layout({ children }) {
 
     return (
         <DashboardContext.Provider value={contextValue}>
-            <Joyride
+            {/* <Joyride
                 callback={handleJoyrideCallback}
                 continuous
                 run={runTour}
@@ -442,7 +442,7 @@ export default function Layout({ children }) {
                         marginRight: 'auto',
                     }
                 }}
-            />
+            /> */}
             <div className={`${styles.dashboardLayout} bg-primary-50`}>
                 <Toast ref={toast} />
 
