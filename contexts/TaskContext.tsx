@@ -31,6 +31,7 @@ interface TaskContextType {
     removeTask: (taskId: string) => void;
     clearCompleted: () => void;
     handleSaveAndRedirect: (task: Task) => Promise<void>;
+    saveTasks: () => void;
 }
 
 const TaskContext = createContext<TaskContextType | undefined>(undefined);
@@ -49,6 +50,12 @@ export const TaskProvider = ({ children }: { children: React.ReactNode }) => {
     const router = useRouter();
     const toast = useRef<Toast>(null);
     const [isSaving, setIsSaving] = useState<string | null>(null);
+    const tasksRef = useRef<Task[]>(tasks);
+
+    // Keep ref in sync with state
+    useEffect(() => {
+        tasksRef.current = tasks;
+    }, [tasks]);
 
     // Ref to store previous tasks for comparison
     const prevTasksRef = useRef<Task[]>();
@@ -92,10 +99,20 @@ export const TaskProvider = ({ children }: { children: React.ReactNode }) => {
         };
     }, []); // Run only on mount
 
+    const saveTasks = useCallback(() => {
+        try {
+            // Use the ref for a synchronous value
+            localStorage.setItem('tasks', JSON.stringify(tasksRef.current));
+        } catch (error) {
+            console.error("Failed to synchronously save tasks to localStorage", error);
+        }
+    }, []);
+
     // Persist tasks to localStorage whenever they change
     useEffect(() => {
-        localStorage.setItem('tasks', JSON.stringify(tasks));
-    }, [tasks]);
+        // The ref is already updated by the other effect, so we can just call save.
+        saveTasks();
+    }, [tasks, saveTasks]);
 
 
     const pollTasks = useCallback(async (tasksToPoll: Task[]) => {
@@ -289,7 +306,8 @@ export const TaskProvider = ({ children }: { children: React.ReactNode }) => {
         addTask,
         removeTask,
         clearCompleted,
-        handleSaveAndRedirect
+        handleSaveAndRedirect,
+        saveTasks
     };
 
     return (

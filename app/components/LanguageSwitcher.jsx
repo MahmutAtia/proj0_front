@@ -25,20 +25,15 @@ const LanguageSwitcher = () => {
 
     const currentLanguage = languages.find((lang) => lang.value === locale) || languages[0];
 
-    const handleLanguageChange = (newLocale) => {
+   const handleLanguageChange = (newLocale) => {
         // Set a cookie to remember the user's choice
         document.cookie = `NEXT_LOCALE=${newLocale}; path=/; max-age=31536000; SameSite=Lax`;
 
-        const pathSegments = pathname.split('/');
-        // The first segment is empty, the second is the locale.
-        // e.g., "/en/main" -> ["", "en", "main"]
-        pathSegments[1] = newLocale;
-        const newPath = pathSegments.join('/');
+        const newPath = pathname.replace(`/${locale}`, `/${newLocale}`);
         
-        router.push(newPath);
+        router.replace(newPath);
         setIsOpen(false);
     };
-
 
     const dropdownVariants = {
         hidden: {
