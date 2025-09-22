@@ -325,10 +325,10 @@ const ResumePreviewPage = () => {
                                 <div className="mb-5">
                                     {templatesData.length > 0 ? (
                                         <div className="grid grid-nogutter -m-1">
-                                            {templatesData.map((template) => (
+                                         {templatesData.map((template) => (
                                                 <div key={template.id} className="col-6 p-1">
-                                                    <Card
-                                                        className={`cursor-pointer border-2 hover:shadow-md ${styles.templateCard} ${selectedTemplate?.id === template.id ? 'border-primary shadow-2' : 'border-transparent'} relative`}
+                                             <Card
+                                                        className={`cursor-pointer border-2 hover:shadow-md ${styles.templateCard} ${selectedTemplate?.id === template.id ? 'border-primary shadow-2' : 'border-transparent'} relative group`}
                                                         onClick={() => handleTemplateSelect(template)}
                                                         pt={{ header: { className: 'p-0' }, body: { className: 'p-0' }, content: { className: 'p-2 text-center' } }}
                                                     >
@@ -336,17 +336,17 @@ const ResumePreviewPage = () => {
                                                         <Button
                                                             icon="pi pi-eye"
                                                             rounded
-                                                            text
                                                             severity="secondary"
                                                             aria-label={`Preview ${template.name}`}
                                                             tooltip="Preview Template"
                                                             tooltipOptions={{ position: 'top', showDelay: 300 }}
-                                                            className={`absolute top-0 right-0 mt-1 mr-1 z-1 ${styles.previewButton}`}
+                                                            className={`absolute top-0 right-0 mt-1 mr-1 z-1  group-hover:opacity-100 transition-opacity duration-300 ${styles.previewButton}`}
                                                             onClick={(e) => handlePreviewOpen(template.previewUrl, e)}
                                                         />
 
                                                         <img src={template.previewUrl || '/images/previews/default.png'} alt={`${template.name} Preview`} className={`w-full block border-round-top ${styles.templatePreviewImage}`} />
                                                         <div className="text-sm font-medium text-color-secondary mt-1">{template.name}</div>
+
                                                     </Card>
                                                 </div>
                                             ))}
@@ -562,18 +562,27 @@ const ResumePreviewPage = () => {
                 </div>
             </div>
             {/* --- Template Preview Modal --- */}
-            <Dialog
-                header="Template Preview"
+          <Dialog
                 visible={isPreviewVisible}
-                style={{ width: '90vw', maxWidth: '600px' }}
                 modal
                 onHide={() => setIsPreviewVisible(false)}
+                showHeader={false}
+                dismissableMask
                 pt={{
-                    content: { className: 'p-0' }
+                    root: {
+                        className: 'border-none shadow-none bg-transparent',
+                        style: { width: '90vw', maxWidth: '600px' }
+                    },
+                    content: {
+                        className: 'p-0 shadow-2xl overflow-hidden '
+                    },
+                    mask: {
+                        className: 'bg-black-alpha-60'
+                    }
                 }}
             >
                 <img src={previewImageUrl} alt="Template Preview" style={{ width: '100%', display: 'block' }} />
-            </Dialog>
+            </Dialog>  
         </div>
     );
 };
