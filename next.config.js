@@ -46,24 +46,8 @@ async headers() {
         // Note: X-Frame-Options is intentionally omitted for site routes
       ],
     },
-    {
-      // Deny framing for all other routes
-      source: '/((?!.*site).*)',
-      headers: [
-        {
-          key: 'X-Frame-Options',
-          value: 'DENY',
-        },
-        {
-          key: 'X-Content-Type-Options',
-          value: 'nosniff',
-        },
-        {
-          key: 'Referrer-Policy',
-          value: 'origin-when-cross-origin',
-        },
-      ],
-    },
+    
+    
     // Prevent caching of auth-related routes
     {
       source: '/api/auth/(.*)',

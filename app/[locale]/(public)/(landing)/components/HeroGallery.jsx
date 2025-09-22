@@ -6,11 +6,11 @@ import PreviewModal from './PreviewModal';
 
 // Data remains the same
 const portfolios = [
-    { src: '/images/john-1-high.gif', alt: 'Animated portfolio preview', type: 'iframe', url: '/site/mohamed-attia/' },
-    { src: '/images/john-2-high.gif', alt: 'Animated portfolio preview', type: 'iframe', url: '/site/mohamed-attia-20/' },
-    { src: '/images/john-3-high.gif', alt: 'Animated portfolio preview', type: 'iframe', url: '/site/mohamed-attia-21/' },
-    { src: '/images/john-4-high.gif', alt: 'Animated portfolio preview 4', type: 'iframe', url: '/site/mohamed-attia-22/' },
-    { src: '/images/john-5-high.gif', alt: 'Animated portfolio preview 5', type: 'iframe', url: '/site/mohamed-attia-23/' },
+    { src: '/images/john-1-high.gif', alt: 'Animated portfolio preview', type: 'iframe', url: 'https://vbs.attiais.me/site/mohamed-attia/' },
+    { src: '/images/john-2-high.gif', alt: 'Animated portfolio preview', type: 'iframe', url: 'https://vbs.attiais.me/site/mohamed-attia-20/' },
+    { src: '/images/john-3-high.gif', alt: 'Animated portfolio preview', type: 'iframe', url: 'https://vbs.attiais.me/site/mohamed-attia-21/' },
+    { src: '/images/john-4-high.gif', alt: 'Animated portfolio preview 4', type: 'iframe', url: 'https://vbs.attiais.me/site/mohamed-attia-22/' },
+    { src: '/images/john-5-high.gif', alt: 'Animated portfolio preview 5', type: 'iframe', url: 'https://vbs.attiais.me/site/mohamed-attia-23/' },
 ];
 const resumes = [
     { src: 'https://picsum.photos/seed/new-resume-1/600/800', alt: 'ATS-friendly resume template', type: 'image' },
