@@ -671,7 +671,7 @@ const EditableResumeTemplate = ({
                                         if (!sectionKey || hiddenSections.includes(sectionKey)) return null;
 
                                         return (
-                                            <div key={sectionKey} id={sectionKey} className="scroll-mt-[80px]">
+                                            <div key={sectionKey} id={`section-${sectionKey}`} className="scroll-mt-[80px]">
                                                 {renderSectionComponent(sectionKey)}
                                             </div>
                                         );
