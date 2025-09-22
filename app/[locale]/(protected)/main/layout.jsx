@@ -1,7 +1,7 @@
 'use client';
 import React, { useState, useRef, useEffect } from 'react'; // Removed cloneElement
 import { useSession, signOut } from 'next-auth/react';
-import { useRouter } from 'next/navigation';
+import { useRouter, usePathname } from 'next/navigation';
 import Link from 'next/link';
 import { Button } from 'primereact/button';
 import { Card } from 'primereact/card';
@@ -54,12 +54,17 @@ const SidebarLogo = ({ collapsed }) => {
     );
 };
 
-const SidebarNav = ({ items, currentPath, router, collapsed }) => (
+const SidebarNav = ({ items, currentPath, router, collapsed }) => {
+    const pathWithoutLocale = '/' + currentPath.split('/').slice(2).join('/');
+
+    
+    return(
     <div>
         <ul className="list-none p-3 m-0">
             {items.map((item) => (
                 <li key={item.label}>
-                    <button type="button" onClick={() => router.push(item.route)} className={`${styles.sidebarLink} p-ripple ${currentPath === item.route ? styles.sidebarItemActive : ''}`} title={collapsed ? item.label : ''}>
+                    <button disabled={item.disabled} type="button" onClick={() => router.push(item.route)} className={`${styles.sidebarLink} p-ripple ${pathWithoutLocale === item.route ? styles.sidebarItemActive : ''}
+                    ${item.disabled ? 'opacity-50 cursor-not-allowed' : ''}`} title={collapsed ? item.label : ''}>
                         <span className={styles.sidebarLinkIcon}>{item.icon}</span>
                         {!collapsed && <span className={styles.sidebarLinkText}>{item.label}</span>}
                         <Ripple />
@@ -69,6 +74,7 @@ const SidebarNav = ({ items, currentPath, router, collapsed }) => (
         </ul>
     </div>
 );
+};
 
 const SidebarFooter = ({ router, collapsed }) => {
     const { t, isRTL } = useTranslation();
@@ -158,6 +164,7 @@ const TopBar = ({ session, userMenuRef, userMenuItems, onToggleSidebar, onToggle
 export default function Layout({ children }) {
     const { data: session, status } = useSession();
     const router = useRouter();
+    const pathname = usePathname(); // Get the current path
     const toast = useRef(null);
     const userMenuRef = useRef(null);
     const sidebarRef = useRef(null);
@@ -447,7 +454,8 @@ export default function Layout({ children }) {
                         }}
                     />
                 ),
-                route: '/main/scholarship-feed'
+                route: '/main/scholarship-feed',
+                disabled: true // Placeholder for future feature
             }
         ];
     };
@@ -510,7 +518,7 @@ export default function Layout({ children }) {
 
                     {/* Scrollable sidebar nav area */}
                     <div className={`${styles.sidebarNavContainer} ${styles.sidebarScrollbar}`}>
-                        <SidebarNav items={getSidebarNavItems(defaultResume)} currentPath={router.pathname} router={router} collapsed={sidebarCollapsed} />
+                        <SidebarNav items={getSidebarNavItems(defaultResume)} currentPath={pathname} router={router} collapsed={sidebarCollapsed} />
                     </div>
 
                     <SidebarFooter router={router} collapsed={sidebarCollapsed} />
