@@ -711,7 +711,7 @@ const PersonalSiteEditorPage = ({ params: paramsPromise }) => {
                                     disabled={!blockHistory[block.name] || (historyIndex[block.name] ?? 0) <= 0}
                                 />
                                 <Button
-                                    icon="pi pi-redo"
+                                    icon="pi pi-refresh"
                                     className="p-button-rounded p-button-secondary"
                                     onClick={() => forwardBlock(block.name)}
                                     tooltip={`Forward ${block.name}`}
@@ -934,7 +934,7 @@ const EditorToolbar = ({
                     tooltipOptions={{ position: 'bottom' }}
                 />
                 <Button
-                    icon="pi pi-redo"
+                    icon="pi pi-refresh"
                     className="p-button-text p-button-secondary"
                     onClick={onForwardGlobal}
                     disabled={isForwardDisabled}
