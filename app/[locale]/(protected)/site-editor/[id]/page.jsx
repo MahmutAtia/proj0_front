@@ -507,6 +507,10 @@ const PersonalSiteEditorPage = ({ params: paramsPromise }) => {
                     hasUnsavedChanges={hasUnsavedChanges}
                     onEditGlobal={() => openEditDialog(yamlData.global)}
                     confirmAndProceed={confirmAndProceed}
+                    onRollbackGlobal={() => rollbackBlock('global')}
+                    onForwardGlobal={() => forwardBlock('global')}
+                    isRollbackDisabled={!blockHistory['global'] || (historyIndex['global'] ?? 0) <= 0}
+                    isForwardDisabled={!blockHistory['global'] || (historyIndex['global'] ?? 0) >= blockHistory['global'].length - 1}
                 />
             )}
 
@@ -837,6 +841,7 @@ const PersonalSiteEditorPage = ({ params: paramsPromise }) => {
                         <Button
                             label="Save & Continue"
                             icon="pi pi-check"
+                            className="p-button-success"
                             onClick={async () => {
                                 await handleSaveChanges();
                                 setShowConfirmDialog(false);
@@ -892,7 +897,11 @@ const EditorToolbar = ({
     isSaving,
     hasUnsavedChanges,
     onEditGlobal,
-    confirmAndProceed
+    confirmAndProceed,
+    onRollbackGlobal,
+    onForwardGlobal,
+    isRollbackDisabled,
+    isForwardDisabled
 }) => {
     // Add the /site/ prefix to the URL
     const siteUrl = `${process.env.NEXT_PUBLIC_BACKEND_URL}/site/${resumeId}/`;
@@ -914,6 +923,22 @@ const EditorToolbar = ({
                     className="p-button-secondary p-button-sm"
                     onClick={onEditGlobal}
                     tooltip="Edit sitewide CSS, JS, or Head HTML"
+                    tooltipOptions={{ position: 'bottom' }}
+                />
+                <Button
+                    icon="pi pi-undo"
+                    className="p-button-text p-button-secondary"
+                    onClick={onRollbackGlobal}
+                    disabled={isRollbackDisabled}
+                    tooltip="Undo Global Change"
+                    tooltipOptions={{ position: 'bottom' }}
+                />
+                <Button
+                    icon="pi pi-redo"
+                    className="p-button-text p-button-secondary"
+                    onClick={onForwardGlobal}
+                    disabled={isForwardDisabled}
+                    tooltip="Redo Global Change"
                     tooltipOptions={{ position: 'bottom' }}
                 />
             </div>
