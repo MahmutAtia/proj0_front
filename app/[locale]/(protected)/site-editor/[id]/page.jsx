@@ -56,6 +56,11 @@ const PersonalSiteEditorPage = ({ params: paramsPromise }) => {
     const initialDataRef = useRef(null); // To compare for unsaved changes
     const [isRestoring, setIsRestoring] = useState(false); // Flag during restore confirmation
 
+    // --- State for Unsaved Changes Dialog ---
+    const [showConfirmDialog, setShowConfirmDialog] = useState(false);
+    const [nextAction, setNextAction] = useState(null);
+    const router = useRouter();
+
     // --- Local Storage Key ---
     const getLocalStorageKey = useCallback(() => `personalSiteEditorBackup_${resumeId}`, [resumeId]);
     // --- Helper to Initialize History --- (Run after setting yamlData)
@@ -128,8 +133,34 @@ const PersonalSiteEditorPage = ({ params: paramsPromise }) => {
     useEffect(() => {
         // Trigger debounce function when yamlData changes
         debouncedSaveToLocalStorage(yamlData);
-    }, [yamlData, debouncedSaveToLocalStorage]);
 
+        // Check for unsaved changes
+        if (initialDataRef.current && !loading) {
+            const currentState = JSON.stringify(yamlData);
+            if (currentState !== initialDataRef.current) {
+                setHasUnsavedChanges(true);
+            } else {
+                setHasUnsavedChanges(false);
+            }
+        }
+    }, [yamlData, debouncedSaveToLocalStorage, loading]);
+
+
+    // --- Browser Navigation Warning for Unsaved Changes ---
+    useEffect(() => {
+        const handleBeforeUnload = (event) => {
+            if (hasUnsavedChanges) {
+                event.preventDefault();
+                event.returnValue = ''; // Required for modern browsers
+            }
+        };
+
+        window.addEventListener('beforeunload', handleBeforeUnload);
+
+        return () => {
+            window.removeEventListener('beforeunload', handleBeforeUnload);
+        };
+    }, [hasUnsavedChanges]);
 
 
     // --- Manual Save to Backend ---
@@ -159,6 +190,21 @@ const PersonalSiteEditorPage = ({ params: paramsPromise }) => {
             // Keep hasUnsavedChanges as true if save failed
         } finally {
             setIsSaving(false);
+        }
+    };
+
+
+    // --- Navigation Confirmation Logic ---
+    const confirmAndProceed = (action) => {
+        if (hasUnsavedChanges) {
+            setNextAction(() => action);
+            setShowConfirmDialog(true);
+        } else {
+            if (typeof action === 'function') {
+                action();
+            } else if (typeof action === 'string') {
+                router.push(action);
+            }
         }
     };
 
@@ -460,6 +506,7 @@ const PersonalSiteEditorPage = ({ params: paramsPromise }) => {
                     isSaving={isSaving}
                     hasUnsavedChanges={hasUnsavedChanges}
                     onEditGlobal={() => openEditDialog(yamlData.global)}
+                    confirmAndProceed={confirmAndProceed}
                 />
             )}
 
@@ -765,6 +812,52 @@ const PersonalSiteEditorPage = ({ params: paramsPromise }) => {
                     </div>
                 </div>
             </Dialog>
+
+            {/* Confirmation Dialog for Unsaved Changes */}
+            <Dialog
+                header="Unsaved Changes"
+                visible={showConfirmDialog}
+                style={{ width: '400px' }}
+                modal
+                footer={
+                    <div>
+                        <Button label="Cancel" icon="pi pi-times" onClick={() => setShowConfirmDialog(false)} className="p-button-text" />
+                        <Button
+                            label="Discard & Continue"
+                            icon="pi pi-trash"
+                            className="p-button-danger p-button-text"
+                            onClick={() => {
+                                setShowConfirmDialog(false);
+                                if (nextAction) {
+                                    if (typeof nextAction === 'function') nextAction();
+                                    else if (typeof nextAction === 'string') router.push(nextAction);
+                                }
+                            }}
+                        />
+                        <Button
+                            label="Save & Continue"
+                            icon="pi pi-check"
+                            onClick={async () => {
+                                await handleSaveChanges();
+                                setShowConfirmDialog(false);
+                                // Check if changes are actually saved before proceeding
+                                if (!hasUnsavedChanges && nextAction) {
+                                    if (typeof nextAction === 'function') nextAction();
+                                    else if (typeof nextAction === 'string') router.push(nextAction);
+                                }
+                            }}
+                            autoFocus
+                        />
+                    </div>
+                }
+                onHide={() => setShowConfirmDialog(false)}
+            >
+                <div className="flex align-items-center">
+                    <i className="pi pi-exclamation-triangle mr-3" style={{ fontSize: '2rem' }} />
+                    <span>You have unsaved changes. What would you like to do?</span>
+                </div>
+            </Dialog>
+
             <style jsx global>{`
                 .ai-feedback-toast {
                     min-width: 350px;
@@ -798,7 +891,8 @@ const EditorToolbar = ({
     onSave,
     isSaving,
     hasUnsavedChanges,
-    onEditGlobal
+    onEditGlobal,
+    confirmAndProceed
 }) => {
     // Add the /site/ prefix to the URL
     const siteUrl = `${process.env.NEXT_PUBLIC_BACKEND_URL}/site/${resumeId}/`;
@@ -812,7 +906,7 @@ const EditorToolbar = ({
                     className="p-button-text p-button-secondary"
                     tooltip="Back to Dashboard"
                     tooltipOptions={{ position: 'bottom' }}
-                    onClick={() => router.push('/main')}
+                    onClick={() => confirmAndProceed('/main')}
                 />
                 <Button
                     label="Edit Global Settings"
