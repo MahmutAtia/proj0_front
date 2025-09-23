@@ -11,6 +11,7 @@ import { Divider } from 'primereact/divider'; // Import Divider
 import { Tooltip } from 'primereact/tooltip'; // Import Tooltip
 import { DataView } from 'primereact/dataview'; // Added DataView import
 import { Dialog } from 'primereact/dialog'; // Added Dialog import
+import { SplitButton } from 'primereact/splitbutton'; // Import SplitButton
 import { useResume } from "./ResumeContext";
 import PersonalInformation from "./components/PersonalInformation";
 import Summary from "./components/Summary";
@@ -71,6 +72,30 @@ const EditableResumeTemplate = ({
     // Get resumes cache for GenerateDocumentDialog
     const allResumesListCache = getResumesFromCache() || [];
  
+    const actionItems = [
+        {
+            label: 'Generate Website',
+            icon: 'pi pi-globe',
+            command: () => confirmAndProceed(() => {
+                if (personalWebsiteUuid) {
+                    router.push(`/site-editor/${personalWebsiteUuid}`);
+                } else {
+                    router.push(`/generate_site_yaml/${resumeId}`);
+                }
+            })
+        },
+        {
+            label: 'Browse Documents',
+            icon: 'pi pi-folder-open',
+            command: () => setShowDocumentsDialog(true)
+        },
+        {
+            label: 'Generate New Resume',
+            icon: 'pi pi-copy',
+            command: () => setShowCreateDialog(true)
+        }
+    ];
+
     // Define section keys and non-array sections
     const ALL_SECTION_KEYS = [
         "personal_information", "summary", "experience", "education", "projects",
@@ -501,61 +526,28 @@ const EditableResumeTemplate = ({
                 </div>
                 <div className="flex gap-2 align-items-center">
                     {loading && <ProgressSpinner style={{ width: '2rem', height: '2rem' }} strokeWidth="6" />}
-                    <Button
-                        icon="pi pi-globe"
-                        tooltip="Generate Website"
-                        tooltipOptions={{ position: 'bottom' }}
+                    
+                    <SplitButton
+                        label="Generate Document"
+                        icon="pi pi-file-edit"
+                        onClick={() => setShowGenerateDialog(true)}
+                        model={actionItems}
                         className="p-button-outlined p-button-secondary"
-                        onClick={() => confirmAndProceed(() => {
-                            if (personalWebsiteUuid) {
-                                router.push(`/site-editor/${personalWebsiteUuid}`);
-                            } else {
-                                router.push(`/generate_site_yaml/${resumeId}`);
-                            }
-                        })}
-                        disabled={loading}
+                        tooltip="Actions"
+                        tooltipOptions={{ position: 'bottom' }}
+                        disabled={loading || !data}
                     />
+
                     <Button
                         icon="pi pi-download"
+                        label="Export"
                         tooltip="Export Options"
                         tooltipOptions={{ position: 'bottom' }}
-                        className="p-button-outlined p-button-secondary"
+                        className="p-button-secondary"
                         onClick={() => confirmAndProceed(`/export/${resumeId}`)}
                         disabled={loading}
                     />
-                    {/* // create new resume from this resume */}
-                    <Button
-                        icon="pi pi-copy"
-                        tooltip="Create New Resume from this one"
-                        tooltipOptions={{ position: 'bottom' }}
-                        className="p-button-outlined p-button-secondary"
-                        onClick={() => {
-
-                            setShowCreateDialog(true);
-                        }
-                        }
-                        // disabled={loading}
-                    />
-
-
-                    <Button
-                        icon="pi pi-folder-open"
-                        tooltip="Browse Documents"
-                        tooltipOptions={{ position: 'bottom' }}
-                        className="p-button-outlined p-button-secondary"
-                        onClick={() => setShowDocumentsDialog(true)}
-                        disabled={loading}
-                        badge={linkedDocuments?.length || 0}
-                        badgeClassName={linkedDocuments?.length ? "p-badge-warning" : ""}
-                    />
-                    <Button
-                        icon="pi pi-file-edit" // Or pi-plus, pi-book, etc.
-                        tooltip="Generate Document"
-                        tooltipOptions={{ position: 'bottom' }}
-                        className="p-button-outlined p-button-secondary"
-                        onClick={() => setShowGenerateDialog(true)} // <-- Open the dialog
-                        disabled={loading || !data} // Disable if loading or no data
-                    />
+                    
                     <Button
                         icon="pi pi-save"
                         label="Save"
@@ -827,3 +819,6 @@ const EditableResumeTemplate = ({
 };
 
 export default EditableResumeTemplate;
+
+
+
