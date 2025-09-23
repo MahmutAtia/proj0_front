@@ -4,7 +4,7 @@ import { useSession, signOut } from 'next-auth/react';
 import { useRouter, usePathname } from 'next/navigation';
 import Link from 'next/link';
 import { Button } from 'primereact/button';
-import { Card } from 'primereact/card';
+import { Tooltip } from 'primereact/tooltip';
 import { Avatar } from 'primereact/avatar';
 import { Menu } from 'primereact/menu';
 import { Toast } from 'primereact/toast';
@@ -60,10 +60,14 @@ const SidebarNav = ({ items, currentPath, router, collapsed }) => {
     
     return(
     <div>
+            {/* Attach tooltip globally to all elements with .has-tooltip */}
+            <Tooltip target=".has-tooltip" position="right" />
         <ul className="list-none p-3 m-0">
             {items.map((item) => (
-                <li key={item.label}>
-                    <button disabled={item.disabled} type="button" onClick={() => router.push(item.route)} className={`${styles.sidebarLink} p-ripple ${pathWithoutLocale === item.route ? styles.sidebarItemActive : ''}
+                <li key={item.label} className={item.disabled ? 'has-tooltip' : ''} data-pr-tooltip={item.disabled ? 'Coming soon' : ''}>
+
+                    <button disabled={item.disabled}  data-pr-tooltip={item.disabled ? 'Coming soon' : ''}
+                    type="button" onClick={() => router.push(item.route)} className={`${item.disabled ? 'has-tooltip' : ''} ${styles.sidebarLink} p-ripple ${pathWithoutLocale === item.route ? styles.sidebarItemActive : ''}
                     ${item.disabled ? 'opacity-50 cursor-not-allowed' : ''}`} title={collapsed ? item.label : ''}>
                         <span className={styles.sidebarLinkIcon}>{item.icon}</span>
                         {!collapsed && <span className={styles.sidebarLinkText}>{item.label}</span>}
