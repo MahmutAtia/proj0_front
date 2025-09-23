@@ -424,7 +424,7 @@ const AIAssistant = ({ prompt = "", setPrompt, onSubmit, isProcessing }) => {
                         className={classNames(styles.voiceButton, {
                             [styles.listening]: isListening,
                             [styles.initializing]: isInitializing
-                        })}
+                        }, "tour-voice-input")}
                         onClick={toggleListening}
                         tooltip={!isBrowserSupported ? BROWSER_SUPPORT_INFO :
                                 permissionDenied ? "Microphone permission denied" :

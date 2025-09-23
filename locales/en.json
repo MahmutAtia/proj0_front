@@ -375,5 +375,73 @@
             "title": "No jobs found",
             "description": "No job postings found matching your criteria. Try broadening your search!"
         }
+    },
+        "resumeEditor": {
+        "tour": {
+            "sidebar": {
+                "navigation": {
+                    "title": "Resume Sections",
+                    "description": "This sidebar lists all the sections of your resume. You can quickly navigate to any section by clicking on its name."
+                },
+                "sectionItem": {
+                    "title": "Navigate & Reorder",
+                    "description": "Click to scroll to a section. You can also drag and drop sections to change their order in the final document."
+                },
+                "dragHandle": {
+                    "title": "Drag to Reorder",
+                    "description": "Use this handle to grab a section and move it up or down in the list."
+                },
+                "visibilityToggle": {
+                    "title": "Show or Hide Sections",
+                    "description": "Click the eye icon to include or exclude a section from your resume. Hidden sections are not deleted, just not shown."
+                }
+            },
+            "editor": {
+                "overview": {
+                    "title": "Main Editor",
+                    "description": "This is where you edit the content of each section. We'll now focus on the 'Experience' section to see the available actions."
+                },
+                "addSection": {
+                    "title": "Add New Entry",
+                    "description": "Click this button to add a new entry to the current section, like a new job in your experience."
+                },
+                "editSection": {
+                    "title": "Edit an Entry",
+                    "description": "Click the pencil icon to open the editor for an existing entry. Let's open it to see more options."
+                },
+                "aiEdit": {
+                    "title": "AI Assistant",
+                    "description": "Use our AI Assistant to improve your writing. Type a prompt like 'make this more professional' and let the AI rewrite the text for you."
+                },
+                "voiceInput": {
+                    "title": "Voice-to-Text",
+                    "description": "Click the microphone to dictate your text instead of typing. This is a fast way to get your ideas down."
+                }
+            },
+            "topbar": {
+                "saveButton": {
+                    "title": "Save Your Progress",
+                    "description": "Don't forget to save your changes frequently! Your work is saved when you click this button."
+                },
+                "exportButton": {
+                    "title": "Export Your Resume",
+                    "description": "When you're finished, click here to see options for exporting your resume as a PDF or other formats."
+                },
+                "generateDocument": {
+                    "title": "Generate Documents",
+                    "description": "Create tailored documents like cover letters or professional bios based on this resume data."
+                },
+                "actionsDropdown": {
+                    "title": "More Actions",
+                    "description": "This menu contains additional actions, such as generating a personal website from your resume or creating a new resume variant."
+                },
+                "backButton": {
+                    "title": "Back to Dashboard",
+                    "description": "Click here to return to your main dashboard. Make sure you've saved your work first!"
+                }
+            }
+        }
     }
+
+    
 }

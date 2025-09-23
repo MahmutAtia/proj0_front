@@ -26,6 +26,9 @@ import CreateResumeFromExistingDialog from "./components/CreateResumeFromExistin
 import { getResumesFromCache } from '@/app/utils/resumeCache'; // Import cache utility
 import 'primeflex/primeflex.css';
 import styles from './EditableResumeTemplate.module.css'; // Ensure CSS Modules are used
+import { startTour } from './tour'; 
+import { useTranslation } from '@/hooks/useTranslation';
+import { FaQuestionCircle } from "react-icons/fa"; // Import tour icon
 
 const SECTION_ICONS = {
     personal_information: 'pi pi-user',
@@ -38,6 +41,8 @@ const SECTION_ICONS = {
     // Add icons for all other keys...
     default: 'pi pi-file'
 };
+
+
 
 const EditableResumeTemplate = ({
     resumeId,
@@ -71,6 +76,23 @@ const EditableResumeTemplate = ({
     
     // Get resumes cache for GenerateDocumentDialog
     const allResumesListCache = getResumesFromCache() || [];
+
+    const { t } = useTranslation();
+
+        // Effect to run the tour on first visit
+    useEffect(() => {
+        if (!loading && data) {
+            const hasSeenTour = localStorage.getItem('hasSeenResumeEditorTour');
+
+            console.log("Has seen tour?", hasSeenTour);
+            if (!hasSeenTour) {
+                setTimeout(() => {
+                    console.log("################# Starting tour...");
+                    startTour(t);
+                }, 1000);
+            }
+        }
+    }, [loading, data, t]);
  
     const actionItems = [
         {
@@ -509,7 +531,7 @@ const EditableResumeTemplate = ({
                 <div className="flex align-items-center">
                                         <Button
                         icon="pi pi-arrow-left"
-                        className="p-button-text p-button-secondary"
+                        className="p-button-text p-button-secondary tour-back-button"
                         tooltip="Back to Dashboard"
                         tooltipOptions={{ position: 'bottom' }}
                         onClick={() => confirmAndProceed('/main')}
@@ -527,12 +549,20 @@ const EditableResumeTemplate = ({
                 <div className="flex gap-2 align-items-center">
                     {loading && <ProgressSpinner style={{ width: '2rem', height: '2rem' }} strokeWidth="6" />}
                     
+                    <Button 
+                        icon={<FaQuestionCircle />} 
+                        className="p-button-rounded p-button-text p-button-plain" 
+                        onClick={() => startTour(t)} 
+                        tooltip="Start Tour"
+                        tooltipOptions={{ position: 'bottom' }}
+                    />
+
                     <SplitButton
                         label="Generate Document"
                         icon="pi pi-file-edit"
                         onClick={() => setShowGenerateDialog(true)}
                         model={actionItems}
-                        className="p-button-outlined p-button-secondary"
+                        className="p-button-outlined p-button-secondary tour-generate-document "
                         tooltip="Actions"
                         tooltipOptions={{ position: 'bottom' }}
                         disabled={loading || !data}
@@ -543,7 +573,7 @@ const EditableResumeTemplate = ({
                         label="Export"
                         tooltip="Export Options"
                         tooltipOptions={{ position: 'bottom' }}
-                        className="p-button-secondary"
+                        className="p-button-secondary tour-export-button"
                         onClick={() => confirmAndProceed(`/export/${resumeId}`)}
                         disabled={loading}
                     />
@@ -554,6 +584,7 @@ const EditableResumeTemplate = ({
                         severity="success"
                         onClick={saveResumeData}
                         disabled={loading}
+                        className="tour-save-button"
                     />
                 </div>
             </header>
@@ -567,7 +598,8 @@ const EditableResumeTemplate = ({
                     className={classNames(
                         styles.sidebar,
                         sidebarVisible && styles.sidebarVisible,
-                        "flex flex-column h-full surface-section border-right-1 surface-border"
+                        "flex flex-column h-full surface-section border-right-1 surface-border",
+                        "tour-sidebar"
                     )}
                     style={{ transition: 'transform 0.3s ease' }}
                 >
@@ -600,12 +632,13 @@ const EditableResumeTemplate = ({
                                                                 snapshot.isDragging && styles.sidebarItemDragging,
                                                                 isHidden && styles.sidebarItemHidden,
                                                                 activeSection === sectionKey && "bg-primary-reverse",
-                                                                "flex align-items-center justify-content-between p-2 surface-border cursor-pointer"
+                                                                "flex align-items-center justify-content-between p-2 surface-border cursor-pointer",
+                                                                "tour-section-item"
                                                             )}
                                                             onClick={() => scrollToSection(sectionKey)}
                                                         >
                                                             <div className={classNames(styles.sidebarItemContent, "flex align-items-center")}>
-                                                                <span {...provided.dragHandleProps} className={classNames(styles.dragHandle, "mr-2", "cursor-grab")}>
+                                                                <span {...provided.dragHandleProps} className={classNames(styles.dragHandle, "mr-2", "cursor-grab", "tour-drag-handle")}>
                                                                     <i className={SECTION_ICONS[sectionKey] || SECTION_ICONS.default}></i>
                                                                 </span>
                                                                 <span className={styles.sidebarItemText}>{formatSectionName(sectionKey)}</span>
@@ -617,7 +650,7 @@ const EditableResumeTemplate = ({
                                                             </div>
                                                             <Button
                                                                 icon={isHidden ? 'pi pi-eye-slash' : 'pi pi-eye'}
-                                                                className={classNames("p-button-text p-button-secondary p-button-sm", styles.visibilityToggle)}
+                                                                className={classNames("p-button-text p-button-secondary p-button-sm", styles.visibilityToggle, "tour-visibility-toggle")}
                                                                 onClick={(e) => {
                                                                     e.stopPropagation();
                                                                     toggleSectionVisibility(sectionKey);
@@ -642,7 +675,7 @@ const EditableResumeTemplate = ({
                 {sidebarVisible && <div className={classNames(styles.overlay, "lg:hidden")} onClick={() => setSidebarVisible(false)} />}
 
                 {/* Main Content */}
-                <main ref={mainContentRef} className="flex-1 overflow-y-auto surface-ground p-3 md:p-5">
+                <main ref={mainContentRef} className="flex-1 overflow-y-auto surface-ground p-3 md:p-5 tour-main-editor">
                     <div className="h-full">
                         {!data && loading && (
                             <div className="flex flex-column justify-content-center align-items-center h-full">

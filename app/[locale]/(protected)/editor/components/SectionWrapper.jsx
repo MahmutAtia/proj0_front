@@ -10,7 +10,7 @@ const SectionWrapper = ({ title, onAdd, children, toast, sectionKey }) => {
                 <h2 className="text-xl font-semibold m-0">{title}</h2>
                 <Button
                     icon="pi pi-plus"
-                    className="p-button-rounded p-button-success"
+                    className="p-button-rounded p-button-success tour-add-section"
                     onClick={onAdd}
                     tooltip={`Add ${title}`}
                 />

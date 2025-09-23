@@ -63,7 +63,7 @@ const ItemWrapper = ({
                     <div className="flex align-items-center">
                         <Button
                             icon="pi pi-pencil"
-                            className="p-button-rounded p-button-text"
+                            className="p-button-rounded p-button-text tour-edit-section"
                             onClick={onEdit}
                             tooltip="Edit Section"
                         />
@@ -71,7 +71,7 @@ const ItemWrapper = ({
                     <div className="flex align-items-center gap-1">
                          <Button
                             icon="pi pi-arrow-up"
-                            className="p-button-rounded p-button-text p-button-secondary"
+                            className="p-button-rounded p-button-text p-button-secondary tour-sort-items"
                             onClick={onMoveUp}
                             disabled={isFirst}
                             tooltip="Move Up"
@@ -85,7 +85,7 @@ const ItemWrapper = ({
                         />
                         <Button
                             icon="pi pi-trash"
-                            className="p-button-rounded p-button-danger p-button-text"
+                            className="p-button-rounded p-button-danger p-button-text tour-delete-section"
                             onClick={() => setShowDeleteDialog(true)}
                             tooltip="Delete Section"
                         />
@@ -114,7 +114,7 @@ const ItemWrapper = ({
                         {/* Sticky AI Assistant and Undo Button at the Bottom */}
                         <div className="sticky bottom-0 bg-surface-0 border-top-1 surface-border pt-3">
                             <div className="flex align-items-center justify-content-between gap-2 p-3">
-                                <div className="flex-grow-1">
+                                <div className="flex-grow-1 tour-ai-edit">
                                     <AIAssistant
                                         prompt={aiPrompt}
                                         setPrompt={setAiPrompt}
