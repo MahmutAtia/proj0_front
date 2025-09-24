@@ -532,7 +532,11 @@ const PersonalSiteEditorPage = ({ params: paramsPromise }) => {
                     className="website-block-container relative tour-block-container"
                     onMouseEnter={() => handleMouseEnter(block.name)}
                     onMouseLeave={handleMouseLeave}
-                    style={{ minHeight: '50px', outline: hoveredBlock === block.name ? '2px dashed var(--primary-color)' : 'none', transition: 'outline-color 0.2s' }}
+                    style={{
+                        minHeight: '50px',
+                        outline: hoveredBlock === block.name ? '2px dashed var(--primary-color)' : 'none',
+                        transition: 'outline-color 0.2s'
+                    }}
                 >
                     <iframe
                         title={`Preview ${block.name}`}
@@ -693,54 +697,63 @@ const PersonalSiteEditorPage = ({ params: paramsPromise }) => {
                         }}
                         scrolling="no"
                     />
-                    {hoveredBlock === block.name && (
-                        <div
-                            className="edit-overlay absolute top-0 right-0 p-2 flex flex-column align-items-end gap-2 z-1000 tour-edit-overlay"
-                            style={{ zIndex: 1000 }}
-                        >
-                            {block.feedback && (
-                                <React.Fragment>
-                                    <span
-                                        className="p-tag p-tag-info border-round-sm text-sm font-normal cursor-help feedback-tooltip-target"
-                                        data-pr-tooltip={block.feedback}
-                                        data-pr-position="left"
-                                        style={{ maxWidth: '150px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}
-                                    >
-                                        {block.feedback}
-                                    </span>
-                                    <Tooltip target=".feedback-tooltip-target" />
-                                </React.Fragment>
-                            )}
-                            <div className="flex align-items-center gap-2">
-                                <Button
-                                    icon="pi pi-undo"
-                                    className="p-button-rounded p-button-secondary tour-block-undo"
-                                    onClick={() => rollbackBlock(block.name)}
-                                    tooltip={`Rollback ${block.name}`}
-                                    tooltipOptions={{ position: 'left' }}
-                                    style={{ zIndex: 1001 }}
-                                    disabled={!blockHistory[block.name] || (historyIndex[block.name] ?? 0) <= 0}
-                                />
-                                <Button
-                                    icon="pi pi-refresh"
-                                    className="p-button-rounded p-button-secondary tour-block-redo"
-                                    onClick={() => forwardBlock(block.name)}
-                                    tooltip={`Forward ${block.name}`}
-                                    tooltipOptions={{ position: 'left' }}
-                                    style={{ zIndex: 1001 }}
-                                    disabled={!blockHistory[block.name] || (historyIndex[block.name] ?? 0) >= blockHistory[block.name].length - 1}
-                                />
-                                <Button
-                                    icon="pi pi-pencil"
-                                    className="p-button-rounded p-button-secondary tour-edit-block"
-                                    onClick={() => openEditDialog(block)}
-                                    tooltip={`Edit ${block.name}`}
-                                    tooltipOptions={{ position: 'left' }}
-                                    style={{ zIndex: 1001 }}
-                                />
-                            </div>
+                    {/* Always render the overlay, but control visibility with CSS */}
+                    <div
+                        className={`edit-overlay absolute top-0 right-0 p-2 flex flex-column align-items-end gap-2 z-1000 tour-edit-overlay`}
+                        style={{
+                            zIndex: 1000,
+                            opacity: hoveredBlock === block.name ? 1 : 0,
+                            pointerEvents: hoveredBlock === block.name ? 'auto' : 'none',
+                            transition: 'opacity 0.2s'
+                        }}
+                    >
+                        {block.feedback && (
+                            <React.Fragment>
+                                <span
+                                    className="p-tag p-tag-info border-round-sm text-sm font-normal cursor-help feedback-tooltip-target"
+                                    data-pr-tooltip={block.feedback}
+                                    data-pr-position="left"
+                                    style={{
+                                        maxWidth: '150px',
+                                        overflow: 'hidden',
+                                        textOverflow: 'ellipsis',
+                                        whiteSpace: 'nowrap'
+                                    }}
+                                >
+                                    {block.feedback}
+                                </span>
+                                <Tooltip target=".feedback-tooltip-target" />
+                            </React.Fragment>
+                        )}
+                        <div className="flex align-items-center gap-2">
+                            <Button
+                                icon="pi pi-undo"
+                                className="p-button-rounded p-button-secondary tour-block-undo"
+                                onClick={() => rollbackBlock(block.name)}
+                                tooltip={`Rollback ${block.name}`}
+                                tooltipOptions={{ position: 'left' }}
+                                style={{ zIndex: 1001 }}
+                                disabled={!blockHistory[block.name] || (historyIndex[block.name] ?? 0) <= 0}
+                            />
+                            <Button
+                                icon="pi pi-refresh"
+                                className="p-button-rounded p-button-secondary tour-block-redo"
+                                onClick={() => forwardBlock(block.name)}
+                                tooltip={`Forward ${block.name}`}
+                                tooltipOptions={{ position: 'left' }}
+                                style={{ zIndex: 1001 }}
+                                disabled={!blockHistory[block.name] || (historyIndex[block.name] ?? 0) >= blockHistory[block.name].length - 1}
+                            />
+                            <Button
+                                icon="pi pi-pencil"
+                                className="p-button-rounded p-button-secondary tour-edit-block"
+                                onClick={() => openEditDialog(block)}
+                                tooltip={`Edit ${block.name}`}
+                                tooltipOptions={{ position: 'left' }}
+                                style={{ zIndex: 1001 }}
+                            />
                         </div>
-                    )}
+                    </div>
                 </div>
             ))}
             <Dialog
