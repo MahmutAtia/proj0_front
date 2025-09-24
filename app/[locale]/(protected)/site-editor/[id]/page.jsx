@@ -13,6 +13,9 @@ import { Tooltip } from 'primereact/tooltip';
 import { Toast } from 'primereact/toast';
 import { Divider } from 'primereact/divider';
 import AIAssistant from '../../editor/components/AIAssistant';
+import { FaQuestionCircle } from "react-icons/fa"; // Import tour icon
+import { startSiteTour } from './tour'; // Import the new tour function
+import { useTranslation } from '@/hooks/useTranslation';
 
 const initialYamlState = {
     global: { name: "global", js: "", css: "", html: "", feedback: "Global styles and settings." },
@@ -60,6 +63,7 @@ const PersonalSiteEditorPage = ({ params: paramsPromise }) => {
     const [showConfirmDialog, setShowConfirmDialog] = useState(false);
     const [nextAction, setNextAction] = useState(null);
     const router = useRouter();
+    const { t } = useTranslation(); // Get translation function
 
     // --- Local Storage Key ---
     const getLocalStorageKey = useCallback(() => `personalSiteEditorBackup_${resumeId}`, [resumeId]);
@@ -98,6 +102,14 @@ const PersonalSiteEditorPage = ({ params: paramsPromise }) => {
             initializeHistory(fetchedData); // Initialize history based on fetched data
             setHasUnsavedChanges(false); // Fresh data has no unsaved changes
             setLoading(false);
+
+            // Start tour on first visit
+            const hasSeenTour = localStorage.getItem('hasSeenSiteEditorTour');
+            if (!hasSeenTour) {
+                setTimeout(() => {
+                    startSiteTour(t);
+                }, 1000);
+            }
         };
 
         const fetchAndProcess = async () => {
@@ -385,8 +397,6 @@ const PersonalSiteEditorPage = ({ params: paramsPromise }) => {
             const previousIndex = currentIndex - 1;
             const previousState = history[previousIndex];
 
-            console.log(`[${blockName}] Rolling back to Index: ${previousIndex}`);
-
             setYamlData(prevData => {
                 const updatedBlocks = prevData.code_bloks.map(block => {
                     if (block.name === blockName) {
@@ -511,6 +521,7 @@ const PersonalSiteEditorPage = ({ params: paramsPromise }) => {
                     onForwardGlobal={() => forwardBlock('global')}
                     isRollbackDisabled={!blockHistory['global'] || (historyIndex['global'] ?? 0) <= 0}
                     isForwardDisabled={!blockHistory['global'] || (historyIndex['global'] ?? 0) >= blockHistory['global'].length - 1}
+                    onStartTour={() => startSiteTour(t)}
                 />
             )}
 
@@ -518,7 +529,7 @@ const PersonalSiteEditorPage = ({ params: paramsPromise }) => {
             {yamlData.code_bloks.map((block, index) => (
                 <div
                     key={block.name || index}
-                    className="website-block-container relative"
+                    className="website-block-container relative tour-block-container"
                     onMouseEnter={() => handleMouseEnter(block.name)}
                     onMouseLeave={handleMouseLeave}
                     style={{ minHeight: '50px', outline: hoveredBlock === block.name ? '2px dashed var(--primary-color)' : 'none', transition: 'outline-color 0.2s' }}
@@ -684,7 +695,7 @@ const PersonalSiteEditorPage = ({ params: paramsPromise }) => {
                     />
                     {hoveredBlock === block.name && (
                         <div
-                            className="edit-overlay absolute top-0 right-0 p-2 flex flex-column align-items-end gap-2 z-1000"
+                            className="edit-overlay absolute top-0 right-0 p-2 flex flex-column align-items-end gap-2 z-1000 tour-edit-overlay"
                             style={{ zIndex: 1000 }}
                         >
                             {block.feedback && (
@@ -703,7 +714,7 @@ const PersonalSiteEditorPage = ({ params: paramsPromise }) => {
                             <div className="flex align-items-center gap-2">
                                 <Button
                                     icon="pi pi-undo"
-                                    className="p-button-rounded p-button-secondary"
+                                    className="p-button-rounded p-button-secondary tour-block-undo"
                                     onClick={() => rollbackBlock(block.name)}
                                     tooltip={`Rollback ${block.name}`}
                                     tooltipOptions={{ position: 'left' }}
@@ -712,7 +723,7 @@ const PersonalSiteEditorPage = ({ params: paramsPromise }) => {
                                 />
                                 <Button
                                     icon="pi pi-refresh"
-                                    className="p-button-rounded p-button-secondary"
+                                    className="p-button-rounded p-button-secondary tour-block-redo"
                                     onClick={() => forwardBlock(block.name)}
                                     tooltip={`Forward ${block.name}`}
                                     tooltipOptions={{ position: 'left' }}
@@ -721,7 +732,7 @@ const PersonalSiteEditorPage = ({ params: paramsPromise }) => {
                                 />
                                 <Button
                                     icon="pi pi-pencil"
-                                    className="p-button-rounded p-button-secondary"
+                                    className="p-button-rounded p-button-secondary tour-edit-block"
                                     onClick={() => openEditDialog(block)}
                                     tooltip={`Edit ${block.name}`}
                                     tooltipOptions={{ position: 'left' }}
@@ -738,18 +749,18 @@ const PersonalSiteEditorPage = ({ params: paramsPromise }) => {
                 style={{ width: '50vw' }}
                 breakpoints={{ '960px': '75vw', '641px': '90vw' }}
                 modal
-                className="p-fluid"
+                className="p-fluid tour-ai-dialog"
                 onHide={closeEditDialog}
             >
-                <div className="p-mb-4">
+                <div className="mb-4">
                     <p className="text-600">Current Block Feedback: {currentBlock?.feedback || 'No feedback available.'}</p>
                     <small className="text-500">Enter your prompt to modify the HTML, CSS, or JS of this specific block.</small>
                 </div>
 
                 <Divider />
 
-                <div className="p-mb-4">
-                    <h6 className="p-mb-3">AI Prompt</h6>
+                <div className="mb-4">
+                    <h6 className="mb-3">AI Prompt</h6>
                     <AIAssistant
                         prompt={aiPrompt}
                         setPrompt={setAiPrompt}
@@ -761,8 +772,8 @@ const PersonalSiteEditorPage = ({ params: paramsPromise }) => {
                 {currentBlock?.feedback_message && (
                     <React.Fragment>
                         <Divider />
-                        <div className="p-mb-4">
-                            <h6 className="p-mb-2">AI Feedback</h6>
+                        <div className="mb-4">
+                            <h6 className="mb-2">AI Feedback</h6>
                             <div className="p-3 border-1 border-round-sm border-primary bg-primary-50 text-primary-900">
                                 <i className="pi pi-info-circle mr-2"></i>
                                 {currentBlock.feedback_message}
@@ -773,12 +784,12 @@ const PersonalSiteEditorPage = ({ params: paramsPromise }) => {
 
                 <Divider />
 
-                <div className="p-mb-4">
-                    <h6 className="p-mb-3">Artifacts (Optional)</h6>
-                    <small className="p-d-block p-mb-3 text-500">Add key-value pairs for specific data like image URLs, video links, specific text snippets, etc.</small>
+                <div className="mb-4">
+                    <h6 className="mb-3">Artifacts (Optional)</h6>
+                    <small className="p-d-block mb-3 text-500">Add key-value pairs for specific data like image URLs, video links, specific text snippets, etc.</small>
                     <div className="p-grid p-formgrid nested-grid">
                         {artifacts.map((artifact, index) => (
-                            <div key={index} className="p-col-12 p-md-6 flex align-items-center p-mb-2">
+                            <div key={index} className="p-col-12 p-md-6 flex align-items-center mb-2">
                                 <div className="p-field p-col p-m-0">
                                     <InputText
                                         value={artifact.key}
@@ -901,18 +912,19 @@ const EditorToolbar = ({
     onRollbackGlobal,
     onForwardGlobal,
     isRollbackDisabled,
-    isForwardDisabled
+    isForwardDisabled,
+    onStartTour
 }) => {
     // Add the /site/ prefix to the URL
     const siteUrl = `${process.env.NEXT_PUBLIC_BACKEND_URL}/site/${resumeId}/`;
     const router = useRouter();
 
     return (
-        <div className="p-3 surface-ground border-bottom-1 surface-border flex flex-wrap justify-content-between align-items-center sticky top-0 z-5 gap-2" style={{ zIndex: 1010 }}>
+        <div className="p-3 surface-ground border-bottom-1 surface-border flex flex-wrap justify-content-between align-items-center sticky top-0 z-5 gap-2 tour-toolbar" style={{ zIndex: 1010 }}>
             <div className="flex align-items-center gap-2">
                 <Button
                     icon="pi pi-arrow-left"
-                    className="p-button-text p-button-secondary"
+                    className="p-button-text p-button-secondary tour-back-button"
                     tooltip="Back to Dashboard"
                     tooltipOptions={{ position: 'bottom' }}
                     onClick={() => confirmAndProceed('/main')}
@@ -920,31 +932,40 @@ const EditorToolbar = ({
                 <Button
                     label="Edit Global Settings"
                     icon="pi pi-cog"
-                    className="p-button-secondary p-button-sm"
+                    className="p-button-secondary p-button-sm tour-global-settings"
                     onClick={onEditGlobal}
                     tooltip="Edit sitewide CSS, JS, or Head HTML"
                     tooltipOptions={{ position: 'bottom' }}
                 />
-                <Button
-                    icon="pi pi-undo"
-                    className="p-button-text p-button-secondary"
-                    onClick={onRollbackGlobal}
-                    disabled={isRollbackDisabled}
-                    tooltip="Undo Global Change"
-                    tooltipOptions={{ position: 'bottom' }}
-                />
-                <Button
-                    icon="pi pi-refresh"
-                    className="p-button-text p-button-secondary"
-                    onClick={onForwardGlobal}
-                    disabled={isForwardDisabled}
-                    tooltip="Redo Global Change"
-                    tooltipOptions={{ position: 'bottom' }}
-                />
+                <div className="flex align-items-center tour-global-history">
+                    <Button
+                        icon="pi pi-undo"
+                        className="p-button-text p-button-secondary tour-global-undo"
+                        onClick={onRollbackGlobal}
+                        disabled={isRollbackDisabled}
+                        tooltip="Undo Global Change"
+                        tooltipOptions={{ position: 'bottom' }}
+                    />
+                    <Button
+                        icon="pi pi-refresh"
+                        className="p-button-text p-button-secondary tour-global-redo"
+                        onClick={onForwardGlobal}
+                        disabled={isForwardDisabled}
+                        tooltip="Redo Global Change"
+                        tooltipOptions={{ position: 'bottom' }}
+                    />
+                </div>
             </div>
 
             <div className="flex align-items-center gap-2">
-                <a href={siteUrl} target="_blank" rel="noopener noreferrer" style={{ textDecoration: 'none' }}>
+                <Button
+                    icon={<FaQuestionCircle />}
+                    className="p-button-rounded p-button-text p-button-plain"
+                    onClick={onStartTour}
+                    tooltip="Start Tour"
+                    tooltipOptions={{ position: 'bottom' }}
+                />
+                <a href={siteUrl} target="_blank" rel="noopener noreferrer" style={{ textDecoration: 'none' }} className="tour-view-site">
                     <Button
                         label="View My Site"
                         icon="pi pi-external-link"
@@ -957,7 +978,7 @@ const EditorToolbar = ({
                 <Button
                     label={isSaving ? 'Saving...' : 'Save Changes'}
                     icon={isSaving ? <ProgressSpinner style={{ width: '18px', height: '18px' }} strokeWidth="8" /> : "pi pi-save"}
-                    className="p-button-sm p-button-success"
+                    className="p-button-sm p-button-success tour-save-button"
                     onClick={onSave}
                     disabled={isSaving || !hasUnsavedChanges}
                     tooltip={hasUnsavedChanges ? "Save your latest changes to the server" : "No changes to save"}
