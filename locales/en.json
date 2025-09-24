@@ -441,6 +441,55 @@
                 }
             }
         }
+    },
+    
+    "siteEditor": {
+        "tour": {
+            "intro": {
+                "title": "Welcome to the Site Editor",
+                "description": "You are currently in the <b>Site Editor</b>. This is not your live website, but a safe place to make changes and preview them before publishing. Let's take a quick tour!"
+            },
+            "toolbar": {
+                "title": "Site Editor Toolbar",
+                "description": "This toolbar contains all the main actions for managing your website."
+            },
+            "globalSettings": {
+                "title": "Global Settings",
+                "description": "Edit sitewide settings like general themes, fonts, and colors, site wide animations, and more."
+            },
+            "globalHistory": {
+                "title": "Global History",
+                "description": "Undo and redo changes made to your global settings."
+            },
+            "viewLiveSite": {
+                "title": "View Live Site",
+                "description": "Open your live website in a new tab to see how it looks to visitors. you can share this link with your friends, add it to your resume and start promoting your personal brand."
+            },
+            "saveChanges": {
+                "title": "Save Changes",
+                "description": "Save all your edits. The button is disabled if there are no unsaved changes."
+            },
+            "contentBlock": {
+                "title": "Editable Content Block",
+                "description": "Your website is made of these blocks. Hover over a block to see editing options."
+            },
+            "undoBlock": {
+                "title": "Undo Block Change",
+                "description": "You can undo any change you make to this specific block."
+            },
+            "redoBlock": {
+                "title": "Redo Block Change",
+                "description": "If you undo by mistake, you can redo the change right here."
+            },
+            "aiEditor": {
+                "title": "AI-Powered Editor",
+                "description": "Click the pencil to open the AI editor. Let's see what's inside."
+            },
+            "aiAssistant": {
+                "title": "AI Assistant",
+                "description": "Here, you can write a prompt to change the block's content, style, or functionality. The AI will handle the code."
+            }
+        }
     }
 
     

@@ -374,5 +374,52 @@
         }
     },
      "resumeEditor": { "tour": { "sidebar": { "navigation": { "title": "Secciones del Currículum", "description": "Esta barra lateral enumera todas las secciones de tu currículum. Puedes navegar rápidamente a cualquier sección haciendo clic en su nombre." }, "sectionItem": { "title": "Navegar y Reordenar", "description": "Haz clic para desplazarte a una sección. También puedes arrastrar y soltar secciones para cambiar su orden en el documento final." }, "dragHandle": { "title": "Arrastrar para Reordenar", "description": "Usa este manejador para agarrar una sección y moverla hacia arriba o abajo en la lista." }, "visibilityToggle": { "title": "Mostrar u Ocultar Secciones", "description": "Haz clic en el icono del ojo para incluir o excluir una sección de tu currículum. Las secciones ocultas no se eliminan, solo no se muestran." } }, "editor": { "overview": { "title": "Editor Principal", "description": "Aquí es donde editas el contenido de cada sección. Ahora nos centraremos en la sección de 'Experiencia' para ver las acciones disponibles." }, "addSection": { "title": "Agregar Nueva Entrada", "description": "Haz clic en este botón para agregar una nueva entrada a la sección actual, como un nuevo trabajo en tu experiencia." }, "editSection": { "title": "Editar una Entrada", "description": "Haz clic en el icono del lápiz para abrir el editor de una entrada existente. Vamos a abrirlo para ver más opciones." }, "aiEdit": { "title": "Asistente de IA", "description": "Usa nuestro Asistente de IA para mejorar tu escritura. Escribe una solicitud como 'haz esto más profesional' y deja que la IA reescriba el texto por ti." }, "voiceInput": { "title": "Voz a Texto", "description": "Haz clic en el micrófono para dictar tu texto en lugar de escribir. Esta es una forma rápida de plasmar tus ideas." } }, "topbar": { "saveButton": { "title": "Guarda tu Progreso", "description": "¡No olvides guardar tus cambios con frecuencia! Tu trabajo se guarda cuando haces clic en este botón." }, "exportButton": { "title": "Exportar tu Currículum", "description": "Cuando termines, haz clic aquí para ver las opciones para exportar tu currículum como PDF u otros formatos." }, "generateDocument": { "title": "Generar Documentos", "description": "Crea documentos a medida como cartas de presentación o biografías profesionales basadas en los datos de este currículum." }, "actionsDropdown": { "title": "Más Acciones", "description": "Este menú contiene acciones adicionales, como generar un sitio web personal a partir de tu currículum o crear una nueva variante del currículum." }, "backButton": { "title": "Volver al Panel de Control", "description": "Haz clic aquí para volver a tu panel de control principal. ¡Asegúrate de haber guardado tu trabajo primero!" } } } } 
-
+,  "siteEditor": {
+        "tour": {
+            "intro": {
+                "title": "Bienvenido al Editor de Sitios",
+                "description": "Actualmente te encuentras en el <b>Editor de Sitios</b>. Este no es tu sitio web en vivo, sino un lugar seguro para realizar cambios y previsualizarlos antes de publicar. ¡Hagamos un recorrido rápido!"
+            },
+            "toolbar": {
+                "title": "Barra de herramientas del Editor de Sitios",
+                "description": "Esta barra de herramientas contiene todas las acciones principales para gestionar tu sitio web."
+            },
+            "globalSettings": {
+                "title": "Configuración Global",
+                "description": "Edita la configuración de todo el sitio, como temas generales, fuentes y colores, animaciones de todo el sitio y más."
+            },
+            "globalHistory": {
+                "title": "Historial Global",
+                "description": "Deshaz y rehaz los cambios realizados en tu configuración global."
+            },
+            "viewLiveSite": {
+                "title": "Ver Sitio en Vivo",
+                "description": "Abre tu sitio web en vivo en una nueva pestaña para ver cómo se ve para los visitantes. Puedes compartir este enlace con tus amigos, agregarlo a tu currículum y empezar a promocionar tu marca personal."
+            },
+            "saveChanges": {
+                "title": "Guardar Cambios",
+                "description": "Guarda todas tus ediciones. El botón se deshabilita si no hay cambios sin guardar."
+            },
+            "contentBlock": {
+                "title": "Bloque de Contenido Editable",
+                "description": "Tu sitio web está hecho de estos bloques. Pasa el cursor sobre un bloque para ver las opciones de edición."
+            },
+            "undoBlock": {
+                "title": "Deshacer Cambio de Bloque",
+                "description": "Puedes deshacer cualquier cambio que hagas en este bloque específico."
+            },
+            "redoBlock": {
+                "title": "Rehacer Cambio de Bloque",
+                "description": "Si deshaces por error, puedes rehacer el cambio aquí mismo."
+            },
+            "aiEditor": {
+                "title": "Editor Impulsado por IA",
+                "description": "Haz clic en el lápiz para abrir el editor de IA. Veamos qué hay dentro."
+            },
+            "aiAssistant": {
+                "title": "Asistente de IA",
+                "description": "Aquí, puedes escribir una solicitud para cambiar el contenido, estilo o funcionalidad del bloque. La IA se encargará del código."
+            }
+        }
+    }
 }

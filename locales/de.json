@@ -373,5 +373,52 @@
             "description": "Keine Stellenangebote gefunden, die Ihren Kriterien entsprechen. Versuchen Sie, Ihre Suche zu erweitern!"
         }
     }, "resumeEditor": { "tour": { "sidebar": { "navigation": { "title": "Lebenslauf-Abschnitte", "description": "Diese Seitenleiste listet alle Abschnitte Ihres Lebenslaufs auf. Sie können schnell zu jedem Abschnitt navigieren, indem Sie auf seinen Namen klicken." }, "sectionItem": { "title": "Navigieren & Neu anordnen", "description": "Klicken Sie, um zu einem Abschnitt zu scrollen. Sie können Abschnitte auch per Drag-and-Drop verschieben, um ihre Reihenfolge im endgültigen Dokument zu ändern." }, "dragHandle": { "title": "Zum Neu anordnen ziehen", "description": "Verwenden Sie diesen Griff, um einen Abschnitt zu greifen und ihn in der Liste nach oben oder unten zu verschieben." }, "visibilityToggle": { "title": "Abschnitte anzeigen oder ausblenden", "description": "Klicken Sie auf das Augensymbol, um einen Abschnitt in Ihren Lebenslauf aufzunehmen oder auszuschließen. Ausgeblendete Abschnitte werden nicht gelöscht, sondern nur nicht angezeigt." } }, "editor": { "overview": { "title": "Haupteditor", "description": "Hier bearbeiten Sie den Inhalt jedes Abschnitts. Wir werden uns nun auf den Abschnitt 'Erfahrung' konzentrieren, um die verfügbaren Aktionen zu sehen." }, "addSection": { "title": "Neuen Eintrag hinzufügen", "description": "Klicken Sie auf diese Schaltfläche, um dem aktuellen Abschnitt einen neuen Eintrag hinzuzufügen, wie z.B. einen neuen Job in Ihrer Erfahrung." }, "editSection": { "title": "Einen Eintrag bearbeiten", "description": "Klicken Sie auf das Bleistiftsymbol, um den Editor für einen vorhandenen Eintrag zu öffnen. Lassen Sie uns ihn öffnen, um weitere Optionen zu sehen." }, "aiEdit": { "title": "KI-Assistent", "description": "Verwenden Sie unseren KI-Assistenten, um Ihr Schreiben zu verbessern. Geben Sie eine Aufforderung wie 'Mach das professioneller' ein und lassen Sie die KI den Text für Sie neu schreiben." }, "voiceInput": { "title": "Sprache zu Text", "description": "Klicken Sie auf das Mikrofon, um Ihren Text zu diktieren, anstatt ihn zu tippen. Dies ist ein schneller Weg, um Ihre Ideen festzuhalten." } }, "topbar": { "saveButton": { "title": "Speichern Sie Ihren Fortschritt", "description": "Vergessen Sie nicht, Ihre Änderungen häufig zu speichern! Ihre Arbeit wird gespeichert, wenn Sie auf diese Schaltfläche klicken." }, "exportButton": { "title": "Lebenslauf exportieren", "description": "Wenn Sie fertig sind, klicken Sie hier, um Optionen zum Exportieren Ihres Lebenslaufs als PDF oder in anderen Formaten zu sehen." }, "generateDocument": { "title": "Dokumente erstellen", "description": "Erstellen Sie maßgeschneiderte Dokumente wie Anschreiben oder professionelle Biografien basierend auf diesen Lebenslaufdaten." }, "actionsDropdown": { "title": "Weitere Aktionen", "description": "Dieses Menü enthält zusätzliche Aktionen, wie das Generieren einer persönlichen Website aus Ihrem Lebenslauf oder das Erstellen einer neuen Lebenslaufvariante." }, "backButton": { "title": "Zurück zum Dashboard", "description": "Klicken Sie hier, um zu Ihrem Haupt-Dashboard zurückzukehren. Stellen Sie sicher, dass Sie Ihre Arbeit zuerst gespeichert haben!" } } } } 
-
+, "siteEditor": {
+        "tour": {
+            "intro": {
+                "title": "Willkommen im Site-Editor",
+                "description": "Sie befinden sich derzeit im <b>Site-Editor</b>. Dies ist nicht Ihre Live-Website, sondern ein sicherer Ort, um Änderungen vorzunehmen und sie vor der Veröffentlichung in der Vorschau anzuzeigen. Machen wir eine kurze Tour!"
+            },
+            "toolbar": {
+                "title": "Site-Editor-Symbolleiste",
+                "description": "Diese Symbolleiste enthält alle Hauptaktionen zur Verwaltung Ihrer Website."
+            },
+            "globalSettings": {
+                "title": "Globale Einstellungen",
+                "description": "Bearbeiten Sie websiteweite Einstellungen wie allgemeine Themen, Schriftarten und Farben, websiteweite Animationen und mehr."
+            },
+            "globalHistory": {
+                "title": "Globaler Verlauf",
+                "description": "Machen Sie Änderungen an Ihren globalen Einstellungen rückgängig und wiederholen Sie sie."
+            },
+            "viewLiveSite": {
+                "title": "Live-Website anzeigen",
+                "description": "Öffnen Sie Ihre Live-Website in einem neuen Tab, um zu sehen, wie sie für Besucher aussieht. Sie können diesen Link mit Ihren Freunden teilen, ihn Ihrem Lebenslauf hinzufügen und mit der Förderung Ihrer persönlichen Marke beginnen."
+            },
+            "saveChanges": {
+                "title": "Änderungen speichern",
+                "description": "Speichern Sie alle Ihre Bearbeitungen. Die Schaltfläche ist deaktiviert, wenn keine ungespeicherten Änderungen vorhanden sind."
+            },
+            "contentBlock": {
+                "title": "Bearbeitbarer Inhaltsblock",
+                "description": "Ihre Website besteht aus diesen Blöcken. Fahren Sie mit der Maus über einen Block, um Bearbeitungsoptionen anzuzeigen."
+            },
+            "undoBlock": {
+                "title": "Blockänderung rückgängig machen",
+                "description": "Sie können jede Änderung, die Sie an diesem bestimmten Block vornehmen, rückgängig machen."
+            },
+            "redoBlock": {
+                "title": "Blockänderung wiederherstellen",
+                "description": "Wenn Sie versehentlich rückgängig machen, können Sie die Änderung hier wiederherstellen."
+            },
+            "aiEditor": {
+                "title": "KI-gestützter Editor",
+                "description": "Klicken Sie auf den Bleistift, um den KI-Editor zu öffnen. Sehen wir uns an, was sich darin befindet."
+            },
+            "aiAssistant": {
+                "title": "KI-Assistent",
+                "description": "Hier können Sie eine Aufforderung schreiben, um den Inhalt, den Stil oder die Funktionalität des Blocks zu ändern. Die KI kümmert sich um den Code."
+            }
+        }
+    }
 }

@@ -374,5 +374,55 @@
         }
     },
      "resumeEditor": { "tour": { "sidebar": { "navigation": { "title": "Sections du CV", "description": "Cette barre latérale liste toutes les sections de votre CV. Vous pouvez naviguer rapidement vers n'importe quelle section en cliquant sur son nom." }, "sectionItem": { "title": "Naviguer et Réorganiser", "description": "Cliquez pour faire défiler jusqu'à une section. Vous pouvez également faire glisser et déposer des sections pour modifier leur ordre dans le document final." }, "dragHandle": { "title": "Faire glisser pour Réorganiser", "description": "Utilisez cette poignée pour saisir une section et la déplacer vers le haut ou vers le bas dans la liste." }, "visibilityToggle": { "title": "Afficher ou masquer les sections", "description": "Cliquez sur l'icône de l'œil pour inclure ou exclure une section de votre CV. Les sections masquées ne sont pas supprimées, elles ne sont simplement pas affichées." } }, "editor": { "overview": { "title": "Éditeur Principal", "description": "C'est ici que vous modifiez le contenu de chaque section. Nous allons maintenant nous concentrer sur la section 'Expérience' pour voir les actions disponibles." }, "addSection": { "title": "Ajouter une nouvelle entrée", "description": "Cliquez sur ce bouton pour ajouter une nouvelle entrée à la section actuelle, comme un nouvel emploi dans votre expérience." }, "editSection": { "title": "Modifier une entrée", "description": "Cliquez sur l'icône du crayon pour ouvrir l'éditeur d'une entrée existante. Ouvrons-le pour voir plus d'options." }, "aiEdit": { "title": "Assistant IA", "description": "Utilisez notre assistant IA pour améliorer votre écriture. Tapez une invite comme 'rendre cela plus professionnel' et laissez l'IA réécrire le texte pour vous." }, "voiceInput": { "title": "Voix en texte", "description": "Cliquez sur le microphone pour dicter votre texte au lieu de le taper. C'est un moyen rapide de coucher vos idées." } }, "topbar": { "saveButton": { "title": "Sauvegarder votre progression", "description": "N'oubliez pas de sauvegarder vos modifications fréquemment ! Votre travail est enregistré lorsque vous cliquez sur ce bouton." }, "exportButton": { "title": "Exporter votre CV", "description": "Lorsque vous avez terminé, cliquez ici pour voir les options d'exportation de votre CV au format PDF ou autres." }, "generateDocument": { "title": "Générer des documents", "description": "Créez des documents sur mesure comme des lettres de motivation ou des biographies professionnelles basés sur ces données de CV." }, "actionsDropdown": { "title": "Plus d'actions", "description": "Ce menu contient des actions supplémentaires, telles que la génération d'un site web personnel à partir de votre CV ou la création d'une nouvelle variante de CV." }, "backButton": { "title": "Retour au tableau de bord", "description": "Cliquez ici pour retourner à votre tableau de bord principal. Assurez-vous d'avoir d'abord sauvegardé votre travail !" } } } } 
+,
 
+"siteEditor": {
+"tour": {
+"intro": {
+"title": "Bienvenue dans l'éditeur de site",
+"description": "Vous êtes actuellement dans l'<b>éditeur de site</b>. Ce n'est pas votre site web en direct, mais un endroit sûr pour faire des changements et les prévisualiser avant de les publier. Faisons une visite rapide !"
+},
+"toolbar": {
+"title": "Barre d'outils de l'éditeur de site",
+"description": "Cette barre d'outils contient toutes les actions principales pour gérer votre site web."
+},
+"globalSettings": {
+"title": "Paramètres globaux",
+"description": "Modifiez les paramètres de l'ensemble du site comme les thèmes généraux, les polices et les couleurs, les animations de l'ensemble du site, et plus encore."
+},
+"globalHistory": {
+"title": "Historique global",
+"description": "Annulez et rétablissez les changements effectués sur vos paramètres globaux."
+},
+"viewLiveSite": {
+"title": "Voir le site en direct",
+"description": "Ouvrez votre site web en direct dans un nouvel onglet pour voir à quoi il ressemble pour les visiteurs. Vous pouvez partager ce lien avec vos amis, l'ajouter à votre CV et commencer à promouvoir votre marque personnelle."
+},
+"saveChanges": {
+"title": "Enregistrer les modifications",
+"description": "Enregistrez toutes vos modifications. Le bouton est désactivé s'il n'y a pas de modifications non enregistrées."
+},
+"contentBlock": {
+"title": "Bloc de contenu modifiable",
+"description": "Votre site web est composé de ces blocs. Survolez un bloc pour voir les options d'édition."
+},
+"undoBlock": {
+"title": "Annuler la modification du bloc",
+"description": "Vous pouvez annuler toute modification que vous apportez à ce bloc spécifique."
+},
+"redoBlock": {
+"title": "Rétablir la modification du bloc",
+"description": "Si vous annulez par erreur, vous pouvez rétablir la modification ici."
+},
+"aiEditor": {
+"title": "Éditeur assisté par l'IA",
+"description": "Cliquez sur le crayon pour ouvrir l'éditeur IA. Voyons ce qu'il y a à l'intérieur."
+},
+"aiAssistant": {
+"title": "Assistant IA",
+"description": "Ici, vous pouvez écrire une invite pour modifier le contenu, le style ou la fonctionnalité du bloc. L'IA se chargera du code."
 }
+}
+}
+}
+

@@ -6,11 +6,11 @@ export const startSiteTour = (t) => {
         showProgress: true,
         popoverClass: 'driverjs-theme',
         steps: [
-                        {
+            {
                 element: null, // No element, show as modal
                 popover: {
-                    title: "Welcome to the Site Editor",
-                    description: "You are currently in the <b>Site Editor</b>. This is not your live website, but a safe place to make changes and preview them before publishing. Let's take a quick tour!",
+                    title: t('siteEditor.tour.intro.title'),
+                    description: t('siteEditor.tour.intro.description'),
                     side: "center",
                     align: 'center'
                 }
@@ -18,8 +18,8 @@ export const startSiteTour = (t) => {
             {
                 element: '.tour-toolbar',
                 popover: {
-                    title: "Site Editor Toolbar",
-                    description: "This toolbar contains all the main actions for managing your website.",
+                    title: t('siteEditor.tour.toolbar.title'),
+                    description: t('siteEditor.tour.toolbar.description'),
                     side: "bottom", 
                     align: 'start'
                 
@@ -28,8 +28,8 @@ export const startSiteTour = (t) => {
             {
                 element: '.tour-global-settings',
                 popover: {
-                    title: "Global Settings",
-                    description: "Edit sitewide settings like general themes, fonts, and colors, site wide animations, and more.",
+                    title: t('siteEditor.tour.globalSettings.title'),
+                    description: t('siteEditor.tour.globalSettings.description'),
                     side: "bottom",
                     align: 'start'
                 }
@@ -37,8 +37,8 @@ export const startSiteTour = (t) => {
             {
                 element: '.tour-global-history',
                 popover: {
-                    title: "Global History",
-                    description: "Undo and redo changes made to your global settings.",
+                    title: t('siteEditor.tour.globalHistory.title'),
+                    description: t('siteEditor.tour.globalHistory.description'),
                     side: "bottom",
                     align: 'start'
                 }
@@ -46,8 +46,8 @@ export const startSiteTour = (t) => {
             {
                 element: '.tour-view-site',
                 popover: {
-                    title: "View Live Site",
-                    description: "Open your live website in a new tab to see how it looks to visitors. you can share this link with your friends, add it to your resume and start promoting your personal brand.",
+                    title: t('siteEditor.tour.viewLiveSite.title'),
+                    description: t('siteEditor.tour.viewLiveSite.description'),
                     side: "bottom",
                     align: 'end'
                 }
@@ -55,8 +55,8 @@ export const startSiteTour = (t) => {
             {
                 element: '.tour-save-button',
                 popover: {
-                    title: "Save Changes",
-                    description: "Save all your edits. The button is disabled if there are no unsaved changes.",
+                    title: t('siteEditor.tour.saveChanges.title'),
+                    description: t('siteEditor.tour.saveChanges.description'),
                     side: "bottom",
                     align: 'end'
                 }
@@ -64,8 +64,8 @@ export const startSiteTour = (t) => {
             {
                 element: '.tour-block-container',
                 popover: {
-                    title: "Editable Content Block",
-                    description: "Your website is made of these blocks. Hover over a block to see editing options.",
+                    title: t('siteEditor.tour.contentBlock.title'),
+                    description: t('siteEditor.tour.contentBlock.description'),
                     side: "top",
                     align: 'center'
                 },
@@ -87,8 +87,8 @@ onHighlightEnded: () => {
             {
                 element: '.tour-block-undo',
                 popover: {
-                    title: "Undo Block Change",
-                    description: "You can undo any change you make to this specific block.",
+                    title: t('siteEditor.tour.undoBlock.title'),
+                    description: t('siteEditor.tour.undoBlock.description'),
                     side: "left",
                     align: 'start'
                 },
@@ -102,8 +102,8 @@ onHighlightEnded: () => {
             {
                 element: '.tour-block-redo',
                 popover: {
-                    title: "Redo Block Change",
-                    description: "If you undo by mistake, you can redo the change right here.",
+                    title: t('siteEditor.tour.redoBlock.title'),
+                    description: t('siteEditor.tour.redoBlock.description'),
                     side: "left",
                     align: 'start'
                 },
@@ -116,8 +116,8 @@ onHighlightEnded: () => {
 },            {
                 element: '.tour-edit-block',
                 popover: {
-                    title: "AI-Powered Editor",
-                    description: "Click the pencil to open the AI editor. Let's see what's inside.",
+                    title: t('siteEditor.tour.aiEditor.title'),
+                    description: t('siteEditor.tour.aiEditor.description'),
                     side: "left",
                     align: 'start'
                 },
@@ -134,8 +134,8 @@ onHighlightEnded: () => {
 },            {
                 element: '.tour-ai-dialog',
                 popover: {
-                    title: "AI Assistant",
-                    description: "Here, you can write a prompt to change the block's content, style, or functionality. The AI will handle the code.",
+                    title: t('siteEditor.tour.aiAssistant.title'),
+                    description: t('siteEditor.tour.aiAssistant.description'),
                     side: "top",
                     align: 'center'
                 },
@@ -155,3 +155,4 @@ onHighlightEnded: () => {
 
     driverObj.drive();
 };
+// Usage example in a React component
