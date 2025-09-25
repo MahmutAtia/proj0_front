@@ -39,13 +39,26 @@
     transform: translateY(-3px);
 }
 
-/* Ensure image covers the area within the template card */
 .templatePreviewImage {
     object-fit: cover;
-    object-position: top center;
+    object-position: top;
     width: 100%;
-    height: 150px; /* Fixed height for consistency */
+    height: 150px;
+    border-radius: 4px 4px 0 0; /* rounded top, flat bottom like a page */
+    transition: transform 0.3s ease, filter 0.3s ease, box-shadow 0.3s ease;
+
+    /* Sharper + vibrant look */
+    filter: contrast(1.08) brightness(1.05) saturate(1.08);
+
+    /* Document-like border (no bottom) */
+    border: 1px solid rgba(0,0,0,0.1);
+    border-bottom: 0;
+    background: white;
+
+    /* Subtle "paper" shadow */
+    box-shadow: 0 2px 6px rgba(0,0,0,0.1);
 }
+
 
 /* Style theme swatches */
 .themeSwatch {
