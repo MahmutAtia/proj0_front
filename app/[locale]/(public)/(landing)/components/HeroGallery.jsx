@@ -3,6 +3,8 @@ import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import styles from '../styles/HeroGallery.module.css';
 import PreviewModal from './PreviewModal';
+import { MOCK_TEMPLATES_WITH_THEMES } from "@/app/[locale]/(protected)/export/[id]/templates";
+
 
 // Data remains the same
 const portfolios = [
@@ -12,11 +14,11 @@ const portfolios = [
     { src: '/images/john-4-high.gif', alt: 'Animated portfolio preview 4', type: 'iframe', url: 'https://vbs.attiais.me/site/mohamed-attia-22/' },
     { src: '/images/john-5-high.gif', alt: 'Animated portfolio preview 5', type: 'iframe', url: 'https://vbs.attiais.me/site/mohamed-attia-23/' },
 ];
-const resumes = [
-    { src: 'https://picsum.photos/seed/new-resume-1/600/800', alt: 'ATS-friendly resume template', type: 'image' },
-    { src: 'https://picsum.photos/seed/new-resume-2/600/800', alt: 'Modern resume design', type: 'image' },
-    { src: 'https://picsum.photos/seed/new-resume-3/600/800', alt: 'Creative resume layout', type: 'image' },
-];
+const resumes = MOCK_TEMPLATES_WITH_THEMES.map(t => ({
+    src: t.previewUrl,
+    alt: t.name + " resume template",
+    type: "image"
+}));
 const documents = [
     { src: 'https://picsum.photos/seed/new-doc-1/600/850', alt: 'Professional cover letter', type: 'image' },
     { src: 'https://picsum.photos/seed/new-doc-2/600/850', alt: 'Recommendation letter format', type: 'image' },

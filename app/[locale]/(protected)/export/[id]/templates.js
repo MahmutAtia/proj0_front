@@ -37,25 +37,7 @@ export const MOCK_TEMPLATES_WITH_THEMES = [
     ],
     defaultFont: 'sourcesans-sourceserif'
   },
-  {
-    "id": "t8",
-    "name": "Soft Professional",
-    "value": "soft",
-    "previewUrl": "/templates/soft.jpg",
-    "themes": [
-      { "name": "Slate Blue", "value": "theme-slate-blue", "color": "#a9cce3" },
-      { "name": "Dusty Rose", "value": "theme-dusty-rose", "color": "#e6b0aa" },
-      { "name": "Sage Green", "value": "theme-sage-green", "color": "#a9dfbf" },
-      { "name": "Lavender", "value": "theme-lavender", "color": "#d7bde2" }
-    ],
-    "fonts": [
-      { "name": "Nunito + Raleway", "value": "nunito-raleway", "primary": "Raleway", "secondary": "Nunito", "description": "Soft and friendly" },
-      { "name": "Lato + Montserrat", "value": "lato-montserrat", "primary": "Montserrat", "secondary": "Lato", "description": "Modern and versatile" },
-      { "name": "Inter + Poppins", "value": "inter-poppins", "primary": "Poppins", "secondary": "Inter", "description": "Professional and clear" },
-      { "name": "Quicksand + Rubik", "value": "quicksand-rubik", "primary": "Rubik", "secondary": "Quicksand", "description": "Rounded and unique" }
-    ],
-    "defaultFont": "nunito-raleway"
-  },
+ 
   {
 
     id: 't0',
@@ -76,19 +58,44 @@ export const MOCK_TEMPLATES_WITH_THEMES = [
       { name: 'Nunito + Crimson Text', value: 'nunito-crimson', primary: 'Nunito', secondary: 'Crimson Text', description: 'Contemporary and elegant' },
     ],
     defaultFont: 'roboto-opensans'
-  },
-    {
-    id: 't7',
-    name: 'Asymmetrical',
-    value: 'template_asymmetrical',
-    previewUrl: '/templates/asymmetrical.jpg',
+  },   {
+    id: 't2',
+    name: 'Modern',
+    value: 'template2',
+    previewUrl: '/templates/modern.jpg',
     themes: [
-      { name: 'Burnt Orange', value: 'theme-burnt-orange', color: '#E2703A' },
+      { name: 'Default', value: 'theme-default', color: '#2c3e50' },
+      { name: 'Blue', value: 'theme-blue', color: '#1565c0' },
+      { name: 'Green', value: 'theme-green', color: '#2e7d32' },
+      { name: 'Grey', value: 'theme-grey', color: '#455a64' },
     ],
     fonts: [
-      { name: 'Open Sans + Montserrat', value: 'opensans-montserrat', primary: 'Open Sans', secondary: 'Montserrat', description: 'Modern & versatile' },
+      { name: 'Inter + Poppins', value: 'inter-poppins', primary: 'Inter', secondary: 'Poppins', description: 'Ultra-modern and clean' },
+      { name: 'Montserrat + Source Sans', value: 'montserrat-sourcesans', primary: 'Montserrat', secondary: 'Source Sans Pro', description: 'Bold and contemporary' },
+      { name: 'Nunito Sans + Open Sans', value: 'nunitosans-opensans', primary: 'Nunito Sans', secondary: 'Open Sans', description: 'Friendly modern' },
+      { name: 'Work Sans + Lora', value: 'worksans-lora', primary: 'Work Sans', secondary: 'Lora', description: 'Professional with character' },
     ],
-    defaultFont: 'opensans-montserrat'
+    defaultFont: 'inter-poppins'
+  },
+
+   {
+    "id": "t8",
+    "name": "Soft Professional",
+    "value": "soft",
+    "previewUrl": "/templates/soft.jpg",
+    "themes": [
+      { "name": "Slate Blue", "value": "theme-slate-blue", "color": "#a9cce3" },
+      { "name": "Dusty Rose", "value": "theme-dusty-rose", "color": "#e6b0aa" },
+      { "name": "Sage Green", "value": "theme-sage-green", "color": "#a9dfbf" },
+      { "name": "Lavender", "value": "theme-lavender", "color": "#d7bde2" }
+    ],
+    "fonts": [
+      { "name": "Nunito + Raleway", "value": "nunito-raleway", "primary": "Raleway", "secondary": "Nunito", "description": "Soft and friendly" },
+      { "name": "Lato + Montserrat", "value": "lato-montserrat", "primary": "Montserrat", "secondary": "Lato", "description": "Modern and versatile" },
+      { "name": "Inter + Poppins", "value": "inter-poppins", "primary": "Poppins", "secondary": "Inter", "description": "Professional and clear" },
+      { "name": "Quicksand + Rubik", "value": "quicksand-rubik", "primary": "Rubik", "secondary": "Quicksand", "description": "Rounded and unique" }
+    ],
+    "defaultFont": "nunito-raleway"
   },
   {
     id: 't3',
@@ -109,26 +116,20 @@ export const MOCK_TEMPLATES_WITH_THEMES = [
     ],
     defaultFont: 'crimson-lato'
   },
-  {
-    id: 't2',
-    name: 'Modern',
-    value: 'template2',
-    previewUrl: '/templates/modern.jpg',
+
+    {
+    id: 't7',
+    name: 'Asymmetrical',
+    value: 'template_asymmetrical',
+    previewUrl: '/templates/asymmetrical.jpg',
     themes: [
-      { name: 'Default', value: 'theme-default', color: '#2c3e50' },
-      { name: 'Blue', value: 'theme-blue', color: '#1565c0' },
-      { name: 'Green', value: 'theme-green', color: '#2e7d32' },
-      { name: 'Grey', value: 'theme-grey', color: '#455a64' },
+      { name: 'Burnt Orange', value: 'theme-burnt-orange', color: '#E2703A' },
     ],
     fonts: [
-      { name: 'Inter + Poppins', value: 'inter-poppins', primary: 'Inter', secondary: 'Poppins', description: 'Ultra-modern and clean' },
-      { name: 'Montserrat + Source Sans', value: 'montserrat-sourcesans', primary: 'Montserrat', secondary: 'Source Sans Pro', description: 'Bold and contemporary' },
-      { name: 'Nunito Sans + Open Sans', value: 'nunitosans-opensans', primary: 'Nunito Sans', secondary: 'Open Sans', description: 'Friendly modern' },
-      { name: 'Work Sans + Lora', value: 'worksans-lora', primary: 'Work Sans', secondary: 'Lora', description: 'Professional with character' },
+      { name: 'Open Sans + Montserrat', value: 'opensans-montserrat', primary: 'Open Sans', secondary: 'Montserrat', description: 'Modern & versatile' },
     ],
-    defaultFont: 'inter-poppins'
+    defaultFont: 'opensans-montserrat'
   },
-
 
   {
     id: 't5',
