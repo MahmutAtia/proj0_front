@@ -7,7 +7,7 @@ import { useTranslation } from "@/hooks/useTranslation";
 export default function WhatsAppChatButton() {
   const { t } = useTranslation();
 
-  const phoneNumber = "5050782635"; // your business WhatsApp number
+  const phoneNumber = "905050782635"; // your business WhatsApp number
   const message = t("whatsapp.defaultMessage", "Hey! I have a question, can you help me?");
 
   return (
