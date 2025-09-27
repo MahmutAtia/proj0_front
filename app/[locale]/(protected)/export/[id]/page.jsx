@@ -336,11 +336,10 @@ const ResumePreviewPage = () => {
                                                         <Button
                                                             icon="pi pi-eye"
                                                             rounded
-                                                            severity="secondary"
                                                             aria-label={`Preview ${template.name}`}
                                                             tooltip="Preview Template"
                                                             tooltipOptions={{ position: 'top', showDelay: 300 }}
-                                                            className={`absolute top-0 right-0 mt-1 mr-1 z-1  group-hover:opacity-100 transition-opacity duration-300 ${styles.previewButton}`}
+                                                            className={`absolute top-0 right-0 mt-1 mr-1 z-1  group-hover:opacity-100 transition-opacity duration-300 ${styles.previewButton} text-primary-300`}
                                                             onClick={(e) => handlePreviewOpen(template.previewUrl, e)}
                                                         />
 
