@@ -9,6 +9,8 @@ import './styles/layout/layout.scss';
 import './styles/demo/Demos.scss';
 import AuthProvider from './providers/AuthProvider';
 import type { Metadata, Viewport } from "next";
+import WhatsAppChatButton from "./components/WhatsAppChatButton";
+
 
 const APP_NAME = "Sakai React";
 const APP_DEFAULT_TITLE = "Sakai React - PrimeFaces";
@@ -72,6 +74,7 @@ export default function RootLayout({ children }: RootLayoutProps) {
                 <AuthProvider>
                     <PrimeReactProvider>
                         <LayoutProvider>
+                            <WhatsAppChatButton />
                             {children}
                         </LayoutProvider>
                     </PrimeReactProvider>
