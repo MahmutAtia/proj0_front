@@ -20,11 +20,11 @@ const resumes = MOCK_TEMPLATES_WITH_THEMES.map(t => ({
     type: "image"
 }));
 const documents = [
-    { src: 'https://picsum.photos/seed/new-doc-1/600/850', alt: 'Professional cover letter', type: 'image' },
-    { src: 'https://picsum.photos/seed/new-doc-2/600/850', alt: 'Recommendation letter format', type: 'image' },
-    { src: 'https://picsum.photos/seed/new-doc-3/600/850', alt: 'Clean cover letter example', type: 'image' },
-];
-
+    { src: './docs/cover.jpg', alt: 'Cover Letter Example', type: 'image' },
+    { src: './docs/recommend.jpg', alt: 'Recommendation Letter Example', type: 'image' },
+    { src: './docs/motivation.jpg', alt: 'Motivation Letter Example', type: 'image' }
+    ];
+    
 const GalleryCard = ({ src, alt, onClick, type }) => (
     <div className={`${styles.card} ${styles[type]}`} onClick={onClick}>
         <img src={src} alt={alt} loading="lazy" className={styles.cardImage} />

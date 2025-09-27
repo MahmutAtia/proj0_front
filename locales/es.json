@@ -20,6 +20,11 @@
         "refresh": "Actualizar",
         "viewAll": "Ver todo"
     },
+      "whatsapp": {
+    "tooltip": "💬 Pregúntanos lo que quieras — ¡estamos encantados de ayudarte!",
+    "defaultMessage": "¡Hola! Tengo una pregunta, ¿puedes ayudarme?",
+    "ariaLabel": "Chatear en WhatsApp"
+  },
     "resumes": {
         "title": "Mis Currículums",
         "createNew": "Crear Nuevo Currículum",

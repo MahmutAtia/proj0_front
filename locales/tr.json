@@ -20,6 +20,11 @@
         "refresh": "Yenile",
         "viewAll": "Tümünü Gör"
     },
+      "whatsapp": {
+    "tooltip": "💬 Her şeyi sorabilirsiniz — size yardımcı olmaktan mutluluk duyarız!",
+    "defaultMessage": "Merhaba! Bir sorum var, yardımcı olabilir misiniz?",
+    "ariaLabel": "WhatsApp'ta sohbet edin"
+  },
     "resumes": {
         "title": "Özgeçmişlerim",
         "createNew": "Yeni Özgeçmiş Oluştur",

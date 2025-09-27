@@ -20,6 +20,11 @@
         "refresh": "Aktualisieren",
         "viewAll": "Alle anzeigen"
     },
+      "whatsapp": {
+    "tooltip": "💬 Frag uns alles — wir helfen dir gerne!",
+    "defaultMessage": "Hey! Ich habe eine Frage, kannst du mir helfen?",
+    "ariaLabel": "Auf WhatsApp chatten"
+  },
     "resumes": {
         "title": "Meine Lebensläufe",
         "createNew": "Neuen Lebenslauf erstellen",

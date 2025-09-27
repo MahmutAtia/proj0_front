@@ -20,6 +20,12 @@
         "refresh": "Refresh",
         "viewAll": "View All"
     },
+    "whatsapp": {
+        "tooltip": "💬 Ask us anything — we’re eager to help!",
+        "defaultMessage": "Hey! I have a question, can you help me?",
+        "ariaLabel": "Chat on WhatsApp"
+    },
+
 
     "resumes": {
         "title": "My Resumes",

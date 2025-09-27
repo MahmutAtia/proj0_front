@@ -20,6 +20,11 @@
         "refresh": "Actualiser",
         "viewAll": "Voir tout"
     },
+      "whatsapp": {
+    "tooltip": "💬 Posez-nous toutes vos questions — nous sommes ravis de vous aider !",
+    "defaultMessage": "Salut ! J'ai une question, pouvez-vous m'aider ?",
+    "ariaLabel": "Discuter sur WhatsApp"
+  },
     "resumes": {
         "title": "Mes CVs",
         "createNew": "Créer un nouveau CV",
