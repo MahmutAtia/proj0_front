@@ -68,7 +68,7 @@
         "imageAlt": "Professionals collaborating and achieving career success with technology"
     },
     "header": {
-        "logo": "CareerFlow",
+        "logo": "CareerStudio",
         "theStruggle": "The Struggle",
         "yourEdge": "Your Edge",
         "howItWorks": "How It Works",
@@ -285,7 +285,7 @@
         }
     },
     "dashboard_layout": {
-        "logo": "CareerFlow",
+        "logo": "CareerStudio",
         "sidebar": {
             "settings": "Settings",
             "overview": "Overview",
