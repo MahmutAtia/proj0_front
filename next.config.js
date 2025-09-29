@@ -16,7 +16,8 @@ const nextConfig = {
   images: {
     domains: [
       'localhost',
-      'vbs.attiais.me'  // Add your domain here
+      'vbs.attiais.me',  // Add your domain here
+      'careerstudio.work'
     ],
     // Remove unoptimized: true to enable image optimization
     formats: ['image/webp', 'image/avif'], // Modern formats for better performance
