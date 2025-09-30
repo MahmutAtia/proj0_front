@@ -404,7 +404,7 @@ const ATSCheckerPageContent = () => {
     const handleSubmit = async () => {
         // --- Early Returns for Validation ---
         if (isLoading) return;
-        
+
         if (resumeInputMethod === 'upload' && !resumeFile) {
             return toast.current?.show({ severity: 'warn', summary: 'No File Selected', detail: 'Please upload your resume file.' });
         }
@@ -430,6 +430,7 @@ const ATSCheckerPageContent = () => {
             description: includeJobDescription ? jobDescription : '',
             targetLanguage: targetLanguage,
             targetRole: targetRole,
+            inputMethod: resumeInputMethod,
         };
 
         if (status === 'authenticated') {
