@@ -613,7 +613,7 @@ const ATSCheckerPageContent = () => {
             Paste Resume or Write from Scratch
         </label>
         <p className="mt-0 mb-2 text-sm text-color-secondary">
-            Don't have a resume? No problem. Just list your past jobs, skills, or education below. Our AI can build a professional resume from simple notes.
+            Don&apos;t have a resume? No problem. Just list your past jobs, skills, or education below. Our AI can build a professional resume from simple notes.
         </p>
                                                 <InputTextarea
                                                     value={resumeText}
