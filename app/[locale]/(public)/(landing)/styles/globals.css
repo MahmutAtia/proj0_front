@@ -1,5 +1,9 @@
 @import url('https://api.fontshare.com/v2/css?f[]=general-sans@400,500,600,700&display=swap');
 
+html {
+  scroll-behavior: smooth;
+}
+
 /* Scope all styles to landing-page-wrapper */
 .landing-page-wrapper {
     /* --- Color Palette (Slightly Refined) --- */

@@ -45,9 +45,9 @@ const HeroSection = () => {
     const { t, isRTL } = useTranslation();
 
     return (
-        <section id="hero" className={`${styles.heroSection} section-padding`}>
+             <section id="hero" className={`${styles.heroSection} section-padding`}>
             <div className={`container ${styles.heroContainer} ${isRTL ? styles.rtl : ''}`}>
-                <motion.div
+                              <motion.div
                     className={`${styles.heroContent} ${isRTL ? styles.rtl : ''}`}
                     variants={staggerContainer(0.15, 0.1)}
                     initial="hidden"
@@ -73,7 +73,8 @@ const HeroSection = () => {
                         {t('hero.description')}
                     </motion.p>
 
-                    <motion.div variants={fadeInUp} className={`${styles.heroActions} ${isRTL ? styles.rtl : ''}`}>
+                     <motion.div variants={fadeInUp} className={`${styles.heroActions} ${isRTL ? styles.rtl : ''}`}>
+                        {/* PRIMARY BUTTON - unchanged */}
                         <motion.button
                             className={`button button-primary ${styles.heroButton}`}
                             variants={buttonHoverTap}
@@ -81,24 +82,25 @@ const HeroSection = () => {
                             whileTap="tap"
                             animate={primaryButtonPulse}
                             onClick={() => router.push('/ats')}>
-                            {isRTL ? <FiArrowRight size="1.1em" /> : null}
                             {t('hero.startFreeResume')}
-                            {!isRTL ? <FiArrowRight size="1.1em" /> : null}
+                            {!isRTL && <FiArrowRight size="1.1em" />}
                         </motion.button>
-                        <motion.button
+                        
+                        {/* SECONDARY BUTTON - CHANGED TO A LINK */}
+                        <motion.a
+                            href="#advantage" // <-- LINK TO THE SECTION ID
                             className={`button button-secondary ${styles.heroButton}`}
                             variants={buttonHoverTap}
                             whileHover="hover"
                             whileTap="tap"
-                            onClick={() => router.push('/ats')}>
-                            {isRTL ? <FiShield size="1.1em" /> : null}
-                            {t('hero.checkScore')}
-                            {!isRTL ? <FiShield size="1.1em" /> : null}
-                        </motion.button>
+                        >
+                            {t('hero.checkScore')}{' '}
+                            {/* This now translates to "See The Advantage" */}
+                            {!isRTL && <FiShield size="1.1em" />} 
+                        </motion.a>
                     </motion.div>
                 </motion.div>
 
-                {/* The HeroGallery should be a direct child of the container, alongside heroContent */}
                 <HeroGallery isRTL={isRTL} />
             </div>
         </section>

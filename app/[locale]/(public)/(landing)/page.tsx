@@ -1,71 +1,43 @@
 import type { Metadata } from 'next';
-import { headers } from 'next/headers'; // Import headers to potentially get the host
 
-// --- Define your site's base URL ---
-// Option 1: Hardcode if you know it
 const siteBaseUrl = 'https://www.yourdomain.com'; // <-- REPLACE with your actual domain
-// Option 2: Try to get dynamically (might not work in all environments, especially build time)
-// const getBaseUrl = () => {
-//   const host = headers().get('host');
-//   const protocol = host?.includes('localhost') ? 'http' : 'https';
-//   return `${protocol}://${host}`;
-// };
-// const siteBaseUrl = getBaseUrl();
 
 export const metadata: Metadata = {
-  // --- Base URL for resolving relative paths ---
-  metadataBase: new URL(siteBaseUrl), // <-- SET YOUR BASE URL HERE
-
-  // --- Core SEO ---
-  title: 'CareerFlow AI | AI Resume Builder & Portfolio Generator',
+  metadataBase: new URL(siteBaseUrl),
+  title: 'CareerFlow AI | Your AI Career Co-Pilot for Resumes & Portfolios',
   description:
-    'Stop getting rejected by ATS. Create AI-powered resumes, cover letters, and portfolios that land interviews. Try CareerFlow AI free!',
+    "Stop the job search struggle. CareerFlow's AI crafts tailored resumes, builds portfolios, and finds jobs FOR YOU. Land your dream job faster. Try it free.",
   keywords: [
     'AI resume builder',
+    'AI career co-pilot', // Add this
+    'automated job search', // Add this
     'ATS resume checker',
     'AI portfolio generator',
-    'job application help',
-    'career tools',
+    'job application automation', // Add this
     'AI cover letter generator',
     'resume optimization',
     'get past ATS',
     'land interviews',
-    'job search AI',
   ],
-
-  // --- Social Sharing (Open Graph for Facebook, LinkedIn, etc.) ---
   openGraph: {
-    title: 'CareerFlow AI: Build Job-Winning Resumes & Portfolios with AI',
+    title: 'Stop Applying. Start Interviewing. Meet Your AI Career Co-Pilot.',
     description:
-      'Tired of rejections? Use AI to create ATS-friendly resumes and impressive portfolios that get you noticed.',
-    url: '/', // Canonical URL for this page relative to metadataBase
+      'CareerFlow AI automates your job hunt. Get perfectly tailored resumes, instant portfolios, and curated job alerts. See why it’s the secret weapon for top candidates.',
+    url: '/',
     siteName: 'CareerFlow AI',
-    images: [
-      {
-        url: '/og-image.png',
-        width: 1200,
-        height: 630,
-        alt: 'CareerFlow AI helping a job seeker create a resume',
-      },
-    ],
+    images: [ { url: '/og-image.png', width: 1200, height: 630, alt: 'An AI co-pilot helping a job seeker land their dream job.' } ],
     locale: 'en_US',
     type: 'website',
   },
-
-  // --- Twitter Card ---
   twitter: {
     card: 'summary_large_image',
-    title: 'CareerFlow AI: Build Job-Winning Resumes & Portfolios with AI',
+    title: 'Stop Applying. Start Interviewing. Meet Your AI Career Co-Pilot.',
     description:
-      'Tired of rejections? Use AI to create ATS-friendly resumes and impressive portfolios that get you noticed.',
+      'CareerFlow AI automates your job hunt with AI-powered resumes, portfolios, and job searching.',
     // images: ['/twitter-image.png'],
-    // creator: '@yourTwitterHandle',
   },
+  alternates: { canonical: '/' },
 
-  // --- Other Useful Metadata ---
-  alternates: {
-    canonical: '/',
-  },
   // icons: {
   //   icon: '/favicon.ico',
   //   shortcut: '/favicon-16x16.png',
@@ -83,6 +55,9 @@ import PricingSection from './components/PricingSection';
 import HowItWorksSection from './components/HowItWorksSection';
 import ATSCheckerSection from './components/ATSCheckerSection';
 import Footer from './components/Footer';
+import AdvantageSection from './components/AdvantageSection';
+import FaqSection from './components/FaqSection';
+import FloatingOfferBanner from './components/FloatingOfferBanner';
 import './styles/globals.css';
 
 const LandingPage = () => {
@@ -91,11 +66,14 @@ const LandingPage = () => {
       <Header />
       <main>
         <HeroSection />
+        <FloatingOfferBanner />
         <StruggleSection />
+        <AdvantageSection />
         <FeaturesSection />
         <HowItWorksSection />
         <ATSCheckerSection />
         <PricingSection />
+        <FaqSection />
       </main>
       <Footer />
     </div>

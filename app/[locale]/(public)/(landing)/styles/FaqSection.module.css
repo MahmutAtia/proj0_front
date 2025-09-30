@@ -1,0 +1,44 @@
+.faqSection {
+    background-color: #ffffff;
+}
+
+.faqList {
+    max-width: 800px;
+    margin: 3rem auto 0;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.faqItem {
+    border-bottom: 1px solid #e5e7eb;
+    padding-bottom: 1rem;
+}
+.faqItem:last-child {
+    border-bottom: none;
+}
+
+.faqQuestion {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+    text-align: left;
+    padding: 1rem 0;
+    font-size: 1.125rem;
+    font-weight: 500;
+    cursor: pointer;
+    background: none;
+    border: none;
+    color: inherit;
+}
+
+.faqAnswer {
+    overflow: hidden;
+}
+
+.faqAnswer p {
+    margin: 0;
+    color: #4b5563; /* Gray-600 */
+    line-height: 1.6;
+}

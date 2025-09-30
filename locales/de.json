@@ -25,6 +25,83 @@
     "defaultMessage": "Hey! Ich habe eine Frage, kannst du mir helfen?",
     "ariaLabel": "Auf WhatsApp chatten"
   },
+      "ats": {
+      "upload_label": "Ich habe einen Lebenslauf zum Hochladen",
+      "paste_label": "Noch keinen Lebenslauf?",
+      "english_label": "Englisch",
+      "french_label": "Französisch",
+      "spanish_label": "Spanisch"
+    },
+    "advantage": {
+      "title": "Der CareerStudio  Vorteil",
+      "items": [
+        {
+          "title": "Die Alte Methode (Mehrere Getrennte Tools)",
+          "points": [
+            "Generischer Lebenslauf-Vorlagen-Ersteller",
+            "Separates Tool für Anschreiben",
+            "Manuelles Bearbeiten für jede Bewerbung",
+            "Komplexer Website-Builder für ein Portfolio",
+            "Endloses Scrollen auf Jobportalen",
+            "Getrennte Dokumente und Dateien"
+          ],
+          "isDisadvantage": true
+        },
+        {
+          "title": "Die CareerStudio  Methode (Ein Intelligentes System)",
+          "points": [
+            "KI-Co-Pilot, der schreibt und optimiert",
+            "Lebenslauf, Anschreiben, Portfolio synchronisiert",
+            "1-Klick-KI-Anpassung für jeden Job",
+            "Sofortige Portfolio-Generierung",
+            "Automatisierter Job Scout, der rund um die Uhr für Sie arbeitet",
+            "Ihre Karriere an einem Ort verwaltet"
+          ],
+          "isDisadvantage": false
+        }
+      ]
+    },
+    "floatingOffer": {
+      "text": "🎉 Einführungsangebot! Verwenden Sie den Code",
+      "code": "DREAMJOB50",
+      "text2": "für 50% Rabatt!"
+    },
+    "faq": {
+      "title": "Häufig Gestellte Fragen",
+      "subtitle": "Haben Sie Fragen? Wir haben Antworten. Wenn Sie sie hier nicht finden, ist unser 24/7 Support bereit zu helfen.",
+      "questions": [
+        {
+          "id": "faq1",
+          "question": "Ist der erste Lebenslauf wirklich kostenlos? Was ist der Haken?",
+          "answer": "Ja, 100% kostenlos. Der Haken ist, dass wir zuversichtlich sind, dass Ihnen das Ergebnis so gut gefallen wird, dass Sie die volle Leistung von CareerStudio  Pro freischalten möchten. Sie können Ihr Profil erstellen, Ihren ersten ATS-optimierten Lebenslauf generieren und ihn als PDF herunterladen, ohne jemals eine Kreditkarte eingeben zu müssen."
+        },
+        {
+          "id": "faq2",
+          "question": "Wie unterscheidet sich das von einem einfachen Vorlagen-Ersteller?",
+          "answer": "Vorlagen geben Ihnen nur ein Layout. CareerStudio  ist ein intelligentes System. Unsere KI füllt nicht nur Lücken—sie versteht Ihre Karriere, schlägt aussagekräftige Formulierungen vor, optimiert jede Zeile für ATS-Bots und hilft Ihnen, Ihre gesamte Bewerbung in Sekundenschnelle an einen bestimmten Job anzupassen. Es ist ein Schreibpartner, nicht nur ein Dokument."
+        },
+        {
+          "id": "faq3",
+          "question": "Was ist ATS und warum ist es so wichtig?",
+          "answer": "ATS (Applicant Tracking System - Bewerber-Tracking-System) ist eine automatisierte Software, die Ihren Lebenslauf nach Schlüsselwörtern und Formatierung scannt, bevor ihn ein Mensch sieht. Über 75% der Lebensläufe werden von diesen Bots abgelehnt. Wir entwerfen und strukturieren jeden Lebenslauf akribisch, damit er perfekt vom ATS analysiert wird, und garantieren, dass Ihre Bewerbung bei einer echten Person landet."
+        },
+        {
+          "id": "faq4",
+          "question": "Kann ich meinen Pro-Plan jederzeit kündigen?",
+          "answer": "Absolut. Sie haben die volle Kontrolle. Sie können Ihr Abonnement jederzeit über Ihr Kontroll-Dashboard mit einem einzigen Klick kündigen. Keine versteckten Gebühren, kein Aufwand. Sie behalten den Zugriff auf Pro-Funktionen bis zum Ende Ihres aktuellen Abrechnungszeitraums."
+        },
+        {
+          "id": "faq5",
+          "question": "Für wen ist diese Plattform gedacht? Studenten? Führungskräfte?",
+          "answer": "CareerStudio  wurde für jeden entwickelt, der seine Karriere ernst nimmt. Es ist leistungsstark genug für Führungskräfte, die wettbewerbsfähige Positionen anstreben, und dennoch einfach genug für Hochschulabsolventen, um ihren ersten professionellen Lebenslauf zu erstellen. Wenn Sie den sich wiederholenden, frustrierenden Bewerbungsprozess satt haben, ist CareerStudio  das Richtige für Sie."
+        },
+        {
+          "id": "faq6",
+          "question": "Was passiert mit meiner Portfolio-Website, wenn ich meinen Pro-Plan kündige?",
+          "answer": "Wenn Sie Ihren Pro-Plan kündigen, wird Ihre Portfolio-Website de-publiziert und der teilbare Link ist nicht mehr aktiv. Alle Ihre Daten und Designs werden sicher gespeichert, und Sie können sie sofort wieder veröffentlichen, falls Sie sich entscheiden, erneut zu abonnieren."
+        }
+      ]
+    },
     "resumes": {
         "title": "Meine Lebensläufe",
         "createNew": "Neuen Lebenslauf erstellen",
@@ -60,13 +137,13 @@
         "subtitle_part1": "Entfliehen Sie der zermürbenden Jobsuche. Wussten Sie, dass die meisten Jobs einen ",
         "subtitle_styled": "maßgeschneiderten Lebenslauf",
         "subtitle_part2": " benötigen, nur um die Bots zu bestehen? Wir erstellen ihn *mit* Ihnen, mithilfe von KI.",
-        "description": "Sie sind brillant, qualifiziert und bereit. Aber Ihre Bewerbung verschwindet im ATS-Abgrund. Es liegt nicht an Ihnen, es liegt am System. CareerFlow AI erstellt Lebensläufe & Portfolios, die Ihnen Aufmerksamkeit verschaffen.",
+        "description": "Sie sind brillant, qualifiziert und bereit. Aber Ihre Bewerbung verschwindet im ATS-Abgrund. Es liegt nicht an Ihnen, es liegt am System. CareerStudio  AI erstellt Lebensläufe & Portfolios, die Ihnen Aufmerksamkeit verschaffen.",
         "startFreeResume": "Meinen kostenlosen KI-Lebenslauf starten",
         "checkScore": "Meinen ATS-Score prüfen",
         "imageAlt": "Fachleute, die zusammenarbeiten und mit Technologie beruflichen Erfolg erzielen"
     },
     "header": {
-        "logo": "CareerFlow",
+        "logo": "CareerStudio ",
         "theStruggle": "Die Hürden",
         "yourEdge": "Ihr Vorteil",
         "howItWorks": "Wie es funktioniert",
@@ -108,7 +185,7 @@
     "features": {
         "title": "Ihr neuer Vorteil: ",
         "aiAndBrilliance": "KI + Ihre Brillanz",
-        "subtitle": "CareerFlow AI ist nicht nur ein weiteres Werkzeug. Es ist Ihr intelligenter Partner, der entwickelt wurde, um Ihre Stärken zu verstärken und die Komplexität des modernen Arbeitsmarktes zu meistern.",
+        "subtitle": "CareerStudio  AI ist nicht nur ein weiteres Werkzeug. Es ist Ihr intelligenter Partner, der entwickelt wurde, um Ihre Stärken zu verstärken und die Komplexität des modernen Arbeitsmarktes zu meistern.",
         "hyperPersonalized": {
             "title": "Hyper-personalisierte KI-Entwürfe",
             "text": "Die KI analysiert Stellenbeschreibungen UND Ihr Profil, um in Sekunden einzigartige, zielgerichtete Lebensläufe & Anschreiben zu erstellen. Sagen Sie Tschüss zu allgemeinen Floskeln!"
@@ -185,7 +262,7 @@
         "legal": "Rechtliches",
         "privacyPolicy": "Datenschutzrichtlinie",
         "termsOfService": "Nutzungsbedingungen",
-        "copyright": "©  CareerFlow AI. Alle Rechte vorbehalten."
+        "copyright": "©  CareerStudio  AI. Alle Rechte vorbehalten."
     },
     "dashboard": {
         "welcome": "Willkommen zurück",
@@ -282,7 +359,7 @@
         }
     },
     "dashboard_layout": {
-        "logo": "CareerFlow",
+        "logo": "CareerStudio ",
         "sidebar": {
             "settings": "Einstellungen",
             "overview": "Übersicht",

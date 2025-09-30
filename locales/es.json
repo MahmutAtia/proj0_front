@@ -25,6 +25,83 @@
     "defaultMessage": "¡Hola! Tengo una pregunta, ¿puedes ayudarme?",
     "ariaLabel": "Chatear en WhatsApp"
   },
+      "ats": {
+      "upload_label": "Tengo un currículum para subir",
+      "paste_label": "¿Aún no tienes un currículum?",
+      "english_label": "Inglés",
+      "french_label": "Francés",
+      "spanish_label": "Español"
+    },
+    "advantage": {
+      "title": "La Ventaja de CareerStudio ",
+      "items": [
+        {
+          "title": "La Forma Antigua (Múltiples Herramientas Desconectadas)",
+          "points": [
+            "Creador de plantillas de currículum genérico",
+            "Herramienta separada para cartas de presentación",
+            "Edición manual para cada solicitud",
+            "Creador de sitios web complejo para un portafolio",
+            "Desplazamiento interminable en portales de empleo",
+            "Documentos y archivos desconectados"
+          ],
+          "isDisadvantage": true
+        },
+        {
+          "title": "La Forma CareerStudio  (Un Sistema Inteligente)",
+          "points": [
+            "Co-Piloto de IA que escribe y optimiza",
+            "Currículum, Carta de Presentación, Portafolio sincronizados",
+            "Adaptación de IA con 1 clic para cualquier trabajo",
+            "Generación instantánea de portafolio",
+            "Buscador de Empleo Automatizado que trabaja para ti 24/7",
+            "Tu carrera gestionada en un solo lugar"
+          ],
+          "isDisadvantage": false
+        }
+      ]
+    },
+    "floatingOffer": {
+      "text": "🎉 ¡Oferta de Lanzamiento! Usa el código",
+      "code": "DREAMJOB50",
+      "text2": "para un 50% de descuento!"
+    },
+    "faq": {
+      "title": "Preguntas Frecuentes",
+      "subtitle": "¿Tienes preguntas? Tenemos respuestas. Si no puedes encontrarlas aquí, nuestro soporte 24/7 está listo para ayudarte.",
+      "questions": [
+        {
+          "id": "faq1",
+          "question": "¿Es el primer currículum realmente gratis? ¿Cuál es el truco?",
+          "answer": "Sí, 100% gratis. El truco es que estamos seguros de que te encantará tanto el resultado que querrás desbloquear todo el poder de CareerStudio  Pro. Puedes crear tu perfil, generar tu primer currículum optimizado para ATS y descargarlo como PDF sin necesidad de introducir una tarjeta de crédito."
+        },
+        {
+          "id": "faq2",
+          "question": "¿En qué se diferencia de un simple creador de plantillas?",
+          "answer": "Las plantillas solo te dan un diseño. CareerStudio  es un sistema inteligente. Nuestra IA no solo rellena espacios en blanco—entiende tu carrera, sugiere frases potentes, optimiza cada línea para los bots de ATS y te ayuda a adaptar toda tu solicitud a un trabajo específico en segundos. Es un socio de escritura, no solo un documento."
+        },
+        {
+          "id": "faq3",
+          "question": "¿Qué es ATS y por qué es tan importante?",
+          "answer": "ATS (Sistema de Seguimiento de Candidatos) es un software automatizado que escanea tu currículum en busca de palabras clave y formato antes de que un humano lo vea. Más del 75% de los currículums son rechazados por estos bots. Diseñamos y estructuramos meticulosamente cada currículum para que sea perfectamente analizado por ATS, garantizando que tu solicitud llegue a una persona real."
+        },
+        {
+          "id": "faq4",
+          "question": "¿Puedo cancelar mi plan Pro en cualquier momento?",
+          "answer": "Absolutamente. Tienes el control total. Puedes cancelar tu suscripción en cualquier momento desde el panel de control de tu cuenta con un solo clic. Sin cargos ocultos, sin complicaciones. Mantendrás el acceso a las funciones Pro hasta el final de tu período de facturación actual."
+        },
+        {
+          "id": "faq5",
+          "question": "¿Para quién es esta plataforma? ¿Estudiantes? ¿Ejecutivos?",
+          "answer": "CareerStudio  está diseñado para cualquier persona que se tome en serio su carrera. Es lo suficientemente potente para ejecutivos que aspiran a roles competitivos, pero lo suficientemente sencillo para que los recién graduados construyan su primer currículum profesional. Si estás cansado del proceso de solicitud de empleo repetitivo y frustrante, CareerStudio  es para ti."
+        },
+        {
+          "id": "faq6",
+          "question": "¿Qué pasa con el sitio web de mi portafolio si cancelo mi plan Pro?",
+          "answer": "Si cancelas tu plan Pro, el sitio web de tu portafolio será dado de baja y el enlace para compartir ya no estará activo. Todos tus datos y diseños se almacenarán de forma segura, y podrás volver a publicarlo al instante si decides volver a suscribirte."
+        }
+      ]
+    },
     "resumes": {
         "title": "Mis Currículums",
         "createNew": "Crear Nuevo Currículum",
@@ -60,13 +137,13 @@
         "subtitle_part1": "Escapa de la agotadora búsqueda de empleo. ¿Sabías que la mayoría de los trabajos necesitan un ",
         "subtitle_styled": "currículum a medida",
         "subtitle_part2": " solo para pasar los filtros automáticos? Los creamos *contigo*, usando IA.",
-        "description": "Eres brillante, cualificado y estás listo. Pero tu solicitud se desvanece en el abismo de los ATS. No eres tú, es el sistema. CareerFlow AI crea currículums y portafolios que logran que te vean.",
+        "description": "Eres brillante, cualificado y estás listo. Pero tu solicitud se desvanece en el abismo de los ATS. No eres tú, es el sistema. CareerStudio  AI crea currículums y portafolios que logran que te vean.",
         "startFreeResume": "Empezar Mi Currículum con IA Gratis",
         "checkScore": "Revisar Mi Puntuación ATS",
         "imageAlt": "Profesionales colaborando y alcanzando el éxito profesional con tecnología"
     },
     "header": {
-        "logo": "CareerFlow",
+        "logo": "CareerStudio ",
         "theStruggle": "El Obstáculo",
         "yourEdge": "Tu Ventaja",
         "howItWorks": "Cómo Funciona",
@@ -108,7 +185,7 @@
     "features": {
         "title": "Tu Nueva Ventaja: ",
         "aiAndBrilliance": "IA + Tu Genialidad",
-        "subtitle": "CareerFlow AI no es solo otra herramienta. Es tu socio inteligente, diseñado para amplificar tus fortalezas y navegar las complejidades del mercado laboral moderno.",
+        "subtitle": "CareerStudio  AI no es solo otra herramienta. Es tu socio inteligente, diseñado para amplificar tus fortalezas y navegar las complejidades del mercado laboral moderno.",
         "hyperPersonalized": {
             "title": "Borradores de IA Hiper-Personalizados",
             "text": "La IA analiza las descripciones de trabajo Y tu perfil para crear currículums y cartas únicos y específicos en segundos. ¡Adiós a lo genérico!"
@@ -185,7 +262,7 @@
         "legal": "Legal",
         "privacyPolicy": "Política de Privacidad",
         "termsOfService": "Términos de Servicio",
-        "copyright": "©  CareerFlow AI. Todos los derechos reservados."
+        "copyright": "©  CareerStudio  AI. Todos los derechos reservados."
     },
     "dashboard": {
         "welcome": "Bienvenido de vuelta",
@@ -282,7 +359,7 @@
         }
     },
     "dashboard_layout": {
-        "logo": "CareerFlow",
+        "logo": "CareerStudio ",
         "sidebar": {
             "settings": "Configuración",
             "overview": "Vista General",

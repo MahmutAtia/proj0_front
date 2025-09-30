@@ -25,6 +25,83 @@
     "defaultMessage": "Merhaba! Bir sorum var, yardımcı olabilir misiniz?",
     "ariaLabel": "WhatsApp'ta sohbet edin"
   },
+      "ats": {
+      "upload_label": "Yükleyecek bir özgeçmişim var",
+      "paste_label": "Henüz bir özgeçmişiniz yok mu?",
+      "english_label": "İngilizce",
+      "french_label": "Fransızca",
+      "spanish_label": "İspanyolca"
+    },
+    "advantage": {
+      "title": "CareerStudio Avantajı",
+      "items": [
+        {
+          "title": "Eski Yöntem (Birden Fazla, Bağlantısız Araç)",
+          "points": [
+            "Jenerik özgeçmiş şablonu oluşturucu",
+            "Ön yazılar için ayrı araç",
+            "Her başvuru için manuel düzenleme",
+            "Portföy için karmaşık web sitesi oluşturucu",
+            "İş ilanlarında sonsuz kaydırma",
+            "Bağlantısız belgeler ve dosyalar"
+          ],
+          "isDisadvantage": true
+        },
+        {
+          "title": "CareerStudio Yöntemi (Tek Akıllı Sistem)",
+          "points": [
+            "Yazan ve optimize eden AI Co-Pilot",
+            "Özgeçmiş, Ön Yazı, Portföy senkronize",
+            "Herhangi bir iş için 1 Tıklamayla AI Uyarlama",
+            "Anında portföy oluşturma",
+            "Otomatik İş Keşfi 7/24 sizin için çalışır",
+            "Kariyeriniz tek bir yerde yönetilir"
+          ],
+          "isDisadvantage": false
+        }
+      ]
+    },
+    "floatingOffer": {
+      "text": "🎉 Lansman Teklifi! Şunu kullanın:",
+      "code": "DREAMJOB50",
+      "text2": "kodunu %50 indirim için kullanın!"
+    },
+    "faq": {
+      "title": "Sıkça Sorulan Sorular",
+      "subtitle": "Sorularınız mı var? Cevaplarımız var. Burada bulamazsanız, 7/24 desteğimiz yardıma hazır.",
+      "questions": [
+        {
+          "id": "faq1",
+          "question": "İlk özgeçmiş gerçekten ücretsiz mi? Ne aldatmacası var?",
+          "answer": "Evet, %100 ücretsiz. Aldatmaca şu ki, sonuca o kadar bayılacağınıza eminiz ki, CareerStudio Pro'nun tüm gücünü açmak isteyeceksiniz. Profilinizi oluşturabilir, ilk ATS için optimize edilmiş özgeçmişinizi oluşturabilir ve kredi kartı girmeden PDF olarak indirebilirsiniz."
+        },
+        {
+          "id": "faq2",
+          "question": "Bu, basit bir şablon oluşturucudan ne kadar farklı?",
+          "answer": "Şablonlar sadece bir düzen verir. CareerStudio akıllı bir sistemdir. Yapay zekamız sadece boşlukları doldurmakla kalmaz—kariyerinizi anlar, güçlü ifadeler önerir, ATS botları için her satırı optimize eder ve tüm başvurunuzu saniyeler içinde belirli bir işe uyarlamanıza yardımcı olur. Bu sadece bir belge değil, bir yazma ortağıdır."
+        },
+        {
+          "id": "faq3",
+          "question": "ATS nedir ve neden bu kadar önemli?",
+          "answer": "ATS (Applicant Tracking System - Başvuru Takip Sistemi), bir insan görmeden önce özgeçmişinizi anahtar kelimeler ve biçimlendirme için tarayan otomatik bir yazılımdır. Özgeçmişlerin %75'inden fazlası bu botlar tarafından reddedilir. Başvurunuzun gerçek bir kişinin önüne düşmesini garanti ederek, her özgeçmişi ATS tarafından mükemmel bir şekilde ayrıştırılacak şekilde titizlikle tasarlıyor ve yapılandırıyoruz."
+        },
+        {
+          "id": "faq4",
+          "question": "Pro planımı istediğim zaman iptal edebilir miyim?",
+          "answer": "Kesinlikle. Tamamen kontrol sizde. Aboneliğinizi, hesap panonuzdan tek bir tıklamayla istediğiniz zaman iptal edebilirsiniz. Gizli ücret yok, sorun yok. Mevcut fatura döneminizin sonuna kadar Pro özelliklere erişiminizi sürdüreceksiniz."
+        },
+        {
+          "id": "faq5",
+          "question": "Bu platform kimler için? Öğrenciler için mi? Yöneticiler için mi?",
+          "answer": "CareerStudio , kariyeri konusunda ciddi olan herkes için tasarlanmıştır. Rekabetçi rolleri hedefleyen yöneticiler için yeterince güçlü, ancak yeni mezunların ilk profesyonel özgeçmişlerini oluşturmaları için yeterince basittir. Tekrarlayan, sinir bozucu iş başvuru sürecinden yorulduysanız, CareerStudio tam size göre."
+        },
+        {
+          "id": "faq6",
+          "question": "Pro planımı iptal edersem portföy web siteme ne olur?",
+          "answer": "Pro planınızı iptal ederseniz, portföy web siteniz yayından kaldırılacak ve paylaşılabilir bağlantı artık aktif olmayacaktır. Tüm verileriniz ve tasarımlarınız güvenli bir şekilde saklanacak ve tekrar abone olmaya karar verirseniz anında yeniden yayınlayabilirsiniz."
+        }
+      ]
+    },
     "resumes": {
         "title": "Özgeçmişlerim",
         "createNew": "Yeni Özgeçmiş Oluştur",
@@ -60,13 +137,13 @@
         "subtitle_part1": "Ruh emen iş arayışından kurtulun. Çoğu işin, sırf robotları geçmek için bile ",
         "subtitle_styled": "özel hazırlanmış bir özgeçmişe",
         "subtitle_part2": " ihtiyacı olduğunu biliyor muydunuz? Onları yapay zeka kullanarak *sizinle birlikte* oluşturuyoruz.",
-        "description": "Zekisiniz, yeteneklisiniz ve hazırsınız. Ama başvurunuz ATS girdabında kayboluyor. Sorun sizde değil, sistemde. CareerFlow AI, fark edilmenizi sağlayan özgeçmişler ve portfolyolar hazırlar.",
+        "description": "Zekisiniz, yeteneklisiniz ve hazırsınız. Ama başvurunuz ATS girdabında kayboluyor. Sorun sizde değil, sistemde. CareerStudio AI, fark edilmenizi sağlayan özgeçmişler ve portfolyolar hazırlar.",
         "startFreeResume": "Ücretsiz YZ Özgeçmişimi Başlat",
         "checkScore": "ATS Puanımı Kontrol Et",
         "imageAlt": "Teknoloji ile kariyer başarısı elde eden ve işbirliği yapan profesyoneller"
     },
     "header": {
-        "logo": "CareerFlow",
+        "logo": "CareerStudio ",
         "theStruggle": "Zorluklar",
         "yourEdge": "Avantajınız",
         "howItWorks": "Nasıl Çalışır?",
@@ -108,7 +185,7 @@
     "features": {
         "title": "Yeni Avantajınız: ",
         "aiAndBrilliance": "Yapay Zeka + Sizin Zekanız",
-        "subtitle": "CareerFlow AI sadece bir araç değil. Güçlü yönlerinizi öne çıkarmak ve modern iş piyasasının karmaşıklığında yolunuzu bulmak için tasarlanmış akıllı ortağınızdır.",
+        "subtitle": "CareerStudio AI sadece bir araç değil. Güçlü yönlerinizi öne çıkarmak ve modern iş piyasasının karmaşıklığında yolunuzu bulmak için tasarlanmış akıllı ortağınızdır.",
         "hyperPersonalized": {
             "title": "Hiper-Kişiselleştirilmiş YZ Taslakları",
             "text": "Yapay zeka, iş tanımlarını VE profilinizi analiz ederek saniyeler içinde benzersiz, hedefe yönelik özgeçmişler ve mektuplar oluşturur. Sıradanlığa veda edin!"
@@ -185,7 +262,7 @@
         "legal": "Yasal",
         "privacyPolicy": "Gizlilik Politikası",
         "termsOfService": "Hizmet Şartları",
-        "copyright": "©  CareerFlow AI. Tüm hakları saklıdır."
+        "copyright": "©  CareerStudio AI. Tüm hakları saklıdır."
     },
     "dashboard": {
         "welcome": "Tekrar hoş geldiniz",
@@ -282,7 +359,7 @@
         }
     },
     "dashboard_layout": {
-        "logo": "CareerFlow",
+        "logo": "CareerStudio ",
         "sidebar": {
             "settings": "Ayarlar",
             "overview": "Genel Bakış",
@@ -381,3 +458,6 @@
      "resumeEditor": { "tour": { "sidebar": { "navigation": { "title": "Özgeçmiş Bölümleri", "description": "Bu kenar çubuğu, özgeçmişinizin tüm bölümlerini listeler. Herhangi bir bölüme adının üzerine tıklayarak hızlıca gidebilirsiniz." }, "sectionItem": { "title": "Gezin ve Yeniden Sırala", "description": "Bir bölüme kaydırmak için tıklayın. Son belgedeki sıralarını değiştirmek için bölümleri sürükleyip bırakabilirsiniz." }, "dragHandle": { "title": "Yeniden Sıralamak için Sürükle", "description": "Bir bölümü almak ve listede yukarı veya aşağı taşımak için bu tutamacı kullanın." }, "visibilityToggle": { "title": "Bölümleri Göster veya Gizle", "description": "Özgeçmişinize bir bölümü dahil etmek veya hariç tutmak için göz simgesine tıklayın. Gizli bölümler silinmez, sadece gösterilmez." } }, "editor": { "overview": { "title": "Ana Düzenleyici", "description": "Burası, her bölümün içeriğini düzenlediğiniz yerdir. Şimdi, mevcut eylemleri görmek için 'Deneyim' bölümüne odaklanacağız." }, "addSection": { "title": "Yeni Girdi Ekle", "description": "Geçerli bölüme yeni bir girdi eklemek için bu düğmeye tıklayın, deneyiminizdeki yeni bir iş gibi." }, "editSection": { "title": "Bir Girdiyi Düzenle", "description": "Mevcut bir girdiyi düzenleyiciyi açmak için kalem simgesine tıklayın. Daha fazla seçenek görmek için onu açalım." }, "aiEdit": { "title": "Yapay Zeka Asistanı", "description": "Yazınızı geliştirmek için Yapay Zeka Asistanımızı kullanın. 'Bunu daha profesyonel hale getir' gibi bir komut yazın ve metni sizin için yeniden yazmasına izin verin." }, "voiceInput": { "title": "Metne Sesli Çevirme", "description": "Metninizi yazmak yerine dikte etmek için mikrofona tıklayın. Bu, fikirlerinizi hızlı bir şekilde yazmanın bir yoludur." } }, "topbar": { "saveButton": { "title": "İlerlemenizi Kaydedin", "description": "Değişikliklerinizi sık sık kaydetmeyi unutmayın! Bu düğmeye tıkladığınızda çalışmanız kaydedilir." }, "exportButton": { "title": "Özgeçmişinizi Dışa Aktar", "description": "İşiniz bittiğinde, özgeçmişinizi PDF veya diğer biçimlerde dışa aktarma seçeneklerini görmek için buraya tıklayın." }, "generateDocument": { "title": "Belgeler Oluşturun", "description": "Bu özgeçmiş verilerine dayanarak kapak mektupları veya profesyonel biyografiler gibi özel belgeler oluşturun." }, "actionsDropdown": { "title": "Daha Fazla Eylem", "description": "Bu menü, özgeçmişinizden kişisel bir web sitesi oluşturma veya yeni bir özgeçmiş varyantı oluşturma gibi ek eylemler içerir." }, "backButton": { "title": "Kontrol Paneline Dön", "description": "Ana kontrol panelinize dönmek için buraya tıklayın. Önce çalışmanızı kaydettiğinizden emin olun!" } } } } 
 , "siteEditor": { "tour": { "intro": { "title": "Site Düzenleyicisine Hoş Geldiniz", "description": "Şu anda <b>Site Düzenleyicisindesiniz</b>. Bu, canlı web siteniz değildir, ancak yayınlamadan önce değişiklikleri yapabileceğiniz ve önizleyebileceğiniz güvenli bir yerdir. Hadi hızlı bir tura çıkalım!" }, "toolbar": { "title": "Site Düzenleyici Araç Çubuğu", "description": "Bu araç çubuğu, web sitenizi yönetmek için tüm ana eylemleri içerir." }, "globalSettings": { "title": "Global Ayarlar", "description": "Genel temalar, fontlar, renkler, site genelindeki animasyonlar ve daha fazlası gibi site genelindeki ayarları düzenleyin." }, "globalHistory": { "title": "Global Geçmiş", "description": "Global ayarlarınızda yapılan değişiklikleri geri alın ve yineleyin." }, "viewLiveSite": { "title": "Canlı Siteyi Görüntüle", "description": "Canlı web sitenizi yeni bir sekmede açarak ziyaretçilere nasıl göründüğünü görün. Bu bağlantıyı arkadaşlarınızla paylaşabilir, özgeçmişinize ekleyebilir ve kişisel markanızı tanıtmaya başlayabilirsiniz." }, "saveChanges": { "title": "Değişiklikleri Kaydet", "description": "Tüm düzenlemelerinizi kaydedin. Kaydedilmemiş değişiklikler yoksa düğme devre dışı kalır." }, "contentBlock": { "title": "Düzenlenebilir İçerik Bloğu", "description": "Web siteniz bu bloklardan oluşur. Düzenleme seçeneklerini görmek için bir bloğun üzerine gelin." }, "undoBlock": { "title": "Blok Değişikliğini Geri Al", "description": "Bu belirli blokta yaptığınız herhangi bir değişikliği geri alabilirsiniz." }, "redoBlock": { "title": "Blok Değişikliğini Yinele", "description": "Yanlışlıkla geri alırsanız, değişikliği burada yineleyebilirsiniz." }, "aiEditor": { "title": "Yapay Zeka Destekli Düzenleyici", "description": "Yapay zeka düzenleyicisini açmak için kaleme tıklayın. İçinde ne olduğunu görelim." }, "aiAssistant": { "title": "Yapay Zeka Asistanı", "description": "Burada, bloğun içeriğini, stilini veya işlevselliğini değiştirmek için bir komut yazabilirsiniz. Yapay zeka kodu halledecektir." } } } 
 }
+
+
+

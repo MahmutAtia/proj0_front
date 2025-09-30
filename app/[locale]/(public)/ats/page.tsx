@@ -21,6 +21,7 @@ import styles from './ats.module.css';
 import { Suspense } from 'react';
 import { addOrUpdateResumeInCache, getResumesFromCache } from '@/app/utils/resumeCache'; // 1. Import getResumesFromCache
 import api,{ aiApi } from '@/lib/axios'; 
+import { useTranslation } from '@/hooks/useTranslation';
 
 
 
@@ -78,17 +79,19 @@ const ATSCheckerPageContent = () => {
     const router = useRouter();
     const searchParams = useSearchParams();
     const pollingIntervalRef = useRef<NodeJS.Timeout | null>(null);
+    const { t, locale } = useTranslation();
+
 
     // --- Options for SelectButton ---
     const resumeInputOptions = [
-        { label: 'Upload File', value: 'upload', icon: 'pi pi-upload' },
-        { label: 'Paste Text', value: 'paste', icon: 'pi pi-pencil' }
+        // use use translation for lable
+        { label: t('ats.upload_label'), value: 'upload', icon: 'pi pi-upload' },
+        { label: t('ats.paste_label'), value: 'paste', icon: 'pi pi-pencil' }
     ];
-
     const languageOptions = [
-        { label: 'English', value: 'en' },
-        { label: 'French', value: 'fr' },
-        { label: 'Spanish', value: 'es' },
+        { label: t('ats.english_label'), value: 'en' },
+        { label: t('ats.french_label'), value: 'fr' },
+        { label: t('ats.spanish_label'), value: 'es' },
     ];
 
     // --- Event Handlers ---
@@ -401,9 +404,7 @@ const ATSCheckerPageContent = () => {
     const handleSubmit = async () => {
         // --- Early Returns for Validation ---
         if (isLoading) return;
-        if (targetRole.trim() === '') {
-            return toast.current?.show({ severity: 'warn', summary: 'Missing Role', detail: 'Please specify a target role for your resume.' });
-        }
+        
         if (resumeInputMethod === 'upload' && !resumeFile) {
             return toast.current?.show({ severity: 'warn', summary: 'No File Selected', detail: 'Please upload your resume file.' });
         }
@@ -529,7 +530,7 @@ const ATSCheckerPageContent = () => {
         signIn('google', { callbackUrl });
     };
 
-    const isSubmitDisabled = isLoading || !targetRole.trim() || !((resumeInputMethod === 'upload' && resumeFile) || (resumeInputMethod === 'paste' && resumeText.trim()));
+    const isSubmitDisabled = isLoading || !((resumeInputMethod === 'upload' && resumeFile) || (resumeInputMethod === 'paste' && resumeText.trim()));
 
     return (
         <div className="p-4 md:p-6 lg:p-8 flex justify-content-center align-items-start min-h-screen bg-gray-100">
@@ -543,6 +544,13 @@ const ATSCheckerPageContent = () => {
                                 <div className="p-fluid formgrid grid">
                                     <div className="field col-12">
                                         <label className="font-semibold block mb-2">1. Provide Your Resume</label>
+                                           { resumeInputMethod === 'upload' && (
+                                            <Message
+                                                severity="info"
+                                                text="Tip: Don't worry if it's not perfect. Upload any version—even an old one—to get a baseline. Our AI is here to help you improve it."
+                                                className="mb-3"
+                                            />
+                                        )}
                                         <SelectButton
                                             value={resumeInputMethod}
                                             options={resumeInputOptions}
@@ -600,12 +608,25 @@ const ATSCheckerPageContent = () => {
                                                 exit={{ opacity: 0 }}
                                                 transition={{ duration: 0.2 }}
                                             >
+                                                        <label htmlFor="resumeText" className="font-semibold block mb-2">
+            Paste Resume or Write from Scratch
+        </label>
+        <p className="mt-0 mb-2 text-sm text-color-secondary">
+            Don't have a resume? No problem. Just list your past jobs, skills, or education below. Our AI can build a professional resume from simple notes.
+        </p>
                                                 <InputTextarea
                                                     value={resumeText}
                                                     onChange={handleResumeTextChange}
                                                     rows={10}
-                                                    placeholder="Paste your full resume text here..."
-                                                    autoResize
+ placeholder={
+`e.g.,
+- name: John Doe
+- Software Developer at Tech Corp, Ankara (2022-2025)
+  - Built web applications using React and Node.js.
+- Skills: JavaScript, Python, Customer Communication
+
+- Education: B.S. in Computer Science from Middle East Technical University`
+            }                                                    autoResize
                                                     className="w-full"
                                                     disabled={isLoading}
                                                 />
@@ -687,7 +708,7 @@ const ATSCheckerPageContent = () => {
                                         )}
                                     </AnimatePresence>
 
-                                    <div className="col-12 flex justify-content-center mt-4">
+                                    <div className="col-12 flex flex-column align-items-center mt-4">
                                         <motion.div variants={buttonHoverTap} whileHover="hover" whileTap="tap">
                                             <Button
                                                 label="Check ATS Score"
@@ -697,6 +718,9 @@ const ATSCheckerPageContent = () => {
                                                 className="p-button-lg p-button-success w-full md:w-auto"
                                             />
                                         </motion.div>
+                                            <p className="mt-3 text-sm text-color-secondary text-center" style={{ maxWidth: '450px' }}>
+        Your current resume is just the starting point. After you submit, our AI will work its magic to analyze and prepare an improved version tailored to your target role and your job description (if provided).
+    </p>
                                     </div>
                                 </div>
                             </motion.div>

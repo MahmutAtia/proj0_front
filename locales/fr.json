@@ -25,6 +25,83 @@
     "defaultMessage": "Salut ! J'ai une question, pouvez-vous m'aider ?",
     "ariaLabel": "Discuter sur WhatsApp"
   },
+      "ats": {
+      "upload_label": "J'ai un CV à télécharger",
+      "paste_label": "Vous n'avez pas encore de CV ?",
+      "english_label": "Anglais",
+      "french_label": "Français",
+      "spanish_label": "Espagnol"
+    },
+    "advantage": {
+      "title": "L'Avantage CareerStudio ",
+      "items": [
+        {
+          "title": "L'Ancienne Méthode (Outils Multiples Déconnectés)",
+          "points": [
+            "Constructeur de modèle de CV générique",
+            "Outil séparé pour les lettres de motivation",
+            "Modification manuelle pour chaque candidature",
+            "Constructeur de site web complexe pour un portfolio",
+            "Défilement interminable sur les sites d'emploi",
+            "Documents et fichiers déconnectés"
+          ],
+          "isDisadvantage": true
+        },
+        {
+          "title": "La Méthode CareerStudio  (Un Système Intelligent Unique)",
+          "points": [
+            "Co-Pilote IA qui écrit et optimise",
+            "CV, Lettre de motivation, Portfolio synchronisés",
+            "Adaptation IA en 1 clic pour n'importe quel emploi",
+            "Génération de portfolio instantanée",
+            "Scout de Travail Automatisé travaillant pour vous 24/7",
+            "Votre carrière gérée en un seul endroit"
+          ],
+          "isDisadvantage": false
+        }
+      ]
+    },
+    "floatingOffer": {
+      "text": "🎉 Offre de Lancement ! Utilisez le code",
+      "code": "DREAMJOB50",
+      "text2": "pour 50% de réduction !"
+    },
+    "faq": {
+      "title": "Foire Aux Questions",
+      "subtitle": "Vous avez des questions ? Nous avons des réponses. Si vous ne les trouvez pas ici, notre support 24/7 est prêt à vous aider.",
+      "questions": [
+        {
+          "id": "faq1",
+          "question": "Le premier CV est-il vraiment gratuit ? Où est le piège ?",
+          "answer": "Oui, 100% gratuit. Le piège, c'est que nous sommes convaincus que vous aimerez tellement le résultat que vous voudrez débloquer toute la puissance de CareerStudio  Pro. Vous pouvez créer votre profil, générer votre premier CV optimisé pour l'ATS et le télécharger au format PDF sans jamais entrer de carte de crédit."
+        },
+        {
+          "id": "faq2",
+          "question": "En quoi est-ce différent d'un simple constructeur de modèles ?",
+          "answer": "Les modèles ne vous donnent qu'une mise en page. CareerStudio  est un système intelligent. Notre IA ne fait pas que remplir des blancs—elle comprend votre carrière, suggère des formulations puissantes, optimise chaque ligne pour les robots ATS et vous aide à adapter votre candidature entière à un emploi spécifique en quelques secondes. C'est un partenaire d'écriture, pas seulement un document."
+        },
+        {
+          "id": "faq3",
+          "question": "Qu'est-ce que l'ATS et pourquoi est-il si important ?",
+          "answer": "L'ATS (Applicant Tracking System - Système de Suivi des Candidats) est un logiciel automatisé qui scanne votre CV pour les mots-clés et le formatage avant qu'un humain ne le voie. Plus de 75% des CV sont rejetés par ces robots. Nous concevons et structurons méticuleusement chaque CV pour qu'il soit parfaitement analysé par l'ATS, garantissant que votre candidature atterrisse devant une personne réelle."
+        },
+        {
+          "id": "faq4",
+          "question": "Puis-je annuler mon plan Pro à tout moment ?",
+          "answer": "Absolument. Vous avez le contrôle total. Vous pouvez annuler votre abonnement à tout moment depuis le tableau de bord de votre compte en un seul clic. Pas de frais cachés, pas de tracas. Vous conserverez l'accès aux fonctionnalités Pro jusqu'à la fin de votre période de facturation actuelle."
+        },
+        {
+          "id": "faq5",
+          "question": "À qui s'adresse cette plateforme ? Étudiants ? Cadres ?",
+          "answer": "CareerStudio  est conçu pour toute personne sérieuse au sujet de sa carrière. Il est assez puissant pour les cadres visant des rôles compétitifs, mais assez simple pour que les jeunes diplômés construisent leur premier CV professionnel. Si vous en avez assez du processus de candidature répétitif et frustrant, CareerStudio  est fait pour vous."
+        },
+        {
+          "id": "faq6",
+          "question": "Qu'arrive-t-il à mon site web de portfolio si j'annule mon plan Pro ?",
+          "answer": "Si vous annulez votre plan Pro, le site web de votre portfolio sera dépublié et le lien partageable ne sera plus actif. Toutes vos données et conceptions seront stockées en toute sécurité, et vous pourrez le republier instantanément si vous décidez de vous réabonner."
+        }
+      ]
+    },
     "resumes": {
         "title": "Mes CVs",
         "createNew": "Créer un nouveau CV",
@@ -60,13 +137,13 @@
         "subtitle_part1": "Échappez à la recherche d'emploi éreintante. Saviez-vous que la plupart des emplois nécessitent un ",
         "subtitle_styled": "CV personnalisé",
         "subtitle_part2": " juste pour passer les filtres automatiques ? Nous les créons *avec* vous, en utilisant l'IA.",
-        "description": "Vous êtes brillant, compétent et prêt. Mais votre candidature disparaît dans l'abîme des ATS. Ce n'est pas vous, c'est le système. CareerFlow AI crée des CVs et des portfolios qui vous font remarquer.",
+        "description": "Vous êtes brillant, compétent et prêt. Mais votre candidature disparaît dans l'abîme des ATS. Ce n'est pas vous, c'est le système. CareerStudio  AI crée des CVs et des portfolios qui vous font remarquer.",
         "startFreeResume": "Commencer mon CV IA gratuit",
         "checkScore": "Vérifier mon score ATS",
         "imageAlt": "Professionnels collaborant et atteignant le succès professionnel grâce à la technologie"
     },
     "header": {
-        "logo": "CareerFlow",
+        "logo": "CareerStudio ",
         "theStruggle": "Le Défi",
         "yourEdge": "Votre Avantage",
         "howItWorks": "Comment ça marche",
@@ -108,7 +185,7 @@
     "features": {
         "title": "Votre nouvel avantage : ",
         "aiAndBrilliance": "IA + Votre Génie",
-        "subtitle": "CareerFlow AI n'est pas juste un autre outil. C'est votre partenaire intelligent, conçu pour amplifier vos forces et naviguer les complexités du marché du travail moderne.",
+        "subtitle": "CareerStudio  AI n'est pas juste un autre outil. C'est votre partenaire intelligent, conçu pour amplifier vos forces et naviguer les complexités du marché du travail moderne.",
         "hyperPersonalized": {
             "title": "Ébauches IA hyper-personnalisées",
             "text": "L'IA analyse les descriptions de poste ET votre profil pour créer des CVs et lettres uniques et ciblés en quelques secondes. Dites adieu au générique !"
@@ -185,7 +262,7 @@
         "legal": "Légal",
         "privacyPolicy": "Politique de confidentialité",
         "termsOfService": "Conditions d'utilisation",
-        "copyright": "©  CareerFlow AI. Tous droits réservés."
+        "copyright": "©  CareerStudio  AI. Tous droits réservés."
     },
     "dashboard": {
         "welcome": "Bon retour",
@@ -282,7 +359,7 @@
         }
     },
     "dashboard_layout": {
-        "logo": "CareerFlow",
+        "logo": "CareerStudio ",
         "sidebar": {
             "settings": "Paramètres",
             "overview": "Aperçu",
