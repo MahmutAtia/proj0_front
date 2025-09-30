@@ -23,7 +23,7 @@ const AdvantageSection = () => {
                 </motion.div>
                 
                 <div className={styles.comparisonContainer}>
-                    {advantageData.items.map((item, index) => (
+                    {advantageData.items.map((item: any, index: number) => (
                         <motion.div
                             key={index}
                             className={styles.advantageColumn}
@@ -35,7 +35,7 @@ const AdvantageSection = () => {
                         >
                             <h3 className={styles.columnTitle}>{item.title}</h3>
                             <ul className={styles.pointList}>
-                                {item.points.map((point, pointIndex) => (
+                                {item.points.map((point: string, pointIndex: number) => (
                                     <li key={pointIndex} className={styles.pointItem}>
                                         {item.isDisadvantage ? (
                                             <FiXCircle className={`${styles.icon} ${styles.iconDisadvantage}`} />

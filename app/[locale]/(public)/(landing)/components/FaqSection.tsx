@@ -6,7 +6,7 @@ import { FiChevronDown, FiChevronUp } from 'react-icons/fi';
 import styles from '../styles/FaqSection.module.css';
 
 // Reusable FAQ Item component
-const FaqItem = ({ item, isOpen, onClick }) => {
+const FaqItem = ({ item, isOpen, onClick }: { item: any; isOpen: boolean; onClick: () => void; }) => {
     return (
         <div className={styles.faqItem}>
             <button className={styles.faqQuestion} onClick={onClick}>
@@ -35,7 +35,7 @@ const FaqSection = () => {
     const faqData = t('faq');
     const [openId, setOpenId] = useState(null);
 
-    const toggleItem = (id) => {
+    const toggleItem = (id: any) => {
         setOpenId(openId === id ? null : id);
     };
 
@@ -46,7 +46,7 @@ const FaqSection = () => {
                 <h2 className="section-title">{faqData.title}</h2>
                 <p className="section-subtitle">{faqData.subtitle}</p>
                 <div className={styles.faqList}>
-                    {faqData.questions.map((item) => (
+                    {faqData.questions.map((item: any) => (
                         <FaqItem
                             key={item.id}
                             item={item}
