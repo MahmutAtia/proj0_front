@@ -70,7 +70,7 @@
         "subtitle_part1": "Escape the soul-crushing job hunt. Did you know most jobs need a ",
         "subtitle_styled": "tailored resume",
         "subtitle_part2": " just to pass the bots? We build them *with* you, using AI.",
-        "description": "You're brilliant, skilled, and ready. But your application vanishes into the ATS abyss. It's not you, it's the system. CareerFlow AI crafts resumes & portfolios that get you noticed.",
+        "description": "You're brilliant, skilled, and ready. But your application vanishes into the ATS abyss. It's not you, it's the system. CareerStudio AI crafts resumes & portfolios that get you noticed.",
         "startFreeResume": "Start My Free AI Resume",
         "checkScore": "See The Advantage",
         "imageAlt": "Professionals collaborating and achieving career success with technology"
@@ -119,7 +119,7 @@
     "features": {
         "title": "Your New Edge: ",
         "aiAndBrilliance": "AI + Your Brilliance",
-        "subtitle": "CareerFlow AI isn't just another tool. It's your intelligent partner, designed to amplify your strengths and navigate the complexities of the modern job market.",
+        "subtitle": "CareerStudio AI isn't just another tool. It's your intelligent partner, designed to amplify your strengths and navigate the complexities of the modern job market.",
         "hyperPersonalized": {
             "title": "Hyper-Personalized AI Drafts",
             "text": "AI analyzes job descriptions AND your profile to craft unique, targeted resumes & letters in seconds. Say goodbye to generic!"
@@ -138,7 +138,7 @@
         }
     },
       "advantage": {
-    "title": "The CareerFlow Advantage",
+    "title": "The CareerStudio Advantage",
     "items": [
       {
         "title": "The Old Way (Multiple Disconnected Tools)",
@@ -153,7 +153,7 @@
         "isDisadvantage": true
       },
       {
-        "title": "The CareerFlow Way (One Intelligent System)",
+        "title": "The CareerStudio Way (One Intelligent System)",
         "points": [
           "AI Co-Pilot that writes and optimizes",
           "Resume, Cover Letter, Portfolio in sync",
@@ -219,12 +219,12 @@
       {
         "id": "faq1",
         "question": "Is the first resume really free? What's the catch?",
-        "answer": "Yes, 100% free. The catch is that we're confident you'll love the result so much you'll want to unlock the full power of CareerFlow Pro. You can create your profile, generate your first ATS-optimized resume, and download it as a PDF without ever entering a credit card."
+        "answer": "Yes, 100% free. The catch is that we're confident you'll love the result so much you'll want to unlock the full power of CareerStudio Pro. You can create your profile, generate your first ATS-optimized resume, and download it as a PDF without ever entering a credit card."
       },
       {
         "id": "faq2",
         "question": "How is this different from a simple template builder?",
-        "answer": "Templates just give you a layout. CareerFlow is an intelligent system. Our AI doesn't just fill blanks—it understands your career, suggests powerful phrasing, optimizes every line for ATS bots, and helps you tailor your entire application to a specific job in seconds. It’s a writing partner, not just a document."
+        "answer": "Templates just give you a layout. CareerStudio is an intelligent system. Our AI doesn't just fill blanks—it understands your career, suggests powerful phrasing, optimizes every line for ATS bots, and helps you tailor your entire application to a specific job in seconds. It’s a writing partner, not just a document."
       },
       {
         "id": "faq3",
@@ -239,7 +239,7 @@
       {
         "id": "faq5",
         "question": "Who is this platform for? Students? Executives?",
-        "answer": "CareerFlow is designed for anyone serious about their career. It's powerful enough for executives targeting competitive roles, yet simple enough for recent graduates to build their first professional resume. If you're tired of the repetitive, frustrating job application process, CareerFlow is for you."
+        "answer": "CareerStudio is designed for anyone serious about their career. It's powerful enough for executives targeting competitive roles, yet simple enough for recent graduates to build their first professional resume. If you're tired of the repetitive, frustrating job application process, CareerStudio is for you."
       },
       {
         "id": "faq6",
@@ -267,7 +267,7 @@
         "legal": "Legal",
         "privacyPolicy": "Privacy Policy",
         "termsOfService": "Terms of Service",
-        "copyright": "©  CareerFlow AI. All rights reserved."
+        "copyright": "©  CareerStudio AI. All rights reserved."
     },
     "dashboard": {
         "welcome": "Welcome back",
