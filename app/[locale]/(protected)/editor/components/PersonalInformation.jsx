@@ -18,7 +18,7 @@ import './styles.css';
 
 const PersonalInformation = ({ sectionKey }) => {
     const toast = useRef(null);
-    const { data, setData, toggleEditMode, editMode } = useResume();
+    const { data, aboutCandidate, setData, toggleEditMode, editMode } = useResume();
     const { avatar, uploadAvatar, removeAvatar } = useAvatar();
     const personalInfo = data[sectionKey];
     const isEditing = editMode[sectionKey]?.all;
@@ -118,6 +118,8 @@ const PersonalInformation = ({ sectionKey }) => {
                 prompt: aiPrompt,
                 sectionData: personalInfo,
                 sectionTitle: "Personal Information",
+                aboutCandidate: aboutCandidate
+
             });
             const data = response.data;
             handleAIUpdate(data);

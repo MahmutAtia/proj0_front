@@ -4,6 +4,7 @@ import { ConfirmDialog } from 'primereact/confirmdialog';
 import { useState } from 'react';
 import { aiApi } from '@/lib/axios';
 import AIAssistant from './AIAssistant';
+import { useResume } from '../ResumeContext';
 
 const ItemWrapper = ({
     sectionTitle,
@@ -26,6 +27,7 @@ const ItemWrapper = ({
     const [showDeleteDialog, setShowDeleteDialog] = useState(false);
     const [aiPrompt, setAiPrompt] = useState('');
     const [isAIProcessing, setIsAIProcessing] = useState(false);
+    const { aboutCandidate } = useResume(); 
 
     const handleAISubmit = async () => {
         setIsAIProcessing(true);
@@ -33,7 +35,8 @@ const ItemWrapper = ({
             const response = await aiApi.post("/resumes-v2/edit_section", {
                 prompt: aiPrompt,
                 sectionData: sectionData,
-                sectionTitle: sectionTitle
+                sectionTitle: sectionTitle,
+                aboutCandidate: aboutCandidate
             });
             const data = response.data;
             onAIUpdate(data);

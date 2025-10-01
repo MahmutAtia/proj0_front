@@ -10,7 +10,7 @@ import AIAssistant from "./AIAssistant";
 
 const Summary = ({ sectionKey }) => {
     const toast = useRef(null);
-    const { data, setData, toggleEditMode, editMode } = useResume();
+    const { data, setData, aboutCandidate, toggleEditMode, editMode } = useResume();
     const summary = data[sectionKey];
     const isEditing = editMode[sectionKey]?.all;
     const historyRef = useRef([]);
@@ -62,7 +62,9 @@ const Summary = ({ sectionKey }) => {
                 sectionData: { [sectionKey]: summary }, // dict: key is sectionKey, value is summary
                 sectionTitle: sectionKey.split('_').map(word =>
                     word.charAt(0).toUpperCase() + word.slice(1)
-                ).join(' ')
+                ).join(' '),
+                aboutCandidate: aboutCandidate
+
             });
             const data = response.data;
             handleAIUpdate(data);

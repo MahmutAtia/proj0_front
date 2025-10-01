@@ -7,7 +7,7 @@ import { Dialog } from 'primereact/dialog';
 import { Toast } from 'primereact/toast';
 import { useResume } from '../ResumeContext';
 import AIAssistant from './AIAssistant';
-import api from '@/lib/axios';
+import {aiApi} from '@/lib/axios';
 import './styles.css';
 
 const Languages = ({ sectionKey }) => {
@@ -112,9 +112,9 @@ const Languages = ({ sectionKey }) => {
     const handleAISubmit = async () => {
         setIsAIProcessing(true);
         try {
-            const response = await api.post("/api/resumes/edit/", {
+            const response = await aiApi.post("/resumes-v2/edit_section", {
                 prompt: aiPrompt,
-                sectionData: languages,
+                sectionData: { languages: languages },
                 sectionTitle: "Languages",
             });
             const data = response.data;
