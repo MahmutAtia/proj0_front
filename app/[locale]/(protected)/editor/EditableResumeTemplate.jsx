@@ -827,7 +827,7 @@ const EditableResumeTemplate = ({
             >
                 <div className="p-fluid">
                     <p className="mb-4 text-color-secondary">
-                        Enter instructions to apply changes across your entire resume. For example: "Change all dates to YYYY-MM format" or "Rewrite my experience section to be more concise and impactful."
+                        Enter instructions to apply changes across your entire resume. For example: &quot;Change all dates to YYYY-MM format&quot; or &quot;Rewrite my experience section to be more concise and impactful.&quot;
                     </p>
                     <AIAssistant
                         prompt={globalEditPrompt}
