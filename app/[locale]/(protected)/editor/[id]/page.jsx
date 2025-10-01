@@ -21,6 +21,7 @@ const ResumeEditorPage = ({ params: paramsPromise }) => {
     const [initialSectionOrder, setInitialSectionOrder] = useState(null); // New state
     const [initialHiddenSections, setInitialHiddenSections] = useState(null); // New state
     const [personalWebsiteUuid, setPersonalWebsiteUuid] = useState(null); // State for website UUID
+    const [aboutCandidate, setAboutCandidate] = useState(''); // State for about candidate
     const [fetchError, setFetchError] = useState(null);
     const router = useRouter();
     const toast = useRef(null);
@@ -35,6 +36,7 @@ const ResumeEditorPage = ({ params: paramsPromise }) => {
             setInitialSectionOrder(null); // Reset
             setInitialHiddenSections(null); // Reset
             setPersonalWebsiteUuid(null); // Reset
+            setAboutCandidate(''); // Reset
             setFetchError(null);
             const localResumes = getResumesFromCache();
             let foundInLocal = false;
@@ -47,6 +49,7 @@ const ResumeEditorPage = ({ params: paramsPromise }) => {
                         setInitialSectionOrder(resumeItem.sections_sort || null); // Load sections_sort
                         setInitialHiddenSections(resumeItem.hidden_sections || null); // Load hidden_sections
                         setPersonalWebsiteUuid(resumeItem.personal_website_uuid || null); // Load website UUID
+                        setAboutCandidate(resumeItem.about || ''); // Load about candidate
                         foundInLocal = true;
                         console.log("Loaded resume from local cache.");
                         // site uuid
@@ -83,6 +86,7 @@ const ResumeEditorPage = ({ params: paramsPromise }) => {
                         setInitialSectionOrder(response.data.sections_sort || null); // Load sections_sort from API
                         setInitialHiddenSections(response.data.hidden_sections || null); // Load hidden_sections from API
                         setPersonalWebsiteUuid(response.data.personal_website_uuid || null); // Load website UUID from API
+                        setAboutCandidate(response.data.about || ''); // Load about candidate from API
                         
                         // Update the cache with the newly fetched data
                         addOrUpdateResumeInCache(response.data);
@@ -133,7 +137,7 @@ const ResumeEditorPage = ({ params: paramsPromise }) => {
             )}
 
             {resumeData && (
-                <ResumeProvider initialData={resumeData}>
+                <ResumeProvider initialData={resumeData} aboutCandidate={aboutCandidate}>
                     <EditableResumeTemplate
                         resumeId={resumeId}
                         linkedDocuments={linkedDocuments}

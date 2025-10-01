@@ -1,13 +1,49 @@
-import React, { createContext, useState, useContext } from "react";
+import React, { createContext, useState, useContext, useCallback, useEffect } from "react";
 import { v4 as uuidv4 } from "uuid";
 import "primeicons/primeicons.css";
 
 export const ResumeContext = createContext();
 
-export const ResumeProvider = ({ children, initialData }) => {
-
+export const ResumeProvider = ({ children, initialData , aboutCandidate }) => {
     const [data, setData] = useState(initialData);
+    const [history, setHistory] = useState([initialData]);
+    const [historyIndex, setHistoryIndex] = useState(0);
     const [editMode, setEditMode] = useState({});
+
+    useEffect(() => {
+        // Reset history when the initial data changes (e.g., navigating between resumes)
+        setData(initialData);
+        setHistory([initialData]);
+        setHistoryIndex(0);
+    }, [initialData]);
+
+    const updateData = useCallback((newData) => {
+        // When updating data, create a new history entry
+        const newHistory = history.slice(0, historyIndex + 1);
+        newHistory.push(newData);
+        setHistory(newHistory);
+        setHistoryIndex(newHistory.length - 1);
+        setData(newData);
+    }, [history, historyIndex]);
+
+    const undo = useCallback(() => {
+        if (historyIndex > 0) {
+            const newIndex = historyIndex - 1;
+            setHistoryIndex(newIndex);
+            setData(history[newIndex]);
+        }
+    }, [history, historyIndex]);
+
+    const redo = useCallback(() => {
+        if (historyIndex < history.length - 1) {
+            const newIndex = historyIndex + 1;
+            setHistoryIndex(newIndex);
+            setData(history[newIndex]);
+        }
+    }, [history, historyIndex]);
+
+    const canUndo = historyIndex > 0;
+    const canRedo = historyIndex < history.length - 1;
 
     // List of all default sections
     const defaultSections = [
@@ -45,31 +81,28 @@ export const ResumeProvider = ({ children, initialData }) => {
     };
 
     const addSectionItem = (section) => {
-        setData((prevData) => {
-            const newData = JSON.parse(JSON.stringify(prevData));
-            if (!newData[section]) {
-                newData[section] = [];
-            }
-            if (Array.isArray(newData[section])) {
-                const newItem = getDefaultItem(section);
-                // Add a unique ID for drag-and-drop
-                newItem.id = `${section}-${crypto.randomUUID()}`; 
-                newData[section].push(newItem);
-            }
-            return newData;
-        });
+        const newData = JSON.parse(JSON.stringify(data));
+        if (!newData[section]) {
+            newData[section] = [];
+        }
+        if (Array.isArray(newData[section])) {
+            const newItem = getDefaultItem(section);
+            // Add a unique ID for drag-and-drop
+            newItem.id = `${section}-${crypto.randomUUID()}`;
+            newData[section].push(newItem);
+        }
+        updateData(newData); // Use updateData to record history
     };
 
     const removeSectionItem = (section, index, id) => {
-        setData((prevData) => {
-            const newData = JSON.parse(JSON.stringify(prevData));
-            if (Array.isArray(newData[section])) {
-                newData[section] = newData[section].filter((item, i) =>
-                    id ? item.id !== id : i !== index,
-                );
-            }
-            return newData;
-        });
+        const newData = JSON.parse(JSON.stringify(data));
+        if (Array.isArray(newData[section])) {
+            newData[section] = newData[section].filter((item, i) =>
+                id ? item.id !== id : i !== index,
+            );
+        }
+        updateData(newData); // Use updateData to record history
+
         setEditMode((prevEditMode) => {
             const newEditMode = { ...prevEditMode };
             if (newEditMode[section]) {
@@ -79,26 +112,21 @@ export const ResumeProvider = ({ children, initialData }) => {
         });
     };
 
-
-
     const moveSectionItem = (section, index, direction) => {
-        setData((prevData) => {
-            const newData = { ...prevData };
-            const items = Array.from(newData[section]);
-            const item = items[index];
+        const items = Array.from(data[section]);
+        const item = items[index];
 
-            const newIndex = direction === 'up' ? index - 1 : index + 1;
+        const newIndex = direction === 'up' ? index - 1 : index + 1;
 
-            if (newIndex < 0 || newIndex >= items.length) {
-                return prevData; // Invalid move
-            }
+        if (newIndex < 0 || newIndex >= items.length) {
+            return; // Invalid move
+        }
 
-            items.splice(index, 1);
-            items.splice(newIndex, 0, item);
+        items.splice(index, 1);
+        items.splice(newIndex, 0, item);
 
-            newData[section] = items;
-            return newData;
-        });
+        const newData = { ...data, [section]: items };
+        updateData(newData); // Use updateData to record history
     };
 
     const getDefaultItem = (section) => {
@@ -112,7 +140,8 @@ export const ResumeProvider = ({ children, initialData }) => {
         <ResumeContext.Provider
             value={{
                 data,
-                setData,
+                setData: updateData, // Expose updateData as setData
+                aboutCandidate,
                 editMode,
                 toggleEditMode,
                 addSectionItem,
@@ -120,6 +149,10 @@ export const ResumeProvider = ({ children, initialData }) => {
                 moveSectionItem,
                 getDefaultItem,
                 defaultSections,
+                undo,
+                redo,
+                canUndo,
+                canRedo,
             }}
         >
             {children}

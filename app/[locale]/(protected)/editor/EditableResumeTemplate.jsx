@@ -1,6 +1,6 @@
 'use client';
 import React, { useEffect, useState, useRef } from 'react';
-import api from '@/lib/axios';
+import api,{aiApi} from '@/lib/axios';
 import { useSession } from 'next-auth/react';
 import { Button } from 'primereact/button';
 import { ProgressSpinner } from 'primereact/progressspinner';
@@ -24,6 +24,7 @@ import GenericSection from "./components/GenericSection";
 import GenerateDocumentDialog from "./components/GenerateDocumentDialog"; // <-- Import the new component
 import CreateResumeFromExistingDialog from "./components/CreateResumeFromExistingDialog"; // <-- Import the new component
 import { getResumesFromCache } from '@/app/utils/resumeCache'; // Import cache utility
+import AIAssistant from './components/AIAssistant'; // Import AIAssistant
 import 'primeflex/primeflex.css';
 import styles from './EditableResumeTemplate.module.css'; // Ensure CSS Modules are used
 import { startTour } from './tour'; 
@@ -49,9 +50,10 @@ const EditableResumeTemplate = ({
     linkedDocuments: initialLinkedDocuments,
     initialSectionOrder,
     initialHiddenSections, 
-    personalWebsiteUuid
+    personalWebsiteUuid,
+    
 }) => {
-    const { data, updateData } = useResume();
+    const { data,aboutCandidate, setData, undo, redo, canUndo, canRedo } = useResume();
     const [loading, setLoading] = useState(!data);
     // Initialize with prop, default to empty array if prop is null/undefined
     const [hiddenSections, setHiddenSections] = useState(initialHiddenSections || []);
@@ -63,6 +65,9 @@ const EditableResumeTemplate = ({
     const [isDirty, setIsDirty] = useState(false); // State to track unsaved changes
     const [showConfirmDialog, setShowConfirmDialog] = useState(false); // State for the confirmation dialog
     const [nextAction, setNextAction] = useState(null); // State to hold the navigation URL or action
+    const [showGlobalEditDialog, setShowGlobalEditDialog] = useState(false); // State for global edit dialog
+    const [globalEditPrompt, setGlobalEditPrompt] = useState(''); // State for global edit prompt
+    const [isGlobalAIProcessing, setIsGlobalAIProcessing] = useState(false); // State for global AI processing
     const router = useRouter();
     const toast = useRef(null);
     const mainContentRef = useRef(null); // Ref for the main scrollable area
@@ -94,6 +99,37 @@ const EditableResumeTemplate = ({
         }
     }, [loading, data, t]);
  
+    const handleGlobalEditSubmit = async () => {
+        if (!globalEditPrompt.trim()) {
+            toast.current?.show({ severity: 'warn', summary: 'Warning', detail: 'Please enter a prompt.', life: 3000 });
+            return;
+        }
+        setIsGlobalAIProcessing(true);
+        try {
+            const response = await aiApi.post("/resumes-v2/global_edit_resume", {
+                input_text: JSON.stringify(data),
+                instructions: globalEditPrompt,
+                aboutCandidate: aboutCandidate || "No context about the candidate was provided."
+            });
+
+            setData(response.data); // Update context, which handles history
+            setShowGlobalEditDialog(false);
+            setGlobalEditPrompt('');
+            toast.current?.show({ severity: 'success', summary: 'Success', detail: 'Resume updated globally!', life: 3000 });
+
+        } catch (error) {
+            console.error("Error during global AI edit:", error);
+            toast.current?.show({
+                severity: 'error',
+                summary: 'Error',
+                detail: `Failed to edit resume: ${error.response?.data?.detail || "Unknown error"}`,
+                life: 5000
+            });
+        } finally {
+            setIsGlobalAIProcessing(false);
+        }
+    };
+
     const actionItems = [
         {
             label: 'Generate Website',
@@ -550,10 +586,35 @@ const EditableResumeTemplate = ({
                     {loading && <ProgressSpinner style={{ width: '2rem', height: '2rem' }} strokeWidth="6" />}
                     
                     <Button 
+                        icon="pi pi-undo" 
+                        className="p-button-rounded p-button-text" 
+                        onClick={undo} 
+                        disabled={!canUndo}
+                        tooltip="Undo"
+                    />
+                    <Button 
+                        icon="pi pi-refresh" 
+                        className="p-button-rounded p-button-text" 
+                        onClick={redo} 
+                        disabled={!canRedo}
+                        tooltip="Redo"
+                    />
+
+                    <Button 
                         icon={<FaQuestionCircle />} 
                         className="p-button-rounded p-button-text p-button-plain" 
                         onClick={() => startTour(t)} 
                         tooltip="Start Tour"
+                        tooltipOptions={{ position: 'bottom' }}
+                    />
+
+                    <Button
+                        label="Global Edit"
+                        icon="pi pi-sparkles"
+                        className="p-button-secondary"
+                        onClick={() => setShowGlobalEditDialog(true)}
+                        disabled={loading || !data}
+                        tooltip="Use AI to edit the entire resume"
                         tooltipOptions={{ position: 'bottom' }}
                     />
 
@@ -753,6 +814,27 @@ const EditableResumeTemplate = ({
                 <div className="flex align-items-center">
                     <i className="pi pi-exclamation-triangle mr-3" style={{ fontSize: '2rem' }} />
                     <span>You have unsaved changes. What would you like to do?</span>
+                </div>
+            </Dialog>
+
+            {/* Global Edit Dialog */}
+            <Dialog
+                header="Global Resume Edit"
+                visible={showGlobalEditDialog}
+                style={{ width: '50vw', maxWidth: '600px' }}
+                modal
+                onHide={() => setShowGlobalEditDialog(false)}
+            >
+                <div className="p-fluid">
+                    <p className="mb-4 text-color-secondary">
+                        Enter instructions to apply changes across your entire resume. For example: "Change all dates to YYYY-MM format" or "Rewrite my experience section to be more concise and impactful."
+                    </p>
+                    <AIAssistant
+                        prompt={globalEditPrompt}
+                        setPrompt={setGlobalEditPrompt}
+                        onSubmit={handleGlobalEditSubmit}
+                        isProcessing={isGlobalAIProcessing}
+                    />
                 </div>
             </Dialog>
 
