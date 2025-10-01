@@ -20,87 +20,87 @@
         "refresh": "Actualizar",
         "viewAll": "Ver todo"
     },
-      "whatsapp": {
-    "tooltip": "💬 Pregúntanos lo que quieras — ¡estamos encantados de ayudarte!",
-    "defaultMessage": "¡Hola! Tengo una pregunta, ¿puedes ayudarme?",
-    "ariaLabel": "Chatear en WhatsApp"
-  },
-      "ats": {
-      "upload_label": "Tengo un currículum para subir",
-      "paste_label": "¿Aún no tienes un currículum?",
-      "english_label": "Inglés",
-      "french_label": "Francés",
-      "spanish_label": "Español"
+    "whatsapp": {
+        "tooltip": "💬 Pregúntanos lo que quieras — ¡estamos encantados de ayudarte!",
+        "defaultMessage": "¡Hola! Tengo una pregunta, ¿puedes ayudarme?",
+        "ariaLabel": "Chatear en WhatsApp"
+    },
+    "ats": {
+        "upload_label": "Tengo un currículum para subir",
+        "paste_label": "¿Aún no tienes un currículum?",
+        "english_label": "Inglés",
+        "french_label": "Francés",
+        "spanish_label": "Español"
     },
     "advantage": {
-      "title": "La Ventaja de CareerStudio ",
-      "items": [
-        {
-          "title": "La Forma Antigua (Múltiples Herramientas Desconectadas)",
-          "points": [
-            "Creador de plantillas de currículum genérico",
-            "Herramienta separada para cartas de presentación",
-            "Edición manual para cada solicitud",
-            "Creador de sitios web complejo para un portafolio",
-            "Desplazamiento interminable en portales de empleo",
-            "Documentos y archivos desconectados"
-          ],
-          "isDisadvantage": true
-        },
-        {
-          "title": "La Forma CareerStudio  (Un Sistema Inteligente)",
-          "points": [
-            "Co-Piloto de IA que escribe y optimiza",
-            "Currículum, Carta de Presentación, Portafolio sincronizados",
-            "Adaptación de IA con 1 clic para cualquier trabajo",
-            "Generación instantánea de portafolio",
-            "Buscador de Empleo Automatizado que trabaja para ti 24/7",
-            "Tu carrera gestionada en un solo lugar"
-          ],
-          "isDisadvantage": false
-        }
-      ]
+        "title": "La Ventaja de CareerStudio ",
+        "items": [
+            {
+                "title": "La Forma Antigua (Múltiples Herramientas Desconectadas)",
+                "points": [
+                    "Creador de plantillas de currículum genérico",
+                    "Herramienta separada para cartas de presentación",
+                    "Edición manual para cada solicitud",
+                    "Creador de sitios web complejo para un portafolio",
+                    "Desplazamiento interminable en portales de empleo",
+                    "Documentos y archivos desconectados"
+                ],
+                "isDisadvantage": true
+            },
+            {
+                "title": "La Forma CareerStudio  (Un Sistema Inteligente)",
+                "points": [
+                    "Co-Piloto de IA que escribe y optimiza",
+                    "Currículum, Carta de Presentación, Portafolio sincronizados",
+                    "Adaptación de IA con 1 clic para cualquier trabajo",
+                    "Generación instantánea de portafolio",
+                    "Buscador de Empleo Automatizado que trabaja para ti 24/7",
+                    "Tu carrera gestionada en un solo lugar"
+                ],
+                "isDisadvantage": false
+            }
+        ]
     },
     "floatingOffer": {
-      "text": "🎉 ¡Oferta de Lanzamiento! Usa el código",
-      "code": "DREAMJOB50",
-      "text2": "para un 50% de descuento!"
+        "text": "🎉 ¡Oferta de Lanzamiento! Usa el código",
+        "code": "DREAMJOB50",
+        "text2": "para un 50% de descuento!"
     },
     "faq": {
-      "title": "Preguntas Frecuentes",
-      "subtitle": "¿Tienes preguntas? Tenemos respuestas. Si no puedes encontrarlas aquí, nuestro soporte 24/7 está listo para ayudarte.",
-      "questions": [
-        {
-          "id": "faq1",
-          "question": "¿Es el primer currículum realmente gratis? ¿Cuál es el truco?",
-          "answer": "Sí, 100% gratis. El truco es que estamos seguros de que te encantará tanto el resultado que querrás desbloquear todo el poder de CareerStudio  Pro. Puedes crear tu perfil, generar tu primer currículum optimizado para ATS y descargarlo como PDF sin necesidad de introducir una tarjeta de crédito."
-        },
-        {
-          "id": "faq2",
-          "question": "¿En qué se diferencia de un simple creador de plantillas?",
-          "answer": "Las plantillas solo te dan un diseño. CareerStudio  es un sistema inteligente. Nuestra IA no solo rellena espacios en blanco—entiende tu carrera, sugiere frases potentes, optimiza cada línea para los bots de ATS y te ayuda a adaptar toda tu solicitud a un trabajo específico en segundos. Es un socio de escritura, no solo un documento."
-        },
-        {
-          "id": "faq3",
-          "question": "¿Qué es ATS y por qué es tan importante?",
-          "answer": "ATS (Sistema de Seguimiento de Candidatos) es un software automatizado que escanea tu currículum en busca de palabras clave y formato antes de que un humano lo vea. Más del 75% de los currículums son rechazados por estos bots. Diseñamos y estructuramos meticulosamente cada currículum para que sea perfectamente analizado por ATS, garantizando que tu solicitud llegue a una persona real."
-        },
-        {
-          "id": "faq4",
-          "question": "¿Puedo cancelar mi plan Pro en cualquier momento?",
-          "answer": "Absolutamente. Tienes el control total. Puedes cancelar tu suscripción en cualquier momento desde el panel de control de tu cuenta con un solo clic. Sin cargos ocultos, sin complicaciones. Mantendrás el acceso a las funciones Pro hasta el final de tu período de facturación actual."
-        },
-        {
-          "id": "faq5",
-          "question": "¿Para quién es esta plataforma? ¿Estudiantes? ¿Ejecutivos?",
-          "answer": "CareerStudio  está diseñado para cualquier persona que se tome en serio su carrera. Es lo suficientemente potente para ejecutivos que aspiran a roles competitivos, pero lo suficientemente sencillo para que los recién graduados construyan su primer currículum profesional. Si estás cansado del proceso de solicitud de empleo repetitivo y frustrante, CareerStudio  es para ti."
-        },
-        {
-          "id": "faq6",
-          "question": "¿Qué pasa con el sitio web de mi portafolio si cancelo mi plan Pro?",
-          "answer": "Si cancelas tu plan Pro, el sitio web de tu portafolio será dado de baja y el enlace para compartir ya no estará activo. Todos tus datos y diseños se almacenarán de forma segura, y podrás volver a publicarlo al instante si decides volver a suscribirte."
-        }
-      ]
+        "title": "Preguntas Frecuentes",
+        "subtitle": "¿Tienes preguntas? Tenemos respuestas. Si no puedes encontrarlas aquí, nuestro soporte 24/7 está listo para ayudarte.",
+        "questions": [
+            {
+                "id": "faq1",
+                "question": "¿Es el primer currículum realmente gratis? ¿Cuál es el truco?",
+                "answer": "Sí, 100% gratis. El truco es que estamos seguros de que te encantará tanto el resultado que querrás desbloquear todo el poder de CareerStudio  Pro. Puedes crear tu perfil, generar tu primer currículum optimizado para ATS y descargarlo como PDF sin necesidad de introducir una tarjeta de crédito."
+            },
+            {
+                "id": "faq2",
+                "question": "¿En qué se diferencia de un simple creador de plantillas?",
+                "answer": "Las plantillas solo te dan un diseño. CareerStudio  es un sistema inteligente. Nuestra IA no solo rellena espacios en blanco—entiende tu carrera, sugiere frases potentes, optimiza cada línea para los bots de ATS y te ayuda a adaptar toda tu solicitud a un trabajo específico en segundos. Es un socio de escritura, no solo un documento."
+            },
+            {
+                "id": "faq3",
+                "question": "¿Qué es ATS y por qué es tan importante?",
+                "answer": "ATS (Sistema de Seguimiento de Candidatos) es un software automatizado que escanea tu currículum en busca de palabras clave y formato antes de que un humano lo vea. Más del 75% de los currículums son rechazados por estos bots. Diseñamos y estructuramos meticulosamente cada currículum para que sea perfectamente analizado por ATS, garantizando que tu solicitud llegue a una persona real."
+            },
+            {
+                "id": "faq4",
+                "question": "¿Puedo cancelar mi plan Pro en cualquier momento?",
+                "answer": "Absolutamente. Tienes el control total. Puedes cancelar tu suscripción en cualquier momento desde el panel de control de tu cuenta con un solo clic. Sin cargos ocultos, sin complicaciones. Mantendrás el acceso a las funciones Pro hasta el final de tu período de facturación actual."
+            },
+            {
+                "id": "faq5",
+                "question": "¿Para quién es esta plataforma? ¿Estudiantes? ¿Ejecutivos?",
+                "answer": "CareerStudio  está diseñado para cualquier persona que se tome en serio su carrera. Es lo suficientemente potente para ejecutivos que aspiran a roles competitivos, pero lo suficientemente sencillo para que los recién graduados construyan su primer currículum profesional. Si estás cansado del proceso de solicitud de empleo repetitivo y frustrante, CareerStudio  es para ti."
+            },
+            {
+                "id": "faq6",
+                "question": "¿Qué pasa con el sitio web de mi portafolio si cancelo mi plan Pro?",
+                "answer": "Si cancelas tu plan Pro, el sitio web de tu portafolio será dado de baja y el enlace para compartir ya no estará activo. Todos tus datos y diseños se almacenarán de forma segura, y podrás volver a publicarlo al instante si decides volver a suscribirte."
+            }
+        ]
     },
     "resumes": {
         "title": "Mis Currículums",
@@ -455,8 +455,31 @@
             "description": "No se encontraron ofertas de empleo que coincidan con tus criterios. ¡Intenta ampliar tu búsqueda!"
         }
     },
-     "resumeEditor": { "tour": { "sidebar": { "navigation": { "title": "Secciones del Currículum", "description": "Esta barra lateral enumera todas las secciones de tu currículum. Puedes navegar rápidamente a cualquier sección haciendo clic en su nombre." }, "sectionItem": { "title": "Navegar y Reordenar", "description": "Haz clic para desplazarte a una sección. También puedes arrastrar y soltar secciones para cambiar su orden en el documento final." }, "dragHandle": { "title": "Arrastrar para Reordenar", "description": "Usa este manejador para agarrar una sección y moverla hacia arriba o abajo en la lista." }, "visibilityToggle": { "title": "Mostrar u Ocultar Secciones", "description": "Haz clic en el icono del ojo para incluir o excluir una sección de tu currículum. Las secciones ocultas no se eliminan, solo no se muestran." } }, "editor": { "overview": { "title": "Editor Principal", "description": "Aquí es donde editas el contenido de cada sección. Ahora nos centraremos en la sección de 'Experiencia' para ver las acciones disponibles." }, "addSection": { "title": "Agregar Nueva Entrada", "description": "Haz clic en este botón para agregar una nueva entrada a la sección actual, como un nuevo trabajo en tu experiencia." }, "editSection": { "title": "Editar una Entrada", "description": "Haz clic en el icono del lápiz para abrir el editor de una entrada existente. Vamos a abrirlo para ver más opciones." }, "aiEdit": { "title": "Asistente de IA", "description": "Usa nuestro Asistente de IA para mejorar tu escritura. Escribe una solicitud como 'haz esto más profesional' y deja que la IA reescriba el texto por ti." }, "voiceInput": { "title": "Voz a Texto", "description": "Haz clic en el micrófono para dictar tu texto en lugar de escribir. Esta es una forma rápida de plasmar tus ideas." } }, "topbar": { "saveButton": { "title": "Guarda tu Progreso", "description": "¡No olvides guardar tus cambios con frecuencia! Tu trabajo se guarda cuando haces clic en este botón." }, "exportButton": { "title": "Exportar tu Currículum", "description": "Cuando termines, haz clic aquí para ver las opciones para exportar tu currículum como PDF u otros formatos." }, "generateDocument": { "title": "Generar Documentos", "description": "Crea documentos a medida como cartas de presentación o biografías profesionales basadas en los datos de este currículum." }, "actionsDropdown": { "title": "Más Acciones", "description": "Este menú contiene acciones adicionales, como generar un sitio web personal a partir de tu currículum o crear una nueva variante del currículum." }, "backButton": { "title": "Volver al Panel de Control", "description": "Haz clic aquí para volver a tu panel de control principal. ¡Asegúrate de haber guardado tu trabajo primero!" } } } } 
-,  "siteEditor": {
+    "resumeEditor": {
+        "tour": {
+            "sidebar": {
+                "navigation": { "title": "Secciones del Currículum", "description": "Esta barra lateral enumera todas las secciones de tu currículum. Puedes navegar rápidamente a cualquier sección haciendo clic en su nombre." },
+                "sectionItem": { "title": "Navegar y Reordenar", "description": "Haz clic para desplazarte a una sección. También puedes arrastrar y soltar secciones para cambiar su orden en el documento final." },
+                "dragHandle": { "title": "Arrastrar para Reordenar", "description": "Usa este manejador para agarrar una sección y moverla hacia arriba o abajo en la lista." },
+                "visibilityToggle": { "title": "Mostrar u Ocultar Secciones", "description": "Haz clic en el icono del ojo para incluir o excluir una sección de tu currículum. Las secciones ocultas no se eliminan, solo no se muestran." }
+            },
+            "editor": {
+                "overview": { "title": "Editor Principal", "description": "Aquí es donde editas el contenido de cada sección. Ahora nos centraremos en la sección de 'Experiencia' para ver las acciones disponibles." },
+                "addSection": { "title": "Agregar Nueva Entrada", "description": "Haz clic en este botón para agregar una nueva entrada a la sección actual, como un nuevo trabajo en tu experiencia." },
+                "editSection": { "title": "Editar una Entrada", "description": "Haz clic en el icono del lápiz para abrir el editor de una entrada existente. Vamos a abrirlo para ver más opciones." },
+                "aiEdit": { "title": "Asistente de IA", "description": "Usa nuestro Asistente de IA para mejorar tu escritura. Escribe una solicitud como 'haz esto más profesional' y deja que la IA reescriba el texto por ti." },
+                "voiceInput": { "title": "Voz a Texto", "description": "Haz clic en el micrófono para dictar tu texto en lugar de escribir. Esta es una forma rápida de plasmar tus ideas." }
+            },
+            "topbar": {
+                "saveButton": { "title": "Guarda tu Progreso", "description": "¡No olvides guardar tus cambios con frecuencia! Tu trabajo se guarda cuando haces clic en este botón." },
+                "exportButton": { "title": "Exportar tu Currículum", "description": "Cuando termines, haz clic aquí para ver las opciones para exportar tu currículum como PDF u otros formatos." },
+                "generateDocument": { "title": "Generar Documentos", "description": "Crea documentos a medida como cartas de presentación o biografías profesionales basadas en los datos de este currículum." },
+                "actionsDropdown": { "title": "Más Acciones", "description": "Este menú contiene acciones adicionales, como generar un sitio web personal a partir de tu currículum o crear una nueva variante del currículum." },
+                "backButton": { "title": "Volver al Panel de Control", "description": "Haz clic aquí para volver a tu panel de control principal. ¡Asegúrate de haber guardado tu trabajo primero!" }
+            }
+        }
+    },
+    "siteEditor": {
         "tour": {
             "intro": {
                 "title": "Bienvenido al Editor de Sitios",
@@ -502,6 +525,88 @@
                 "title": "Asistente de IA",
                 "description": "Aquí, puedes escribir una solicitud para cambiar el contenido, estilo o funcionalidad del bloque. La IA se encargará del código."
             }
+        }
+    },
+
+    "settings": {
+        "title": "Configuración de la cuenta",
+        "subtitle": "Administra las preferencias y la seguridad de tu cuenta",
+        "Profile": {
+            "title": "Perfil",
+            "subtitle": "Información personal",
+            "firstName": "Nombre",
+            "lastName": "Apellido",
+            "email": "Correo electrónico",
+            "phone": "Número de teléfono",
+            "company": "Empresa",
+            "jobTitle": "Cargo",
+            "timezone": "Zona horaria",
+            "language": "Idioma",
+            "save": "Guardar cambios",
+            "tips": "Consejos de perfil",
+            "tipsKeepEmail": "Mantén tu correo actualizado para recibir notificaciones importantes",
+            "tipsAddCompany": "Agrega la información de tu empresa para mejorar tu networking",
+            "tipsSetTimezone": "Configura tu zona horaria para una programación precisa",
+            "firstNamePlaceholder": "Ingresa tu nombre",
+            "lastNamePlaceholder": "Ingresa tu apellido",
+            "emailPlaceholder": "Ingresa tu correo electrónico",
+            "phonePlaceholder": "Ingresa tu número de teléfono",
+            "companyPlaceholder": "Ingresa tu empresa",
+            "jobTitlePlaceholder": "Ingresa tu cargo"
+        },
+        "Subscription": {
+            "title": "Suscripción",
+            "manage": "Administra tu suscripción y facturación",
+            "active": "ACTIVA",
+            "endingSoon": "PRÓXIMO A TERMINAR",
+            "noActive": "Sin suscripción activa",
+            "noActiveDescription": "Suscríbete a un plan para desbloquear funciones premium y mejorar tu carrera",
+            "explore": "Explorar planes",
+            "quickStats": "Estadísticas rápidas",
+            "features": "Funciones",
+            "payments": "Pagos"
+        },
+        "Privacy": {
+            "title": "Privacidad",
+            "subtitle": "Gestión de datos",
+            "exportyourdata": "Exportar tus datos",
+            "exportyourdataDescription": "Descarga una copia de todos tus datos, incluyendo información de perfil, historial de suscripción y estadísticas de uso.",
+            "export": "Exportar datos",
+            "deleteaccount": "Eliminar cuenta",
+            "deleteaccountDescription": "Elimina tu cuenta y todos los datos asociados de forma permanente. Esta acción no se puede deshacer.",
+            "info": "Información de privacidad",
+            "infosell": "Nunca vendemos tus datos",
+            "infoenrypted": "Los datos están encriptados en reposo",
+            "infocontrol": "Tú controlas tu información",
+            "infogdpr": "Cumple con GDPR",
+            "downloadedata": "Descargar tus datos",
+            "downloadedataDescription": "Esto creará un archivo ZIP con todos los datos de tu cuenta:",
+            "downloadedataProfile": "Información del perfil",
+            "downloadedataResume": "Datos de currículum",
+            "downloadedataDocuments": "Documentos generados",
+            "downloadedataSubscription": "Historial de suscripción",
+            "downloadedataPayment": "Registros de pagos",
+            "downloadedataUsage": "Estadísticas de uso",
+            "exportyourdataDescriptioninfo": "La exportación puede tardar unos momentos. Por favor, no cierres esta ventana.",
+            "deleteaccountConfirm": "¿Estás completamente seguro?",
+            "deleteaccountConfirmDescription": "Esta acción <strong>no se puede deshacer</strong>. Tu cuenta se eliminará permanentemente y todos tus datos se removerán de nuestros servidores.",
+            "deleteaccountConfirmData": "Esto eliminará permanentemente:",
+            "deleteaccountConfirmDataProfile": "Tu perfil y cuenta",
+            "deleteaccountConfirmDataResume": "Todos tus currículums y documentos",
+            "deleteaccountConfirmDataDocuments": "Sitios web y documentos generados",
+            "deleteaccountConfirmDataSubscription": "Historial de suscripción y pagos",
+            "deleteaccountConfirmDataPayment": "Todos los datos de uso y preferencias",
+            "deleteaccountConfirmDataInfo": "Enviaremos un correo de confirmación a <strong>{email}</strong> para completar el proceso de eliminación.",
+            "deleteaccountConfirmDataExport": "Considera exportar tus datos primero si deseas conservar una copia.",
+            "deleteaccountConfirmwantExport": "Quiero exportar los datos primero"
+        },
+        "Security": {
+            "title": "Seguridad",
+            "subtitle": "La configuración de seguridad estará disponible en una actualización futura."
+        },
+        "Notifications": {
+            "title": "Notificaciones",
+            "subtitle": "La configuración de notificaciones estará disponible en una actualización futura."
         }
     }
 }

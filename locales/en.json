@@ -18,22 +18,22 @@
         "justNow": "Just now",
         "sortBy": "Sort By",
         "refresh": "Refresh",
-        "viewAll": "View All"
+        "viewAll": "View All",
+        "download": "Download"
     },
-"ats": {
-    "upload_label": "I have a resume to upload",
-    "paste_label": "Don't have any resume yet?",
-    "english_label": "English",
-    "french_label": "French",
-    "spanish_label": "Spanish"
-},
+    "ats": {
+        "upload_label": "I have a resume to upload",
+        "paste_label": "Don't have any resume yet?",
+        "english_label": "English",
+        "french_label": "French",
+        "spanish_label": "Spanish"
+    },
 
     "whatsapp": {
         "tooltip": "💬 Ask us anything — we’re eager to help!",
         "defaultMessage": "Hey! I have a question, can you help me?",
         "ariaLabel": "Chat on WhatsApp"
     },
-
 
     "resumes": {
         "title": "My Resumes",
@@ -137,35 +137,35 @@
             "text": "Need a section stronger? More concise? Just ask the AI. Edit anything in real-time with simple prompts. ✨"
         }
     },
-      "advantage": {
-    "title": "The CareerStudio Advantage",
-    "items": [
-      {
-        "title": "The Old Way (Multiple Disconnected Tools)",
-        "points": [
-          "Generic resume template builder",
-          "Separate tool for cover letters",
-          "Manually editing for every application",
-          "Complex website builder for a portfolio",
-          "Endless scrolling on job boards",
-          "Disconnected documents and files"
-        ],
-        "isDisadvantage": true
-      },
-      {
-        "title": "The CareerStudio Way (One Intelligent System)",
-        "points": [
-          "AI Co-Pilot that writes and optimizes",
-          "Resume, Cover Letter, Portfolio in sync",
-          "1-Click AI Tailoring for any job",
-          "Instant portfolio generation",
-          "Automated Job Scout works for you 24/7",
-          "Your career managed in one place"
-        ],
-        "isDisadvantage": false
-      }
-    ]
-  },
+    "advantage": {
+        "title": "The CareerStudio Advantage",
+        "items": [
+            {
+                "title": "The Old Way (Multiple Disconnected Tools)",
+                "points": [
+                    "Generic resume template builder",
+                    "Separate tool for cover letters",
+                    "Manually editing for every application",
+                    "Complex website builder for a portfolio",
+                    "Endless scrolling on job boards",
+                    "Disconnected documents and files"
+                ],
+                "isDisadvantage": true
+            },
+            {
+                "title": "The CareerStudio Way (One Intelligent System)",
+                "points": [
+                    "AI Co-Pilot that writes and optimizes",
+                    "Resume, Cover Letter, Portfolio in sync",
+                    "1-Click AI Tailoring for any job",
+                    "Instant portfolio generation",
+                    "Automated Job Scout works for you 24/7",
+                    "Your career managed in one place"
+                ],
+                "isDisadvantage": false
+            }
+        ]
+    },
     "howItWorks": {
         "title": "AI Is Your Co-Pilot, Not the Pilot",
         "subtitle": "Forget robotic templates. We blend AI's speed with your unique voice. You're always in control, crafting applications that are both effective and authentically *you*.",
@@ -206,48 +206,48 @@
         "disclaimer": "No tricks, no sign-up required for the scan.",
         "imageAlt": "Visual representation of an ATS resume scan"
     },
-     
-  "floatingOffer": {
-    "text": "🎉 Launch Offer! Use code",
-    "code": "DREAMJOB50",
-    "text2": "for 50% off!"
-  },
-  "faq": {
-    "title": "Frequently Asked Questions",
-    "subtitle": "Have questions? We have answers. If you can't find it here, our 24/7 support is ready to help.",
-    "questions": [
-      {
-        "id": "faq1",
-        "question": "Is the first resume really free? What's the catch?",
-        "answer": "Yes, 100% free. The catch is that we're confident you'll love the result so much you'll want to unlock the full power of CareerStudio Pro. You can create your profile, generate your first ATS-optimized resume, and download it as a PDF without ever entering a credit card."
-      },
-      {
-        "id": "faq2",
-        "question": "How is this different from a simple template builder?",
-        "answer": "Templates just give you a layout. CareerStudio is an intelligent system. Our AI doesn't just fill blanks—it understands your career, suggests powerful phrasing, optimizes every line for ATS bots, and helps you tailor your entire application to a specific job in seconds. It’s a writing partner, not just a document."
-      },
-      {
-        "id": "faq3",
-        "question": "What is ATS and why is it so important?",
-        "answer": "ATS (Applicant Tracking System) is automated software that scans your resume for keywords and formatting before a human ever sees it. Over 75% of resumes are rejected by these bots. We meticulously design and structure every resume to be perfectly parsed by ATS, guaranteeing your application lands in front of a real person."
-      },
-      {
-        "id": "faq4",
-        "question": "Can I cancel my Pro plan at any time?",
-        "answer": "Absolutely. You are in complete control. You can cancel your subscription anytime from your account dashboard with a single click. No hidden fees, no hassle. You will retain access to Pro features until the end of your current billing period."
-      },
-      {
-        "id": "faq5",
-        "question": "Who is this platform for? Students? Executives?",
-        "answer": "CareerStudio is designed for anyone serious about their career. It's powerful enough for executives targeting competitive roles, yet simple enough for recent graduates to build their first professional resume. If you're tired of the repetitive, frustrating job application process, CareerStudio is for you."
-      },
-      {
-        "id": "faq6",
-        "question": "What happens to my portfolio website if I cancel my Pro plan?",
-        "answer": "If you cancel your Pro plan, your portfolio website will be unpublished and the shareable link will no longer be active. All your data and designs will be safely stored, and you can republish it instantly if you ever decide to resubscribe."
-      }
-    ]
-  },
+
+    "floatingOffer": {
+        "text": "🎉 Launch Offer! Use code",
+        "code": "DREAMJOB50",
+        "text2": "for 50% off!"
+    },
+    "faq": {
+        "title": "Frequently Asked Questions",
+        "subtitle": "Have questions? We have answers. If you can't find it here, our 24/7 support is ready to help.",
+        "questions": [
+            {
+                "id": "faq1",
+                "question": "Is the first resume really free? What's the catch?",
+                "answer": "Yes, 100% free. The catch is that we're confident you'll love the result so much you'll want to unlock the full power of CareerStudio Pro. You can create your profile, generate your first ATS-optimized resume, and download it as a PDF without ever entering a credit card."
+            },
+            {
+                "id": "faq2",
+                "question": "How is this different from a simple template builder?",
+                "answer": "Templates just give you a layout. CareerStudio is an intelligent system. Our AI doesn't just fill blanks—it understands your career, suggests powerful phrasing, optimizes every line for ATS bots, and helps you tailor your entire application to a specific job in seconds. It’s a writing partner, not just a document."
+            },
+            {
+                "id": "faq3",
+                "question": "What is ATS and why is it so important?",
+                "answer": "ATS (Applicant Tracking System) is automated software that scans your resume for keywords and formatting before a human ever sees it. Over 75% of resumes are rejected by these bots. We meticulously design and structure every resume to be perfectly parsed by ATS, guaranteeing your application lands in front of a real person."
+            },
+            {
+                "id": "faq4",
+                "question": "Can I cancel my Pro plan at any time?",
+                "answer": "Absolutely. You are in complete control. You can cancel your subscription anytime from your account dashboard with a single click. No hidden fees, no hassle. You will retain access to Pro features until the end of your current billing period."
+            },
+            {
+                "id": "faq5",
+                "question": "Who is this platform for? Students? Executives?",
+                "answer": "CareerStudio is designed for anyone serious about their career. It's powerful enough for executives targeting competitive roles, yet simple enough for recent graduates to build their first professional resume. If you're tired of the repetitive, frustrating job application process, CareerStudio is for you."
+            },
+            {
+                "id": "faq6",
+                "question": "What happens to my portfolio website if I cancel my Pro plan?",
+                "answer": "If you cancel your Pro plan, your portfolio website will be unpublished and the shareable link will no longer be active. All your data and designs will be safely stored, and you can republish it instantly if you ever decide to resubscribe."
+            }
+        ]
+    },
     "footer": {
         "tagline": "Empowering job seekers and students with AI to create opportunities and build brighter futures.",
         "product": "Product",
@@ -461,7 +461,7 @@
             "description": "No job postings found matching your criteria. Try broadening your search!"
         }
     },
-        "resumeEditor": {
+    "resumeEditor": {
         "tour": {
             "sidebar": {
                 "navigation": {
@@ -527,7 +527,7 @@
             }
         }
     },
-    
+
     "siteEditor": {
         "tour": {
             "intro": {
@@ -575,7 +575,87 @@
                 "description": "Here, you can write a prompt to change the block's content, style, or functionality. The AI will handle the code."
             }
         }
-    }
+    },
 
-    
+    "settings": {
+        "title": "Account Settings",
+        "subtitle": "Manage your account preferences and security",
+        "Profile": {
+            "title": "Profile",
+            "subtitle": "Personal Information",
+            "firstName": "First Name",
+            "lastName": "Last Name",
+            "email": "Email Address",
+            "phone": "Phone Number",
+            "company": "Company",
+            "jobTitle": "Job Title",
+            "timezone": "Timezone",
+            "language": "Language",
+            "save": "Save Changes",
+            "tips": "Profile Tips",
+            "tipsKeepEmail": "Keep your email updated for important notifications",
+            "tipsAddCompany": "Add your company info for better networking",
+            "tipsSetTimezone": "Set your timezone for accurate scheduling",
+            "firstNamePlaceholder": "Enter your first name",
+            "lastNamePlaceholder": "Enter your last name",
+            "emailPlaceholder": "Enter your email",
+            "phonePlaceholder": "Enter your phone number",
+            "companyPlaceholder": "Enter your company",
+            "jobTitlePlaceholder": "Enter your job title"
+        },
+        "Subscription": {
+            "title": "Subscription",
+            "manage": "Manage your subscription and billing",
+            "active": "ACTIVE",
+            "endingSoon": "ENDING SOON",
+            "noActive": "No Active Subscription",
+            "noActiveDescription": "Subscribe to a plan to unlock premium features and boost your career",
+            "explore": "Explore Plans",
+            "quickStats": "Quick Stats",
+            "features": "Features",
+            "payments": "Payments"
+        },
+        "Privacy": {
+            "title": "Privacy",
+            "subtitle": "Data Management",
+            "exportyourdata": "Export Your Data",
+            "exportyourdataDescription": "Download a copy of all your data including profile information, subscription history, and usage statistics.",
+            "export": "Export Data",
+            "deleteaccount": "Delete Account",
+            "deleteaccountDescription": "Permanently delete your account and all associated data. This action cannot be undone.",
+            "info": "Privacy Information",
+            "infosell": "We never sell your data",
+            "infoenrypted": "Data is encrypted at rest",
+            "infocontrol": "You control your information",
+            "infogdpr": "GDPR compliant",
+            "downloadedata": "Download Your Data",
+            "downloadedataDescription": "This will create a ZIP file containing all your account data:",
+            "downloadedataProfile": "Profile information",
+            "downloadedataResume": "Resume data",
+            "downloadedataDocuments": "Generated documents",
+            "downloadedataSubscription": "Subscription history",
+            "downloadedataPayment": "Payment records",
+            "downloadedataUsage": "Usage statistics",
+            "exportyourdataDescriptioninfo": "The export may take a few moments to prepare. Please don't close this window.",
+            "deleteaccountConfirm": "Are you absolutely sure?",
+            "deleteaccountConfirmDescription": "This action <strong>cannot be undone</strong>. This will permanently delete your account and remove all your data from our servers.",
+            "deleteaccountConfirmData": "This will permanently delete:",
+            "deleteaccountConfirmDataProfile": "Your profile and account",
+            "deleteaccountConfirmDataResume": "All your resumes and documents",
+            "deleteaccountConfirmDataDocuments": "Generated websites and documents",
+            "deleteaccountConfirmDataSubscription": "Subscription and payment history",
+            "deleteaccountConfirmDataPayment": "All usage data and preferences",
+            "deleteaccountConfirmDataInfo": "We will send a confirmation email to <strong>{email}</strong> to complete the deletion process.",
+            "deleteaccountConfirmDataExport": "Consider exporting your data first if you want to keep a copy.",
+            "deleteaccountConfirmwantExport": "I Want to Export Data First"
+        },
+        "Security": {
+            "title": "Security",
+            "subtitle": "Security settings will be available in a future update."
+        },
+        "Notifications": {
+            "title": "Notifications",
+            "subtitle": "Notification settings will be available in a future update."
+        }
+    }
 }
