@@ -22,12 +22,13 @@ const ItemWrapper = ({
     onMoveUp,
     onMoveDown,
     isFirst,
-    isLast
+    isLast,
+    itemId // <-- Use itemId prop
 }) => {
     const [showDeleteDialog, setShowDeleteDialog] = useState(false);
     const [aiPrompt, setAiPrompt] = useState('');
     const [isAIProcessing, setIsAIProcessing] = useState(false);
-    const { aboutCandidate } = useResume(); 
+    const { aboutCandidate, toggleItemVisibility } = useResume(); // <-- Get toggle function
 
     const handleAISubmit = async () => {
         setIsAIProcessing(true);
@@ -55,12 +56,14 @@ const ItemWrapper = ({
         </div>
     );
 
+    const itemIsHidden = sectionData && sectionData.hidden;
+
     return (
         <div
             ref={itemRef}
             className={`relative scroll-mt-[100px] ${isNewItem ? 'animate-fadeIn' : ''}`}
         >
-            <div className={`surface-card p-3 border-1 surface-border border-round shadow-1 hover:shadow-3 transition-shadow`}>
+            <div className={`surface-card p-3 border-1 surface-border border-round shadow-1 hover:shadow-3 transition-shadow ${itemIsHidden ? 'opacity-50 bg-surface-100' : ''}`}>
                 <ConfirmDialog />
                 <div className="flex justify-content-between align-items-center mb-3">
                     <div className="flex align-items-center">
@@ -70,6 +73,14 @@ const ItemWrapper = ({
                             onClick={onEdit}
                             tooltip="Edit Section"
                         />
+                         {itemId && ( // <-- Check if itemId exists
+                            <Button
+                                icon={itemIsHidden ? "pi pi-eye-slash" : "pi pi-eye"}
+                                className="p-button-rounded p-button-text p-button-secondary"
+                                onClick={() => toggleItemVisibility(sectionTitle.toLowerCase(), itemId)}
+                                tooltip={itemIsHidden ? "Show Item" : "Hide Item"}
+                            />
+                        )}
                     </div>
                     <div className="flex align-items-center gap-1">
                          <Button
@@ -94,6 +105,13 @@ const ItemWrapper = ({
                         />
                     </div>
                 </div>
+
+                {itemIsHidden && (
+                    <div className="text-center p-2 mb-3 bg-gray-100 text-gray-700 border-round text-sm">
+                        <i className="pi pi-eye-slash mr-2"></i>
+                        Item is hidden and will not be shown in the final document.
+                    </div>
+                )}
 
                 {viewContent}
 

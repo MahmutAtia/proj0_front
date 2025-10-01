@@ -35,6 +35,7 @@ const BaseSection = ({
             {items.map((item, index) => (
                 <ItemWrapper
                     key={index}
+                    itemId={item.id}
                     isEditing={item.isEditing}
                     onEdit={() => onEdit(index)}
                     onUndo={() => onUndo(index)}

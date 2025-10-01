@@ -153,6 +153,7 @@ const Experience = ({ sectionKey }) => {
         {experiences.map((exp, index) => (
             <ItemWrapper
                 key={exp.id || index}
+                itemId={exp.id}
                 itemRef={index === 0
                     ? firstItemRef
                     : index === experiences.length - 1

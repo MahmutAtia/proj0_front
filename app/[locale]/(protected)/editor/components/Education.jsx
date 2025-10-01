@@ -154,6 +154,7 @@ const Education = ({ sectionKey }) => {
             {education.map((edu, index) => (
                 <ItemWrapper
                     key={edu.id || index}
+                    itemId={edu.id}
                     itemRef={index === 0
                         ? firstItemRef
                         : index === education.length - 1

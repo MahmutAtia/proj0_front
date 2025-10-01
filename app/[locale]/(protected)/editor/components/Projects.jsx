@@ -119,6 +119,7 @@ const Projects = ({ sectionKey }) => {
             {projects.map((project, index) => (
                 <ItemWrapper
                     key={project.id || index}
+                    itemId={project.id}
                     itemRef={index === 0
                         ? firstItemRef
                         : index === projects.length - 1

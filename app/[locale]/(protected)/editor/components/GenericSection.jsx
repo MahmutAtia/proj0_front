@@ -344,6 +344,7 @@ const GenericSection = ({ sectionKey }) => {
             {items.map((item, index) => (
                 <ItemWrapper
                     key={item.id || index}
+                    itemId={item.id}
                     sectionTitle={sectionKey.split('_').map(word =>
                         word.charAt(0).toUpperCase() + word.slice(1)
                     ).join(' ')}

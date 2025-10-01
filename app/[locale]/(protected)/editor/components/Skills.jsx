@@ -145,6 +145,7 @@ const Skills = ({ sectionKey }) => {
             {skills.map((skill, index) => (
                 <ItemWrapper
                     key={skill.id || index}
+                    itemId={skill.id}
                     itemRef={index === 0
                         ? firstItemRef
                         : index === skills.length - 1

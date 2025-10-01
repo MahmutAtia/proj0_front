@@ -112,6 +112,17 @@ export const ResumeProvider = ({ children, initialData , aboutCandidate }) => {
         });
     };
 
+    const toggleItemVisibility = (sectionKey, itemId) => {
+        const newData = JSON.parse(JSON.stringify(data));
+        if (Array.isArray(newData[sectionKey])) {
+            const item = newData[sectionKey].find(i => i.id === itemId);
+            if (item) {
+                item.hidden = !item.hidden; // Toggle the hidden property
+                updateData(newData);
+            }
+        }
+    };
+
     const moveSectionItem = (section, index, direction) => {
         const items = Array.from(data[section]);
         const item = items[index];
@@ -130,8 +141,13 @@ export const ResumeProvider = ({ children, initialData , aboutCandidate }) => {
     };
 
     const getDefaultItem = (section) => {
-        const defaultItem = defaultSections[section] || {};
-        return defaultItem;
+        // Deep copy to avoid modifying the original defaultItems object
+        const itemStructure = JSON.parse(JSON.stringify(defaultItems[section] || {}));
+        
+        return {
+            ...itemStructure,
+            hidden: false, // Ensure it's visible by default
+        };
     };
 
 
@@ -146,6 +162,7 @@ export const ResumeProvider = ({ children, initialData , aboutCandidate }) => {
                 toggleEditMode,
                 addSectionItem,
                 removeSectionItem,
+                toggleItemVisibility, // <-- Add this
                 moveSectionItem,
                 getDefaultItem,
                 defaultSections,
