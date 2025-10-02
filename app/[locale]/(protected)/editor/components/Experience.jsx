@@ -199,7 +199,7 @@ const Experience = ({ sectionKey }) => {
                             tooltip="Work Location"
                             tooltipOptions={{ position: 'top' }}
                         />
-                        <div className="flex gap-2">
+                        <div className="flex flex-column md:flex-row gap-2">
                             <InputText
                                 placeholder="Start Date (YYYY-MM-DD)"
                                 value={exp.start_date}

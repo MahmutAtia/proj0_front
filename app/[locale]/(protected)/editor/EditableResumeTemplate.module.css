@@ -288,6 +288,10 @@
     .dragHandle {
         display: none; /* Hide drag handle on mobile */
     }
+    /* Reduce font size for section titles on mobile */
+    .resumePaper h2 {
+        font-size: 1.15rem;
+    }
 }
 
 @media (max-width: 1023px) {
@@ -302,7 +306,7 @@
         box-shadow: 0 8px 32px rgba(0,0,0,0.18);
     }
     .sidebarVisible { left: 0; }
-    .resumePaper { padding: 1.5rem 0.5rem; }
+    .resumePaper { padding: 1.5rem 1rem; } /* Adjusted padding */
 }
 
 @media (max-width: 600px) {
@@ -310,9 +314,16 @@
     .sidebarHeader { padding: 1rem 0.75rem 0.5rem 0.75rem; }
     .sidebarSectionList { padding: 0.5rem 0.25rem 0 0.25rem; }
     .mainContent { padding: 1rem 0.25rem; }
-    .resumePaper { padding: 1rem 0.25rem; }
-    .resumeSectionsContainer { gap: 1.25rem; }
+    .resumePaper { padding: 1.25rem 0.75rem; } /* Adjusted padding */
+    .resumeSectionsContainer { gap: 1.5rem; } /* Adjusted gap */
     .sectionWrapper { margin-bottom: 1rem; }
+    /* Further reduce font size for very small screens */
+    .resumePaper h2 {
+        font-size: 1.05rem;
+    }
+    .resumePaper p, .resumePaper span, .resumePaper div {
+        font-size: 0.9rem;
+    }
 }
 
 

@@ -936,7 +936,7 @@ const EditableResumeTemplate = ({
             <Dialog
                 header="Global Resume Edit"
                 visible={showGlobalEditDialog}
-                style={{ width: '50vw', maxWidth: '600px' }}
+                style={{ width: 'min(95vw, 600px)' }}
                 modal
                 onHide={() => setShowGlobalEditDialog(false)}
             >
@@ -957,7 +957,7 @@ const EditableResumeTemplate = ({
             <Dialog
                 header="Resume Documents"
                 visible={showDocumentsDialog}
-                style={{ width: '80vw', maxWidth: '900px' }}
+                style={{ width: 'min(95vw, 900px)' }}
                 modal
                 onHide={() => setShowDocumentsDialog(false)}
                 footer={
