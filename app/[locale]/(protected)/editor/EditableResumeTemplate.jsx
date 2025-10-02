@@ -67,6 +67,7 @@ const EditableResumeTemplate = ({
     const [isDirty, setIsDirty] = useState(false); // State to track unsaved changes
     const [showConfirmDialog, setShowConfirmDialog] = useState(false); // State for the confirmation dialog
     const [nextAction, setNextAction] = useState(null); // State to hold the navigation URL or action
+    const [isOnline, setIsOnline] = useState(true); // <-- PWA: Add online status state
     const [showGlobalEditDialog, setShowGlobalEditDialog] = useState(false); // State for global edit dialog
     const [globalEditPrompt, setGlobalEditPrompt] = useState(''); // State for global edit prompt
     const [isGlobalAIProcessing, setIsGlobalAIProcessing] = useState(false); // State for global AI processing
@@ -349,6 +350,25 @@ const EditableResumeTemplate = ({
             }
         }
     }, [data, sectionOrder, hiddenSections, loading]);
+
+        // PWA: Effect to handle online/offline status
+    useEffect(() => {
+        const handleOnline = () => setIsOnline(true);
+        const handleOffline = () => setIsOnline(false);
+
+        // Set initial status
+        if (typeof window !== 'undefined') {
+            setIsOnline(navigator.onLine);
+        }
+
+        window.addEventListener('online', handleOnline);
+        window.addEventListener('offline', handleOffline);
+
+        return () => {
+            window.removeEventListener('online', handleOnline);
+            window.removeEventListener('offline', handleOffline);
+        };
+    }, []);
 
     // Effect to handle browser navigation (refresh, close tab)
     useEffect(() => {
@@ -710,13 +730,12 @@ const EditableResumeTemplate = ({
                     {/* --- Save Button (Always Visible) --- */}
                     <Button
                         icon="pi pi-save"
-                        label="Save"
-                        severity="success"
+                        label={!isOnline ? "Offline" : (isDirty ? "Save" : "Saved")}
+                        severity={isDirty ? "success" : "success"}
                         onClick={saveResumeData}
-                        disabled={loading || !isDirty}
+                        disabled={loading || !isDirty || !isOnline}
                         className="tour-save-button"
                     />
-
                     {/* --- Mobile "More Options" Menu --- */}
                     <div className={styles.showOnMobile}>
                         <Menu model={moreOptionsItems} popup ref={moreOptionsMenu} id="popup_menu_right" popupAlignment="right" />
@@ -885,10 +904,10 @@ const EditableResumeTemplate = ({
             </div>
 
             {/* Confirmation Dialog for Unsaved Changes */}
-            <Dialog
+                   <Dialog
                 header="Unsaved Changes"
                 visible={showConfirmDialog}
-                style={{ width: '400px' }}
+                style={{ width: 'min(90vw, 400px)' }}
                 modal
                 footer={
                     <div>

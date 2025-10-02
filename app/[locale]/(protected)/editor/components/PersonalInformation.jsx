@@ -154,7 +154,7 @@ const PersonalInformation = ({ sectionKey }) => {
             </div>
 
             {/* View Content with Photo */}
-            <div className="flex gap-4 p-4">
+            <div className="flex flex-column md:flex-row gap-4 p-4">
                 {/* Left side - Personal Info */}
                 <div className="flex-grow-1">
                     <div className="flex flex-column gap-2">
