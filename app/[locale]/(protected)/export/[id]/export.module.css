@@ -111,3 +111,34 @@
 .centeredToggle {
     text-align: center !important;
 }
+/* --- Mobile Responsive Adjustments --- */
+.showOnDesktop {
+    display: flex;
+}
+.showOnMobile {
+    display: none;
+}
+
+@media (max-width: 768px) {
+    .showOnDesktop {
+        display: none;
+    }
+    .showOnMobile {
+        display: flex;
+    }
+    .previewToolbar {
+        flex-wrap: wrap;
+        height: auto !important;
+        gap: 0.5rem;
+    }
+    .pdfContainer {
+        /* On mobile, let the scale state control the size entirely */
+        width: auto;
+        height: auto;
+    }
+}
+
+.controlSection {
+    padding: 1rem;
+    border-bottom: 1px solid var(--surface-border);
+}

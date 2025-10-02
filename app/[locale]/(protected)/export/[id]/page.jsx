@@ -12,6 +12,8 @@ import { Card } from 'primereact/card';
 import { Tooltip } from 'primereact/tooltip';
 import { Dialog } from 'primereact/dialog'; // Import Dialog
 import { Dropdown } from 'primereact/dropdown'; // Import Dropdown for font selector
+import { Sidebar } from 'primereact/sidebar'; // Import Sidebar
+
 import styles from './export.module.css';
 import { MOCK_TEMPLATES_WITH_THEMES } from './templates.js';
 import { motion, AnimatePresence } from 'framer-motion'; // Import AnimatePresence
@@ -93,6 +95,7 @@ const ResumePreviewPage = () => {
     const [errorPdf, setErrorPdf] = useState(null);
     const [isPreviewVisible, setIsPreviewVisible] = useState(false);
     const [previewImageUrl, setPreviewImageUrl] = useState('');
+    const [isMobileControlsVisible, setIsMobileControlsVisible] = useState(false); // State for mobile sidebar
 
     // --- Calculated Dimensions ---
     const iframeScaleFactor = scale / 100;
@@ -209,6 +212,35 @@ const ResumePreviewPage = () => {
         // Cleanup interval on component unmount
         return () => clearInterval(loadingIntervalRef.current);
     }, [isLoadingPdf]);
+    // Effect to open sidebar on mobile if no template is selected yet
+    useEffect(() => {
+        const isMobile = window.innerWidth < 768;
+        // If on mobile, options have loaded, and no template is chosen, open the controls.
+        if (isMobile && !isLoadingOptions && !selectedTemplate) {
+            setIsMobileControlsVisible(true);
+        }
+    }, [isLoadingOptions, selectedTemplate]);
+
+
+    // Effect to set initial scale on mobile for a perfect fit
+    useEffect(() => {
+        const calculateMobileScale = () => {
+            // Check for mobile view (e.g., screen width < 768px)
+            if (window.innerWidth < 768 && previewContentRef.current) {
+                const containerWidth = previewContentRef.current.offsetWidth;
+                // Account for padding in the preview area (p-4 is 1rem * 2 = 32px on default)
+                const padding = 32;
+                const initialScale = ((containerWidth - padding) / BASE_PREVIEW_WIDTH) * 100;
+                setScale(Math.min(100, Math.floor(initialScale))); // Set initial scale, but don't go over 100%
+            }
+        };
+
+        // Run on mount and on resize to handle orientation changes
+        calculateMobileScale();
+        window.addEventListener('resize', calculateMobileScale);
+        return () => window.removeEventListener('resize', calculateMobileScale);
+    }, []); // Empty dependency array ensures this runs once on mount
+
 
     // --- Handlers ---
     const handleTemplateSelect = (template) => {
@@ -295,6 +327,124 @@ const ResumePreviewPage = () => {
         );
     };
 
+    // --- Reusable Controls Panel Component ---
+    const ControlsPanel = ({ isMobile = false }) => (
+        <>
+            {/* Scrollable Content Area (Templates & Settings) */}
+            <div className="flex-grow-1 overflow-y-auto">
+                {/* Templates Section */}
+                <div className={styles.controlSection}>
+                    <h3 className="text-lg font-semibold mb-3 text-color">Select Template</h3>
+                    {isLoadingOptions ? (
+                        <div className="grid"> {renderTemplateSkeletons()} </div>
+                    ) : errorOptions ? (
+                        <Message severity="error" text={errorOptions} className="w-full" />
+                    ) : (
+                        <div className={`grid grid-nogutter ${isMobile ? '-m-1' : '-m-1'}`}>
+                            {templatesData.map((template) => (
+                                <div key={template.id} className={`${isMobile ? 'col-12' : 'col-6'} p-1`}>
+                                    <Card
+                                        className={`cursor-pointer border-2 hover:shadow-md ${styles.templateCard} ${selectedTemplate?.id === template.id ? 'border-primary shadow-2' : 'border-transparent'} relative group`}
+                                        onClick={() => handleTemplateSelect(template)}
+                                        pt={{ header: { className: 'p-0' }, body: { className: 'p-0' }, content: { className: 'p-2 text-center' } }}
+                                    >
+                                        <Button
+                                            icon="pi pi-eye"
+                                            rounded
+                                            aria-label={`Preview ${template.name}`}
+                                            tooltip="Preview Template"
+                                            tooltipOptions={{ position: 'top', showDelay: 300 }}
+                                            className={`absolute top-0 right-0 mt-1 mr-1 z-1 group-hover:opacity-100 transition-opacity duration-300 ${styles.previewButton} text-primary-300`}
+                                            onClick={(e) => handlePreviewOpen(template.previewUrl, e)}
+                                        />
+                                        <img src={template.previewUrl || '/images/previews/default.png'} alt={`${template.name} Preview`} className={`w-full block border-round-top ${styles.templatePreviewImage}`} />
+                                        <div className="text-sm font-medium text-color-secondary mt-1">{template.name}</div>
+                                    </Card>
+                                </div>
+                            ))}
+                        </div>
+                    )}
+                </div>
+
+                {/* Enhanced Controls Section */}
+                <div className={styles.controlSection}>
+                    <h3 className="text-lg font-semibold mb-3 text-color">Appearance</h3>
+
+                    {/* Font Selector */}
+                    {selectedTemplate && currentFonts.length > 0 && (
+                        <div className="mb-4">
+                            <label className="text-sm font-medium text-color-secondary mb-2 block">Font Style</label>
+                            <Dropdown
+                                value={selectedFont}
+                                options={fontSelectButtonOptions}
+                                onChange={(e) => handleFontChange(e.value)}
+                                placeholder="Select a Font Style"
+                                className="w-full"
+                                disabled={isLoadingOptions || isLoadingPdf}
+                            />
+                        </div>
+                    )}
+
+                    {/* Font Size Selector */}
+                    <div className="mb-4">
+                        <label className="text-sm font-medium text-color-secondary mb-2 block">Font Size</label>
+                        <SelectButton
+                            value={fontScale}
+                            onChange={(e) => setFontScale(e.value)}
+                            options={[
+                                { label: 'Small', value: 'small' },
+                                { label: 'Medium', value: 'medium' },
+                                { label: 'Large', value: 'large' }
+                            ]}
+                            className="w-full"
+                            disabled={isLoadingOptions || isLoadingPdf}
+                        />
+                    </div>
+
+
+                    {/* Avatar and Icons Toggles */}
+                    <div className="space-y-3">
+                        <div className="flex align-items-center justify-content-between">
+                            <div className="flex align-items-center">
+                                <i className="pi pi-user mr-2 text-color-secondary"></i>
+                                <label htmlFor="avatarToggle" className="text-sm font-medium text-color">Show Avatar</label>
+                                <Tooltip target=".avatar-tooltip" content="Display your profile picture on the resume." position="top" />
+                                <i className="pi pi-info-circle ml-2 text-xs text-color-secondary avatar-tooltip cursor-pointer"></i>
+                            </div>
+                            <ToggleButton id="avatarToggle" checked={showAvatar} onChange={(e) => setShowAvatar(e.value)} className={`w-3rem h-2rem ${styles.centeredToggle}`} disabled={isLoadingOptions || isLoadingPdf} />
+                        </div>
+                        <div className="flex align-items-center justify-content-between">
+                            <div className="flex align-items-center">
+                                <i className="pi pi-at mr-2 text-color-secondary"></i>
+                                <label htmlFor="iconsToggle" className="text-sm font-medium text-color">Show Icons</label>
+                                <Tooltip target=".icons-tooltip" content="Display icons (e.g., for email, phone) next to contact info." position="top" />
+                                <i className="pi pi-info-circle ml-2 text-xs text-color-secondary icons-tooltip cursor-pointer"></i>
+                            </div>
+                            <ToggleButton id="iconsToggle" checked={showIcons} onChange={(e) => setShowIcons(e.value)} className={`w-3rem h-2rem ${styles.centeredToggle}`} disabled={isLoadingOptions || isLoadingPdf} />
+                        </div>
+                    </div>
+                </div>
+
+                {/* Zoom Control Section */}
+                <div className={styles.controlSection}>
+                    <h3 className="text-lg font-semibold mb-3 text-color">Zoom</h3>
+                    <div className="flex align-items-center gap-2">
+                        <Button icon="pi pi-search-minus" text rounded severity="secondary" onClick={() => setScale(s => Math.max(50, s - 10))} disabled={isLoadingPdf || scale <= 50} />
+                        <Slider value={scale} onChange={(e) => setScale(e.value)} min={50} max={150} step={10} className="flex-grow-1" disabled={isLoadingPdf} />
+                        <Button icon="pi pi-search-plus" text rounded severity="secondary" onClick={() => setScale(s => Math.min(150, s + 10))} disabled={isLoadingPdf || scale >= 150} />
+                        <span className="text-sm font-semibold w-3rem text-center tabular-nums">{scale}%</span>
+                    </div>
+                </div>
+            </div>
+
+
+            {/* Download Button */}
+            <div className="p-4 border-top-1 surface-border mt-auto flex-shrink-0">
+                <Button label="Download PDF" icon="pi pi-download" className="w-full" onClick={handleDownload} disabled={!pdfUrl || isLoadingPdf || errorPdf || isLoadingOptions} />
+            </div>
+        </>
+    );
+
 
     // --- Render Component ---
     return (
@@ -302,145 +452,23 @@ const ResumePreviewPage = () => {
             {/* Main Grid - Adjust height calculation */}
             <div className="flex-grow-1 grid grid-nogutter" style={{ height: `calc(100vh - ${HEADER_HEIGHT}px)` }}>
 
-                {/* Control Panel (Templates Only) */}
-                <div className="col-12 md:col-4 lg:col-3 flex flex-column h-full border-right-1 surface-border bg-surface-0">
-                    {/* Panel Header */}
-                    <div className="p-4 border-bottom-1 surface-border flex-shrink-0">
-                        <h1 className="text-lg font-semibold m-0">Select Template</h1>
-                    </div>
-
-                    {/* Scrollable Content Area (Templates) */}
-                    <div className="p-4 flex-grow-1 overflow-y-auto">
-                        {isLoadingOptions ? (
-                            <> {/* Skeleton Loading */}
-                                <div className="mb-5">
-                                    <div className="grid"> {renderTemplateSkeletons()} </div>
-                                </div>
-                            </>
-                        ) : errorOptions ? (
-                            <Message severity="error" text={errorOptions} className="w-full" />
-                        ) : (
-                            <> {/* Loaded Content */}
-                                {/* Templates Section */}
-                                <div className="mb-5">
-                                    {templatesData.length > 0 ? (
-                                        <div className="grid grid-nogutter -m-1">
-                                         {templatesData.map((template) => (
-                                                <div key={template.id} className="col-6 p-1">
-                                             <Card
-                                                        className={`cursor-pointer border-2 hover:shadow-md ${styles.templateCard} ${selectedTemplate?.id === template.id ? 'border-primary shadow-2' : 'border-transparent'} relative group`}
-                                                        onClick={() => handleTemplateSelect(template)}
-                                                        pt={{ header: { className: 'p-0' }, body: { className: 'p-0' }, content: { className: 'p-2 text-center' } }}
-                                                    >
-                                                        {/* --- Preview Button Overlay --- */}
-                                                        <Button
-                                                            icon="pi pi-eye"
-                                                            rounded
-                                                            aria-label={`Preview ${template.name}`}
-                                                            tooltip="Preview Template"
-                                                            tooltipOptions={{ position: 'top', showDelay: 300 }}
-                                                            className={`absolute top-0 right-0 mt-1 mr-1 z-1  group-hover:opacity-100 transition-opacity duration-300 ${styles.previewButton} text-primary-300`}
-                                                            onClick={(e) => handlePreviewOpen(template.previewUrl, e)}
-                                                        />
-
-                                                        <img src={template.previewUrl || '/images/previews/default.png'} alt={`${template.name} Preview`} className={`w-full block border-round-top ${styles.templatePreviewImage}`} />
-                                                        <div className="text-sm font-medium text-color-secondary mt-1">{template.name}</div>
-
-                                                    </Card>
-                                                </div>
-                                            ))}
-                                        </div>
-                                    ) : (<p className="text-sm text-color-secondary">No templates available.</p>)}
-                                </div>
-                            </>
-                        )}
-                    </div>
-
-                    {/* Enhanced Controls Section */}
-                    <div className="p-4 border-top-1 surface-border">
-                        <h3 className="text-lg font-semibold mb-3 text-color">Preview Settings</h3>
-
-                        {/* Font Selector */}
-                        {selectedTemplate && currentFonts.length > 0 && (
-                            <div className="mb-4">
-                                <div className="flex align-items-center justify-content-between mb-2">
-                                    <label className="text-sm font-medium text-color-secondary">Font Style</label>
-                                </div>
-                                <SelectButton 
-                                    value={selectedFont} 
-                                    onChange={(e) => handleFontChange(e.value)} 
-                                    options={fontSelectButtonOptions} 
-                                    itemTemplate={fontOptionTemplate}
-                                    className="w-full"
-                                    disabled={isLoadingOptions || isLoadingPdf}
-                                    pt={{
-                                        button: ({ context }) => ({
-                                            className: context.selected ? 'p-button' : 'p-button-secondary p-button-outlined'
-                                        })
-                                    }}
-                                />
-                            </div>
-                        )}
-
-                        {/* Avatar and Icons Toggles */}
-                        <div className="space-y-3">
-                            {/* Avatar Toggle */}
-                            <div className="flex align-items-center justify-content-between">
-                                <div className="flex align-items-center">
-                                    <i className="pi pi-user mr-2 text-color-secondary"></i>
-                                    <label htmlFor="avatarToggle" className="text-sm font-medium text-color">Show Avatar</label>
-                                    <Tooltip target=".avatar-tooltip" content="Display your profile picture on the resume." position="top" />
-                                    <i className="pi pi-info-circle ml-2 text-xs text-color-secondary avatar-tooltip cursor-pointer"></i>
-                                </div>
-                                <ToggleButton
-                                    id="avatarToggle"
-                                    checked={showAvatar}
-                                    onChange={(e) => setShowAvatar(e.value)}
-                                    className={`w-3rem h-2rem ${styles.centeredToggle}`}
-                                    disabled={isLoadingOptions || isLoadingPdf}
-                                />
-                            </div>
-                            {/* Icons Toggle */}
-                            <div className="flex align-items-center justify-content-between">
-                                <div className="flex align-items-center">
-                                    <i className="pi pi-at mr-2 text-color-secondary"></i>
-                                    <label htmlFor="iconsToggle" className="text-sm font-medium text-color">Show  Icons</label>
-                                    <Tooltip target=".icons-tooltip" content="Display icons (e.g., for email, phone) next to contact info." position="top" />
-                                    <i className="pi pi-info-circle ml-2 text-xs text-color-secondary icons-tooltip cursor-pointer"></i>
-                                </div>
-                                <ToggleButton
-                                    id="iconsToggle"
-                                    checked={showIcons}
-                                    onChange={(e) => setShowIcons(e.value)}
-                                    className={`w-3rem h-2rem ${styles.centeredToggle}`}
-                                    disabled={isLoadingOptions || isLoadingPdf}
-                                />
-                            </div>
-                        </div>
-                    </div>
-
-                    {/* Download Button */}
-                    <div className="p-4 border-top-1 surface-border mt-auto flex-shrink-0">
-                        <Button 
-                            label="Download PDF" 
-                            icon="pi pi-download" 
-                            className="w-full" 
-                            onClick={handleDownload} 
-                            disabled={!pdfUrl || isLoadingPdf || errorPdf || isLoadingOptions} 
-                        />
-                    </div>
+                {/* Control Panel (Desktop) */}
+                <div className={`col-12 md:col-4 lg:col-3 flex-column h-full border-right-1 surface-border bg-surface-0 ${styles.showOnDesktop}`}>
+                    <ControlsPanel />
                 </div>
 
                 {/* Right Side (Toolbar + Preview) */}
                 <div className="col-12 md:col-8 lg:col-9 h-full flex flex-column">
 
-                    {/* Preview Toolbar - UPDATED */}
+                    {/* Preview Toolbar */}
                     <div className={`p-2 border-bottom-1 surface-border bg-surface-0 flex align-items-center justify-content-between flex-shrink-0 ${styles.previewToolbar}`} style={{ height: `${TOOLBAR_HEIGHT}px` }}>
                         {/* Left side - Theme and Font preview */}
                         <div className="flex align-items-center gap-3">
+                             {/* Mobile Settings Button */}
+                            <Button icon="pi pi-cog" text rounded severity="secondary" className={styles.showOnMobile} onClick={() => setIsMobileControlsVisible(true)} tooltip="Settings" tooltipOptions={{position: 'bottom'}} />
                             {selectedTemplate && currentThemes.length > 0 && (
                                 <>
-                                    <span className="text-xs uppercase font-semibold text-color-secondary mr-1">Theme:</span>
+                                    <span className={`text-xs uppercase font-semibold text-color-secondary mr-1 ${styles.showOnDesktop}`}>Theme:</span>
                                     {currentThemes.map((theme) => (
                                         <React.Fragment key={theme.value}>
                                             <Tooltip target={`.swatch-${theme.value}`} content={theme.name} position="bottom" />
@@ -454,9 +482,9 @@ const ResumePreviewPage = () => {
                                 </>
                             )}
 
-                            {/* Current Font Display */}
+                            {/* Current Font Display (Desktop Only) */}
                             {selectedTemplate && selectedFont && (
-                                <div className="flex align-items-center gap-2 ml-3">
+                                <div className={`align-items-center gap-2 ml-3 ${styles.showOnDesktop}`}>
                                     <span className="text-xs uppercase font-semibold text-color-secondary">Font:</span>
                                     <div className="flex align-items-center gap-1 bg-surface-100 px-2 py-1 border-round">
                                         <span className="text-sm font-bold text-primary">
@@ -468,13 +496,10 @@ const ResumePreviewPage = () => {
                                     </div>
                                 </div>
                             )}
-
-                            {/* Font Size Selector */}
-                            
                         </div>
 
-                        {/* Right side - Scale and Size controls */}
-                        <div className="flex align-items-center gap-4">
+                        {/* Right side - Scale and Size controls (Desktop Only) */}
+                        <div className={`align-items-center gap-4 ${styles.showOnDesktop}`}>
                             {/* Font Size Selector */}
                             <div className="flex align-items-center gap-2">
                                 <span className="text-xs uppercase font-semibold text-color-secondary">Size:</span>
@@ -582,6 +607,13 @@ const ResumePreviewPage = () => {
             >
                 <img src={previewImageUrl} alt="Template Preview" style={{ width: '100%', display: 'block' }} />
             </Dialog>  
+
+            {/* --- Mobile Controls Sidebar --- */}
+            <Sidebar visible={isMobileControlsVisible} onHide={() => setIsMobileControlsVisible(false)} position="left" className="w-full md:w-20rem lg:w-30rem">
+                <div className="flex flex-column h-full">
+                    <ControlsPanel isMobile={true} />
+                </div>
+            </Sidebar>
         </div>
     );
 };
