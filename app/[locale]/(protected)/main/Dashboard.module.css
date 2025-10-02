@@ -379,7 +379,32 @@
     box-shadow: 0 8px 20px -5px rgba(59, 130, 246, 0.2);
 }
 
+/* --- Mobile Sidebar Overlay --- */
+.sidebarMobileOverlay {
+    transform: translateX(0) !important; /* This class brings the sidebar into view */
+}
+
+
 /* Enhanced mobile responsive */
+@media (max-width: 991px) { /* lg breakpoint */
+    .mainContent {
+        width: 100% !important; /* Full width on mobile */
+    }
+    .mainContentExpanded {
+        width: 100% !important; /* Ensure it stays full width */
+    }
+    /* On mobile, take sidebar out of flow and hide it by default */
+    .sidebar {
+        position: fixed;
+        top: 0;
+        left: 0;
+        height: 100%;
+        z-index: 1001;
+        transform: translateX(-100%);
+        transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+}
+
 @media (max-width: 768px) {
     .mainScrollArea {
         padding: 1.5rem;
@@ -396,6 +421,26 @@
     .quickActionCard .actionIcon {
         font-size: 2.5rem;
         padding: 1rem;
+    }
+    /* Hide user name in topbar on mobile */
+    .profileName {
+        display: none;
+    }
+}
+
+@media (max-width: 576px) {
+    .mainScrollArea {
+        padding: 1rem 0.75rem; /* Further reduce padding for small screens */
+    }
+    .pageHeader {
+        font-size: 1.8rem; /* Smaller header on small screens */
+    }
+    .pageSubheader {
+        font-size: 1rem;
+        margin-bottom: 2rem;
+    }
+    .topbar {
+        padding: 0 1rem; /* Reduce topbar padding */
     }
 }
 

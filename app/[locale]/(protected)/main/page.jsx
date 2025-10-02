@@ -41,20 +41,20 @@ const ActionCard = ({ title, icon, description, onClick, route, buttonLabel }) =
     };
 
     return (
-        <Card className={`${styles.quickActionCard} h-full surface-card shadow-2 border-1 surface-border`}>
-            <div className="flex flex-column justify-content-between h-full text-center">
+        <div className={`${styles.quickActionCard} surface-card shadow-2 h-full flex flex-column text-center p-4`} onClick={handleClick}>
+            <div className="flex-grow-1 flex flex-column align-items-center">
                 <div className="mb-4 flex align-items-center justify-content-center">
                     <div className="bg-primary-100 text-primary-700 p-3 border-round-2xl">{icon}</div>
                 </div>
                 <div>
                     <h3 className="text-xl font-semibold mb-2 text-900">{title}</h3>
-                    <p className="text-600 mb-4 px-2 " style={{ height: '5.0rem' }}>
+                    <p className="text-600 mb-4 px-2">
                         {description}
                     </p>
                 </div>
                 <Button label={buttonLabel || t('dashboard_main.actionCard.explore')} icon={isRTL ? 'pi pi-arrow-left' : 'pi pi-arrow-right'} iconPos={isRTL ? 'right' : 'right'} className="p-button-primary w-full mt-auto" onClick={handleClick} />
             </div>
-        </Card>
+        </div>
     );
 };
 

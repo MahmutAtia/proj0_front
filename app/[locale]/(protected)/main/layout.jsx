@@ -56,6 +56,7 @@ const SidebarLogo = ({ collapsed }) => {
 
 const SidebarNav = ({ items, currentPath, router, collapsed }) => {
     const pathWithoutLocale = '/' + currentPath.split('/').slice(2).join('/');
+    
 
     
     return(
@@ -112,12 +113,6 @@ const TopBar = ({ session, userMenuRef, userMenuItems, onToggleSidebar, onToggle
             <div className="flex align-items-center gap-3">
                 <Button ref={mobileToggleButtonRef} icon={<FiMenu size={20} />} className="p-button-rounded p-button-text p-button-plain mr-2 lg:hidden" onClick={onToggleMobileSidebar} />
                 <Button
-                    icon={sidebarCollapsed ? isRTL ? <FiChevronLeft size={18} /> : <FiChevronRight size={18} /> : isRTL ? <FiChevronRight size={18} /> : <FiChevronLeft size={18} />}
-                    ref={mobileToggleButtonRef}
-                    className="p-button-rounded p-button-text p-button-plain mr-2 lg:hidden"
-                    onClick={onToggleMobileSidebar}
-                />
-                <Button
                     id="tour-toggle-sidebar"
                     icon={sidebarCollapsed ? <FiChevronRight size={18} /> : <FiChevronLeft size={18} />}
                     className={`${styles.toggleButton} p-button-text hidden lg:inline-flex`}
@@ -156,7 +151,7 @@ const TopBar = ({ session, userMenuRef, userMenuItems, onToggleSidebar, onToggle
                         style={{ width: '2.2rem', height: '2.2rem' }}
                     />
                     {/* TODO: Fix white text issue on dark mode */}
-                    <span className="font-medium hidden md:inline">{session?.user?.name || t('dashboard_layout.topbar.userFallback')}</span>
+                    <span className={`${styles.profileName} font-medium hidden md:inline`}>{session?.user?.name || t('dashboard_layout.topbar.userFallback')}</span>
                     <FiChevronDown className="text-600" />
                 </div>
                 <Menu model={userMenuItems} popup ref={userMenuRef} id="popup_menu_right" popupAlignment={isRTL ? 'left' : 'right'} />
@@ -501,24 +496,27 @@ export default function Layout({ children }) {
         toast
     };
 
-    return (
-        <DashboardContext.Provider value={contextValue}>
+    return (        <DashboardContext.Provider value={contextValue}>
             <div className={`${styles.dashboardLayout} bg-primary-50`}>
                 <Toast ref={toast} />
+
+                {/* Mobile Overlay */}
+                {mobileSidebarVisible && <div className="layout-mask" onClick={toggleMobileSidebar}></div>}
 
                 {/* Sidebar */}
                 <div
                     id="tour-sidebar"
                     ref={sidebarRef}
-                    className={`${styles.sidebar} surface-card shadow-3 border-right-1 surface-border ${sidebarCollapsed ? styles.sidebarCollapsed : ''} flex-shrink-0 lg:flex lg:flex-column ${
-                        mobileSidebarVisible ? styles.sidebarMobileOverlay : 'hidden'
-                    }`}
+                    className={`${styles.sidebar} surface-card shadow-3 border-right-1 surface-border lg:flex lg:flex-column ${
+                        sidebarCollapsed ? styles.sidebarCollapsed : ''
+                    } ${mobileSidebarVisible ? styles.sidebarMobileOverlay : ''}`}
                     style={{
                         width: sidebarCollapsed ? '80px' : '280px',
-                        transition: 'width 0.3s cubic-bezier(0.4, 0, 0.2, 1)'
+                        transition: 'width 0.3s cubic-bezier(0.4, 0, 0.2, 1), transform 0.3s cubic-bezier(0.4, 0, 0.2, 1)'
                     }}
                 >
                     <SidebarLogo collapsed={sidebarCollapsed} />
+       
 
                     {/* Scrollable sidebar nav area */}
                     <div className={`${styles.sidebarNavContainer} ${styles.sidebarScrollbar}`}>
