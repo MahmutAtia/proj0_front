@@ -79,6 +79,9 @@
     border-bottom: 1px solid var(--surface-border);
     flex-shrink: 0;
     font-size: 1.1rem;
+    display: flex; /* Added for alignment */
+    justify-content: space-between; /* Added for alignment */
+    align-items: center; /* Added for alignment */
 }
 
 .sidebarContent {
@@ -164,6 +167,20 @@
     overflow: hidden;
     text-overflow: ellipsis;
     flex-grow: 1;
+}
+
+.sidebarItemControls {
+    display: flex;
+    align-items: center;
+    gap: 0.25rem; /* Space between buttons */
+}
+
+.mobileOnly {
+    display: none;
+}
+
+.desktopOnly {
+    display: flex; /* Or inline-flex, depending on the element */
 }
 
 .emptyIndicator {
@@ -258,6 +275,21 @@
 }
 
 /* --- Responsive Adjustments --- */
+@media (max-width: 767px) { /* Targeting mobile devices */
+    .mobileOnly {
+        display: flex; /* Or inline-flex */
+    }
+    .desktopOnly {
+        display: none;
+    }
+    .sidebarItem {
+        padding: 0.5rem; /* Adjust padding for touch */
+    }
+    .dragHandle {
+        display: none; /* Hide drag handle on mobile */
+    }
+}
+
 @media (max-width: 1023px) {
     .sidebarToggleButton { display: inline-flex !important; }
     .mainContent { margin-left: 0; }

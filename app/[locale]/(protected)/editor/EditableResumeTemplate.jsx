@@ -59,6 +59,7 @@ const EditableResumeTemplate = ({
     // Initialize with prop, default to empty array if prop is null/undefined
     const [hiddenSections, setHiddenSections] = useState(initialHiddenSections || []);
     const [sidebarVisible, setSidebarVisible] = useState(true);
+    const [isMobileView, setIsMobileView] = useState(false); // State for mobile view
     const [activeSection, setActiveSection] = useState(null);
     const [showGenerateDialog, setShowGenerateDialog] = useState(false); // <-- Add state for dialog
     const [showDocumentsDialog, setShowDocumentsDialog] = useState(false); // <-- Add state for documents dialog
@@ -243,6 +244,20 @@ const EditableResumeTemplate = ({
         setSectionOrder(newOrder);
     };
 
+    // Handle moving sections up/down on mobile
+    const handleMoveSection = (index, direction) => {
+        const newOrder = Array.from(sectionOrder);
+        const newIndex = direction === 'up' ? index - 1 : index + 1;
+
+        if (newIndex < 0 || newIndex >= newOrder.length) {
+            return; // Cannot move outside of bounds
+        }
+
+        const [item] = newOrder.splice(index, 1);
+        newOrder.splice(newIndex, 0, item);
+        setSectionOrder(newOrder);
+    };
+
     // Render the appropriate component for each section
     const renderSectionComponent = (sectionKey) => {
         const commonProps = { sectionKey: sectionKey }; // Pass sectionKey for potential use within components
@@ -266,7 +281,12 @@ const EditableResumeTemplate = ({
         if (sectionElement) {
             sectionElement.scrollIntoView({ behavior: 'smooth', block: 'start' });
         }
+        // Close sidebar on mobile after clicking a section to navigate
+        if (isMobileView) {
+            setSidebarVisible(false);
+        }
     };
+
 
     // Initialize hidden sections and sidebar visibility effect
     useEffect(() => {
@@ -284,11 +304,22 @@ const EditableResumeTemplate = ({
         }
 
         // Handle responsive sidebar visibility
-        const mediaQuery = window.matchMedia('(min-width: 1024px)'); // lg breakpoint
-        const handleResize = () => setSidebarVisible(mediaQuery.matches);
+        const desktopMediaQuery = window.matchMedia('(min-width: 1024px)');
+        const mobileMediaQuery = window.matchMedia('(max-width: 767px)');
+
+        const handleResize = () => {
+            setSidebarVisible(desktopMediaQuery.matches);
+            setIsMobileView(mobileMediaQuery.matches);
+        };
+
         handleResize(); // Initial check
-        mediaQuery.addEventListener('change', handleResize);
-        return () => mediaQuery.removeEventListener('change', handleResize);
+        desktopMediaQuery.addEventListener('change', handleResize);
+        mobileMediaQuery.addEventListener('change', handleResize);
+
+        return () => {
+            desktopMediaQuery.removeEventListener('change', handleResize);
+            mobileMediaQuery.removeEventListener('change', handleResize);
+        };
     }, [data, initialHiddenSections, sectionOrder]); // Added initialHiddenSections and sectionOrder to dependencies
 
     // Effect to track unsaved changes
@@ -715,8 +746,18 @@ const EditableResumeTemplate = ({
                     style={{ transition: 'transform 0.3s ease' }}
                 >
                     <div className={styles.sidebarHeader}>
-                        <span className="font-semibold">Sections</span>
-                        <p className="text-xs text-color-secondary mt-1 mb-0">Drag to reorder. Click eye to toggle.</p>
+                        <div>
+                            <span className="font-semibold">Sections</span>
+                            <p className="text-xs text-color-secondary mt-1 mb-0">
+                                {isMobileView ? "Tap arrows to reorder" : "Drag to reorder"}
+                            </p>
+                        </div>
+                        <Button
+                            icon="pi pi-times"
+                            className={classNames("p-button-text p-button-secondary", styles.mobileOnly)}
+                            onClick={() => setSidebarVisible(false)}
+                            aria-label="Close sidebar"
+                        />
                     </div>
 
                     <div className={classNames(styles.sidebarContent, "overflow-y-auto")}>
@@ -733,7 +774,7 @@ const EditableResumeTemplate = ({
                                             const isEmpty = isSectionEmpty(sectionKey);
                                             const isHidden = hiddenSections.includes(sectionKey);
                                             return (
-                                                <Draggable key={sectionKey} draggableId={sectionKey} index={index}>
+                                                <Draggable key={sectionKey} draggableId={sectionKey} index={index} isDragDisabled={isMobileView}>
                                                     {(provided, snapshot) => (
                                                         <div
                                                             ref={provided.innerRef}
@@ -746,11 +787,17 @@ const EditableResumeTemplate = ({
                                                                 "flex align-items-center justify-content-between p-2 surface-border cursor-pointer",
                                                                 "tour-section-item"
                                                             )}
-                                                            onClick={() => scrollToSection(sectionKey)}
+                                                            onClick={(e) => {
+                                                                // Prevent click from firing if the target is a button inside the item
+                                                                if (e.target.closest('button')) {
+                                                                    return;
+                                                                }
+                                                                scrollToSection(sectionKey);
+                                                            }}
                                                         >
                                                             <div className={classNames(styles.sidebarItemContent, "flex align-items-center")}>
                                                                 <span {...provided.dragHandleProps} className={classNames(styles.dragHandle, "mr-2", "cursor-grab", "tour-drag-handle")}>
-                                                                    <i className={SECTION_ICONS[sectionKey] || SECTION_ICONS.default}></i>
+                                                                    <i className="pi pi-bars"></i>
                                                                 </span>
                                                                 <span className={styles.sidebarItemText}>{formatSectionName(sectionKey)}</span>
                                                                 {isEmpty && !isHidden && (
@@ -759,16 +806,34 @@ const EditableResumeTemplate = ({
                                                                     </span>
                                                                 )}
                                                             </div>
-                                                            <Button
-                                                                icon={isHidden ? 'pi pi-eye-slash' : 'pi pi-eye'}
-                                                                className={classNames("p-button-text p-button-secondary p-button-sm", styles.visibilityToggle, "tour-visibility-toggle")}
-                                                                onClick={(e) => {
-                                                                    e.stopPropagation();
-                                                                    toggleSectionVisibility(sectionKey);
-                                                                }}
-                                                                tooltip={isHidden ? 'Show Section' : 'Hide Section'}
-                                                                tooltipOptions={{ position: 'left', showDelay: 500 }}
-                                                            />
+                                                            <div className={styles.sidebarItemControls}>
+                                                                {/* Mobile-only Move Buttons */}
+                                                                <div className={styles.mobileOnly}>
+                                                                    <Button
+                                                                        icon="pi pi-arrow-up"
+                                                                        className="p-button-text p-button-secondary p-button-sm"
+                                                                        onClick={(e) => { e.stopPropagation(); handleMoveSection(index, 'up'); }}
+                                                                        disabled={index === 0}
+                                                                    />
+                                                                    <Button
+                                                                        icon="pi pi-arrow-down"
+                                                                        className="p-button-text p-button-secondary p-button-sm"
+                                                                        onClick={(e) => { e.stopPropagation(); handleMoveSection(index, 'down'); }}
+                                                                        disabled={index === sectionOrder.length - 1}
+                                                                    />
+                                                                </div>
+                                                                {/* Visibility Toggle */}
+                                                                <Button
+                                                                    icon={isHidden ? 'pi pi-eye-slash' : 'pi pi-eye'}
+                                                                    className={classNames("p-button-text p-button-secondary p-button-sm", styles.visibilityToggle, "tour-visibility-toggle")}
+                                                                    onClick={(e) => {
+                                                                        e.stopPropagation();
+                                                                        toggleSectionVisibility(sectionKey);
+                                                                    }}
+                                                                    tooltip={isHidden ? 'Show Section' : 'Hide Section'}
+                                                                    tooltipOptions={{ position: 'left', showDelay: 500 }}
+                                                                />
+                                                            </div>
                                                         </div>
                                                     )}
                                                 </Draggable>
