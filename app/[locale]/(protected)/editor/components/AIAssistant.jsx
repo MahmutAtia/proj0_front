@@ -452,11 +452,10 @@ const AIAssistant = ({ prompt = "", setPrompt, onSubmit, isProcessing }) => {
                 showHeader={false}
                 dismissableMask={false}
                 closable={false}
-                style={{ width: '500px', maxWidth: '95vw' }}
                 onHide={() => {}} // Empty function to prevent unwanted hiding
                 footer={footerContent}
             >
-                <div className={styles.voiceDialogContent}>
+ <div className={styles.voiceDialogContent}>
                     {/* Visualizer with integrated header */}
                     <div className={styles.voiceVisualizer}>
                         <div className={styles.customDialogHeader}>
