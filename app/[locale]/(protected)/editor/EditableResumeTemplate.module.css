@@ -18,6 +18,30 @@
     top: 0;
     z-index: 1002;
     border-bottom: 1px solid var(--surface-border);
+    gap: 0.5rem; /* Add gap for spacing */
+}
+
+.headerLeft, .headerRight {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.hideOnMobile {
+    display: none;
+}
+
+.showOnMobile {
+    display: inline-flex;
+}
+
+@media (min-width: 768px) {
+    .hideOnMobile {
+        display: inline-flex;
+    }
+    .showOnMobile {
+        display: none;
+    }
 }
 
 @media (min-width: 768px) { .editorHeader { padding: 1.5rem 2rem; } }

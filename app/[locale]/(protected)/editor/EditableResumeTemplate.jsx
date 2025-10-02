@@ -12,6 +12,7 @@ import { Tooltip } from 'primereact/tooltip'; // Import Tooltip
 import { DataView } from 'primereact/dataview'; // Added DataView import
 import { Dialog } from 'primereact/dialog'; // Added Dialog import
 import { SplitButton } from 'primereact/splitbutton'; // Import SplitButton
+import { Menu } from 'primereact/menu'; // Import Menu
 import { useResume } from "./ResumeContext";
 import PersonalInformation from "./components/PersonalInformation";
 import Summary from "./components/Summary";
@@ -71,6 +72,7 @@ const EditableResumeTemplate = ({
     const router = useRouter();
     const toast = useRef(null);
     const mainContentRef = useRef(null); // Ref for the main scrollable area
+    const moreOptionsMenu = useRef(null); // Ref for the mobile menu
     const { data: session, status } = useSession();
     const token = session?.accessToken || null; // Get the token from session
     // Initialize local state from props
@@ -151,6 +153,42 @@ const EditableResumeTemplate = ({
             label: 'Generate New Resume',
             icon: 'pi pi-copy',
             command: () => setShowCreateDialog(true)
+        }
+    ];
+
+    // Define items for the mobile "More Options" menu
+    const moreOptionsItems = [
+        {
+            label: t('globalEdit'),
+            icon: 'pi pi-sparkles',
+            command: () => setShowGlobalEditDialog(true),
+            disabled: loading || !data
+        },
+        {
+            label: t('export'),
+            icon: 'pi pi-download',
+            command: () => confirmAndProceed(`/export/${resumeId}`),
+            disabled: loading
+        },
+        { separator: true },
+        ...actionItems, // Includes "Generate Website", "Browse Documents", etc.
+        { separator: true },
+        {
+            label: t('undo'),
+            icon: 'pi pi-undo',
+            command: undo,
+            disabled: !canUndo
+        },
+        {
+            label: t('redo'),
+            icon: 'pi pi-refresh',
+            command: redo,
+            disabled: !canRedo
+        },
+        {
+            label: t('startTour'),
+            icon: 'pi pi-question-circle',
+            command: () => startTour(t)
         }
     ];
 
@@ -565,7 +603,7 @@ const EditableResumeTemplate = ({
             {/* Header */}
             <header className={classNames(styles.editorHeader, "flex justify-content-between align-items-center p-3 border-bottom-1 surface-border")}>
                 <div className="flex align-items-center">
-                                        <Button
+                    <Button
                         icon="pi pi-arrow-left"
                         className="p-button-text p-button-secondary tour-back-button"
                         tooltip="Back to Dashboard"
@@ -579,74 +617,86 @@ const EditableResumeTemplate = ({
                         aria-controls="resume-sidebar"
                         aria-expanded={sidebarVisible}
                     />
-                    <h1 className="text-xl md:text-2xl font-semibold m-0">Resume Editor</h1>
+                    <h1 className="text-xl md:text-2xl font-semibold m-0 hidden md:block">Resume Editor</h1>
 
                 </div>
                 <div className="flex gap-2 align-items-center">
                     {loading && <ProgressSpinner style={{ width: '2rem', height: '2rem' }} strokeWidth="6" />}
                     
-                    <Button 
-                        icon="pi pi-undo" 
-                        className="p-button-rounded p-button-text" 
-                        onClick={undo} 
-                        disabled={!canUndo}
-                        tooltip="Undo"
-                    />
-                    <Button 
-                        icon="pi pi-refresh" 
-                        className="p-button-rounded p-button-text" 
-                        onClick={redo} 
-                        disabled={!canRedo}
-                        tooltip="Redo"
-                    />
-
-                    <Button 
-                        icon={<FaQuestionCircle />} 
-                        className="p-button-rounded p-button-text p-button-plain" 
-                        onClick={() => startTour(t)} 
-                        tooltip="Start Tour"
-                        tooltipOptions={{ position: 'bottom' }}
-                    />
-
-                    <Button
-                        label="Global Edit"
-                        icon="pi pi-sparkles"
-                        className="p-button-secondary"
-                        onClick={() => setShowGlobalEditDialog(true)}
-                        disabled={loading || !data}
-                        tooltip="Use AI to edit the entire resume"
-                        tooltipOptions={{ position: 'bottom' }}
-                    />
-
-                    <SplitButton
-                        label="Generate Document"
-                        icon="pi pi-file-edit"
-                        onClick={() => setShowGenerateDialog(true)}
-                        model={actionItems}
-                        className="p-button-outlined p-button-secondary tour-generate-document "
-                        tooltip="Actions"
-                        tooltipOptions={{ position: 'bottom' }}
-                        disabled={loading || !data}
-                    />
-
-                    <Button
-                        icon="pi pi-download"
-                        label="Export"
-                        tooltip="Export Options"
-                        tooltipOptions={{ position: 'bottom' }}
-                        className="p-button-secondary tour-export-button"
-                        onClick={() => confirmAndProceed(`/export/${resumeId}`)}
-                        disabled={loading}
-                    />
+                    {/* --- Desktop Buttons --- */}
+                    <div className={classNames(styles.hideOnMobile, "flex-row gap-2 align-items-center")}>
+                        <Button 
+                            icon="pi pi-undo" 
+                            className="p-button-rounded p-button-text" 
+                            onClick={undo} 
+                            disabled={!canUndo}
+                            tooltip="Undo"
+                        />
+                        <Button 
+                            icon="pi pi-refresh" 
+                            className="p-button-rounded p-button-text" 
+                            onClick={redo} 
+                            disabled={!canRedo}
+                            tooltip="Redo"
+                        />
+                        <Button 
+                            icon={<FaQuestionCircle />} 
+                            className="p-button-rounded p-button-text p-button-plain" 
+                            onClick={() => startTour(t)} 
+                            tooltip="Start Tour"
+                            tooltipOptions={{ position: 'bottom' }}
+                        />
+                        <Button
+                            label="Global Edit"
+                            icon="pi pi-sparkles"
+                            className="p-button-secondary"
+                            onClick={() => setShowGlobalEditDialog(true)}
+                            disabled={loading || !data}
+                            tooltip="Use AI to edit the entire resume"
+                            tooltipOptions={{ position: 'bottom' }}
+                        />
+                        <SplitButton
+                            label="Generate Document"
+                            icon="pi pi-file-edit"
+                            onClick={() => setShowGenerateDialog(true)}
+                            model={actionItems}
+                            className="p-button-outlined p-button-secondary tour-generate-document "
+                            tooltip="Actions"
+                            tooltipOptions={{ position: 'bottom' }}
+                            disabled={loading || !data}
+                        />
+                        <Button
+                            icon="pi pi-download"
+                            label="Export"
+                            tooltip="Export Options"
+                            tooltipOptions={{ position: 'bottom' }}
+                            className="p-button-secondary tour-export-button"
+                            onClick={() => confirmAndProceed(`/export/${resumeId}`)}
+                            disabled={loading}
+                        />
+                    </div>
                     
+                    {/* --- Save Button (Always Visible) --- */}
                     <Button
                         icon="pi pi-save"
                         label="Save"
                         severity="success"
                         onClick={saveResumeData}
-                        disabled={loading}
+                        disabled={loading || !isDirty}
                         className="tour-save-button"
                     />
+
+                    {/* --- Mobile "More Options" Menu --- */}
+                    <div className={styles.showOnMobile}>
+                        <Menu model={moreOptionsItems} popup ref={moreOptionsMenu} id="popup_menu_right" popupAlignment="right" />
+                        <Button
+                            icon="pi pi-ellipsis-v"
+                            className="p-button-text"
+                            onClick={(event) => moreOptionsMenu.current.toggle(event)}
+                            aria-controls="popup_menu_right"
+                            aria-haspopup
+                        />
+                    </div>
                 </div>
             </header>
 
