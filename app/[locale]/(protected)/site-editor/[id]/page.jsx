@@ -6,6 +6,7 @@ import {aiApi} from '@/lib/axios';
 import api from '@/lib/axios';
 import { Dialog } from 'primereact/dialog';
 import { Button } from 'primereact/button';
+import { Menu } from 'primereact/menu';
 import { ProgressSpinner } from 'primereact/progressspinner';
 import { ConfirmDialog, confirmDialog } from 'primereact/confirmdialog'; // Import ConfirmDialog
 import { InputText } from 'primereact/inputtext';
@@ -756,13 +757,13 @@ const PersonalSiteEditorPage = ({ params: paramsPromise }) => {
                     </div>
                 </div>
             ))}
-            <Dialog
+         <Dialog
                 header={`Edit Block: ${currentBlock?.name || ''}`}
                 visible={isAiDialogOpen}
                 style={{ width: '50vw' }}
                 breakpoints={{ '960px': '75vw', '641px': '90vw' }}
                 modal
-                className="p-fluid tour-ai-dialog"
+                className="p-fluid tour-ai-dialog site-editor-dialog"
                 onHide={closeEditDialog}
             >
                 <div className="mb-4">
@@ -845,7 +846,7 @@ const PersonalSiteEditorPage = ({ params: paramsPromise }) => {
             <Dialog
                 header="Unsaved Changes"
                 visible={showConfirmDialog}
-                style={{ width: '400px' }}
+                style={{ width: 'min(90vw, 400px)' }}
                 modal
                 footer={
                     <div>
@@ -905,6 +906,26 @@ const PersonalSiteEditorPage = ({ params: paramsPromise }) => {
                     overflow-y: auto;
                     line-height: 1.5;
                 }
+                /* Full-screen dialog on mobile */
+                @media (max-width: 640px) {
+                    .site-editor-dialog {
+                        width: 95vw !important;
+                        height: 65vh !important;
+                        max-height: 100vh !important;
+                        top: 0 !important;
+                        left: 0 !important;
+                        margin: 0 !important;
+                        border-radius: 0 !important;
+                    }
+                    .site-editor-dialog .p-dialog-header,
+                    .site-editor-dialog .p-dialog-content {
+                        border-radius: 0 !important;
+                    }
+                    .site-editor-dialog .p-dialog-content {
+                        height: calc(100% - 4rem); /* Adjust based on header height */
+                        overflow-y: auto;
+                    }
+                }
             `}</style>
         </div>
     );
@@ -928,9 +949,34 @@ const EditorToolbar = ({
     isForwardDisabled,
     onStartTour
 }) => {
-    // Add the /site/ prefix to the URL
     const siteUrl = `${process.env.NEXT_PUBLIC_BACKEND_URL}/site/${resumeId}/`;
-    const router = useRouter();
+    const moreOptionsMenu = useRef(null);
+
+    const mobileMenuItems = [
+        {
+            label: "Edit Global Settings",
+            icon: 'pi pi-cog',
+            command: onEditGlobal
+        },
+        {
+            label: "Undo Global Change",
+            icon: 'pi pi-undo',
+            command: onRollbackGlobal,
+            disabled: isRollbackDisabled
+        },
+        {
+            label: "Redo Global Change",
+            icon: 'pi pi-refresh',
+            command: onForwardGlobal,
+            disabled: isForwardDisabled
+        },
+        { separator: true },
+        {
+            label: "Start Tour",
+            icon: 'pi pi-question-circle',
+            command: onStartTour
+        }
+    ];
 
     return (
         <div className="p-3 surface-ground border-bottom-1 surface-border flex flex-wrap justify-content-between align-items-center sticky top-0 z-5 gap-2 tour-toolbar" style={{ zIndex: 1010 }}>
@@ -942,45 +988,48 @@ const EditorToolbar = ({
                     tooltipOptions={{ position: 'bottom' }}
                     onClick={() => confirmAndProceed('/main')}
                 />
-                <Button
-                    label="Edit Global Settings"
-                    icon="pi pi-cog"
-                    className="p-button-secondary p-button-sm tour-global-settings"
-                    onClick={onEditGlobal}
-                    tooltip="Edit sitewide CSS, JS, or Head HTML"
-                    tooltipOptions={{ position: 'bottom' }}
-                />
-                <div className="flex align-items-center tour-global-history">
+                {/* Desktop Global Edit Buttons */}
+                <div className="hidden md:flex align-items-center">
                     <Button
-                        icon="pi pi-undo"
-                        className="p-button-text p-button-secondary tour-global-undo"
-                        onClick={onRollbackGlobal}
-                        disabled={isRollbackDisabled}
-                        tooltip="Undo Global Change"
+                        label="Edit Global Settings"
+                        icon="pi pi-cog"
+                        className="p-button-secondary p-button-sm tour-global-settings"
+                        onClick={onEditGlobal}
+                        tooltip="Edit sitewide CSS, JS, or Head HTML"
                         tooltipOptions={{ position: 'bottom' }}
                     />
-                    <Button
-                        icon="pi pi-refresh"
-                        className="p-button-text p-button-secondary tour-global-redo"
-                        onClick={onForwardGlobal}
-                        disabled={isForwardDisabled}
-                        tooltip="Redo Global Change"
-                        tooltipOptions={{ position: 'bottom' }}
-                    />
+                    <div className="flex align-items-center tour-global-history">
+                        <Button
+                            icon="pi pi-undo"
+                            className="p-button-text p-button-secondary tour-global-undo"
+                            onClick={onRollbackGlobal}
+                            disabled={isRollbackDisabled}
+                            tooltip="Undo Global Change"
+                            tooltipOptions={{ position: 'bottom' }}
+                        />
+                        <Button
+                            icon="pi pi-refresh"
+                            className="p-button-text p-button-secondary tour-global-redo"
+                            onClick={onForwardGlobal}
+                            disabled={isForwardDisabled}
+                            tooltip="Redo Global Change"
+                            tooltipOptions={{ position: 'bottom' }}
+                        />
+                    </div>
                 </div>
             </div>
 
             <div className="flex align-items-center gap-2">
                 <Button
                     icon={<FaQuestionCircle />}
-                    className="p-button-rounded p-button-text p-button-plain"
+                    className="p-button-rounded p-button-text p-button-plain hidden md:flex"
                     onClick={onStartTour}
                     tooltip="Start Tour"
                     tooltipOptions={{ position: 'bottom' }}
                 />
                 <a href={siteUrl} target="_blank" rel="noopener noreferrer" style={{ textDecoration: 'none' }} className="tour-view-site">
                     <Button
-                        label="View My Site"
+                        label="View Site"
                         icon="pi pi-external-link"
                         className="p-button-outlined p-button-sm"
                         tooltip="Open your generated website in a new tab"
@@ -989,17 +1038,28 @@ const EditorToolbar = ({
                 </a>
 
                 <Button
-                    label={isSaving ? 'Saving...' : 'Save Changes'}
+                    label={isSaving ? 'Saving...' : 'Save'}
                     icon={isSaving ? <ProgressSpinner style={{ width: '18px', height: '18px' }} strokeWidth="8" /> : "pi pi-save"}
                     className="p-button-sm p-button-success tour-save-button"
                     onClick={onSave}
                     disabled={isSaving || !hasUnsavedChanges}
-                    tooltip={hasUnsavedChanges ? "Save your latest changes to the server" : "No changes to save"}
+                    tooltip={hasUnsavedChanges ? "Save your latest changes" : "No changes to save"}
                     tooltipOptions={{ position: 'bottom' }}
                 />
                 {hasUnsavedChanges && !isSaving && (
                     <i className="pi pi-circle-fill text-orange-500 p-ml-1 animation-pulse" style={{ fontSize: '0.7rem' }} title="Unsaved changes"></i>
                 )}
+                {/* Mobile "More Options" Menu */}
+                <div className="flex md:hidden">
+                    <Menu model={mobileMenuItems} popup ref={moreOptionsMenu} id="popup_menu_right" popupAlignment="right" />
+                    <Button
+                        icon="pi pi-ellipsis-v"
+                        className="p-button-text"
+                        onClick={(event) => moreOptionsMenu.current.toggle(event)}
+                        aria-controls="popup_menu_right"
+                        aria-haspopup
+                    />
+                </div>
             </div>
             <style jsx>{`
                 .animation-pulse {
