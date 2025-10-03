@@ -37,7 +37,7 @@ const ResumeDocumentsDialog = ({ visible, onHide, resume, onEditDocument, onMana
                 </div>
             }
             visible={visible}
-            style={{ width: 'clamp(380px, 55vw, 650px)' }}
+            style={{ width: 'min(95vw, 650px)' }}
             modal
             onHide={onHide}
             footer={dialogFooter}

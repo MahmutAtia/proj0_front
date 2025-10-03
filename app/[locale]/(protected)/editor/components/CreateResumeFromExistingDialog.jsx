@@ -176,7 +176,7 @@ const CreateResumeFromExistingDialog = ({
             <Dialog
                 header="Create New Resume from Existing"
                 visible={visible}
-                style={{ width: 'clamp(450px, 60vw, 700px)' }}
+                style={{ width: 'min(95vw, 700px)' }}
                 modal
                 footer={dialogFooter}
                 onHide={onHide}

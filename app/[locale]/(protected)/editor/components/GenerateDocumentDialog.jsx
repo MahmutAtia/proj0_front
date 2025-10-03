@@ -329,7 +329,7 @@ const GenerateDocumentDialog = ({
             <Dialog
                 header="Generate New Document"
                 visible={visible}
-                style={{ width: 'clamp(400px, 50vw, 600px)' }}
+                style={{ width: 'min(95vw, 600px)' }}
                 modal
                 footer={dialogFooter}
                 onHide={onHide}
