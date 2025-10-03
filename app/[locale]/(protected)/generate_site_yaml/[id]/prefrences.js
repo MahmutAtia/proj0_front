@@ -76,27 +76,27 @@ const designConceptOptions = [
         id: 'kineticTypography',
         userFacingText: 'Kinetic Typography',
         description: 'A dynamic, minimalist design where oversized, animated typography is the primary visual element, creating a bold and expressive experience.',
-        visualElement: () => <i className={`pi pi-font ${styles.visualIcon} text-gray-700`}></i>,
+        visualElement: () => <i className={`pi pi-pencil ${styles.visualIcon} text-gray-700`}></i>,
         aiInstructions: {
             core: "Create a design where typography is the hero. Use a minimalist layout with very few decorative elements, allowing the text itself to be the main visual. Employ large, bold, and expressive font choices for headings. The core of the design is how text is presented and animated. Content is arranged in simple, clean blocks to support the typographic focus.",
             animation: "Implement text-focused animations as the primary interactive feedback. Words can animate on scroll (e.g., changing weight, size, or position), letters can shuffle on hover, and section transitions can be driven by dramatic typographic changes."
         }
     },
-        {
-        id: 'neonCyberpunk',
-        userFacingText: 'Neon Cyberpunk',
-        description: 'A futuristic, high-tech aesthetic with glowing neon elements, dark backgrounds, and sci-fi inspired interfaces.',
-        visualElement: () => <i className={`pi pi-bolt ${styles.visualIcon} text-purple-400`}></i>,
-        aiInstructions: {
-            core: "Design a cyberpunk-inspired portfolio with dark, metallic backgrounds and electric neon accents. Use glowing borders, holographic effects, and futuristic UI elements. Typography should be sharp and tech-focused with occasional glitch effects. Implement circuit-board patterns, hexagonal grids, and LED-style indicators. Color scheme dominated by deep blacks/grays with electric blues, purples, and greens.",
-            animation: "Implement 'Digital Pulse' animations: elements pulse with neon light, text has subtle glitch effects, and interactive elements create electric spark animations on hover. Add scanning line effects and holographic shimmer transitions."
-        }
-    },
+        // {
+        // id: 'neonCyberpunk',
+        // userFacingText: 'Neon Cyberpunk',
+        // description: 'A futuristic, high-tech aesthetic with glowing neon elements, dark backgrounds, and sci-fi inspired interfaces.',
+        // visualElement: () => <i className={`pi pi-bolt ${styles.visualIcon} text-purple-400`}></i>,
+        // aiInstructions: {
+        //     core: "Design a cyberpunk-inspired portfolio with dark, metallic backgrounds and electric neon accents. Use glowing borders, holographic effects, and futuristic UI elements. Typography should be sharp and tech-focused with occasional glitch effects. Implement circuit-board patterns, hexagonal grids, and LED-style indicators. Color scheme dominated by deep blacks/grays with electric blues, purples, and greens.",
+        //     animation: "Implement 'Digital Pulse' animations: elements pulse with neon light, text has subtle glitch effects, and interactive elements create electric spark animations on hover. Add scanning line effects and holographic shimmer transitions."
+        // }
+    // },
     {
         id: 'marvelHero',
         userFacingText: 'Marvel Hero Universe',
         description: 'Bold, comic book-inspired design with dynamic layouts, heroic typography, and action-packed visual elements.',
-        visualElement: () => <i className={`pi pi-flash ${styles.visualIcon} text-red-600`}></i>,
+        visualElement: () => <i className={`pi pi-shield ${styles.visualIcon} text-red-600`}></i>,
         aiInstructions: {
             core: "Create a superhero comic book aesthetic with bold, dynamic layouts inspired by Marvel comics. Use comic book panel layouts, bold serif and sans-serif typography, and dramatic color contrasts. Implement speech bubble elements, pow/zap style callouts, and heroic iconography. Backgrounds can feature subtle halftone patterns and comic book textures.",
             animation: "Implement 'Hero Impact' animations: elements burst into view with comic book style impact effects, text appears with dramatic scaling, and interactive elements create 'POW!' style feedback with particle effects."
@@ -147,7 +147,7 @@ const designConceptOptions = [
         id: 'minimalistLuxury',
         userFacingText: 'Minimalist Luxury',
         description: 'High-end, sophisticated design with premium materials, subtle animations, and elegant spacing.',
-        visualElement: () => <i className={`pi pi-gem ${styles.visualIcon} text-yellow-600`}></i>,
+        visualElement: () => <i className={`pi pi-briefcase ${styles.visualIcon} text-yellow-600`}></i>,
         aiInstructions: {
             core: "Create a luxury portfolio with premium aesthetics. Use generous white space, high-quality typography, and subtle material design elements. Implement gold accents, marble textures, and premium color palettes. Layout should be spacious and breathable with attention to micro-interactions.",
             animation: "Implement 'Luxury Float' animations: elements gently float and scale with premium easing curves, subtle parallax effects, and elegant hover states with soft shadows."

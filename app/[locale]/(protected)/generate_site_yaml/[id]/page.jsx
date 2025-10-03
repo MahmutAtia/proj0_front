@@ -382,43 +382,42 @@ export default function CreatePortfolioPage({ params: paramsPromise }) {
     return (
         <>
             <Toast ref={toast} />
-            <div className={`p-1 sm:p-2 md:p-3 lg:p-4 ${styles.pageContainer}`}>
-                <div className={`surface-card p-2 sm:p-3 shadow-2 border-round w-full mx-auto ${styles.contentWrapper}`}>
-                    <div>
-                        <div className="text-center mb-3">
-                            <h1 className="text-2xl md:text-3xl font-bold text-gray-800">Customize Your Portfolio</h1>
-                            <p className="text-gray-600 text-base">Follow the steps to define your website&apos;s unique style.</p>
+            <div className={`p-2 md:p-4 ${styles.pageContainer}`}>
+                <div className={`surface-card p-3 sm:p-4 shadow-2 border-round w-full mx-auto ${styles.contentWrapper}`}>
+                    <header>
+                        <div className="text-center mb-4">
+                            <h1 className="text-2xl md:text-4xl font-bold text-gray-800">Customize Your Portfolio</h1>
+                            <p className="text-gray-600 mt-2">Follow the steps to define your website&apos;s unique style.</p>
                         </div>
 
                         {/* Hint/Warning Message */}
-                        <div className={`${styles.hintMessage} surface-100 p-2 border-round mb-4 flex align-items-center`}>
-                            <i className="pi pi-info-circle text-primary text-lg mr-2"></i>
+                        <div className={`${styles.hintMessage} surface-100 p-3 border-round mb-4 flex align-items-center`}>
+                            <i className="pi pi-info-circle text-primary text-xl mr-3"></i>
                             <div>
-                                <span className="font-bold text-primary text-sm">Important:</span> <span className="text-sm">Your selections below will guide your personal AI in crafting a unique website tailored to your preferences. Choose wisely!</span>
+                                <span className="font-bold text-primary">Important:</span> <span>Your selections will guide our AI in crafting a unique website tailored to your preferences. Choose wisely!</span>
                             </div>
                         </div>
 
-                        <Steps model={stepperItems} activeIndex={activeIndex} onSelect={(e) => setActiveIndex(e.index)} readOnly={false} className="mb-4 text-xs md:text-sm" />
-                    </div>
+                        <Steps model={stepperItems} activeIndex={activeIndex} onSelect={(e) => setActiveIndex(e.index)} readOnly={false} className="mb-4" />
+                    </header>
 
-                    {/* Content area - with fixed height and scroll */}
-                    <div className={styles.stepContentContainer}>
+                    {/* Content area - now flows naturally */}
+                    <main className={styles.stepContentContainer}>
                         {renderStepContent()}
-                    </div>
+                    </main>
 
-                    <div className="flex justify-content-between mt-3 p-1 md:p-2">
+                    <footer className="flex justify-content-between mt-4 pt-3 border-top-1 surface-border">
                         <Button
                             label="Back"
                             icon="pi pi-arrow-left"
                             onClick={() => setActiveIndex(Math.max(0, activeIndex - 1))}
                             disabled={activeIndex === 0 || isLoading || isCheckingStatus}
-                            className="p-button-secondary p-button-sm"
-                            size="small"
+                            className="p-button-secondary"
                         />
                         <Button
-                            label={activeIndex === stepperItems.length - 1 ? (isLoading || isCheckingStatus ? 'Generating...' : 'Generate Design') : 'Next'}
-                            iconPos={activeIndex === stepperItems.length - 1 ? 'left' : 'right'}
-                            icon={activeIndex === stepperItems.length - 1 ? (isLoading || isCheckingStatus ? 'pi pi-spin pi-spinner' : 'pi pi-check') : 'pi pi-arrow-right'}
+                            label={activeIndex === stepperItems.length - 1 ? 'Generate Design' : 'Next'}
+                            iconPos="right"
+                            icon={activeIndex === stepperItems.length - 1 ? 'pi pi-sparkles' : 'pi pi-arrow-right'}
                             onClick={() => {
                                 if (activeIndex === stepperItems.length - 1) {
                                     handleSubmitPreferences();
@@ -432,11 +431,11 @@ export default function CreatePortfolioPage({ params: paramsPromise }) {
                                     setActiveIndex(Math.min(stepperItems.length - 1, activeIndex + 1));
                                 }
                             }}
-                            disabled={isLoading || isCheckingStatus || (activeIndex === 0 && !selectedConcept && activeIndex < stepperItems.length - 1) || (activeIndex === 1 && !selectedColorStyle && activeIndex < stepperItems.length - 1)}
-                            className={activeIndex === stepperItems.length - 1 ? 'p-button-success p-button-sm' : 'p-button-primary p-button-sm'}
-                            size="small"
+                            loading={isLoading || isCheckingStatus}
+                            disabled={(activeIndex === 0 && !selectedConcept) || (activeIndex === 1 && !selectedColorStyle)}
+                            className={activeIndex === stepperItems.length - 1 ? 'p-button-success' : 'p-button-primary'}
                         />
-                    </div>
+                    </footer>
                 </div>
             </div>
         </>
