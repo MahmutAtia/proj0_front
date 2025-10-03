@@ -20,87 +20,87 @@
         "refresh": "Aktualisieren",
         "viewAll": "Alle anzeigen"
     },
-      "whatsapp": {
-    "tooltip": "💬 Frag uns alles — wir helfen dir gerne!",
-    "defaultMessage": "Hey! Ich habe eine Frage, kannst du mir helfen?",
-    "ariaLabel": "Auf WhatsApp chatten"
-  },
-      "ats": {
-      "upload_label": "Ich habe einen Lebenslauf zum Hochladen",
-      "paste_label": "Noch keinen Lebenslauf?",
-      "english_label": "Englisch",
-      "french_label": "Französisch",
-      "spanish_label": "Spanisch"
+    "whatsapp": {
+        "tooltip": "💬 Frag uns alles — wir helfen dir gerne!",
+        "defaultMessage": "Hey! Ich habe eine Frage, kannst du mir helfen?",
+        "ariaLabel": "Auf WhatsApp chatten"
+    },
+    "ats": {
+        "upload_label": "Ich habe einen Lebenslauf zum Hochladen",
+        "paste_label": "Noch keinen Lebenslauf?",
+        "english_label": "Englisch",
+        "french_label": "Französisch",
+        "spanish_label": "Spanisch"
     },
     "advantage": {
-      "title": "Der CareerStudio  Vorteil",
-      "items": [
-        {
-          "title": "Die Alte Methode (Mehrere Getrennte Tools)",
-          "points": [
-            "Generischer Lebenslauf-Vorlagen-Ersteller",
-            "Separates Tool für Anschreiben",
-            "Manuelles Bearbeiten für jede Bewerbung",
-            "Komplexer Website-Builder für ein Portfolio",
-            "Endloses Scrollen auf Jobportalen",
-            "Getrennte Dokumente und Dateien"
-          ],
-          "isDisadvantage": true
-        },
-        {
-          "title": "Die CareerStudio  Methode (Ein Intelligentes System)",
-          "points": [
-            "KI-Co-Pilot, der schreibt und optimiert",
-            "Lebenslauf, Anschreiben, Portfolio synchronisiert",
-            "1-Klick-KI-Anpassung für jeden Job",
-            "Sofortige Portfolio-Generierung",
-            "Automatisierter Job Scout, der rund um die Uhr für Sie arbeitet",
-            "Ihre Karriere an einem Ort verwaltet"
-          ],
-          "isDisadvantage": false
-        }
-      ]
+        "title": "Der CareerStudio  Vorteil",
+        "items": [
+            {
+                "title": "Die Alte Methode (Mehrere Getrennte Tools)",
+                "points": [
+                    "Generischer Lebenslauf-Vorlagen-Ersteller",
+                    "Separates Tool für Anschreiben",
+                    "Manuelles Bearbeiten für jede Bewerbung",
+                    "Komplexer Website-Builder für ein Portfolio",
+                    "Endloses Scrollen auf Jobportalen",
+                    "Getrennte Dokumente und Dateien"
+                ],
+                "isDisadvantage": true
+            },
+            {
+                "title": "Die CareerStudio  Methode (Ein Intelligentes System)",
+                "points": [
+                    "KI-Co-Pilot, der schreibt und optimiert",
+                    "Lebenslauf, Anschreiben, Portfolio synchronisiert",
+                    "1-Klick-KI-Anpassung für jeden Job",
+                    "Sofortige Portfolio-Generierung",
+                    "Automatisierter Job Scout, der rund um die Uhr für Sie arbeitet",
+                    "Ihre Karriere an einem Ort verwaltet"
+                ],
+                "isDisadvantage": false
+            }
+        ]
     },
     "floatingOffer": {
-      "text": "🎉 Einführungsangebot! Verwenden Sie den Code",
-      "code": "DREAMJOB50",
-      "text2": "für 50% Rabatt!"
+        "text": "🎉 Einführungsangebot! Verwenden Sie den Code",
+        "code": "DREAMJOB50",
+        "text2": "für 50% Rabatt!"
     },
     "faq": {
-      "title": "Häufig Gestellte Fragen",
-      "subtitle": "Haben Sie Fragen? Wir haben Antworten. Wenn Sie sie hier nicht finden, ist unser 24/7 Support bereit zu helfen.",
-      "questions": [
-        {
-          "id": "faq1",
-          "question": "Ist der erste Lebenslauf wirklich kostenlos? Was ist der Haken?",
-          "answer": "Ja, 100% kostenlos. Der Haken ist, dass wir zuversichtlich sind, dass Ihnen das Ergebnis so gut gefallen wird, dass Sie die volle Leistung von CareerStudio  Pro freischalten möchten. Sie können Ihr Profil erstellen, Ihren ersten ATS-optimierten Lebenslauf generieren und ihn als PDF herunterladen, ohne jemals eine Kreditkarte eingeben zu müssen."
-        },
-        {
-          "id": "faq2",
-          "question": "Wie unterscheidet sich das von einem einfachen Vorlagen-Ersteller?",
-          "answer": "Vorlagen geben Ihnen nur ein Layout. CareerStudio  ist ein intelligentes System. Unsere KI füllt nicht nur Lücken—sie versteht Ihre Karriere, schlägt aussagekräftige Formulierungen vor, optimiert jede Zeile für ATS-Bots und hilft Ihnen, Ihre gesamte Bewerbung in Sekundenschnelle an einen bestimmten Job anzupassen. Es ist ein Schreibpartner, nicht nur ein Dokument."
-        },
-        {
-          "id": "faq3",
-          "question": "Was ist ATS und warum ist es so wichtig?",
-          "answer": "ATS (Applicant Tracking System - Bewerber-Tracking-System) ist eine automatisierte Software, die Ihren Lebenslauf nach Schlüsselwörtern und Formatierung scannt, bevor ihn ein Mensch sieht. Über 75% der Lebensläufe werden von diesen Bots abgelehnt. Wir entwerfen und strukturieren jeden Lebenslauf akribisch, damit er perfekt vom ATS analysiert wird, und garantieren, dass Ihre Bewerbung bei einer echten Person landet."
-        },
-        {
-          "id": "faq4",
-          "question": "Kann ich meinen Pro-Plan jederzeit kündigen?",
-          "answer": "Absolut. Sie haben die volle Kontrolle. Sie können Ihr Abonnement jederzeit über Ihr Kontroll-Dashboard mit einem einzigen Klick kündigen. Keine versteckten Gebühren, kein Aufwand. Sie behalten den Zugriff auf Pro-Funktionen bis zum Ende Ihres aktuellen Abrechnungszeitraums."
-        },
-        {
-          "id": "faq5",
-          "question": "Für wen ist diese Plattform gedacht? Studenten? Führungskräfte?",
-          "answer": "CareerStudio  wurde für jeden entwickelt, der seine Karriere ernst nimmt. Es ist leistungsstark genug für Führungskräfte, die wettbewerbsfähige Positionen anstreben, und dennoch einfach genug für Hochschulabsolventen, um ihren ersten professionellen Lebenslauf zu erstellen. Wenn Sie den sich wiederholenden, frustrierenden Bewerbungsprozess satt haben, ist CareerStudio  das Richtige für Sie."
-        },
-        {
-          "id": "faq6",
-          "question": "Was passiert mit meiner Portfolio-Website, wenn ich meinen Pro-Plan kündige?",
-          "answer": "Wenn Sie Ihren Pro-Plan kündigen, wird Ihre Portfolio-Website de-publiziert und der teilbare Link ist nicht mehr aktiv. Alle Ihre Daten und Designs werden sicher gespeichert, und Sie können sie sofort wieder veröffentlichen, falls Sie sich entscheiden, erneut zu abonnieren."
-        }
-      ]
+        "title": "Häufig Gestellte Fragen",
+        "subtitle": "Haben Sie Fragen? Wir haben Antworten. Wenn Sie sie hier nicht finden, ist unser 24/7 Support bereit zu helfen.",
+        "questions": [
+            {
+                "id": "faq1",
+                "question": "Ist der erste Lebenslauf wirklich kostenlos? Was ist der Haken?",
+                "answer": "Ja, 100% kostenlos. Der Haken ist, dass wir zuversichtlich sind, dass Ihnen das Ergebnis so gut gefallen wird, dass Sie die volle Leistung von CareerStudio  Pro freischalten möchten. Sie können Ihr Profil erstellen, Ihren ersten ATS-optimierten Lebenslauf generieren und ihn als PDF herunterladen, ohne jemals eine Kreditkarte eingeben zu müssen."
+            },
+            {
+                "id": "faq2",
+                "question": "Wie unterscheidet sich das von einem einfachen Vorlagen-Ersteller?",
+                "answer": "Vorlagen geben Ihnen nur ein Layout. CareerStudio  ist ein intelligentes System. Unsere KI füllt nicht nur Lücken—sie versteht Ihre Karriere, schlägt aussagekräftige Formulierungen vor, optimiert jede Zeile für ATS-Bots und hilft Ihnen, Ihre gesamte Bewerbung in Sekundenschnelle an einen bestimmten Job anzupassen. Es ist ein Schreibpartner, nicht nur ein Dokument."
+            },
+            {
+                "id": "faq3",
+                "question": "Was ist ATS und warum ist es so wichtig?",
+                "answer": "ATS (Applicant Tracking System - Bewerber-Tracking-System) ist eine automatisierte Software, die Ihren Lebenslauf nach Schlüsselwörtern und Formatierung scannt, bevor ihn ein Mensch sieht. Über 75% der Lebensläufe werden von diesen Bots abgelehnt. Wir entwerfen und strukturieren jeden Lebenslauf akribisch, damit er perfekt vom ATS analysiert wird, und garantieren, dass Ihre Bewerbung bei einer echten Person landet."
+            },
+            {
+                "id": "faq4",
+                "question": "Kann ich meinen Pro-Plan jederzeit kündigen?",
+                "answer": "Absolut. Sie haben die volle Kontrolle. Sie können Ihr Abonnement jederzeit über Ihr Kontroll-Dashboard mit einem einzigen Klick kündigen. Keine versteckten Gebühren, kein Aufwand. Sie behalten den Zugriff auf Pro-Funktionen bis zum Ende Ihres aktuellen Abrechnungszeitraums."
+            },
+            {
+                "id": "faq5",
+                "question": "Für wen ist diese Plattform gedacht? Studenten? Führungskräfte?",
+                "answer": "CareerStudio  wurde für jeden entwickelt, der seine Karriere ernst nimmt. Es ist leistungsstark genug für Führungskräfte, die wettbewerbsfähige Positionen anstreben, und dennoch einfach genug für Hochschulabsolventen, um ihren ersten professionellen Lebenslauf zu erstellen. Wenn Sie den sich wiederholenden, frustrierenden Bewerbungsprozess satt haben, ist CareerStudio  das Richtige für Sie."
+            },
+            {
+                "id": "faq6",
+                "question": "Was passiert mit meiner Portfolio-Website, wenn ich meinen Pro-Plan kündige?",
+                "answer": "Wenn Sie Ihren Pro-Plan kündigen, wird Ihre Portfolio-Website de-publiziert und der teilbare Link ist nicht mehr aktiv. Alle Ihre Daten und Designs werden sicher gespeichert, und Sie können sie sofort wieder veröffentlichen, falls Sie sich entscheiden, erneut zu abonnieren."
+            }
+        ]
     },
     "resumes": {
         "title": "Meine Lebensläufe",
@@ -454,8 +454,41 @@
             "title": "Keine Jobs gefunden",
             "description": "Keine Stellenangebote gefunden, die Ihren Kriterien entsprechen. Versuchen Sie, Ihre Suche zu erweitern!"
         }
-    }, "resumeEditor": { "tour": { "sidebar": { "navigation": { "title": "Lebenslauf-Abschnitte", "description": "Diese Seitenleiste listet alle Abschnitte Ihres Lebenslaufs auf. Sie können schnell zu jedem Abschnitt navigieren, indem Sie auf seinen Namen klicken." }, "sectionItem": { "title": "Navigieren & Neu anordnen", "description": "Klicken Sie, um zu einem Abschnitt zu scrollen. Sie können Abschnitte auch per Drag-and-Drop verschieben, um ihre Reihenfolge im endgültigen Dokument zu ändern." }, "dragHandle": { "title": "Zum Neu anordnen ziehen", "description": "Verwenden Sie diesen Griff, um einen Abschnitt zu greifen und ihn in der Liste nach oben oder unten zu verschieben." }, "visibilityToggle": { "title": "Abschnitte anzeigen oder ausblenden", "description": "Klicken Sie auf das Augensymbol, um einen Abschnitt in Ihren Lebenslauf aufzunehmen oder auszuschließen. Ausgeblendete Abschnitte werden nicht gelöscht, sondern nur nicht angezeigt." } }, "editor": { "overview": { "title": "Haupteditor", "description": "Hier bearbeiten Sie den Inhalt jedes Abschnitts. Wir werden uns nun auf den Abschnitt 'Erfahrung' konzentrieren, um die verfügbaren Aktionen zu sehen." }, "addSection": { "title": "Neuen Eintrag hinzufügen", "description": "Klicken Sie auf diese Schaltfläche, um dem aktuellen Abschnitt einen neuen Eintrag hinzuzufügen, wie z.B. einen neuen Job in Ihrer Erfahrung." }, "editSection": { "title": "Einen Eintrag bearbeiten", "description": "Klicken Sie auf das Bleistiftsymbol, um den Editor für einen vorhandenen Eintrag zu öffnen. Lassen Sie uns ihn öffnen, um weitere Optionen zu sehen." }, "aiEdit": { "title": "KI-Assistent", "description": "Verwenden Sie unseren KI-Assistenten, um Ihr Schreiben zu verbessern. Geben Sie eine Aufforderung wie 'Mach das professioneller' ein und lassen Sie die KI den Text für Sie neu schreiben." }, "voiceInput": { "title": "Sprache zu Text", "description": "Klicken Sie auf das Mikrofon, um Ihren Text zu diktieren, anstatt ihn zu tippen. Dies ist ein schneller Weg, um Ihre Ideen festzuhalten." } }, "topbar": { "saveButton": { "title": "Speichern Sie Ihren Fortschritt", "description": "Vergessen Sie nicht, Ihre Änderungen häufig zu speichern! Ihre Arbeit wird gespeichert, wenn Sie auf diese Schaltfläche klicken." }, "exportButton": { "title": "Lebenslauf exportieren", "description": "Wenn Sie fertig sind, klicken Sie hier, um Optionen zum Exportieren Ihres Lebenslaufs als PDF oder in anderen Formaten zu sehen." }, "generateDocument": { "title": "Dokumente erstellen", "description": "Erstellen Sie maßgeschneiderte Dokumente wie Anschreiben oder professionelle Biografien basierend auf diesen Lebenslaufdaten." }, "actionsDropdown": { "title": "Weitere Aktionen", "description": "Dieses Menü enthält zusätzliche Aktionen, wie das Generieren einer persönlichen Website aus Ihrem Lebenslauf oder das Erstellen einer neuen Lebenslaufvariante." }, "backButton": { "title": "Zurück zum Dashboard", "description": "Klicken Sie hier, um zu Ihrem Haupt-Dashboard zurückzukehren. Stellen Sie sicher, dass Sie Ihre Arbeit zuerst gespeichert haben!" } } } } 
-, "siteEditor": {
+    },
+    "resumeEditor": {
+        "tour": {
+            "sidebar": {
+                "navigation": { "title": "Lebenslauf-Abschnitte", "description": "Diese Seitenleiste listet alle Abschnitte Ihres Lebenslaufs auf. Sie können schnell zu jedem Abschnitt navigieren, indem Sie auf seinen Namen klicken." },
+                "sectionItem": {
+                    "title": "Navigieren & Neu anordnen",
+                    "description": "Klicken Sie, um zu einem Abschnitt zu scrollen. Sie können Abschnitte auch per Drag-and-Drop verschieben, um ihre Reihenfolge im endgültigen Dokument zu ändern."
+                },
+                "dragHandle": { "title": "Zum Neu anordnen ziehen", "description": "Verwenden Sie diesen Griff, um einen Abschnitt zu greifen und ihn in der Liste nach oben oder unten zu verschieben." },
+                "visibilityToggle": {
+                    "title": "Abschnitte anzeigen oder ausblenden",
+                    "description": "Klicken Sie auf das Augensymbol, um einen Abschnitt in Ihren Lebenslauf aufzunehmen oder auszuschließen. Ausgeblendete Abschnitte werden nicht gelöscht, sondern nur nicht angezeigt."
+                }
+            },
+            "editor": {
+                "overview": { "title": "Haupteditor", "description": "Hier bearbeiten Sie den Inhalt jedes Abschnitts. Wir werden uns nun auf den Abschnitt 'Erfahrung' konzentrieren, um die verfügbaren Aktionen zu sehen." },
+                "addSection": { "title": "Neuen Eintrag hinzufügen", "description": "Klicken Sie auf diese Schaltfläche, um dem aktuellen Abschnitt einen neuen Eintrag hinzuzufügen, wie z.B. einen neuen Job in Ihrer Erfahrung." },
+                "editSection": { "title": "Einen Eintrag bearbeiten", "description": "Klicken Sie auf das Bleistiftsymbol, um den Editor für einen vorhandenen Eintrag zu öffnen. Lassen Sie uns ihn öffnen, um weitere Optionen zu sehen." },
+                "aiEdit": {
+                    "title": "KI-Assistent",
+                    "description": "Verwenden Sie unseren KI-Assistenten, um Ihr Schreiben zu verbessern. Geben Sie eine Aufforderung wie 'Mach das professioneller' ein und lassen Sie die KI den Text für Sie neu schreiben."
+                },
+                "voiceInput": { "title": "Sprache zu Text", "description": "Klicken Sie auf das Mikrofon, um Ihren Text zu diktieren, anstatt ihn zu tippen. Dies ist ein schneller Weg, um Ihre Ideen festzuhalten." }
+            },
+            "topbar": {
+                "saveButton": { "title": "Speichern Sie Ihren Fortschritt", "description": "Vergessen Sie nicht, Ihre Änderungen häufig zu speichern! Ihre Arbeit wird gespeichert, wenn Sie auf diese Schaltfläche klicken." },
+                "exportButton": { "title": "Lebenslauf exportieren", "description": "Wenn Sie fertig sind, klicken Sie hier, um Optionen zum Exportieren Ihres Lebenslaufs als PDF oder in anderen Formaten zu sehen." },
+                "generateDocument": { "title": "Dokumente erstellen", "description": "Erstellen Sie maßgeschneiderte Dokumente wie Anschreiben oder professionelle Biografien basierend auf diesen Lebenslaufdaten." },
+                "actionsDropdown": { "title": "Weitere Aktionen", "description": "Dieses Menü enthält zusätzliche Aktionen, wie das Generieren einer persönlichen Website aus Ihrem Lebenslauf oder das Erstellen einer neuen Lebenslaufvariante." },
+                "backButton": { "title": "Zurück zum Dashboard", "description": "Klicken Sie hier, um zu Ihrem Haupt-Dashboard zurückzukehren. Stellen Sie sicher, dass Sie Ihre Arbeit zuerst gespeichert haben!" }
+            }
+        }
+    },
+    "siteEditor": {
         "tour": {
             "intro": {
                 "title": "Willkommen im Site-Editor",
@@ -501,6 +534,88 @@
                 "title": "KI-Assistent",
                 "description": "Hier können Sie eine Aufforderung schreiben, um den Inhalt, den Stil oder die Funktionalität des Blocks zu ändern. Die KI kümmert sich um den Code."
             }
+        }
+    },
+
+    "settings": {
+        "title": "Kontoeinstellungen",
+        "subtitle": "Verwalten Sie Ihre Kontoeinstellungen und Sicherheit",
+        "Profile": {
+            "title": "Profil",
+            "subtitle": "Persönliche Informationen",
+            "firstName": "Vorname",
+            "lastName": "Nachname",
+            "email": "E-Mail-Adresse",
+            "phone": "Telefonnummer",
+            "company": "Firma",
+            "jobTitle": "Berufsbezeichnung",
+            "timezone": "Zeitzone",
+            "language": "Sprache",
+            "save": "Änderungen speichern",
+            "tips": "Profil-Tipps",
+            "tipsKeepEmail": "Halten Sie Ihre E-Mail für wichtige Benachrichtigungen aktuell",
+            "tipsAddCompany": "Fügen Sie Ihre Firmeninformationen für bessere Vernetzung hinzu",
+            "tipsSetTimezone": "Stellen Sie Ihre Zeitzone für genaue Zeitplanung ein",
+            "firstNamePlaceholder": "Geben Sie Ihren Vornamen ein",
+            "lastNamePlaceholder": "Geben Sie Ihren Nachnamen ein",
+            "emailPlaceholder": "Geben Sie Ihre E-Mail ein",
+            "phonePlaceholder": "Geben Sie Ihre Telefonnummer ein",
+            "companyPlaceholder": "Geben Sie Ihre Firma ein",
+            "jobTitlePlaceholder": "Geben Sie Ihre Berufsbezeichnung ein"
+        },
+        "Subscription": {
+            "title": "Abonnement",
+            "manage": "Verwalten Sie Ihr Abonnement und Ihre Rechnungen",
+            "active": "AKTIV",
+            "endingSoon": "ENDET BALD",
+            "noActive": "Kein aktives Abonnement",
+            "noActiveDescription": "Abonnieren Sie einen Plan, um Premium-Funktionen freizuschalten und Ihre Karriere zu fördern",
+            "explore": "Pläne erkunden",
+            "quickStats": "Schnellstatistiken",
+            "features": "Funktionen",
+            "payments": "Zahlungen"
+        },
+        "Privacy": {
+            "title": "Datenschutz",
+            "subtitle": "Datenverwaltung",
+            "exportyourdata": "Ihre Daten exportieren",
+            "exportyourdataDescription": "Laden Sie eine Kopie aller Ihrer Daten herunter, einschließlich Profilinformationen, Abonnementhistorie und Nutzungsstatistiken.",
+            "export": "Daten exportieren",
+            "deleteaccount": "Konto löschen",
+            "deleteaccountDescription": "Löschen Sie Ihr Konto und alle zugehörigen Daten dauerhaft. Dieser Vorgang kann nicht rückgängig gemacht werden.",
+            "info": "Datenschutzinformationen",
+            "infosell": "Wir verkaufen Ihre Daten niemals",
+            "infoenrypted": "Daten werden im Ruhezustand verschlüsselt",
+            "infocontrol": "Sie kontrollieren Ihre Informationen",
+            "infogdpr": "DSGVO-konform",
+            "downloadedata": "Laden Sie Ihre Daten herunter",
+            "downloadedataDescription": "Dies erstellt eine ZIP-Datei, die alle Ihre Kontodaten enthält:",
+            "downloadedataProfile": "Profilinformationen",
+            "downloadedataResume": "Lebenslaufdaten",
+            "downloadedataDocuments": "Generierte Dokumente",
+            "downloadedataSubscription": "Abonnementhistorie",
+            "downloadedataPayment": "Zahlungsaufzeichnungen",
+            "downloadedataUsage": "Nutzungsstatistiken",
+            "exportyourdataDescriptioninfo": "Der Export kann einige Momente dauern. Bitte schließen Sie dieses Fenster nicht.",
+            "deleteaccountConfirm": "Sind Sie sich absolut sicher?",
+            "deleteaccountConfirmDescription": "Dieser Vorgang <strong>kann nicht rückgängig gemacht werden</strong>. Ihr Konto wird dauerhaft gelöscht und alle Daten von unseren Servern entfernt.",
+            "deleteaccountConfirmData": "Dies wird dauerhaft gelöscht:",
+            "deleteaccountConfirmDataProfile": "Ihr Profil und Konto",
+            "deleteaccountConfirmDataResume": "Alle Lebensläufe und Dokumente",
+            "deleteaccountConfirmDataDocuments": "Generierte Websites und Dokumente",
+            "deleteaccountConfirmDataSubscription": "Abonnement- und Zahlungs-Historie",
+            "deleteaccountConfirmDataPayment": "Alle Nutzungsdaten und Einstellungen",
+            "deleteaccountConfirmDataInfo": "Wir senden eine Bestätigungs-E-Mail an <strong>{email}</strong>, um den Löschvorgang abzuschließen.",
+            "deleteaccountConfirmDataExport": "Erwägen Sie, Ihre Daten zuerst zu exportieren, wenn Sie eine Kopie behalten möchten.",
+            "deleteaccountConfirmwantExport": "Ich möchte zuerst Daten exportieren"
+        },
+        "Security": {
+            "title": "Sicherheit",
+            "subtitle": "Sicherheitseinstellungen werden in einem zukünftigen Update verfügbar sein."
+        },
+        "Notifications": {
+            "title": "Benachrichtigungen",
+            "subtitle": "Benachrichtigungseinstellungen werden in einem zukünftigen Update verfügbar sein."
         }
     }
 }

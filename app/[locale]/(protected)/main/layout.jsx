@@ -13,15 +13,11 @@ import { ProgressSpinner } from 'primereact/progressspinner';
 import { Badge } from 'primereact/badge';
 import { Divider } from 'primereact/divider';
 import { InputText } from 'primereact/inputtext';
-import { IoSparkles } from "react-icons/io5";
-import {
-    FiGrid, FiFileText, FiBriefcase, FiGlobe, FiCheckSquare, FiAward, FiSettings,
-    FiLogOut, FiBell, FiSearch, FiChevronDown, FiUser, FiStar, FiEdit,
-    FiList, FiFolder, FiInfo, FiMenu, FiChevronLeft, FiChevronRight
-} from 'react-icons/fi';
-import { FaQuestionCircle } from "react-icons/fa"; // Import tour icon
-import { driver } from "driver.js";
-import "driver.js/dist/driver.css";
+import { IoSparkles } from 'react-icons/io5';
+import { FiGrid, FiFileText, FiBriefcase, FiGlobe, FiCheckSquare, FiAward, FiSettings, FiLogOut, FiBell, FiSearch, FiChevronDown, FiUser, FiStar, FiEdit, FiList, FiFolder, FiInfo, FiMenu, FiChevronLeft, FiChevronRight } from 'react-icons/fi';
+import { FaQuestionCircle } from 'react-icons/fa'; // Import tour icon
+import { driver } from 'driver.js';
+import 'driver.js/dist/driver.css';
 import styles from './Dashboard.module.css';
 import { useTranslation } from '@/hooks/useTranslation';
 import LanguageSwitcher from '../../../components/LanguageSwitcher';
@@ -58,27 +54,31 @@ const SidebarNav = ({ items, currentPath, router, collapsed }) => {
     const pathWithoutLocale = '/' + currentPath.split('/').slice(2).join('/');
     
 
-    
-    return(
-    <div>
+    return (
+        <div>
             {/* Attach tooltip globally to all elements with .has-tooltip */}
             <Tooltip target=".has-tooltip" position="right" />
-        <ul className="list-none p-3 m-0">
-            {items.map((item) => (
-                <li key={item.label} className={item.disabled ? 'has-tooltip' : ''} data-pr-tooltip={item.disabled ? 'Coming soon' : ''}>
-
-                    <button disabled={item.disabled}  data-pr-tooltip={item.disabled ? 'Coming soon' : ''}
-                    type="button" onClick={() => router.push(item.route)} className={`${item.disabled ? 'has-tooltip' : ''} ${styles.sidebarLink} p-ripple ${pathWithoutLocale === item.route ? styles.sidebarItemActive : ''}
-                    ${item.disabled ? 'opacity-50 cursor-not-allowed' : ''}`} title={collapsed ? item.label : ''}>
-                        <span className={styles.sidebarLinkIcon}>{item.icon}</span>
-                        {!collapsed && <span className={styles.sidebarLinkText}>{item.label}</span>}
-                        <Ripple />
-                    </button>
-                </li>
-            ))}
-        </ul>
-    </div>
-);
+            <ul className="list-none p-3 m-0">
+                {items.map((item) => (
+                    <li key={item.label} className={item.disabled ? 'has-tooltip' : ''} data-pr-tooltip={item.disabled ? 'Coming soon' : ''}>
+                        <button
+                            disabled={item.disabled}
+                            data-pr-tooltip={item.disabled ? 'Coming soon' : ''}
+                            type="button"
+                            onClick={() => router.push(item.route)}
+                            className={`${item.disabled ? 'has-tooltip' : ''} ${styles.sidebarLink} p-ripple ${pathWithoutLocale === item.route ? styles.sidebarItemActive : ''}
+                    ${item.disabled ? 'opacity-50 cursor-not-allowed' : ''}`}
+                            title={collapsed ? item.label : ''}
+                        >
+                            <span className={styles.sidebarLinkIcon}>{item.icon}</span>
+                            {!collapsed && <span className={styles.sidebarLinkText}>{item.label}</span>}
+                            <Ripple />
+                        </button>
+                    </li>
+                ))}
+            </ul>
+        </div>
+    );
 };
 
 const SidebarFooter = ({ router, collapsed }) => {
@@ -114,7 +114,7 @@ const TopBar = ({ session, userMenuRef, userMenuItems, onToggleSidebar, onToggle
                 <Button ref={mobileToggleButtonRef} icon={<FiMenu size={20} />} className="p-button-rounded p-button-text p-button-plain mr-2 lg:hidden" onClick={onToggleMobileSidebar} />
                 <Button
                     id="tour-toggle-sidebar"
-                    icon={sidebarCollapsed ? <FiChevronRight size={18} /> : <FiChevronLeft size={18} />}
+                    icon={sidebarCollapsed ? isRTL ? <FiChevronLeft size={18} /> : <FiChevronRight size={18} /> : isRTL ? <FiChevronRight size={18} /> : <FiChevronLeft size={18} />}
                     className={`${styles.toggleButton} p-button-text hidden lg:inline-flex`}
                     onClick={onToggleSidebar}
                     tooltip={sidebarCollapsed ? t('dashboard_layout.topbar.expandSidebar') : t('dashboard_layout.topbar.collapseSidebar')}
@@ -123,33 +123,15 @@ const TopBar = ({ session, userMenuRef, userMenuItems, onToggleSidebar, onToggle
             </div>
 
             <div className="flex align-items-center gap-3">
-                <Button 
-                    icon={<FaQuestionCircle />} 
-                    className={`p-button-rounded p-button-text p-button-plain ${styles.tourButton}`} 
-                    onClick={onStartTour} 
-                    tooltip={t('dashboard_layout.topbar.startTour')}
-                    tooltipOptions={{ position: 'bottom' }}
-                />
+                <Button icon={<FaQuestionCircle />} className={`p-button-rounded p-button-text p-button-plain ${styles.tourButton}`} onClick={onStartTour} tooltip={t('dashboard_layout.topbar.startTour')} tooltipOptions={{ position: 'bottom' }} />
                 <div id="tour-language-switcher">
                     <LanguageSwitcher />
                 </div>
                 <div id="tour-notifications">
-                    <TaskNotificationBell /> 
+                    <TaskNotificationBell />
                 </div>
-                <div
-                    id="tour-profile-menu"
-                    className={`${styles.profileButton} flex align-items-center gap-2 cursor-pointer`}
-                    onClick={(event) => userMenuRef.current.toggle(event)}
-                    aria-controls="popup_menu_right"
-                    aria-haspopup
-                >
-                    <Avatar
-                        image={session?.user?.image || undefined}
-                        label={session?.user?.name ? session.user.name.charAt(0).toUpperCase() : "U"}
-                        shape="circle"
-                        className={styles.profileAvatar}
-                        style={{ width: '2.2rem', height: '2.2rem' }}
-                    />
+                <div id="tour-profile-menu" className={`${styles.profileButton} flex align-items-center gap-2 cursor-pointer`} onClick={(event) => userMenuRef.current.toggle(event)} aria-controls="popup_menu_right" aria-haspopup>
+                    <Avatar image={session?.user?.image || undefined} label={session?.user?.name ? session.user.name.charAt(0).toUpperCase() : 'U'} shape="circle" className={styles.profileAvatar} style={{ width: '2.2rem', height: '2.2rem' }} />
                     {/* TODO: Fix white text issue on dark mode */}
                     <span className={`${styles.profileName} font-medium hidden md:inline`}>{session?.user?.name || t('dashboard_layout.topbar.userFallback')}</span>
                     <FiChevronDown className="text-600" />
@@ -177,13 +159,13 @@ export default function Layout({ children }) {
             showProgress: true,
             popoverClass: 'driverjs-theme',
             steps: [
-                { element: '#tour-sidebar', popover: { title: t('tour.sidebar.title'), description: t('tour.sidebar.description'), side: "right", align: 'start' } },
-                { element: '#tour-toggle-sidebar', popover: { title: t('tour.toggleSidebar.title'), description: t('tour.toggleSidebar.description'), side: "bottom", align: 'center' } },
-                { element: '#tour-language-switcher', popover: { title: t('tour.language.title'), description: t('tour.language.description'), side: "bottom", align: 'end' } },
-                { element: '#tour-notifications', popover: { title: t('tour.notifications.title'), description: t('tour.notifications.description'), side: "bottom", align: 'end' } },
-                { element: '#tour-profile-menu', popover: { title: t('tour.profile.title'), description: t('tour.profile.description'), side: "bottom", align: 'end' } },
-                { element: '#tour-main-content', popover: { title: t('tour.mainContent.title'), description: t('tour.mainContent.description'), side: "top", align: 'center' } },
-                { element: '#tour-quick-actions', popover: { title: t('tour.actionButtons.title'), description: t('tour.actionButtons.description'), side: "top", align: 'center' } }
+                { element: '#tour-sidebar', popover: { title: t('tour.sidebar.title'), description: t('tour.sidebar.description'), side: 'right', align: 'start' } },
+                { element: '#tour-toggle-sidebar', popover: { title: t('tour.toggleSidebar.title'), description: t('tour.toggleSidebar.description'), side: 'bottom', align: 'center' } },
+                { element: '#tour-language-switcher', popover: { title: t('tour.language.title'), description: t('tour.language.description'), side: 'bottom', align: 'end' } },
+                { element: '#tour-notifications', popover: { title: t('tour.notifications.title'), description: t('tour.notifications.description'), side: 'bottom', align: 'end' } },
+                { element: '#tour-profile-menu', popover: { title: t('tour.profile.title'), description: t('tour.profile.description'), side: 'bottom', align: 'end' } },
+                { element: '#tour-main-content', popover: { title: t('tour.mainContent.title'), description: t('tour.mainContent.description'), side: 'top', align: 'center' } },
+                { element: '#tour-quick-actions', popover: { title: t('tour.actionButtons.title'), description: t('tour.actionButtons.description'), side: 'top', align: 'center' } }
             ],
             onDestroyed: () => {
                 // When the tour is closed (finished or escaped), mark it as seen.
