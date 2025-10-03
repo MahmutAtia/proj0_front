@@ -15,14 +15,14 @@ const TermsOfServicePage = () => {
                             <section>
                                 <h2 className="text-xl font-semibold text-gray-900 mb-3">1. Acceptance of Terms</h2>
                                 <p>
-                                    By accessing and using CareerFlow AI (&quot;we,&quot; &quot;our,&quot; or &quot;us&quot;), you accept and agree to be bound by the terms and provision of this agreement. If you do not agree to abide by the above, please do not use this service.
+                                    By accessing and using CareerStudio AI (&quot;we,&quot; &quot;our,&quot; or &quot;us&quot;), you accept and agree to be bound by the terms and provision of this agreement. If you do not agree to abide by the above, please do not use this service.
                                 </p>
                             </section>
 
                             <section>
                                 <h2 className="text-xl font-semibold text-gray-900 mb-3">2. Description of Service</h2>
                                 <p>
-                                    CareerFlow AI provides AI-powered resume building, portfolio creation, cover letter generation, and ATS compatibility checking services. Our platform uses artificial intelligence to help users create professional career documents and analyze their compatibility with Applicant Tracking Systems.
+                                    CareerStudio AI provides AI-powered resume building, portfolio creation, cover letter generation, and ATS compatibility checking services. Our platform uses artificial intelligence to help users create professional career documents and analyze their compatibility with Applicant Tracking Systems.
                                 </p>
                             </section>
 
@@ -90,7 +90,7 @@ const TermsOfServicePage = () => {
                             <section>
                                 <h2 className="text-xl font-semibold text-gray-900 mb-3">9. Intellectual Property</h2>
                                 <ul className="list-disc pl-6 space-y-2">
-                                    <li>CareerFlow AI and its technology are protected by intellectual property laws</li>
+                                    <li>CareerStudio AI and its technology are protected by intellectual property laws</li>
                                     <li>You may not copy, modify, or distribute our proprietary technology</li>
                                     <li>Templates and design elements remain our intellectual property</li>
                                     <li>Your personal content remains your intellectual property</li>
@@ -100,7 +100,7 @@ const TermsOfServicePage = () => {
                             <section>
                                 <h2 className="text-xl font-semibold text-gray-900 mb-3">10. Limitation of Liability</h2>
                                 <p>
-                                    TO THE MAXIMUM EXTENT PERMITTED BY LAW, CAREERFLOW AI SHALL NOT BE LIABLE FOR ANY INDIRECT, INCIDENTAL, SPECIAL, CONSEQUENTIAL, OR PUNITIVE DAMAGES, OR ANY LOSS OF PROFITS OR REVENUES, WHETHER INCURRED DIRECTLY OR INDIRECTLY, OR ANY LOSS OF DATA, USE, GOODWILL, OR OTHER INTANGIBLE LOSSES.
+                                    TO THE MAXIMUM EXTENT PERMITTED BY LAW, CAREERSTUDIO AI SHALL NOT BE LIABLE FOR ANY INDIRECT, INCIDENTAL, SPECIAL, CONSEQUENTIAL, OR PUNITIVE DAMAGES, OR ANY LOSS OF PROFITS OR REVENUES, WHETHER INCURRED DIRECTLY OR INDIRECTLY, OR ANY LOSS OF DATA, USE, GOODWILL, OR OTHER INTANGIBLE LOSSES.
                                 </p>
                             </section>
 
@@ -134,7 +134,7 @@ const TermsOfServicePage = () => {
                                     If you have any questions about these Terms of Service, please contact us:
                                 </p>
                                 <ul className="list-none space-y-1">
-                                    <li>Email: legal@careerflow.ai</li>
+                                    <li>Email: contact@careerstudio.work</li>
                                     <li>Address: [Your Business Address]</li>
                                 </ul>
                             </section>

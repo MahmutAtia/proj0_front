@@ -59,7 +59,7 @@ const Footer = () => {
                 <div className={styles.footerAbout}>
                     <Link href="/" className={styles.logo}>
                         <IoSparkles className={styles.logoIcon} />
-                        <span>CareerFlow AI</span>
+                        <span>CareerStudio AI</span>
                     </Link>
                     <p className={styles.aboutText}>{t('footer.tagline')}</p>
                     <div className={styles.socialLinks}>

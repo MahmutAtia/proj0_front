@@ -116,7 +116,7 @@ const PrivacyPolicyPage = () => {
                                     If you have any questions or concerns about this Privacy Policy or our data practices, please contact us:
                                 </p>
                                 <ul className="list-none space-y-1">
-                                    <li>Email: <a href="mailto:privacy@careerflow.ai" className="text-blue-600 hover:text-blue-800">privacy@careerflow.ai</a></li>
+                                    <li>Email: <a href="mailto:contact@careerstudio.work" className="text-blue-600 hover:text-blue-800">privacy@careerstudio.ai</a></li>
                                     <li>Via our <Link href="/contact" className="text-blue-600 hover:text-blue-800">Contact Page</Link></li>
                                 </ul>
                             </section>

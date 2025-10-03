@@ -4,9 +4,9 @@ const siteBaseUrl = 'https://www.yourdomain.com'; // <-- REPLACE with your actua
 
 export const metadata: Metadata = {
   metadataBase: new URL(siteBaseUrl),
-  title: 'CareerFlow AI | Your AI Career Co-Pilot for Resumes & Portfolios',
+  title: 'CareerStudio AI | Your AI Career Co-Pilot for Resumes & Portfolios',
   description:
-    "Stop the job search struggle. CareerFlow's AI crafts tailored resumes, builds portfolios, and finds jobs FOR YOU. Land your dream job faster. Try it free.",
+    "Stop the job search struggle. CareerStudio's AI crafts tailored resumes, builds portfolios, and finds jobs FOR YOU. Land your dream job faster. Try it free.",
   keywords: [
     'AI resume builder',
     'AI career co-pilot', // Add this
@@ -22,9 +22,9 @@ export const metadata: Metadata = {
   openGraph: {
     title: 'Stop Applying. Start Interviewing. Meet Your AI Career Co-Pilot.',
     description:
-      'CareerFlow AI automates your job hunt. Get perfectly tailored resumes, instant portfolios, and curated job alerts. See why it’s the secret weapon for top candidates.',
+      'CareerStudio AI automates your job hunt. Get perfectly tailored resumes, instant portfolios, and curated job alerts. See why it’s the secret weapon for top candidates.',
     url: '/',
-    siteName: 'CareerFlow AI',
+    siteName: 'CareerStudio AI',
     images: [ { url: '/og-image.png', width: 1200, height: 630, alt: 'An AI co-pilot helping a job seeker land their dream job.' } ],
     locale: 'en_US',
     type: 'website',
@@ -33,7 +33,7 @@ export const metadata: Metadata = {
     card: 'summary_large_image',
     title: 'Stop Applying. Start Interviewing. Meet Your AI Career Co-Pilot.',
     description:
-      'CareerFlow AI automates your job hunt with AI-powered resumes, portfolios, and job searching.',
+      'CareerStudio AI automates your job hunt with AI-powered resumes, portfolios, and job searching.',
     // images: ['/twitter-image.png'],
   },
   alternates: { canonical: '/' },
