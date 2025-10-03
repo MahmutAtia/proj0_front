@@ -12,6 +12,7 @@ import { ProgressSpinner } from 'primereact/progressspinner';
 import { Toast } from 'primereact/toast';
 import { Badge } from 'primereact/badge';
 import { Message } from 'primereact/message';
+import { Sidebar } from 'primereact/sidebar'; // Import Sidebar
 
 import { useJobService } from '@/contexts/JobServiceContext';
 import { filterJobs } from '@/hooks/useJobService';
@@ -30,6 +31,9 @@ const JobFeedPage = () => {
     const [locationFilterInput, setLocationFilterInput] = useState('');
     const [isRemote, setIsRemote] = useState(false);
     const [mounted, setMounted] = useState(false);
+    const [sortKey, setSortKey] = useState('relevance');
+    const [layout, setLayout] = useState('grid');
+    const [isFiltersVisible, setIsFiltersVisible] = useState(false); // State for mobile filter sidebar
 
     const sortOptions = [
         { label: t('jobFeed.sorting.relevance') || 'Relevance', value: 'relevance' },
@@ -37,8 +41,6 @@ const JobFeedPage = () => {
         { label: t('jobFeed.sorting.company') || 'Company A-Z', value: 'company_asc' },
         { label: t('jobFeed.sorting.title') || 'Title A-Z', value: 'title_asc' }
     ];
-    const [sortKey, setSortKey] = useState(sortOptions[0].value);
-    const [layout, setLayout] = useState('grid');
 
     // This effect now uses the pure utility function, ensuring it's always in sync
     useEffect(() => {
@@ -90,16 +92,12 @@ const JobFeedPage = () => {
                                 <span className="bg-gray-100 text-primary px-2 py-1 border-round-lg text-xs font-semibold">{job.site.toUpperCase()}</span>
                             </div>
                         )}
-                        <div className="mt-auto flex flex-column gap-2">
-                            {/*
-                            <a href={job.job_url} target="_blank" rel="noopener noreferrer" className="bg-primary-100 text-primary-700 hover:bg-primary-200 transition-colors px-3 py-2 border-round-lg text-sm font-semibold no-underline text-center">
-                                {t('jobFeed.job.viewOn') || 'View on'} {job.site || t('common.source') || 'Source'}
-                            </a>
-                           */}
+                        <div className="mt-auto flex flex-column gap-2 pt-3">
                             <Button
                                 label={t('jobFeed.job.applyNow') || 'Apply Now'}
-                                icon="pi pi-send"
-                                className="p-button-outlined   border-2  border-round-3xl  px-3 py-2 border-none font-semibold w-full hover:bg-primary-500 hover:text-white transition-colors"
+                                icon="pi pi-arrow-right"
+                                iconPos="right"
+                                className="p-button-primary p-button-sm w-full"
                                 onClick={() => window.open(job.job_url, '_blank')}
                             />
                         </div>
@@ -127,74 +125,85 @@ const JobFeedPage = () => {
         }
     };
 
+    const renderFilters = (isMobile = false) => (
+        <div className={`flex flex-column gap-3 ${isMobile ? 'p-3' : ''}`}>
+            <div className={`flex flex-column ${isMobile ? 'gap-3' : 'sm:flex-row gap-2'}`} style={{ maxWidth: '600px' }}>
+                <InputText
+                    placeholder={t('jobFeed.filters.search') || 'Job title, keyword...'}
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                    onKeyPress={(e) => e.key === 'Enter' && handleSearch()}
+                    className="border-round-lg border-none p-3 bg-white w-full"
+                />
+                {/* <InputText
+                    placeholder={t('jobFeed.filters.location') || 'City or Country'}
+                    value={locationFilterInput}
+                    onChange={(e) => setLocationFilterInput(e.target.value)}
+                    onKeyPress={(e) => e.key === 'Enter' && handleSearch()}
+                    className="border-round-lg border-none p-3 bg-white w-full"
+                /> */}
+                {/* <Button
+                    icon="pi pi-search"
+                    onClick={handleSearch}
+                    loading={loading}
+                    tooltip={t('common.search') || 'Search'}
+                    tooltipOptions={{ position: 'bottom' }}
+                    className="bg-white text-primary hover:bg-gray-100 border-round-lg px-3 py-3 border-none flex-shrink-0"
+                /> */}
+            </div>
+
+            <div className={`flex flex-column ${isMobile ? 'gap-3' : 'sm:flex-row align-items-stretch sm:align-items-center gap-3'}`}>
+                <div className="flex align-items-center bg-white-alpha-20 px-3 py-2 border-round-lg">
+                    <Checkbox
+                        style={{
+                            marginLeft: isRTL ? '0.5rem' : 0,
+                            marginRight: !isRTL ? '0.5rem' : 0
+                        }}
+                        inputId="remote"
+                        onChange={(e) => setIsRemote(e.checked ?? false)}
+                        checked={isRemote}
+                    />
+                    <label htmlFor="remote" className="ml-2 font-medium" style={{ whiteSpace: 'nowrap' }}>
+                        {t('jobFeed.filters.remoteOnly') || 'Remote Only'}
+                    </label>
+                </div>
+
+                <Dropdown options={sortOptions} value={sortKey} optionLabel="label" placeholder={t('common.sortBy') || 'Sort By'} onChange={(e) => setSortKey(e.value)} className="border-round-lg border-none bg-white w-full" />
+
+                <Button icon="pi pi-refresh" className="bg-white-alpha-20 hover:bg-white-alpha-30 border-round-lg px-3 py-2 border-none" onClick={refresh} loading={loading} tooltip={t('common.refresh') || 'Refresh'} />
+            </div>
+        </div>
+    );
+
+
     const dataviewHeader = (
         <div className="bg-primary-gradient p-4 border-round-top-2xl">
             <div className="flex flex-column lg:flex-row lg:justify-content-between gap-4">
-                <div className="flex flex-column sm:flex-row sm:justify-content-between sm:align-items-center gap-3">
+                <div className="flex justify-content-between align-items-center gap-3">
                     <div className="flex align-items-center gap-2" style={{ whiteSpace: 'nowrap' }}>
-                        <h2 className="text-3xl font-bold mb-1">{t('jobFeed.title') || 'Job Feed'}</h2>
+                        <h2 className="text-2xl md:text-3xl font-bold m-0">{t('jobFeed.title') || 'Job Feed'}</h2>
                         {hasActiveCycle && (
-                            <span className="bg-white-alpha-20  px-3 py-1 border-round-xl text-sm font-semibold flex align-items-center">
+                            <span className="bg-white-alpha-20 px-3 py-1 border-round-xl text-sm font-semibold flex align-items-center">
                                 <i className="pi pi-spin pi-spinner mr-1" style={{ fontSize: '0.8rem' }}></i>
                                 LIVE
                             </span>
                         )}
                     </div>
-                    <p className="text-900 m-0 text-sm" style={{ whiteSpace: 'nowrap' }}>
+                    <p className="text-900 m-0 text-sm hidden lg:block" style={{ whiteSpace: 'nowrap' }}>
                         {t('jobFeed.showingJobs', { filtered: filteredJobs.length, total: allJobs.length })}
                     </p>
+                    {/* Mobile Filter Button */}
+                    <Button
+                        icon="pi pi-filter"
+                        label={t('common.filters') || 'Filters'}
+                        className={`lg:hidden p-button-text  ${styles.mobileFilterButton}`}
+                        onClick={() => setIsFiltersVisible(true)}
+                    />
                 </div>
 
-                <div className="flex flex-column lg:flex-row gap-3 lg:align-items-center">
-                    <div className="flex flex-column sm:flex-row gap-2" style={{ maxWidth: '600px' }}>
-                        <InputText
-                            placeholder={t('jobFeed.filters.search') || 'Job title, keyword...'}
-                            value={searchTerm}
-                            onChange={(e) => setSearchTerm(e.target.value)}
-                            onKeyPress={(e) => e.key === 'Enter' && handleSearch()}
-                            className="border-round-lg border-none p-3 bg-white"
-                        />
-                        <InputText
-                            placeholder={t('jobFeed.filters.location') || 'City or Country'}
-                            value={locationFilterInput}
-                            onChange={(e) => setLocationFilterInput(e.target.value)}
-                            onKeyPress={(e) => e.key === 'Enter' && handleSearch()}
-                            className="border-round-lg border-none p-3 bg-white"
-                        />
-                        <Button
-                            icon="pi pi-search"
-                            onClick={handleSearch}
-                            loading={loading}
-                            tooltip={t('common.search') || 'Search'}
-                            tooltipOptions={{ position: 'bottom' }}
-                            className="bg-white text-primary hover:bg-gray-100 border-round-lg px-3 py-3 border-none flex-shrink-0"
-                        />
-                    </div>
-
-                    <div className="flex flex-column sm:flex-row align-items-stretch sm:align-items-center gap-3">
-                        <div className="flex align-items-center bg-white-alpha-20 px-3 py-2 border-round-lg">
-                            <Checkbox
-                                style={{
-                                    marginLeft: isRTL ? '0.5rem' : 0,
-                                    marginRight: !isRTL ? '0.5rem' : 0
-                                }}
-                                inputId="remote"
-                                onChange={(e) => setIsRemote(e.checked ?? false)}
-                                checked={isRemote}
-                            />
-
-                            <label htmlFor="remote" className="ml-2  font-medium" style={{ whiteSpace: 'nowrap' }}>
-                                {' '}
-                                {t('jobFeed.filters.remoteOnly') || 'Remote Only'}
-                            </label>
-                        </div>
-
-                        <Dropdown options={sortOptions} value={sortKey} optionLabel="label" placeholder={t('common.sortBy') || 'Sort By'} onChange={(e) => setSortKey(e.value)} className="border-round-lg border-none bg-white" />
-
-                        <Button icon="pi pi-refresh" className="bg-white-alpha-20 hover:bg-white-alpha-30 border-round-lg px-3 py-2 border-none" onClick={refresh} loading={loading} tooltip={t('common.refresh') || 'Refresh'} />
-
-                        <DataViewLayoutOptions layout={layout} onChange={(e) => setLayout(e.value)} style={{ display: 'none' }} />
-                    </div>
+                {/* Desktop Filters */}
+                <div className={`hidden lg:flex flex-column lg:flex-row gap-3 lg:align-items-center ${styles.desktopFilters}`}>
+                    {renderFilters()}
                 </div>
             </div>
         </div>
@@ -237,7 +246,7 @@ const JobFeedPage = () => {
     // 3. Handle the "No Jobs Found" state after a full cycle
     if (!loading && !hasActiveCycle && allJobs.length === 0) {
         return (
-            <div className="flex justify-content-center align-items-center min-h-screen">
+            <div className="p-4">
                 <Card title={t('jobFeed.empty.title') || 'No Jobs Found'} className="text-center">
                     <p className="text-color-secondary">{t('jobFeed.empty.description') || "We couldn't find any jobs matching your keywords right now."}</p>
                     <p className="text-sm text-color-secondary mt-2">{t('jobFeed.empty.nextSteps') || "We'll search again automatically later. You can also try updating your resume keywords."}</p>
@@ -248,24 +257,37 @@ const JobFeedPage = () => {
     }
 
     return (
-        <div className="min-h-screen">
+        <div className="min-h-screen bg-gray-50">
             <Toast ref={toast} />
+
+            {/* Mobile Filter Sidebar */}
+            <Sidebar visible={isFiltersVisible} onHide={() => setIsFiltersVisible(false)} position="right" className="w-full sm:w-25rem">
+                <div className="p-4">
+                    <h3 className="text-xl font-bold mb-4">{t('common.filters') || 'Filters'}</h3>
+                    {renderFilters(true)}
+                </div>
+            </Sidebar>
 
             {/* INDICATOR: Show when a cycle is running and jobs are already visible */}
             {hasActiveCycle && allJobs.length > 0 && <Message severity="info" text={t('jobFeed.liveUpdate.message') || 'Searching for more jobs in the background...'} className="m-3" />}
 
-            <DataView
-                value={filteredJobs}
-                header={dataviewHeader}
-                itemTemplate={jobItemTemplate}
-                layout={layout}
-                paginator={filteredJobs.length > 12}
-                rows={12}
-                alwaysShowPaginator={false}
-                emptyMessage={t('jobFeed.empty.noMatch') || 'No job postings found matching your current filters.'}
-                loading={loading && filteredJobs.length === 0}
-                className="m-0"
-            />
+            <div className="p-2 md:p-4">
+                <DataView
+                    value={filteredJobs}
+                    header={dataviewHeader}
+                    itemTemplate={jobItemTemplate}
+                    layout={layout}
+                    paginator={filteredJobs.length > 12}
+                    rows={12}
+                    alwaysShowPaginator={false}
+                    emptyMessage={t('jobFeed.empty.noMatch') || 'No job postings found matching your current filters.'}
+                    loading={loading && filteredJobs.length === 0}
+                    className="surface-card shadow-2 border-round-2xl"
+                    pt={{ content: 'p-0' }}
+                    paginatorTemplate="CurrentPageReport PrevPageLink PageLinks NextPageLink"
+                    currentPageReportTemplate={t('jobFeed.showingJobs', { filtered: filteredJobs.length, total: allJobs.length })}
+                />
+            </div>
         </div>
     );
 };

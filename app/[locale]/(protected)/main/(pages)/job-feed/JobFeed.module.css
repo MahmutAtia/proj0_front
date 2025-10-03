@@ -102,6 +102,34 @@
     margin-top: auto;
 }
 
+/* Style for the mobile filter button */
+.mobileFilterButton {
+    display: none; /* Hidden by default */
+}
+
+/* Responsive adjustments */
+@media screen and (max-width: 991px) { /* lg breakpoint for PrimeFlex */
+    .jobFeedContainer {
+        padding: 1rem;
+    }
+
+    /* Show the mobile filter button */
+    .mobileFilterButton {
+        display: flex;
+    }
+
+    /* Hide desktop filter controls */
+    .desktopFilters {
+        display: none;
+    }
+
+    .header {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 1rem;
+    }
+}
+
 /* Responsive adjustments for filter bar */
 @media screen and (max-width: 991px) { /* md breakpoint for PrimeFlex */
     .jobFeedContainer {
