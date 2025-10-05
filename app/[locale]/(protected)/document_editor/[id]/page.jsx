@@ -1,17 +1,19 @@
 "use client";
 
 import React, { useState, useEffect, useRef, useCallback } from 'react';
-import api from '@/lib/axios'; // Use global axios instance
+import api, { aiApi } from '@/lib/axios'; // Use global axios instance
 import { Toast } from 'primereact/toast';
 import { Button } from 'primereact/button';
 import { ProgressSpinner } from 'primereact/progressspinner';
 import EditorToolbar from './components/EditorToolbar';
 import EditableSection from './components/EditableSection'; // Assuming this uses default export too
 import ManualEditDialog from './components/ManualEditDialog'; // Assuming this uses default export too
+import { Dialog } from 'primereact/dialog'; // Import Dialog
+import AIAssistant from '../../editor/components/AIAssistant'; // Import AIAssistant
 
 // --- Child Component: LoadingIndicator ---
 const LoadingIndicator = ({ message = "Loading document editor..." }) => {
-    return (
+    return ( 
         <div className="flex justify-content-center align-items-center min-h-screen">
             <ProgressSpinner style={{ width: '50px', height: '50px' }} strokeWidth="8" />
             <p className="ml-3 text-lg">{message}</p>
@@ -334,6 +336,12 @@ const DocumentEditorPage = ({ params: paramsPromise }) => {
 
     // --- Word Download State ---
     const [isDownloadingWord, setIsDownloadingWord] = useState(false);
+
+    // --- Global Edit State ---
+    const [isGlobalEditDialogOpen, setIsGlobalEditDialogOpen] = useState(false);
+    const [globalEditPrompt, setGlobalEditPrompt] = useState('');
+    const [isGlobalAIProcessing, setIsGlobalAIProcessing] = useState(false);
+
 
     // --- Helper Functions ---
 
@@ -726,6 +734,54 @@ const DocumentEditorPage = ({ params: paramsPromise }) => {
         }
     };
 
+    const handleGlobalEditSubmit = async () => {
+        if (!globalEditPrompt.trim()) {
+            toast.current?.show({ severity: 'warn', summary: 'Warning', detail: 'Please enter a prompt.', life: 3000 });
+            return;
+        }
+        setIsGlobalAIProcessing(true);
+        try {
+            const response = await aiApi.post("/documents/global_edit", {
+                document_data: JSON.stringify(documentData),
+                document_type: documentType,
+                instructions: globalEditPrompt,
+            });
+
+            const updatedData = response.data;
+
+            // Validate and apply changes
+            if (updatedData && typeof updatedData === 'object') {
+                setDocumentData(updatedData);
+                // Update history for all sections
+                Object.keys(updatedData).forEach(sectionKey => {
+                    if (sectionKey === 'body_paragraphs' && Array.isArray(updatedData[sectionKey])) {
+                        updatedData[sectionKey].forEach((p, i) => {
+                            updateHistory(getSectionId('paragraph', i), p);
+                        });
+                    } else {
+                        updateHistory(getSectionId(sectionKey), updatedData[sectionKey]);
+                    }
+                });
+                setIsGlobalEditDialogOpen(false);
+                setGlobalEditPrompt('');
+                toast.current?.show({ severity: 'success', summary: 'Success', detail: 'Document updated globally!', life: 3000 });
+            } else {
+                throw new Error("Received invalid data from the server.");
+            }
+
+        } catch (error) {
+            console.error("Error during global AI edit:", error);
+            toast.current?.show({
+                severity: 'error',
+                summary: 'Error',
+                detail: `Failed to edit document: ${error.response?.data?.detail || "Unknown error"}`,
+                life: 5000
+            });
+        } finally {
+            setIsGlobalAIProcessing(false);
+        }
+    };
+
     // --- Rendering Logic ---
 
     if (loading) {
@@ -767,6 +823,7 @@ const DocumentEditorPage = ({ params: paramsPromise }) => {
                 isDownloadingPdf={isDownloadingPdf}
                 onDownloadWord={handleDownloadWord}
                 isDownloadingWord={isDownloadingWord}
+                onGlobalEdit={() => setIsGlobalEditDialogOpen(true)} // Pass handler to toolbar
             />
 
             <div
@@ -859,6 +916,27 @@ const DocumentEditorPage = ({ params: paramsPromise }) => {
                 onDataChange={handleDialogInputChange}
                 onSave={handleEditSave}
             />
+
+            {/* Global Edit Dialog */}
+            <Dialog
+                header="Global Document Edit"
+                visible={isGlobalEditDialogOpen}
+                style={{ width: 'min(95vw, 600px)' }}
+                modal
+                onHide={() => setIsGlobalEditDialogOpen(false)}
+            >
+                <div className="p-fluid">
+                    <p className="mb-4 text-color-secondary">
+                        Enter instructions to apply changes across the entire document. For example: &quot;Make the tone more formal&quot; or &quot;Shorten all paragraphs by 10%.&quot;
+                    </p>
+                    <AIAssistant
+                        prompt={globalEditPrompt}
+                        setPrompt={setGlobalEditPrompt}
+                        onSubmit={handleGlobalEditSubmit}
+                        isProcessing={isGlobalAIProcessing}
+                    />
+                </div>
+            </Dialog>
         </div>
     );
 };

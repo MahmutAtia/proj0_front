@@ -26,7 +26,8 @@ const EditorToolbar = ({
     onDownloadPdf,
     isDownloadingPdf,
     onDownloadWord,
-    isDownloadingWord
+    isDownloadingWord,
+    onGlobalEdit
 }) => {
     const router = useRouter();
 
@@ -52,6 +53,19 @@ const EditorToolbar = ({
                     style={{ fontSize: '0.7rem' }}
                     title="Unsaved changes"
                 ></i>
+            )}
+
+            {/* Global Edit Button */}
+            {onGlobalEdit && (
+                <Button
+                    label="Global Edit"
+                    icon="pi pi-sparkles"
+                    className="p-button-sm p-button-secondary"
+                    onClick={onGlobalEdit}
+                    disabled={isSaving || isDownloadingPdf || isDownloadingWord}
+                    tooltip="Use AI to edit the entire document at once"
+                    tooltipOptions={{ position: 'bottom' }}
+                />
             )}
 
             {/* Download PDF Button */}
