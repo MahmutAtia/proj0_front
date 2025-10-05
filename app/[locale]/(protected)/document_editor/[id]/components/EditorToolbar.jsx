@@ -1,8 +1,9 @@
 "use client";
-import React from 'react';
+import React, { useRef } from 'react';
 import { Button } from 'primereact/button';
 import { ProgressSpinner } from 'primereact/progressspinner';
 import { useRouter } from 'next/navigation';
+import { Menu } from 'primereact/menu';
 
 
 // --- Child Component: EditorToolbar ---
@@ -17,6 +18,7 @@ import { useRouter } from 'next/navigation';
  * @param {boolean} [props.isDownloadingPdf] - Indicates if PDF download is in progress.
  * @param {Function} [props.onDownloadWord] - Callback function to trigger Word download.
  * @param {boolean} [props.isDownloadingWord] - Indicates if Word download is in progress.
+ * @param {Function} [props.onGlobalEdit] - Callback for the global AI edit feature.
  */
 const EditorToolbar = ({
     onSave,
@@ -30,16 +32,55 @@ const EditorToolbar = ({
     onGlobalEdit
 }) => {
     const router = useRouter();
+    const moreOptionsMenu = useRef(null);
+
+    const mobileMenuItems = [
+        {
+            label: 'Global Edit',
+            icon: 'pi pi-sparkles',
+            command: onGlobalEdit,
+            disabled: isSaving || isDownloadingPdf || isDownloadingWord
+        },
+        {
+            label: 'Download PDF',
+            icon: 'pi pi-file-pdf',
+            command: onDownloadPdf,
+            disabled: isDownloadingPdf || isSaving || isDownloadingWord
+        },
+        {
+            label: 'Download Word',
+            icon: 'pi pi-file-word',
+            command: onDownloadWord,
+            disabled: isDownloadingWord || isSaving || isDownloadingPdf
+        }
+    ].filter(item => item.command); // Filter out items without a handler
 
     return (
         <div className="p-3 surface-ground border-bottom-1 surface-border flex justify-content-between align-items-center sticky top-0 z-5 gap-2">
-                       <Button
-                icon="pi pi-arrow-left"
-                className="p-button-text p-button-secondary"
-                tooltip="Back to Dashboard"
-                tooltipOptions={{ position: 'bottom' }}
-                onClick={() => router.push('/main')}
-            />
+            {/* Left-aligned buttons */}
+            <div className="flex align-items-center gap-2">
+                <Button
+                    icon="pi pi-arrow-left"
+                    className="p-button-text p-button-secondary"
+                    tooltip="Back to Dashboard"
+                    tooltipOptions={{ position: 'bottom' }}
+                    onClick={() => router.push('/main')}
+                />
+                {/* Global Edit Button (Desktop) */}
+                <div className="hidden md:flex">
+                    {onGlobalEdit && (
+                        <Button
+                            label="Global Edit"
+                            icon="pi pi-sparkles"
+                            className="p-button-sm p-button-secondary"
+                            onClick={onGlobalEdit}
+                            disabled={isSaving || isDownloadingPdf || isDownloadingWord}
+                            tooltip="Use AI to edit the entire document at once"
+                            tooltipOptions={{ position: 'bottom' }}
+                        />
+                    )}
+                </div>
+            </div>
 
 
             {/* Right-aligned buttons */}
@@ -55,44 +96,35 @@ const EditorToolbar = ({
                 ></i>
             )}
 
-            {/* Global Edit Button */}
-            {onGlobalEdit && (
-                <Button
-                    label="Global Edit"
-                    icon="pi pi-sparkles"
-                    className="p-button-sm p-button-secondary"
-                    onClick={onGlobalEdit}
-                    disabled={isSaving || isDownloadingPdf || isDownloadingWord}
-                    tooltip="Use AI to edit the entire document at once"
-                    tooltipOptions={{ position: 'bottom' }}
-                />
-            )}
+            {/* Desktop Buttons */}
+            <div className="hidden md:flex align-items-center gap-2">
 
-            {/* Download PDF Button */}
-            {onDownloadPdf && documentId && (
-                <Button
-                    label={isDownloadingPdf ? 'Downloading...' : 'Download PDF'}
-                    icon={isDownloadingPdf ? <ProgressSpinner style={{ width: '18px', height: '18px' }} strokeWidth="8" /> : "pi pi-file-pdf"}
-                    className="p-button-sm p-button-secondary"
-                    onClick={onDownloadPdf}
-                    disabled={isDownloadingPdf || isSaving || isDownloadingWord}
-                    tooltip="Download as PDF"
-                    tooltipOptions={{ position: 'bottom' }}
-                />
-            )}
+                {/* Download PDF Button */}
+                {onDownloadPdf && documentId && (
+                    <Button
+                        label={isDownloadingPdf ? 'Downloading...' : 'Download PDF'}
+                        icon={isDownloadingPdf ? <ProgressSpinner style={{ width: '18px', height: '18px' }} strokeWidth="8" /> : "pi pi-file-pdf"}
+                        className="p-button-sm p-button-secondary"
+                        onClick={onDownloadPdf}
+                        disabled={isDownloadingPdf || isSaving || isDownloadingWord}
+                        tooltip="Download as PDF"
+                        tooltipOptions={{ position: 'bottom' }}
+                    />
+                )}
 
-            {/* Download Word Button */}
-            {onDownloadWord && documentId && (
-                <Button
-                    label={isDownloadingWord ? 'Downloading...' : 'Download Word'}
-                    icon={isDownloadingWord ? <ProgressSpinner style={{ width: '18px', height: '18px' }} strokeWidth="8" /> : "pi pi-file-word"}
-                    className="p-button-sm p-button-info"
-                    onClick={onDownloadWord}
-                    disabled={isDownloadingWord || isSaving || isDownloadingPdf}
-                    tooltip="Download as Microsoft Word document"
-                    tooltipOptions={{ position: 'bottom' }}
-                />
-            )}
+                {/* Download Word Button */}
+                {onDownloadWord && documentId && (
+                    <Button
+                        label={isDownloadingWord ? 'Downloading...' : 'Download Word'}
+                        icon={isDownloadingWord ? <ProgressSpinner style={{ width: '18px', height: '18px' }} strokeWidth="8" /> : "pi pi-file-word"}
+                        className="p-button-sm p-button-info"
+                        onClick={onDownloadWord}
+                        disabled={isDownloadingWord || isSaving || isDownloadingPdf}
+                        tooltip="Download as Microsoft Word document"
+                        tooltipOptions={{ position: 'bottom' }}
+                    />
+                )}
+            </div>
 
             {/* Save Button */}
             <Button
@@ -104,6 +136,18 @@ const EditorToolbar = ({
                 tooltip={hasUnsavedChanges ? "Save your latest changes" : "No changes to save"}
                 tooltipOptions={{ position: 'bottom' }}
             />
+
+            {/* Mobile "More Options" Menu */}
+            <div className="flex md:hidden">
+                <Menu model={mobileMenuItems} popup ref={moreOptionsMenu} id="popup_menu_right" popupAlignment="right" />
+                <Button
+                    icon="pi pi-ellipsis-v"
+                    className="p-button-text"
+                    onClick={(event) => moreOptionsMenu.current.toggle(event)}
+                    aria-controls="popup_menu_right"
+                    aria-haspopup
+                />
+            </div>
             </div>
 
             <style jsx>{`

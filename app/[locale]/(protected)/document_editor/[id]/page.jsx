@@ -828,7 +828,7 @@ const DocumentEditorPage = ({ params: paramsPromise }) => {
 
             <div
 
-                className="flex-grow-1 overflow-auto p-4 surface-100 flex justify-content-center"
+                className="flex-grow-1 overflow-auto p-4 surface-100 flex justify-content-center document-editor-content-area"
                 style={{
                     background: `linear-gradient(to bottom, transparent 0, transparent calc(297mm - 1px), #ccc calc(297mm - 1px), #ccc 297mm)`,
                     backgroundSize: `100% 297mm`,
@@ -937,6 +937,22 @@ const DocumentEditorPage = ({ params: paramsPromise }) => {
                     />
                 </div>
             </Dialog>
+            <style jsx global>{`
+                @media (max-width: 768px) {
+                    .a4-page {
+                        width: 100% !important;
+                        min-height: auto !important;
+                        padding: 1rem 0.75rem !important; /* Adjust padding for mobile */
+                        margin-bottom: 0 !important;
+                        border: none !important;
+                        box-shadow: none !important;
+                    }
+                    .document-editor-content-area {
+                        background: var(--surface-100) !important;
+                        padding: 0.5rem !important; /* Add padding for mobile */
+                    }
+                }
+            `}</style>
         </div>
     );
 };

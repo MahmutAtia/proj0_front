@@ -23,23 +23,34 @@ const EditableSection = ({
     canRedo,
     children
 }) => {
-    const [isHovered, setIsHovered] = useState(false);
+    const [showControls, setShowControls] = useState(false);
+
+    const handleTap = (e) => {
+        // On touch devices, this toggles the controls.
+        // We check for 'ontouchstart' to distinguish from mouse clicks.
+        if ('ontouchstart' in window) {
+            e.stopPropagation(); // Prevent event from bubbling
+            setShowControls(prev => !prev);
+        }
+    };
 
     return (
         <div
             className="editable-section relative mb-2" // Add margin-bottom for spacing
-            onMouseEnter={() => setIsHovered(true)}
-            onMouseLeave={() => setIsHovered(false)}
-            style={{ outline: isHovered ? '2px dashed var(--primary-color)' : 'none', transition: 'outline-color 0.2s' }}
+            onMouseEnter={() => setShowControls(true)}
+            onMouseLeave={() => setShowControls(false)}
+            onClick={handleTap}
+            style={{ outline: showControls ? '2px dashed var(--primary-color)' : 'none', transition: 'outline-color 0.2s' }}
         >
             {/* Render the actual content (iframe) */}
             {children}
 
-            {/* Overlay controls shown on hover */}
-            {isHovered && (
+            {/* Overlay controls shown on hover/tap */}
+            {showControls && (
                 <div
                     className="edit-overlay absolute top-0 right-0 p-1 flex flex-column align-items-end gap-1 bg-black-alpha-10 border-round-sm" // Subtle background
                     style={{ zIndex: 10 }} // Ensure controls are above iframe
+                    onClick={(e) => e.stopPropagation()} // Prevent closing when clicking the overlay itself
                 >
                     <div className="flex gap-1">
                         {/* Manual Edit Button */}
