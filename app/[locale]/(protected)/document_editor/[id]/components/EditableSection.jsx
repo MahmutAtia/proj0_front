@@ -72,7 +72,7 @@ const EditableSection = ({
                         />
                         {/* Redo Button */}
                         <Button
-                            icon="pi pi-redo"
+                            icon="pi pi-refresh"
                             className="p-button-rounded p-button-secondary p-button-sm"
                             onClick={onRedo}
                             disabled={!canRedo}
