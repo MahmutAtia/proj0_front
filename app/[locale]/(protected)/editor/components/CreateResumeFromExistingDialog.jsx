@@ -17,6 +17,9 @@ const languageOptions = [
     { label: 'English', value: 'en' },
     { label: 'French', value: 'fr' },
     { label: 'Spanish', value: 'es' },
+    { label: 'German', value: 'de' },
+    { label: 'Turkish', value: 'tr' },
+    { label: 'Arabic', value: 'ar' },
     // Add other languages as needed
 ];
 

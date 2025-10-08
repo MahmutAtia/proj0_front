@@ -92,6 +92,9 @@ const ATSCheckerPageContent = () => {
         { label: t('ats.english_label'), value: 'en' },
         { label: t('ats.french_label'), value: 'fr' },
         { label: t('ats.spanish_label'), value: 'es' },
+        { label: t('ats.german_label'), value: 'de' },
+        { label: t('ats.turkish_label'), value: 'tr' },
+        
     ];
 
     // --- Event Handlers ---
@@ -109,14 +112,24 @@ const ATSCheckerPageContent = () => {
         }
     };
 
-    const resetFormAndResults = () => {
+    // Clears everything for a fresh start
+    const handleStartOver = () => {
         setApiResponse(null);
         setError(null);
         setResumeFile(null);
         setResumeText('');
+        // Keep job description and target role as they might be reused
         setShowForm(true);
         resetPollingState();
         fileUploadRef.current?.clear();
+    };
+
+    // Returns to the form with all data preserved
+    const handleEditAndResubmit = () => {
+        setApiResponse(null);
+        setError(null);
+        setShowForm(true);
+        resetPollingState();
     };
 
     const handleFileSelect = (event: FileUploadSelectEvent) => {
@@ -534,7 +547,7 @@ const ATSCheckerPageContent = () => {
     const isSubmitDisabled = isLoading || !((resumeInputMethod === 'upload' && resumeFile) || (resumeInputMethod === 'paste' && resumeText.trim()));
 
     return (
-        <div className="p-4 md:p-6 lg:p-8 flex justify-content-center align-items-start min-h-screen bg-gray-100">
+        <div className="p-2 md:p-6 lg:p-8 flex justify-content-center align-items-start min-h-screen bg-gray-100">
             {/* Make the main container wider */}
             <motion.div initial="hidden" animate="visible" variants={fadeInUp} className="w-full" style={{ maxWidth: '1200px' }}>
                 <Toast ref={toast} position="top-right" />
@@ -609,12 +622,14 @@ const ATSCheckerPageContent = () => {
                                                 exit={{ opacity: 0 }}
                                                 transition={{ duration: 0.2 }}
                                             >
-                                                        <label htmlFor="resumeText" className="font-semibold block mb-2">
-            Paste Resume or Write from Scratch
-        </label>
-        <p className="mt-0 mb-2 text-sm text-color-secondary">
-            Don&apos;t have a resume? No problem. Just list your past jobs, skills, or education below. Our AI can build a professional resume from simple notes.
-        </p>
+                                                <label htmlFor="resumeText" className="font-semibold block mb-2">
+                                                    Paste Resume or Write from Scratch
+                                                </label>
+                                                <Message 
+                                                    severity="info" 
+                                                    text="Don't have a resume? No problem. Just list your past jobs, skills, or education. Our AI can build a professional resume from simple notes."
+                                                    className="mb-3 w-full"
+                                                />
                                                 <InputTextarea
                                                     value={resumeText}
                                                     onChange={handleResumeTextChange}
@@ -712,7 +727,7 @@ const ATSCheckerPageContent = () => {
                                     <div className="col-12 flex flex-column align-items-center mt-4">
                                         <motion.div variants={buttonHoverTap} whileHover="hover" whileTap="tap">
                                             <Button
-                                                label="Check ATS Score"
+                                                label="Submit for Analysis"
                                                 icon="pi pi-shield"
                                                 onClick={handleSubmit}
                                                 disabled={isSubmitDisabled || isLoading}
@@ -773,10 +788,10 @@ const ATSCheckerPageContent = () => {
                                     <div className={styles.reportContent}>
                                         <ReactMarkdown
                                             components={{
-                                                h3: ({ node, ...props }) => <h3 className="text-lg font-semibold mt-3 mb-1" {...props} />,
-                                                p: ({ node, ...props }) => <p className="mb-2 leading-normal" {...props} />,
+                                                h3: ({ node, ...props }) => <h3 className="text-base md:text-lg font-semibold mt-3 mb-1" {...props} />,
+                                                p: ({ node, ...props }) => <p className="mb-2 leading-normal text-sm md:text-base" {...props} />,
                                                 ul: ({ node, ...props }) => <ul className="list-disc pl-5 mb-3" {...props} />,
-                                                li: ({ node, ...props }) => <li className="mb-1" {...props} />,
+                                                li: ({ node, ...props }) => <li className="mb-1 text-sm md:text-base" {...props} />,
                                                 code: ({ node, inline, className, children, ...props }: {
                                                     node?: any;
                                                     inline?: boolean;
@@ -800,7 +815,7 @@ const ATSCheckerPageContent = () => {
 
                                 {/* Right Column: Sticky Actions Panel */}
                                 <div className="col-12 lg:col-5">
-                                    <div className={`${styles.actionPanel} sticky`} style={{ top: '1rem' }}>
+                                    <div className={`${styles.actionPanel} lg:sticky`} style={{ top: '1rem' }}>
                                         <h3 className="text-xl font-semibold mt-0 mb-4">Next Steps</h3>
                                         
                                         <div className="flex flex-column gap-3">
@@ -873,13 +888,22 @@ const ATSCheckerPageContent = () => {
 
                                             <Divider />
 
-                                            <Button
-                                                label="Start New Analysis"
-                                                icon="pi pi-refresh"
-                                                className="p-button-secondary p-button-outlined w-full"
-                                                onClick={resetFormAndResults}
-                                                disabled={isCheckingStatus}
-                                            />
+                                            <div className="flex flex-column gap-2">
+                                                <Button
+                                                    label="Edit & Resubmit"
+                                                    icon="pi pi-pencil"
+                                                    className="p-button-secondary p-button-outlined w-full"
+                                                    onClick={handleEditAndResubmit}
+                                                    disabled={isCheckingStatus}
+                                                />
+                                                <Button
+                                                    label="Start Over"
+                                                    icon="pi pi-refresh"
+                                                    className="p-button-text w-full"
+                                                    onClick={handleStartOver}
+                                                    disabled={isCheckingStatus}
+                                                />
+                                            </div>
 
                                             {statusError && !isCheckingStatus && !(postAuthTaskIdToCheck || generationTaskId) && (
                                                 <small className="p-error text-center block">{statusError}</small>

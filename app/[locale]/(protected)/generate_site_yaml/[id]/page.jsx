@@ -321,7 +321,22 @@ export default function CreatePortfolioPage({ params: paramsPromise }) {
                             <ProgressSpinner style={{ width: '80px', height: '80px' }} strokeWidth="4" />
                             <h3 className="mt-4 text-xl font-semibold">{isCheckingStatus ? 'Preparing Your Website...' : 'Submitting Preferences...'}</h3>
                             <p className="text-lg text-600 mt-2">{loadingMessages[currentLoadingMessageIndex]}</p>
-                            <p className="text-sm text-500 mt-4">This can take up to a few minutes. Please don&apos;t close this page.</p>
+                            
+                            <div className="mt-5 p-3 surface-100 border-round">
+                                <p className="text-sm text-600 m-0">
+                                    This process can take a few minutes. You can safely navigate away.
+                                </p>
+                                <p className="text-sm text-600 m-0 mt-1">
+                                    We will notify you via the <i className="pi pi-bell mx-1"></i> bell icon in the top bar when it&apos;s ready.
+                                </p>
+                            </div>
+
+                            <Button 
+                                label="Back to Dashboard" 
+                                icon="pi pi-arrow-left" 
+                                className="p-button-secondary mt-4" 
+                                onClick={() => router.push('/main')} 
+                            />
                         </div>
                     );
                 }
