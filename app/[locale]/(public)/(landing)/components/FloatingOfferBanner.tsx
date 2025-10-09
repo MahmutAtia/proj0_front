@@ -1,7 +1,7 @@
 "use client";
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { FiX } from 'react-icons/fi';
+import { FiX, FiTag } from 'react-icons/fi';
 import { useTranslation } from '@/hooks/useTranslation';
 import styles from '../styles/FloatingOfferBanner.module.css';
 
@@ -22,7 +22,8 @@ const FloatingOfferBanner = () => {
                 exit={{ y: 100, opacity: 0 }}
                 transition={{ type: 'spring', stiffness: 200, damping: 25 }}
             >
-                <div className={styles.content}>
+             <div className={styles.content}>
+                    <FiTag className={styles.icon} />
                     <p>
                         {t('floatingOffer.text')}{' '}
                         <strong className={styles.code}>{t('floatingOffer.code')}</strong>{' '}

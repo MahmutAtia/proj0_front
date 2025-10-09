@@ -1,38 +1,100 @@
 .banner {
     position: fixed;
-    bottom: 1.5rem;
-    left: 50%;
-    transform: translateX(-50%);
-    background: linear-gradient(90deg, #6d28d9, #4c1d95);
-    color: white;
-    padding: 0.75rem 1.5rem;
-    border-radius: 50px;
-    box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.3);
+    bottom: 16px;
+    left: 16px;
+    right: 16px;
+    max-width: 550px;
+    margin: 0 auto; /* Center the banner */
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px 16px;
+    border-radius: 12px;
+    
+    /* Darker, more opaque background for high contrast */
+    background: rgba(17, 24, 39, 0.9); /* Very dark gray/blue with 90% opacity */
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+
+    color: #ffffff;
+    box-shadow: 0 8px 24px -8px rgba(0, 0, 0, 0.3);
+    z-index: 1000;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    /* Stronger text shadow for better readability */
+    text-shadow: 0 1px 3px rgba(0, 0, 0, 0.4);
+}
+.content {
     display: flex;
     align-items: center;
-    gap: 1rem;
-    z-index: 1000;
+    gap: 12px;
+    flex-grow: 1;
+    min-width: 0; /* Allow content to shrink */
 }
+
+.icon {
+    font-size: 1.4rem;
+    flex-shrink: 0;
+    opacity: 0.9;
+}
+
 .content p {
     margin: 0;
-    font-size: 0.9rem;
-    font-weight: 500;
+    font-size: 14px;
+    line-height: 1.5;
 }
+
 .code {
-    background-color: rgba(255, 255, 255, 0.2);
-    padding: 0.2rem 0.5rem;
+    background-color: rgba(255, 255, 255, 0.1);
+    padding: 3px 7px;
     border-radius: 6px;
     font-weight: 700;
+    border: 1px dashed rgba(255, 255, 255, 0.25);
     cursor: pointer;
+    transition: background-color 0.2s ease;
+    /* Allow code to wrap if needed on small screens */
+    white-space: normal; 
 }
+
+.code:hover {
+    background-color: rgba(255, 255, 255, 0.2);
+}
+
 .closeButton {
-    background: none;
+    background: transparent;
     border: none;
-    color: white;
+    border-radius: 50%;
+    width: 30px;
+    height: 30px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: rgba(255, 255, 255, 0.8);
     cursor: pointer;
-    opacity: 0.7;
-    transition: opacity 0.2s;
+    transition: background-color 0.2s ease, transform 0.2s ease;
+    flex-shrink: 0;
+    margin-left: 8px;
 }
+
 .closeButton:hover {
-    opacity: 1;
+    background: rgba(255, 255, 255, 0.15);
+    color: #ffffff;
+    transform: scale(1.1);
+}
+
+/* Mobile adjustments */
+@media (max-width: 600px) {
+    .banner {
+        /* Adjust padding for smaller screens */
+        padding: 10px 12px;
+    }
+    .content p {
+        font-size: 13px;
+    }
+    .icon {
+        /* Hide icon on very small screens to save space */
+        display: none; 
+    }
+    .closeButton {
+        margin-left: 4px;
+    }
 }
