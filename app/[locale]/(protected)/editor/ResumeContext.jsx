@@ -4,18 +4,52 @@ import "primeicons/primeicons.css";
 
 export const ResumeContext = createContext();
 
-export const ResumeProvider = ({ children, initialData , aboutCandidate }) => {
-    const [data, setData] = useState(initialData);
-    const [history, setHistory] = useState([initialData]);
-    const [historyIndex, setHistoryIndex] = useState(0);
+// --- State Cache ---
+// This object lives outside the component lifecycle, so it persists across unmounts.
+let stateCache = {
+    resumeId: null,
+    data: null,
+    history: [],
+    historyIndex: 0,
+};
+
+export const ResumeProvider = ({ children, initialData, aboutCandidate, resumeId }) => {
+    // On mount, decide whether to load from cache or use initialData.
+    const getInitialState = () => {
+        if (resumeId === stateCache.resumeId && stateCache.data) {
+            // We are editing the same resume, so restore the cached state.
+            return {
+                data: stateCache.data,
+                history: stateCache.history,
+                historyIndex: stateCache.historyIndex,
+            };
+        }
+        // This is a new/different resume, so start fresh.
+        return {
+            data: initialData,
+            history: [initialData],
+            historyIndex: 0,
+        };
+    };
+
+    const [data, setData] = useState(getInitialState().data);
+    const [history, setHistory] = useState(getInitialState().history);
+    const [historyIndex, setHistoryIndex] = useState(getInitialState().historyIndex);
     const [editMode, setEditMode] = useState({});
 
+    // Effect to update the cache whenever the state changes.
     useEffect(() => {
-        // Reset history when the initial data changes (e.g., navigating between resumes)
-        setData(initialData);
-        setHistory([initialData]);
-        setHistoryIndex(0);
-    }, [initialData]);
+        stateCache = { resumeId, data, history, historyIndex };
+    }, [resumeId, data, history, historyIndex]);
+    
+    // Effect to handle loading a completely different resume.
+    useEffect(() => {
+        if (resumeId !== stateCache.resumeId) {
+            setData(initialData);
+            setHistory([initialData]);
+            setHistoryIndex(0);
+        }
+    }, [resumeId, initialData]);
 
     const updateData = useCallback((newData) => {
         // When updating data, create a new history entry
