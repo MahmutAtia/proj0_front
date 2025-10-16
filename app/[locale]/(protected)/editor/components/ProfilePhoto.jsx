@@ -91,7 +91,7 @@ const ProfilePhoto = ({ sectionKey }) => {
                     newData[sectionKey] = {};
                 }
                 newData[sectionKey].profilePhoto = croppedImage;
-                setData(newData);
+                setData(newData, { recordHistory: false });
 
                 toast.current.show({
                     severity: 'success',

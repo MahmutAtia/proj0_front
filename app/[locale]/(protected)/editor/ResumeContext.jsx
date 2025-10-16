@@ -51,12 +51,15 @@ export const ResumeProvider = ({ children, initialData, aboutCandidate, resumeId
         }
     }, [resumeId, initialData]);
 
-    const updateData = useCallback((newData) => {
-        // When updating data, create a new history entry
-        const newHistory = history.slice(0, historyIndex + 1);
-        newHistory.push(newData);
-        setHistory(newHistory);
-        setHistoryIndex(newHistory.length - 1);
+    const updateData = useCallback((newData, options = { recordHistory: true }) => {
+        // By default, record history. If { recordHistory: false } is passed, skip it.
+        if (options.recordHistory) {
+            const newHistory = history.slice(0, historyIndex + 1);
+            newHistory.push(newData);
+            setHistory(newHistory);
+            setHistoryIndex(newHistory.length - 1);
+        }
+        // Always update the live data state
         setData(newData);
     }, [history, historyIndex]);
 

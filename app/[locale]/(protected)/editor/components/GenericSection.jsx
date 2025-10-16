@@ -77,7 +77,7 @@ const GenericSection = ({ sectionKey }) => {
             ...newData[sectionKey][index],
             [field]: value
         };
-        setData(newData);
+        setData(newData, { recordHistory: false });
     };
     const renderFields = (item, index) => {
         const fields = Object.keys(item).filter(key => key !== 'id'); // Filter out the 'id' field
@@ -110,7 +110,7 @@ const GenericSection = ({ sectionKey }) => {
     const handleArrayFieldChange = (index, field, valueIndex, value) => {
         const newData = { ...data };
         newData[sectionKey][index][field][valueIndex] = value;
-        setData(newData);
+        setData(newData, { recordHistory: false });
     };
 
     const addArrayItem = (index, field) => {
@@ -119,13 +119,13 @@ const GenericSection = ({ sectionKey }) => {
             newData[sectionKey][index][field] = [];
         }
         newData[sectionKey][index][field].push('');
-        setData(newData);
+        setData(newData, { recordHistory: false });
     };
 
     const removeArrayItem = (index, field, valueIndex) => {
         const newData = { ...data };
         newData[sectionKey][index][field].splice(valueIndex, 1);
-        setData(newData);
+        setData(newData, { recordHistory: false })
     };
 
 
@@ -267,7 +267,7 @@ const GenericSection = ({ sectionKey }) => {
             // Update data with previous state
             const newData = { ...data };
             newData[sectionKey][index] = previousState;
-            setData(newData);
+            setData(newData, { recordHistory: false });
 
             toast.current.show({
                 severity: 'info',

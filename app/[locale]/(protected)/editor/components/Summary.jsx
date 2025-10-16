@@ -21,7 +21,7 @@ const Summary = ({ sectionKey }) => {
         saveToHistory();
         const newData = { ...data };
         newData[sectionKey] = e.target.value;
-        setData(newData);
+        setData(newData, { recordHistory: false });
     };
 
     const saveToHistory = () => {
@@ -33,7 +33,7 @@ const Summary = ({ sectionKey }) => {
             const previousState = JSON.parse(historyRef.current.pop());
             const newData = { ...data };
             newData[sectionKey] = previousState;
-            setData(newData);
+            setData(newData, { recordHistory: false });
             toast.current.show({
                 severity: "info",
                 summary: "Undo",

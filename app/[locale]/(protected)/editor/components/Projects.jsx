@@ -21,7 +21,7 @@ const Projects = ({ sectionKey }) => {
     const handleInputChange = (index, field, value) => {
         const newData = { ...data };
         newData[sectionKey][index][field] = value.target?.value ?? value;
-        setData(newData);
+        setData(newData, { recordHistory: false });
     };
 
     const addProject = () => {
@@ -33,7 +33,7 @@ const Projects = ({ sectionKey }) => {
         };
         const newData = { ...data };
         newData[sectionKey] = [...projects, newProject];
-        setData(newData);
+        setData(newData, { recordHistory: false });
         setNewItemIndex(newIndex);
         toggleEditMode(sectionKey, projects.length);
 
@@ -77,7 +77,7 @@ const Projects = ({ sectionKey }) => {
             const prevState = JSON.parse(historyRef.current.pop());
             const newData = { ...data };
             newData[sectionKey][index] = prevState;
-            setData(newData);
+            setData(newData, { recordHistory: false });
 
             toast.current.show({
                 severity: 'info',

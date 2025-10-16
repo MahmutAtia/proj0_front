@@ -29,7 +29,7 @@ const Skills = ({ sectionKey }) => {
     const handleInputChange = (index, field, value) => {
         const newData = { ...data };
         newData[sectionKey][index][field] = value;
-        setData(newData);
+        setData(newData, { recordHistory: false });
     };
 
     const addSkill = () => {
@@ -41,7 +41,7 @@ const Skills = ({ sectionKey }) => {
         };
         const newData = { ...data };
         newData[sectionKey] = [...skills, newSkill];
-        setData(newData);
+        setData(newData, { recordHistory: false });
         setNewItemIndex(newIndex);
         toggleEditMode(sectionKey, skills.length);
 
@@ -56,19 +56,19 @@ const Skills = ({ sectionKey }) => {
     const addKeyword = (index) => {
         const newData = { ...data };
         newData[sectionKey][index].keywords = [...(newData[sectionKey][index].keywords || []), ''];
-        setData(newData);
+        setData(newData, { recordHistory: false });
     };
 
     const handleKeywordChange = (skillIndex, keywordIndex, value) => {
         const newData = { ...data };
         newData[sectionKey][skillIndex].keywords[keywordIndex] = value;
-        setData(newData);
+        setData(newData, { recordHistory: false })
     };
 
     const removeKeyword = (skillIndex, keywordIndex) => {
         const newData = { ...data };
         newData[sectionKey][skillIndex].keywords.splice(keywordIndex, 1);
-        setData(newData);
+        setData(newData, { recordHistory: false });
     };
 
     const handleAIUpdate = async (index, updatedData) => {
@@ -103,7 +103,7 @@ const Skills = ({ sectionKey }) => {
             const prevState = JSON.parse(historyRef.current.pop());
             const newData = { ...data };
             newData[sectionKey][index] = prevState;
-            setData(newData);
+            setData(newData, { recordHistory: false });
 
             toast.current.show({
                 severity: 'info',

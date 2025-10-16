@@ -29,7 +29,7 @@ const Experience = ({ sectionKey }) => {
     const handleInputChange = (index, field, value) => {
         const newData = { ...data };
         newData[sectionKey][index][field] = value;
-        setData(newData);
+        setData(newData, { recordHistory: false });
     };
 
     const addExperience = () => {

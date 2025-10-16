@@ -37,7 +37,7 @@ const PersonalInformation = ({ sectionKey }) => {
         const value = e.target?.value ?? e;
         const newData = { ...data };
         newData[sectionKey][field] = value;
-        setData(newData);
+        setData(newData, { recordHistory: false });
     };
 
     // Handle avatar inclusion preference toggle
@@ -45,7 +45,7 @@ const PersonalInformation = ({ sectionKey }) => {
         const newData = { ...data };
         if (!newData[sectionKey]) newData[sectionKey] = {};
         newData[sectionKey].includeAvatarInPDF = e.checked;
-        setData(newData);
+        setData(newData, { recordHistory: false });
     };
 
     // Get avatar inclusion preference with default fallback
@@ -58,14 +58,14 @@ const PersonalInformation = ({ sectionKey }) => {
         const newData = { ...data };
         if (!newData[sectionKey].phones) newData[sectionKey].phones = [];
         newData[sectionKey].phones[index] = value;
-        setData(newData);
+        setData(newData, { recordHistory: false });
     };
 
     const addPhone = () => {
         const newData = { ...data };
         if (!newData[sectionKey].phones) newData[sectionKey].phones = [];
         newData[sectionKey].phones.push('');
-        setData(newData);
+        setData(newData, { recordHistory: false });
     };
 
     const handleLocationChange = (field, e) => {
@@ -73,7 +73,7 @@ const PersonalInformation = ({ sectionKey }) => {
         const newData = { ...data };
         if (!newData[sectionKey].location) newData[sectionKey].location = {};
         newData[sectionKey].location[field] = value;
-        setData(newData);
+        setData(newData, { recordHistory: false });
     };
 
     const handleProfileChange = (field, e) => {
@@ -81,7 +81,7 @@ const PersonalInformation = ({ sectionKey }) => {
         const newData = { ...data };
         if (!newData[sectionKey].profiles) newData[sectionKey].profiles = {};
         newData[sectionKey].profiles[field] = value;
-        setData(newData);
+        setData(newData, { recordHistory: false });
     };
 
     // Photo editing functions are now handled by EnhancedAvatarEditor component
@@ -99,7 +99,7 @@ const PersonalInformation = ({ sectionKey }) => {
             const prevState = JSON.parse(historyRef.current.pop());
             const newData = { ...data };
             newData[sectionKey] = prevState;
-            setData(newData);
+            setData(newData, { recordHistory: false });
         }
     };
 
@@ -204,7 +204,7 @@ const PersonalInformation = ({ sectionKey }) => {
                             const newData = { ...data };
                             if (!newData[sectionKey]) newData[sectionKey] = {};
                             newData[sectionKey].includeAvatarInPDF = checked;
-                            setData(newData);
+                            setData(newData, { recordHistory: false });
                         }}
                         size="large"
                         className="mb-3"

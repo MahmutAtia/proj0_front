@@ -36,7 +36,7 @@ const Languages = ({ sectionKey }) => {
     const handleLanguageChange = (index, field, value) => {
         const newData = { ...data };
         newData[sectionKey][index][field] = value.target?.value ?? value;
-        setData(newData);
+        setData(newData, { recordHistory: false });
     };
 
     const addLanguage = () => {
@@ -46,13 +46,13 @@ const Languages = ({ sectionKey }) => {
         };
         const newData = { ...data };
         newData[sectionKey] = [...languages, newLanguage];
-        setData(newData);
+        setData(newData, { recordHistory: false });
     };
 
     const removeLanguage = (index) => {
         const newData = { ...data };
         newData[sectionKey].splice(index, 1);
-        setData(newData);
+        setData(newData, { recordHistory: false });
     };
 
     const handleAIUpdate = async (updatedData) => {
@@ -84,7 +84,7 @@ const Languages = ({ sectionKey }) => {
             const prevState = JSON.parse(historyRef.current.pop());
             const newData = { ...data };
             newData[sectionKey] = prevState;
-            setData(newData);
+            setData(newData, { recordHistory: false });
 
             toast.current.show({
                 severity: 'info',
@@ -100,7 +100,7 @@ const Languages = ({ sectionKey }) => {
         }
         const newData = { ...data };
         newData[sectionKey] = [];
-        setData(newData);
+        setData(newData, { recordHistory: false });
 
         toast.current.show({
             severity: 'success',

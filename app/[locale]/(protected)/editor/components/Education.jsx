@@ -19,10 +19,11 @@ const Education = ({ sectionKey }) => {
 
     const isItemEditing = (index) => editMode[sectionKey]?.[index];
 
+
     const handleInputChange = (index, field, value) => {
         const newData = { ...data };
         newData[sectionKey][index][field] = value;
-        setData(newData);
+        setData(newData, { recordHistory: false });
     };
 
     const addEducation = () => {
