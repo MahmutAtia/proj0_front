@@ -313,7 +313,7 @@ export class JobService {
 
             const response = await aiApi.post('/scraper/scrape-jobs/', {
                 search_term: currentKeyword,
-                location: location.city,
+                location: location.country,
                 country: location.country,
             });
             
